@@ -1,1 +1,83 @@
-/home/bigmints/.factory/skill-index.yaml
+skills:
+  - name: heartbeat
+    path: factory pulse "liveness check"
+    description: Write a liveness timestamp
+
+  - name: auto-blueprint
+    path: factory blueprint update "checkpoint"
+    description: Append to worklog
+
+  - name: validate-code
+    path: factory validate
+    description: Run lint and type checks
+
+  - name: worker
+    path: factory worker
+    description: Run YAML prompt queue
+
+  - name: task-manager
+    path: factory task
+    description: Manage task lifecycle
+
+  - name: story-generator
+    path: ~/.factory/skills/story-generator/SKILL.md
+    description: Write Factory stories with userStory (asA/iWantTo/soThat), Given/When/Then acceptance criteria, modules, and behavior fields. Full schema-compliant Factory story format.
+    trigger:
+      - write a story
+      - write acceptance criteria
+      - decompose feature
+      - plan feature
+      - create stories
+      - break down requirements
+
+  - name: add-dark-mode-toggle
+    path: ~/.factory/skills/add-dark-mode-toggle.md
+    description: Implement a theme toggle with system preference detection, localStorage persistence, and smooth transitions.
+    trigger:
+      - dark mode
+      - theme toggle
+      - light mode
+
+  - name: add-firebase-auth
+    path: ~/.factory/skills/add-firebase-auth.md
+    description: Integrate Firebase Authentication with email/password and Google OAuth sign-in flows.
+    trigger:
+      - firebase auth
+      - authentication
+      - login
+      - sign in
+
+  - name: configure-drizzle-orm
+    path: ~/.factory/skills/configure-drizzle-orm.md
+    description: Set up Drizzle ORM with SQLite or PostgreSQL, schema definitions, and migration workflow.
+    trigger:
+      - drizzle
+      - orm
+      - database schema
+      - migrations
+
+  - name: scaffold-shadcn-layout
+    path: ~/.factory/skills/scaffold-shadcn-layout.md
+    description: Generate a responsive app shell using shadcn/ui with sidebar navigation, top bar, and content area.
+    trigger:
+      - shadcn
+      - layout
+      - sidebar
+      - app shell
+
+  - name: setup-api-routes
+    path: ~/.factory/skills/setup-api-routes.md
+    description: Create a RESTful API route structure with CRUD operations, error handling, and input validation.
+    trigger:
+      - api routes
+      - rest api
+      - crud
+      - endpoint
+
+  - name: build-knowledge
+    path: ~/.factory/skills/build-knowledge.md
+    description: Distills project history, story completions, and ADRs into a dense architectural chronicle.
+    trigger:
+      - build knowledge
+      - extract learnings
+      - build_knowledge

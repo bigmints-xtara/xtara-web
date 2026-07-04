@@ -1,33 +1,12 @@
 project:
-  name: xtara-web
+  name: xtara
   status: in-development
-  readme_summary: A modern web application named xtara-web built with Next.js 16
-    and React 19. It leverages Firebase for backend services, NextAuth for
-    authentication, and a component-driven UI architecture using Radix UI,
-    Tailwind CSS v4, and Framer Motion.
-  analyzed: 2026-06-12
-audit:
-  completed: 2026-06-08
-  total_files: 207
-  source_dirs: 8
-  key_findings:
-    - Firebase Admin used client-side (security risk)
-    - No Firestore Security Rules file in repo
-    - No React Query or SWR for data caching
-    - No unit tests (0 test files)
-    - CareerPath type duplicated across 2 files
-    - Busy-polling for career path (30 × 2s)
-    - Firebase config hard-coded (no env vars)
-    - NextAuth installed but minimally used
-  p0_recommendations:
-    - Add Firestore Security Rules
-    - Remove firebase-admin from client bundle
-    - Add Firestore index for waitForCareerPath
-  p1_recommendations:
-    - Deduplicate CareerPath interface
-    - Add React Query or SWR
-    - Replace npm install with npm ci in Dockerfile
-    - Add CI/CD pipeline
+  analyzed: 2026-07-04
+  readme_summary: "This is a [Next.js](https://nextjs.org) project bootstrapped
+    with
+    [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-ne\
+    xt-app).  Getting Started  First, run the development server:  ```bash npm
+    run dev"
 package:
   name: xtara-web
   description: ""
@@ -50,20 +29,15 @@ stack:
   packageManager: pnpm
   linter: eslint
   testing: vitest
-user_journeys:
-  assessment: Anonymous → Location → Questionnaire → AI Recommendations → Career Path
-  career_exploration: Browse → Detail → Learn/Connect/Grow → Slideshow
-  profile: Sign Up → Edit Profile → Achievements → Dashboard
-  admin: Stories, Good Reads, Challenges, Sparks, Analytics
 structure:
   - 📄 AGENTS.md
-  - 📄 DEPLOYMENT.md
-  - 📄 Dockerfile
-  - 📄 README.md
-  - 📄 SECRETS.md
   - 📄 components.json
   - 📄 deploy.sh
+  - 📄 DEPLOYMENT.md
+  - 📄 dev_output.log
+  - 📄 Dockerfile
   - 📄 eslint.config.mjs
+  - 📄 firestore.indexes.json
   - 📄 next-env.d.ts
   - 📄 next.config.ts
   - 📄 package-lock.json
@@ -71,36 +45,71 @@ structure:
   - 📄 pnpm-lock.yaml
   - 📄 pnpm-workspace.yaml
   - 📄 postcss.config.mjs
-  - 📁 public
-  - "  📄 file.svg"
-  - "  📁 fonts"
-  - "  📄 globe.svg"
-  - "  📁 illustrations"
-  - "  📁 images"
-  - "  📁 logo"
-  - "  📄 next.svg"
-  - "  📄 vercel.svg"
-  - "  📄 window.svg"
-  - 📁 scripts
-  - "  📄 diagnose-user-data.js"
-  - "  📄 manage-secrets.sh"
-  - "  📄 migrate-data.js"
+  - 📄 prompts.md
+  - 📄 query_spark.js
+  - 📄 README.md
+  - 📄 SECRETS.md
   - 📄 set-env.sh
-  - 📁 src
-  - "  📁 app"
-  - "  📁 components"
-  - "  📁 content"
-  - "  📁 context"
-  - "  📁 data"
-  - "  📁 i18n"
-  - "  📁 lib"
-  - "  📄 setup-tests.ts"
-  - "  📁 types"
-  - "  📄 utils.tsx"
   - 📄 start.sh
   - 📄 tsconfig.json
   - 📄 tsconfig.tsbuildinfo
+  - 📄 unique_skills_list.txt
   - 📄 vitest.config.ts
+  - 📁 assets
+  - "  📄 android-cover.jpg"
+  - "  📄 appicon-source.png"
+  - "  📄 logo-color.svg"
+  - "  📄 logo-colorgram.svg"
+  - "  📄 logo-dark.svg"
+  - "  📄 logo-light.svg"
+  - "  📄 logo.svg"
+  - "  📁 AppIcons"
+  - "  📁 appstore"
+  - "  📁 favicons"
+  - "  📁 screenshots"
+  - 📁 data_models
+  - "  📄 assessment.json"
+  - "  📄 career_cluster_resources.json"
+  - "  📄 career_cluster.json"
+  - "  📄 career_path_AI_call_only.json"
+  - "  📄 career_path_comparison_analysis.json"
+  - "  📄 career_path_expected_output.json"
+  - "  📄 career_path.json"
+  - "  📄 challenge.json"
+  - "  📄 college.json"
+  - "  📄 configurations.json"
+  - "  📄 content_repo.json"
+  - "  📄 dream_career.json"
+  - "  📄 enriched_career_cluster_data.json"
+  - "  📄 field_availability_check.json"
+  - "  📄 game_template.json"
+  - "  📄 games_instance_quiz.json"
+  - "  📄 good_reads.json"
+  - "  📄 images.json"
+  - "  📄 india_states_districts_major_cities.json"
+  - "  📄 indian_board_subjects_remote_config.json"
+  - "  📄 llm_input_data_flow.json"
+  - "  📄 medals.json"
+  - "  📄 points_data_structure.json"
+  - "  📄 points.json"
+  - "  📄 ragOutput.json"
+  - "  📄 soft_skills.json"
+  - "  📄 sparks_progress_tracking.json"
+  - "  📄 sparks.json"
+  - "  📄 stories.json"
+  - "  📄 tiers.json"
+  - "  📄 ucm_config.json"
+  - "  📄 user_profile_schema_firestore.json"
+  - "  📄 wordQuest.json"
+  - 📁 dream_careers-manager-v2
+  - "  📄 course_refiner.py"
+  - "  📄 nohup.out"
+  - "  📄 prompt.txt"
+  - "  📄 README_COURSE_REFINER.md"
+  - "  📄 refine_courses.sh"
+  - "  📄 requirements.txt"
+  - "  📄 upload_dream_careers.py"
+  - "  📄 upload_to_firestore.sh"
 conventions:
   - TypeScript
 key_decisions: []

@@ -1,5 +1,5 @@
 heartbeat:
-  last_seen: 2026-06-15T14:32:43.272Z
-  host: gx10-54fa
-  task: orchestrating turn 2
+  last_seen: "2026-07-04T19:56:28Z"
+  host: "BigMac-2"
+  task: "staging v2 factory reset snapshot"
   status: alive

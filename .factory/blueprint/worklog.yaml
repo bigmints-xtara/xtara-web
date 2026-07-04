@@ -1,5 +1,2 @@
-entries[4]{date,message}:
-  "2026-06-08 20:58:41",factory init complete
-  "2026-06-08 22:22:25","Optimized Dockerfile for reproducibility: replaced npm install with npm ci, updated .dockerignore with comprehensive file exclusions"
-  "2026-06-08 22:33:46","Rewrote deploy.sh with: 1) ADC authentication replacing hardcoded service account key, 2) docker buildx multi-platform builds (amd64+arm64) with BuildKit cache and provenance, 3) Dedicated versioned Artifact Registry (xtara-web-artifacts) with git-hash+timestamp versioning. Added --version, --dry-run, and explicit version tag CLI args. Updated DEPLOYMENT.md."
-  "2026-06-09 06:14:22","Fixed duplicate data in admin story list: added ID-based deduplication in AdminMasterDetail useEffect callback to handle React Strict Mode double-mounting. Updated adminService.ts with explanatory doc comment."
+entries[1]{date,message}:
+  "2026-07-04 19:56:35","reinitialized Factory, cleared all stories, rebuilt project knowledge, and prepared fresh v2 baseline"

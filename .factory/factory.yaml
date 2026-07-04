@@ -1,11 +1,14 @@
 version: 1
-name: xtara-web
-description: Bridge for xtara-web
-factory_home: /home/bigmints/.factory
+name: xtara
+description: Bridge for xtara
+factory_home: /Users/pretheesh/.factory
 stack:
   framework: next.js
   packageManager: npm
   linter: eslint
+  testing: vitest
+project:
+  bootstrapped: true
 conventions:
   rules: .factory/knowledge
   agents: .factory/AGENTS.md

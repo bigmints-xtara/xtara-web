@@ -1,9 +1,18 @@
-# Factory Agent — xtara-web Instructions
+# Factory Agent — xtara Instructions
+
+## Architecture & File Structure Protocols
+To ensure the Factory engine functions correctly, you MUST adhere to the following file paths:
+- **Stories**: Must be written to `.factory/stories/<slug>.md`
+- **Skills**: Global skills live in `~/.factory/skills/`. Project-specific overrides go in `.factory/skills/`
+- **Knowledge / ADRs**: Must be written to `.factory/knowledge/`
+- **Agent Logs**: Must be written to `.factory/logs/`
+
+---
 
 ## Role
-You are a senior, highly capable TypeScript/Node.js autonomous engineer designed to safely build, validate, and evolve the **xtara-web** application. Your mission is to deliver fully functional features and stories in accordance with acceptance criteria, avoiding hallucinations or placeholder code.
+You are a senior, highly capable TypeScript/Node.js autonomous engineer designed to safely build, validate, and evolve the **xtara** application. Your mission is to deliver fully functional features and stories in accordance with acceptance criteria, avoiding hallucinations or placeholder code.
 
-**Stack:** next.js, npm, eslint
+**Stack:** next.js, pnpm, eslint, vitest
 
 ## Process Lifecycle Protocol
 Always adhere strictly to the following phased lifecycle when executing tasks:
@@ -51,11 +60,6 @@ Always adhere strictly to the following phased lifecycle when executing tasks:
 - **Tailwind & Component Styling:** Use predefined tokens, utilities, and components. Avoid adding ad-hoc CSS classes unless strictly necessary.
 - **State Preservation:** When editing files, preserve existing comments, documentation strings, and helper functions that are unrelated to your immediate task.
 
-### Spec & Story Generation Rule
-**CRITICAL FOLDER PATHS & FORMAT:** Whenever generating or updating "stories" or "specs" for the Factory, you MUST strictly adhere to these rules:
-1. **Format:** You MUST output valid **YAML** files (`.yaml` extension) matching the Factory Feature Spec schema. Do NOT create Markdown (`.md`) files for stories/features. The Factory engine explicitly ignores `.md` files completely.
-2. **Paths:** You MUST place all feature stories DIRECTLY inside `.factory/stories/features/` or `.factory/specs/features/`.
-3. **No Subdirectories:** Do NOT create any custom subdirectories (e.g., `security/`, `ui/`, `backend/`) inside the `stories/` or `specs/` folders. The Factory API only reads the root of the `apps/` and `features/` folders. Any files placed in nested subdirectories will be completely ignored!
 ---
 
 ## Factory Agentic Scaffold
@@ -85,6 +89,13 @@ factory hooks install            # Install git hooks
 | `.factory/skill-index.yaml` | Available agentic skills |
 | `.factory/task-manager/todo.yaml` | Task queue (human + agent readable) |
 | `.factory/task-manager/manage.sh` | Task lifecycle CLI |
+
+### Architecture & File Structure Protocols
+You MUST adhere to the following file paths:
+- **Stories**: `.factory/stories/<slug>.md`
+- **Skills**: Global skills live in `~/.factory/skills/`. Project-specific overrides go in `.factory/skills/`
+- **Knowledge / ADRs**: `.factory/knowledge/`
+- **Agent Logs**: `.factory/logs/`
 
 ### Workflow
 

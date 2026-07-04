@@ -1,27 +1,3 @@
-# Worklog — Audit Session
-
-## 2026-06-08: Full Project Audit
-
-### Files Read: 30+ key source files
-- Layout, pages, components, types, services, configs
-- Assessed: auth flow, assessment pipeline, career hub, admin CMS, deployment
-
-### Deliverables
-1. `.factory/audits/project-audit.md` — Full audit (10 sections, risk matrix, 14 recommendations)
-2. `.factory/adr/001-firebase-auth-over-nextauth.md` — Auth strategy ADR
-3. `.factory/adr/002-client-components-over-server-components.md` — Rendering strategy ADR
-4. `.factory/adr/003-firestore-as-primary-data-layer.md` — Data layer ADR
-5. `.factory/adr/004-google-cloud-run-over-vercel.md` — Deployment strategy ADR
-6. `.factory/adr/005-radix-ui-tailwind-css.md` — UI foundation ADR
-7. `.factory/adr/006-polling-over-sse.md` — Real-time strategy ADR
-8. `.factory/knowledge/architecture.md` — Architecture knowledge base
-9. `.factory/knowledge/deployment.md` — Deployment knowledge base
-
-### Critical Findings
-- Firebase Admin SDK in client bundle (security risk)
-- No Firestore security rules in repo (data leakage risk)
-- No tests (207 files, 0 test files)
-- No CI/CD pipeline (manual deployment)
-- task: admin-click-target-area
-  date: "2026-06-09"
-  summary: Refactored AdminListTile for full card click target, keyboard accessibility, and improved hover styles
+entries:
+  - date: 2026-07-04 13:53:22
+    message: xtara .factory/ scaffold initialized
