@@ -1,5 +1,0 @@
-heartbeat:
-  last_seen: "2026-07-04T19:56:28Z"
-  host: "BigMac-2"
-  task: "staging v2 factory reset snapshot"
-  status: alive

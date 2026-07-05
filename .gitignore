@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local/generated cleanup after repo split
+.factory/
+*.log
+.DS_Store
+.env.local
