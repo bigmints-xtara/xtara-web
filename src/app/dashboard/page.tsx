@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import OrganizationMembershipCard from "@/components/organization/OrganizationMembershipCard";
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
@@ -32,6 +33,7 @@ export default function DashboardPage() {
     return (
         <div className="min-h-screen bg-background text-foreground">
             <Navbar />
+            <OrganizationMembershipCard />
             <UserDashboard />
             <Footer />
         </div>

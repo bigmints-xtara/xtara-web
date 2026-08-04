@@ -26,7 +26,18 @@ The deployment script uses **Application Default Credentials (ADC)** instead of 
 
 ```bash
 gcloud auth application-default login
+npm run dev
 ```
+
+`npm run dev` loads the Firebase web configuration without writing it to disk. It first checks Xtara Secret Manager and, when those optional secrets are unavailable, reads and validates the public configuration already shipped by `https://xtara.ai`. By default it proxies browser API calls to the live Xtara API so a web-only localhost session remains fully usable.
+
+When developing both services locally, override the proxy target explicitly:
+
+```bash
+XTARA_API_PROXY_TARGET=http://127.0.0.1:3111 npm run dev
+```
+
+Use `npm run dev:plain` only when all `NEXT_PUBLIC_FIREBASE_*` variables are supplied explicitly, for example through an ignored `.env.local` copied from `.env.local.example`. Missing configuration now produces a clear application message instead of initializing Firebase with a fake API key.
 
 ### CI/CD Pipelines
 
@@ -147,6 +158,13 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 # Algolia (if used)
 NEXT_PUBLIC_ALGOLIA_APP_ID=your_algolia_app_id
 NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY=your_algolia_search_key
+
+# Xtara API
+# Optional in production: xtara-web uses its same-origin /xtara-service proxy,
+# backed by the production xtara-api Cloud Run service. Override both values
+# together only for staging/preview environments.
+NEXT_PUBLIC_XTARA_API_BASE_URL=/xtara-service
+XTARA_API_PROXY_TARGET=https://your-api-service.run.app
 
 # Next Auth (if used)
 NEXTAUTH_URL=https://your-service-url.run.app

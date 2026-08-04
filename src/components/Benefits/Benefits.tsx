@@ -1,101 +1,183 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image";
+import Link from "next/link";
 import {
-    Briefcase,
-    Building2,
-    GraduationCap,
-    Handshake,
-    School,
-    Users,
-} from "lucide-react"
-import { useTranslations } from "@/i18n/language-provider"
+  ArrowRight,
+  BookOpenCheck,
+  CheckCircle2,
+  Compass,
+  Gamepad2,
+  GraduationCap,
+  HeartHandshake,
+  MessageCircleMore,
+  RefreshCcw,
+  Route,
+  ShieldCheck,
+  Sparkles,
+  Users,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useTranslations } from "@/i18n/language-provider";
+import { trackEvent } from "@/lib/analytics";
+
+const outcomeIcons = [Compass, Sparkles, Route];
+const momentumIcons = [BookOpenCheck, Gamepad2, GraduationCap, MessageCircleMore];
+const trustIcons = [ShieldCheck, CheckCircle2, RefreshCcw, Users];
 
 const Benefits = () => {
-    const { t, messages } = useTranslations()
-    const audiences = [
-        { ...messages.home.benefits.audiences[0], icon: GraduationCap },
-        { ...messages.home.benefits.audiences[1], icon: Users },
-        { ...messages.home.benefits.audiences[2], icon: Handshake },
-        { ...messages.home.benefits.audiences[3], icon: School },
-        { ...messages.home.benefits.audiences[4], icon: Building2 },
-        { ...messages.home.benefits.audiences[5], icon: Briefcase },
-    ];
+  const { messages } = useTranslations();
+  const content = messages.trustedDiscovery.home;
 
-    return (
-        <section id="features" className="py-16">
-            <div className="mx-auto max-w-3xl text-center">
-                <Badge variant="secondary" className="bg-muted text-foreground border border-border">
-                    {t("home.benefits.badge")}
-                </Badge>
-                <h2 className="mt-4 text-3xl md:text-4xl font-bold text-foreground">
-                    {t("home.benefits.title")}
-                </h2>
-                <p className="mt-3 text-muted-foreground">
-                    {t("home.benefits.description")}
-                </p>
+  return (
+    <div>
+      <section id="how-it-works" className="py-16 sm:py-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.outcomes.eyebrow}</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
+            {content.outcomes.title}
+          </h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.outcomes.description}</p>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {content.outcomes.items.map((item, index) => {
+            const Icon = outcomeIcons[index] ?? Compass;
+            return (
+              <Card key={item.step} className="group overflow-hidden border-primary/10 py-0 shadow-none transition hover:-translate-y-1 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5">
+                <CardContent className="p-6 sm:p-7">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-primary/45">{item.step}</span>
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/5 text-primary transition group-hover:bg-primary group-hover:text-white">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                  </div>
+                  <h3 className="mt-8 text-xl font-semibold text-primary">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{item.description}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-[2rem] bg-[#fff8e9] px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <div className="relative mx-auto w-full max-w-[460px]">
+            <div className="absolute inset-x-6 bottom-0 top-12 rounded-[2.5rem] bg-amber-200/70" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-4 border-white shadow-xl shadow-amber-900/10">
+              <Image
+                src="/images/home/family-career-conversation.jpg"
+                alt={content.conversation.imageAlt}
+                width={1400}
+                height={1500}
+                sizes="(min-width: 1024px) 38vw, 90vw"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
             </div>
+          </div>
 
-            <div className="mt-10 -mx-2 flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory px-6 scroll-px-6 md:mx-0 md:grid md:grid-cols-2 md:gap-6 md:px-0 md:pb-0 lg:grid-cols-3 lg:gap-8">
-                {audiences.map((audience) => {
-                    const Icon = audience.icon;
-                    return (
-                        <Card key={audience.title} className="w-[70vw] shrink-0 border-border/80 snap-start md:w-auto md:min-w-0">
-                            <CardContent className="p-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground">
-                                        <Icon className="h-5 w-5" />
-                                    </div>
-                                    <h3 className="text-lg font-semibold text-foreground">
-                                        {audience.title}
-                                    </h3>
-                                </div>
-                                <p className="mt-3 text-sm text-muted-foreground text-left">
-                                    {audience.description}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
-            </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.conversation.eyebrow}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
+              {content.conversation.title}
+            </h2>
+            <p className="mt-5 text-base leading-7 text-slate-600">{content.conversation.description}</p>
 
-            <div className="mt-16">
-                <div className="mx-auto max-w-3xl text-center">
-                    <Badge variant="secondary" className="bg-muted text-foreground border border-border">
-                        {t("home.benefits.featuresBadge")}
-                    </Badge>
-                    <h3 className="mt-4 text-2xl md:text-3xl font-bold text-foreground">
-                        {t("home.benefits.featuresTitle")}
-                    </h3>
-                    <p className="mt-3 text-muted-foreground">
-                        {t("home.benefits.featuresDescription")}
-                    </p>
+            <div className="mt-8 space-y-4">
+              {[
+                { label: content.conversation.studentLabel, value: content.conversation.studentValue, icon: Sparkles },
+                { label: content.conversation.parentLabel, value: content.conversation.parentValue, icon: HeartHandshake },
+                { label: content.conversation.togetherLabel, value: content.conversation.togetherValue, icon: MessageCircleMore },
+              ].map(({ label, value, icon: Icon }) => (
+                <div key={label} className="flex items-start gap-4 rounded-2xl bg-white/80 p-4 shadow-sm">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary/55">{label}</p>
+                    <p className="mt-1 text-sm font-medium leading-6 text-primary">{value}</p>
+                  </div>
                 </div>
-
-                <div className="mt-10 -mx-2 flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory px-6 scroll-px-6 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-8 lg:px-0 lg:pb-0">
-                    {messages.home.benefits.segments.map((segment) => (
-                        <Card key={segment.badge} className="w-[70vw] shrink-0 border-border/80 snap-start lg:w-auto lg:min-w-0">
-                            <CardContent className="p-6">
-                                <Badge className="bg-primary text-white">{segment.badge}</Badge>
-                                <h4 className="mt-4 text-lg font-semibold text-foreground text-left">
-                                    {segment.title}
-                                </h4>
-                                <ul className="mt-4 space-y-3 text-sm text-muted-foreground text-left">
-                                    {segment.bullets.map((bullet) => (
-                                        <li key={bullet} className="flex items-start gap-2">
-                                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                            {bullet}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+              ))}
             </div>
-        </section>
-    )
-}
 
-export default Benefits
+            <Button asChild size="lg" className="mt-8 rounded-full px-7">
+              <Link
+                href="/assessment"
+                onClick={() => trackEvent({ action: "cta_click", category: "engagement", label: "home_conversation_assessment" })}
+              >
+                {content.conversation.action}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-24">
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.momentum.eyebrow}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
+              {content.momentum.title}
+            </h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.momentum.description}</p>
+
+            <div className="mt-9 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {content.momentum.items.map((item, index) => {
+                const Icon = momentumIcons[index] ?? Sparkles;
+                return (
+                  <div key={item.title} className="rounded-2xl border border-primary/10 bg-white p-5">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <h3 className="mt-4 font-semibold text-primary">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-[470px]">
+            <div className="absolute inset-x-6 bottom-6 top-8 rounded-[2.5rem] bg-sky-200/70" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2.5rem] border-4 border-white shadow-xl shadow-primary/10">
+              <Image
+                src="/images/home/student-guidance.jpg"
+                alt={content.momentum.imageAlt}
+                width={1400}
+                height={1500}
+                sizes="(min-width: 1024px) 38vw, 90vw"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white sm:px-10 sm:py-16">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.15em] text-sky-200">{content.trust.eyebrow}</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl md:text-5xl">{content.trust.title}</h2>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/70">{content.trust.description}</p>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {content.trust.items.map((item, index) => {
+            const Icon = trustIcons[index] ?? ShieldCheck;
+            return (
+              <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <Icon className="h-5 w-5 text-amber-300" />
+                <h3 className="mt-4 font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/65">{item.description}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Benefits;

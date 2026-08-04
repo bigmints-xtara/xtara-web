@@ -1,4 +1,5 @@
-export const locales = ["en", "hi", "ml", "ta"] as const;
+// Launch only reviewed regional-language journeys.
+export const locales = ["en", "ml", "hi", "ta"] as const;
 
 export type Locale = (typeof locales)[number];
 

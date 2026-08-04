@@ -1,176 +1,194 @@
 "use client";
 
-import { useState } from "react";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "@/lib/firebase/firebase";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { createUserDocument } from "@/lib/firebase/auth-helpers";
-import { getUserCareerPath } from "@/lib/firebase/assessment";
+import { Suspense, useState } from "react";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
+
+import { AuthShell } from "@/components/auth/AuthShell";
+import { LoginForm } from "@/components/login-form";
+import { useAuth } from "@/context/AuthContext";
+import { useTranslations } from "@/i18n/language-provider";
+import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
+import { savePendingAssessmentToAccount, savePendingDiscoveryToAccount } from "@/lib/discovery-save";
+import { getFirebaseAuth } from "@/lib/firebase-client";
+import { getOrganizationContext } from "@/lib/organization";
+import { friendlyLoginError } from "@/lib/login-error";
+import { workspaceDestination, WORKSPACE_MANIFESTS } from "@/lib/workspace-manifest";
+
+type LoginMode = "learner" | "educator";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
+  return <Suspense fallback={<LoginLoading />}><LoginContent /></Suspense>;
+}
 
-    const getFriendlyError = (err: any) => {
-        const code = err?.code as string | undefined;
-        switch (code) {
-            case "auth/popup-closed-by-user":
-                return "Sign-in was cancelled. Please try again.";
-            case "auth/invalid-credential":
-                return "Incorrect email or password. Please try again.";
-            case "auth/user-not-found":
-                return "We couldn't find an account with that email.";
-            case "auth/wrong-password":
-                return "Incorrect email or password. Please try again.";
-            case "auth/too-many-requests":
-                return "Too many attempts. Please wait a moment and try again.";
-            case "auth/network-request-failed":
-                return "Network issue. Check your connection and try again.";
-            default:
-                return err?.message || "Something went wrong. Please try again.";
-        }
-    };
+function LoginContent() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { messages } = useTranslations();
+  const { configurationError } = useAuth();
+  const mode: LoginMode = searchParams.get("mode") === "educator" ? "educator" : "learner";
+  const educatorMode = mode === "educator";
+  const requestedNext = educatorMode
+    ? educatorDestination(searchParams.get("next"))
+    : learnerDestination(searchParams.get("next"));
+  const learnerHref = loginModeHref(searchParams, "learner");
+  const educatorHref = loginModeHref(searchParams, "educator");
+  const signupHref = signupModeHref(searchParams, mode);
+  const commonCopy = messages.auth.common;
+  const loginCopy = messages.auth.login;
+  const modeCopy = educatorMode ? loginCopy.educator : loginCopy.learner;
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
+  async function finishLogin(userId: string, idToken: string) {
+    await createApiSession(idToken);
+    if (searchParams.get("saveDiscovery") === "1") {
+      await savePendingDiscoveryToAccount(userId);
+      router.push(requestedNext || WORKSPACE_MANIFESTS.student.homePath);
+      return;
+    }
+    if (searchParams.get("saveAssessment") === "1") {
+      const didSave = await savePendingAssessmentToAccount(userId);
+      if (!didSave) throw new Error("Complete the assessment before joining an institution.");
+      router.push(requestedNext || WORKSPACE_MANIFESTS.student.homePath);
+      return;
+    }
+    if (educatorMode) {
+      const context = await getOrganizationContext();
+      if (context?.membership.role === "student") {
+        throw new Error("This account currently has a student membership. Use learner login to open your personal career path.");
+      }
+      if (context) {
+        router.push(requestedNext || WORKSPACE_MANIFESTS.educator.homePath);
+        return;
+      }
+      if (requestedNext?.startsWith("/join/")) {
+        router.push(requestedNext);
+        return;
+      }
+      router.push(`${WORKSPACE_MANIFESTS.educator.homePath}/signup`);
+      return;
+    }
+    const context = await getOrganizationContext().catch(() => null);
+    if (context?.membership.role && context.membership.role !== "student") {
+      router.push(WORKSPACE_MANIFESTS.educator.homePath);
+      return;
+    }
+    router.push(requestedNext || await getPostAuthDestination());
+  }
 
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const credential = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+      await finishLogin(credential.user.uid, await credential.user.getIdToken());
+    } catch (reason) {
+      setError(friendlyLoginError(reason));
+      setLoading(false);
+    }
+  };
 
-            // Check if user has career path
-            const user = auth.currentUser;
-            if (user) {
-                const careerPath = await getUserCareerPath(user.uid);
-                if (!careerPath) {
-                    router.push("/assessment");
-                } else {
-                    router.push("/");
-                }
-            } else {
-                router.push("/");
-            }
-        } catch (err: any) {
-            setError(getFriendlyError(err));
-            setLoading(false);
-        }
-    };
+  const handleGoogleLogin = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const credential = await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
+      await finishLogin(credential.user.uid, await credential.user.getIdToken());
+    } catch (reason) {
+      setError(friendlyLoginError(reason));
+      setLoading(false);
+    }
+  };
 
-    const handleGoogleLogin = async () => {
-        const provider = new GoogleAuthProvider();
-        setLoading(true);
-        setError("");
+  return (
+    <AuthShell
+      backLabel={commonCopy.backHome}
+      imageSrc={educatorMode ? "/images/home/student-guidance.jpg" : "/images/home/hero-career-exploration.jpg"}
+      imageAlt={modeCopy.imageAlt}
+      eyebrow={modeCopy.sideEyebrow}
+      title={modeCopy.sideTitle}
+      description={modeCopy.sideDescription}
+      proofs={modeCopy.sideProofs}
+    >
+      <LoginForm
+        mode={mode}
+        copy={{
+          chooseType: loginCopy.chooseType,
+          learnerTab: loginCopy.learnerTab,
+          educatorTab: loginCopy.educatorTab,
+          title: modeCopy.title,
+          description: modeCopy.description,
+          email: commonCopy.email,
+          emailPlaceholder: commonCopy.emailPlaceholder,
+          password: commonCopy.password,
+          submit: modeCopy.submit,
+          submitting: modeCopy.submitting,
+          google: modeCopy.google,
+          divider: loginCopy.divider,
+          assessmentPrompt: loginCopy.assessmentPrompt,
+          assessmentAction: loginCopy.assessmentAction,
+          signupPrompt: loginCopy.signupPrompt,
+          signupAction: loginCopy.signupAction,
+          educatorNote: educatorMode ? loginCopy.educator.educatorNote : undefined,
+          termsPrefix: commonCopy.termsPrefix,
+          terms: commonCopy.terms,
+          privacyConnector: commonCopy.privacyConnector,
+          privacy: commonCopy.privacy,
+        }}
+        email={email}
+        password={password}
+        error={configurationError || error}
+        loading={loading}
+        disabled={Boolean(configurationError)}
+        learnerHref={learnerHref}
+        educatorHref={educatorHref}
+        signupHref={signupHref}
+        onEmailChange={setEmail}
+        onPasswordChange={setPassword}
+        onSubmit={handleLogin}
+        onGoogleLogin={handleGoogleLogin}
+      />
+    </AuthShell>
+  );
+}
 
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+function loginModeHref(params: Readonly<URLSearchParams>, mode: LoginMode) {
+  const next = new URLSearchParams(params.toString());
+  if (mode === "educator") next.set("mode", "educator");
+  else next.delete("mode");
+  const query = next.toString();
+  return query ? `/login?${query}` : "/login";
+}
 
-            // Create user document if it doesn't exist (new Google user)
-            await createUserDocument(user);
+function signupModeHref(params: Readonly<URLSearchParams>, mode: LoginMode) {
+  const next = new URLSearchParams(params.toString());
+  if (mode === "educator") {
+    next.set("mode", "educator");
+    if (!next.has("next")) next.set("next", "/organization/signup");
+  } else {
+    next.delete("mode");
+  }
+  const query = next.toString();
+  return query ? `/signup?${query}` : "/signup";
+}
 
-            // Check if user has completed assessment and has a career path
-            const careerPath = await getUserCareerPath(user.uid);
+function learnerDestination(value: string | null) {
+  return workspaceDestination("student", value) || joinDestination(value);
+}
 
-            if (!careerPath) {
-                // No career path found, redirect to assessment
-                console.log("No career path found for user, redirecting to assessment");
-                router.push("/assessment");
-            } else {
-                // User has career path, go to home
-                router.push("/");
-            }
-        } catch (err: any) {
-            console.error("Google sign-in error:", err);
-            setError(getFriendlyError(err));
-            setLoading(false);
-        }
-    };
+function educatorDestination(value: string | null) {
+  return workspaceDestination("educator", value) || joinDestination(value);
+}
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
-            <div className="w-full max-w-md p-6 md:p-8 md:bg-card md:rounded-lg md: md:border md:border-border">
-                <h1 className="text-3xl font-bold mb-6 text-center">Welcome Back</h1>
+function joinDestination(value: string | null) {
+  return value?.startsWith("/join/") && !value.startsWith("//") ? value : null;
+}
 
-                {error && (
-                    <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                        <label className="block mb-1 font-medium">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 rounded bg-input border border-input focus:border-ring focus:ring-1 focus:ring-ring outline-none transition-all"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-1 font-medium">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 rounded bg-input border border-input focus:border-ring focus:ring-1 focus:ring-ring outline-none transition-all"
-                            required
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        {loading && (
-                            <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                        )}
-                        {loading ? "Logging in..." : "Log In"}
-                    </button>
-                </form>
-
-                <div className="mt-4 flex items-center justify-between">
-                    <hr className="w-full border-border" />
-                    <span className="px-2 text-muted-foreground">OR</span>
-                    <hr className="w-full border-border" />
-                </div>
-
-                <button
-                    onClick={handleGoogleLogin}
-                    disabled={loading}
-                    className="w-full mt-4 py-2 bg-secondary text-secondary-foreground rounded font-semibold hover:bg-secondary/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    {!loading && (
-                        <svg
-                            className="h-5 w-5"
-                            viewBox="0 0 48 48"
-                            aria-hidden="true"
-                        >
-                            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.806 32.657 29.337 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.955 3.045l5.657-5.657C34.051 6.053 29.29 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.651-.389-3.917z"/>
-                            <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 19.027 12 24 12c3.059 0 5.842 1.154 7.955 3.045l5.657-5.657C34.051 6.053 29.29 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
-                            <path fill="#4CAF50" d="M24 44c5.214 0 9.939-1.993 13.515-5.243l-6.24-5.283C29.271 35.091 26.777 36 24 36c-5.315 0-9.77-3.317-11.297-7.946l-6.5 5.007C9.523 39.556 16.278 44 24 44z"/>
-                            <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-0.769 2.155-2.295 3.99-4.328 5.144l6.24 5.283C39.314 36.533 44 32 44 24c0-1.341-.138-2.651-.389-3.917z"/>
-                        </svg>
-                    )}
-                    {loading && (
-                        <div className="w-5 h-5 border-2 border-secondary-foreground border-t-transparent rounded-full animate-spin" />
-                    )}
-                    {loading ? "Signing in..." : "Sign in with Google"}
-                </button>
-
-                <p className="mt-6 text-center text-muted-foreground">
-                    Get started —{" "}
-                    <Link href="/assessment" className="text-primary hover:underline">
-                        start assessment
-                    </Link>
-                </p>
-            </div>
-        </div>
-    );
+function LoginLoading() {
+  return <div className="flex min-h-screen items-center justify-center bg-[#f7fafc]"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
 }

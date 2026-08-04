@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Save, X } from 'lucide-react';
 import type { GameInstance } from '@/types/admin';
 
@@ -10,48 +10,46 @@ interface GameEditorProps {
   onCancel: () => void;
 }
 
-export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) {
-  const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState<Partial<GameInstance>>({
+const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+function gameForm(game: GameInstance | null, referenceDate: Date): Partial<GameInstance> {
+  if (game) {
+    return {
+      ...game,
+      schedule: {
+        startDateTime: game.schedule?.startDateTime ? new Date(game.schedule.startDateTime) : referenceDate,
+        endDateTime: game.schedule?.endDateTime
+          ? new Date(game.schedule.endDateTime)
+          : new Date(referenceDate.getTime() + ONE_WEEK_MS),
+      },
+    };
+  }
+
+  return {
     title: '',
     mode: 'quiz',
     isPublished: false,
     schedule: {
-      startDateTime: new Date(),
-      endDateTime: new Date(Date.now() + 86400000 * 7),
+      startDateTime: referenceDate,
+      endDateTime: new Date(referenceDate.getTime() + ONE_WEEK_MS),
     },
-  });
+  };
+}
 
-  useEffect(() => {
-    if (game) {
-      setFormData({
-        ...game,
-        schedule: {
-          startDateTime: game.schedule?.startDateTime ? new Date(game.schedule.startDateTime) : new Date(),
-          endDateTime: game.schedule?.endDateTime ? new Date(game.schedule.endDateTime) : new Date(Date.now() + 86400000 * 7),
-        }
-      });
-    } else {
-      setFormData({
-        title: '',
-        mode: 'quiz',
-        isPublished: false,
-        schedule: {
-          startDateTime: new Date(),
-          endDateTime: new Date(Date.now() + 86400000 * 7),
-        },
-      });
-    }
-  }, [game]);
+export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) {
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState<Partial<GameInstance>>(() => gameForm(game, new Date()));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setError('');
 
     try {
       await onSave(formData);
     } catch (error) {
-      alert(`Error saving game: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(error instanceof Error ? error.message : 'Unable to save this game');
     } finally {
       setIsSaving(false);
     }
@@ -99,6 +97,8 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
         </div>
       </div>
 
+      {error ? <p role="alert" className="shrink-0 border-b border-red-200 bg-red-50 px-6 py-3 text-sm text-red-700">{error}</p> : null}
+
       {/* Form Content */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         <div className="bg-white rounded-lg p-6 border">
@@ -125,7 +125,7 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
               </label>
               <select
                 value={formData.mode}
-                onChange={(e) => setFormData({ ...formData, mode: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, mode: e.target.value as GameInstance['mode'] })}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="quiz">Quiz</option>

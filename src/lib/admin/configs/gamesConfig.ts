@@ -1,75 +1,49 @@
-import { Timestamp } from 'firebase/firestore';
-import { AdminConfig, GameInstance } from '@/types/admin';
+import type { AdminConfig, GameInstance } from '@/types/admin';
+
+function normalizeDate(value: unknown) {
+  if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
+    return value.toDate();
+  }
+  return value;
+}
 
 export const gamesConfig: AdminConfig<GameInstance> = {
   entityName: 'Game',
   entityNamePlural: 'Games',
   collectionName: 'game_instances',
-
   createEmpty: () => ({
     title: '',
     mode: 'quiz',
     isPublished: false,
     schedule: {
       startDateTime: new Date(),
-      endDateTime: new Date(Date.now() + 86400000 * 7), // 7 days from now
+      endDateTime: new Date(Date.now() + 86400000 * 7),
     },
   }),
-
   getId: (entity) => entity.id,
   getTitle: (entity) => entity.title,
   getSubtitle: (entity) => entity.mode,
   getStatus: (entity) => (entity.isPublished ? 'published' : 'draft'),
   getDomain: (entity) => entity.mode,
   getSearchText: (entity) => `${entity.title} ${entity.mode}`.toLowerCase(),
-
   availableStatuses: ['all', 'published', 'draft'],
-  getAvailableDomains: (_entities) => ['all', 'quiz', 'puzzle', 'memory'],
-
+  getAvailableDomains: () => ['all', 'quiz', 'puzzle', 'memory'],
+  validateEntity: (entity) => (!entity.title || entity.title.trim() === '' ? 'Title is required' : null),
   toFirestore: (entity) => {
-    const data = { ...entity };
-    delete (data as any).id;
-    
-    // Ensure nested schedule dates are JS Dates for Firestore SDK
-    if (data.schedule) {
-      if (!(data.schedule.startDateTime instanceof Date) && (data.schedule.startDateTime as any)?.toDate) {
-        data.schedule.startDateTime = (data.schedule.startDateTime as any).toDate();
-      } else if (typeof data.schedule.startDateTime === 'string') {
-        data.schedule.startDateTime = new Date(data.schedule.startDateTime);
-      }
-
-      if (!(data.schedule.endDateTime instanceof Date) && (data.schedule.endDateTime as any)?.toDate) {
-        data.schedule.endDateTime = (data.schedule.endDateTime as any).toDate();
-      } else if (typeof data.schedule.endDateTime === 'string') {
-        data.schedule.endDateTime = new Date(data.schedule.endDateTime);
-      }
-    }
-
-    return {
-      ...data,
-      updatedAt: new Date(),
-    };
+    const data = { ...entity } as Record<string, unknown>;
+    delete data.id;
+    return { ...data, updatedAt: new Date().toISOString() };
   },
-
-  fromFirestore: (data: Record<string, unknown>, id: string): GameInstance => {
-    const instance = { ...data, id } as any;
-
+  fromFirestore: (data, id) => {
+    const instance = { ...data, id } as GameInstance;
     if (instance.schedule) {
-      if (instance.schedule.startDateTime instanceof Timestamp) {
-        instance.schedule.startDateTime = instance.schedule.startDateTime.toDate();
-      }
-      if (instance.schedule.endDateTime instanceof Timestamp) {
-        instance.schedule.endDateTime = instance.schedule.endDateTime.toDate();
-      }
+      instance.schedule.startDateTime = normalizeDate(instance.schedule.startDateTime) as Date;
+      instance.schedule.endDateTime = normalizeDate(instance.schedule.endDateTime) as Date;
     }
-
-    if (instance.createdAt instanceof Timestamp) {
-      instance.createdAt = instance.createdAt.toDate();
-    }
-    if (instance.updatedAt instanceof Timestamp) {
-      instance.updatedAt = instance.updatedAt.toDate();
-    }
-
-    return instance as GameInstance;
+    instance.createdAt = normalizeDate(instance.createdAt) as Date;
+    instance.updatedAt = normalizeDate(instance.updatedAt) as Date;
+    return instance;
   },
 };
+
+export default gamesConfig;

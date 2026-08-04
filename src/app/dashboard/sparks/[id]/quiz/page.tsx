@@ -7,7 +7,7 @@ import { FirestoreService, Spark, SparkKnowledgeCheck } from "@/lib/firebase/fir
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, CheckCircle2, XCircle, Trophy, Award, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Trophy, Award, Zap } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
 import confetti from "canvas-confetti";
@@ -29,6 +29,10 @@ export default function SparkQuizPage() {
     const [score, setScore] = useState(0);
     const [isPerfect, setIsPerfect] = useState(false);
     const [earnedPoints, setEarnedPoints] = useState(0);
+    const [pointsAwarded, setPointsAwarded] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [rewardError, setRewardError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -48,6 +52,12 @@ export default function SparkQuizPage() {
                 questions.push(...lesson.knowledge_check);
             }
         });
+    }
+    if (questions.length === 0 && spark?.lessons) {
+        spark.lessons.forEach((lesson) => questions.push(...(lesson.knowledge_check || [])));
+    }
+    if (questions.length === 0 && spark?.knowledgeChecks) {
+        questions.push(...spark.knowledgeChecks);
     }
     const currentQuestion = questions[currentQuestionIndex];
 
@@ -73,7 +83,10 @@ export default function SparkQuizPage() {
         
         let correctCount = 0;
         questions.forEach((q, idx) => {
-            if (q.options[selectedAnswers[idx]] === q.correct_answer) {
+            if (
+                selectedAnswers[idx] === q.correctOptionIndex ||
+                q.options[selectedAnswers[idx]] === q.correct_answer
+            ) {
                 correctCount++;
             }
         });
@@ -83,23 +96,33 @@ export default function SparkQuizPage() {
         const medalBonus = perfect ? (spark.medalPoints || 0) : 0;
         const finalTotal = calculatedScore + medalBonus;
 
-        setScore(correctCount);
-        setIsPerfect(perfect);
-        setEarnedPoints(finalTotal);
-        setIsSubmitted(true);
-
+        setSubmitting(true);
+        setSaveError(null);
         try {
-            const achievements = new AchievementsService();
-            await achievements.addPointsForSpark(
-                user.uid, 
-                spark.id, 
-                calculatedScore, 
-                perfect, 
-                medalBonus,
-                spark.title
-            );
+            await FirestoreService.markSparkCompleted(spark.id);
+            let awarded = false;
+            try {
+                const achievements = new AchievementsService();
+                awarded = await achievements.addPointsForSpark(
+                    user.uid,
+                    spark.id,
+                    calculatedScore,
+                    perfect,
+                    medalBonus,
+                    spark.title
+                );
+            } catch (error) {
+                console.error("Spark completion saved but points failed", error);
+                setRewardError("Result saved. Points could not be updated.");
+            }
 
-            if (perfect) {
+            setScore(correctCount);
+            setIsPerfect(perfect);
+            setPointsAwarded(awarded);
+            setEarnedPoints(awarded ? finalTotal : 0);
+            setIsSubmitted(true);
+
+            if (perfect && awarded) {
                 confetti({
                     particleCount: 150,
                     spread: 70,
@@ -107,8 +130,33 @@ export default function SparkQuizPage() {
                 });
             }
         } catch (error) {
-            console.error("Failed to submit spark quiz points", error);
-            alert("Failed to save your score. Please try again.");
+            console.error("Failed to save Spark completion", error);
+            setSaveError("Your result was not saved. Try again.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const retryPoints = async () => {
+        if (!spark || !user || user.isAnonymous) return;
+        setRewardError(null);
+        try {
+            const calculatedScore = score * (spark.rewardPerQuestion || 2);
+            const medalBonus = isPerfect ? (spark.medalPoints || 0) : 0;
+            const achievements = new AchievementsService();
+            await achievements.addPointsForSpark(
+                user.uid,
+                spark.id,
+                calculatedScore,
+                isPerfect,
+                medalBonus,
+                spark.title,
+            );
+            setPointsAwarded(true);
+            setEarnedPoints(calculatedScore + medalBonus);
+        } catch (error) {
+            console.error("Failed to retry Spark points", error);
+            setRewardError("Result saved. Points could not be updated.");
         }
     };
 
@@ -136,7 +184,7 @@ export default function SparkQuizPage() {
         return (
             <div className="container max-w-2xl mx-auto py-12 px-4 text-center space-y-8">
                 <div className="flex justify-center mb-6">
-                    {isPerfect ? (
+                        {isPerfect && pointsAwarded ? (
                         <div className="p-6 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
                             <Trophy className="h-20 w-20 text-yellow-500" />
                         </div>
@@ -157,11 +205,11 @@ export default function SparkQuizPage() {
                     <div className="flex flex-col sm:flex-row justify-center gap-6">
                         <div className="flex flex-col items-center p-4 bg-muted/50 rounded-xl">
                             <Zap className="h-8 w-8 text-blue-500 mb-2" />
-                            <div className="text-2xl font-bold">+{score * (spark.rewardPerQuestion || 2)}</div>
+                            <div className="text-2xl font-bold">+{pointsAwarded ? score * (spark.rewardPerQuestion || 2) : 0}</div>
                             <div className="text-sm text-muted-foreground">Base Points</div>
                         </div>
                         
-                        {isPerfect && spark.medalPoints && spark.medalPoints > 0 && (
+                        {pointsAwarded && isPerfect && spark.medalPoints && spark.medalPoints > 0 && (
                             <div className="flex flex-col items-center p-4 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
                                 <Award className="h-8 w-8 text-yellow-500 mb-2" />
                                 <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">+{spark.medalPoints}</div>
@@ -174,6 +222,17 @@ export default function SparkQuizPage() {
                         <div className="text-lg text-muted-foreground">Total Earned</div>
                         <div className="text-5xl font-black text-primary mt-2">{earnedPoints} pt</div>
                     </div>
+                    {!pointsAwarded && !rewardError && (
+                        <p className="text-sm text-muted-foreground">Already completed. No extra points.</p>
+                    )}
+                    {rewardError && (
+                        <div className="space-y-3 text-sm text-destructive" role="alert">
+                            <p>{rewardError}</p>
+                            <Button variant="outline" size="sm" onClick={() => void retryPoints()}>
+                                Retry points
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="pt-8">
@@ -259,12 +318,13 @@ export default function SparkQuizPage() {
                     <Button 
                         className="bg-primary"
                         onClick={handleSubmit}
-                        disabled={Object.keys(selectedAnswers).length < questions.length}
+                        disabled={submitting || Object.keys(selectedAnswers).length < questions.length}
                     >
-                        Submit Quiz
+                        {submitting ? "Saving…" : "Submit Quiz"}
                     </Button>
                 )}
             </div>
+            {saveError && <p className="mt-3 text-sm text-destructive" role="alert">{saveError}</p>}
         </div>
     );
 }

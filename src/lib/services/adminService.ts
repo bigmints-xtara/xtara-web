@@ -1,229 +1,159 @@
-import {
-    collection,
-    doc,
-    getDocs,
-    getDoc,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    query,
-    orderBy,
-    Timestamp,
-    onSnapshot,
-    type Unsubscribe,
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase/firebase';
-import type { AdminEntity, AdminConfig } from '@/types/admin';
+import { xtaraApi } from '@/lib/api/client';
+import type { AdminConfig, AdminEntity } from '@/types/admin';
+
+type Unsubscribe = () => void;
+
+export interface AdminPageParams {
+  page: number;
+  limit: number;
+  status?: string;
+  domain?: string;
+  searchQuery?: string;
+}
+
+export interface AdminPage<T> {
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  availableDomains: string[];
+}
+
+const ENTITY_SLUGS: Record<string, string> = {
+  stories: 'stories',
+  sparks: 'sparks',
+  challenges: 'challenges',
+  good_reads: 'good-reads',
+  dream_careers: 'dream_careers',
+  future_directions: 'future_directions',
+  career_sources: 'career_sources',
+  career_paths: 'career_paths',
+  career_tools: 'career_tools',
+  game_instances: 'game_instances',
+  game_templates: 'game_templates',
+  games: 'games',
+};
+
+type ListResponse<T> = {
+  items?: T[];
+  data?: T[];
+  total?: number;
+  page?: number;
+  limit?: number;
+  totalPages?: number;
+  availableDomains?: string[];
+} | T[];
+
+function itemsFrom<T>(response: ListResponse<T>): T[] {
+  if (Array.isArray(response)) return response;
+  return response.items || response.data || [];
+}
 
 export class AdminService<T extends AdminEntity> {
-    private config: AdminConfig<T>;
+  private config: AdminConfig<T>;
+  private slug: string;
 
-    constructor(config: AdminConfig<T>) {
-        this.config = config;
+  constructor(config: AdminConfig<T>) {
+    this.config = config;
+    this.slug = ENTITY_SLUGS[config.collectionName] || config.collectionName;
+  }
+
+  async getPage(params: AdminPageParams): Promise<AdminPage<T>> {
+    const query = new URLSearchParams({
+      page: String(params.page),
+      limit: String(params.limit),
+    });
+    if (params.status && params.status !== 'all') query.set('status', params.status);
+    if (params.domain && params.domain !== 'all') query.set('domain', params.domain);
+    if (params.searchQuery?.trim()) query.set('q', params.searchQuery.trim());
+    if (this.config.orderByField) query.set('sort', this.config.orderByField);
+    if (this.config.orderByDirection) query.set('order', this.config.orderByDirection);
+
+    const response = await xtaraApi.get<ListResponse<T>>(
+      `/admin/content/${this.slug}?${query.toString()}`,
+    );
+    const items = itemsFrom(response).map((item) => this.config.fromFirestore(
+      item as unknown as Record<string, unknown>,
+      item.id,
+    ));
+    if (Array.isArray(response)) {
+      return {
+        items,
+        total: items.length,
+        page: params.page,
+        limit: params.limit,
+        totalPages: items.length ? 1 : 0,
+        availableDomains: this.config.getAvailableDomains(items),
+      };
     }
 
-    /**
-     * Get all entities from Firestore
-     */
-    async getAll(): Promise<T[]> {
-        try {
-            const collectionRef = collection(db, this.config.collectionName);
-            let q;
-            if (this.config.orderByField) {
-                q = query(collectionRef, orderBy(this.config.orderByField, this.config.orderByDirection || 'desc'));
-            } else if (this.config.orderByField === null) {
-                q = query(collectionRef);
-            } else {
-                q = query(collectionRef, orderBy('createdAt', 'desc'));
-            }
-            const snapshot = await getDocs(q);
+    return {
+      items,
+      total: response.total ?? items.length,
+      page: response.page ?? params.page,
+      limit: response.limit ?? params.limit,
+      totalPages: response.totalPages ?? (items.length ? 1 : 0),
+      availableDomains: response.availableDomains || this.config.getAvailableDomains(items),
+    };
+  }
 
-            return snapshot.docs.map((doc) => {
-                const data = doc.data();
-                return this.config.fromFirestore(data, doc.id);
-            });
-        } catch (error) {
-            console.error(`Error loading ${this.config.entityNamePlural}:`, error);
-            throw error;
-        }
-    }
+  streamPage(
+    params: AdminPageParams,
+    callback: (page: AdminPage<T>) => void,
+    onError?: (error: Error) => void,
+  ): Unsubscribe {
+    let cancelled = false;
+    let timer: ReturnType<typeof setInterval> | null = null;
 
-    /**
-     * Stream entities in real-time using Firestore onSnapshot.
-     *
-     * Note: The returned callback is invoked once per snapshot. In React Strict Mode
-     * (development), the component's useEffect may mount/unmount/mount, creating
-     * two concurrent listeners. Both will fire the callback for the same snapshot,
-     * so the consumer should deduplicate entities by ID before rendering.
-     */
-    streamAll(callback: (entities: T[]) => void): Unsubscribe {
-        const collectionRef = collection(db, this.config.collectionName);
-        let q;
-        if (this.config.orderByField) {
-            q = query(collectionRef, orderBy(this.config.orderByField, this.config.orderByDirection || 'desc'));
-        } else if (this.config.orderByField === null) {
-            q = query(collectionRef);
-        } else {
-            q = query(collectionRef, orderBy('createdAt', 'desc'));
-        }
+    const load = async () => {
+      try {
+        const page = await this.getPage(params);
+        if (!cancelled) callback(page);
+      } catch (error) {
+        if (!cancelled && onError) onError(error instanceof Error ? error : new Error('Failed to load admin content'));
+      }
+    };
 
-        return onSnapshot(
-            q,
-            (snapshot) => {
-                const entities = snapshot.docs.map((doc) => {
-                    const data = doc.data();
-                    return this.config.fromFirestore(data, doc.id);
-                });
-                callback(entities);
-            },
-            (error) => {
-                console.error(`Error streaming ${this.config.entityNamePlural}:`, error);
-            }
-        );
-    }
+    load();
+    timer = setInterval(load, 30000);
 
-    /**
-     * Get a single entity by ID
-     */
-    async getById(id: string): Promise<T | null> {
-        try {
-            const docRef = doc(db, this.config.collectionName, id);
-            const docSnap = await getDoc(docRef);
+    return () => {
+      cancelled = true;
+      if (timer) clearInterval(timer);
+    };
+  }
 
-            if (docSnap.exists()) {
-                return this.config.fromFirestore(docSnap.data(), docSnap.id);
-            }
-            return null;
-        } catch (error) {
-            console.error(`Error loading ${this.config.entityName}:`, error);
-            throw error;
-        }
-    }
+  async getById(id: string): Promise<T | null> {
+    const item = await xtaraApi.get<T>(`/admin/content/${this.slug}/${id}`);
+    return item ? this.config.fromFirestore(item as unknown as Record<string, unknown>, item.id) : null;
+  }
 
-    /**
-     * Create a new entity
-     */
-    async create(data: Partial<T>): Promise<string> {
-        try {
-            // Validate
-            if (this.config.validateEntity) {
-                const error = this.config.validateEntity(data);
-                if (error) {
-                    throw new Error(error);
-                }
-            }
+  async create(data: Partial<T>): Promise<string> {
+    const created = await xtaraApi.post<{ id: string }>(`/admin/content/${this.slug}`, data);
+    return created.id;
+  }
 
-            const firestoreData = this.config.toFirestore(data);
-            firestoreData.createdAt = Timestamp.now();
-            firestoreData.updatedAt = Timestamp.now();
+  async update(id: string, data: Partial<T>): Promise<void> {
+    await xtaraApi.patch(`/admin/content/${this.slug}/${id}`, data);
+  }
 
-            const collectionRef = collection(db, this.config.collectionName);
-            const docRef = await addDoc(collectionRef, firestoreData);
+  async delete(id: string): Promise<void> {
+    await xtaraApi.delete(`/admin/content/${this.slug}/${id}`);
+  }
 
-            console.log(`✅ Created ${this.config.entityName} with ID:`, docRef.id);
-            return docRef.id;
-        } catch (error) {
-            console.error(`Error creating ${this.config.entityName}:`, error);
-            throw error;
-        }
-    }
+  async publish(id: string): Promise<void> {
+    await xtaraApi.post(`/admin/content/${this.slug}/${id}/publish`);
+  }
 
-    /**
-     * Update an existing entity
-     */
-    async update(id: string, data: Partial<T>): Promise<void> {
-        try {
-            // Validate
-            if (this.config.validateEntity) {
-                const error = this.config.validateEntity(data);
-                if (error) {
-                    throw new Error(error);
-                }
-            }
+  async unpublish(id: string): Promise<void> {
+    await xtaraApi.post(`/admin/content/${this.slug}/${id}/unpublish`);
+  }
 
-            const firestoreData = this.config.toFirestore(data);
-            firestoreData.updatedAt = Timestamp.now();
-
-            const docRef = doc(db, this.config.collectionName, id);
-            await updateDoc(docRef, firestoreData);
-
-            console.log(`✅ Updated ${this.config.entityName} with ID:`, id);
-        } catch (error) {
-            console.error(`Error updating ${this.config.entityName}:`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Delete an entity
-     */
-    async delete(id: string): Promise<void> {
-        try {
-            const docRef = doc(db, this.config.collectionName, id);
-            await deleteDoc(docRef);
-
-            console.log(`✅ Deleted ${this.config.entityName} with ID:`, id);
-        } catch (error) {
-            console.error(`Error deleting ${this.config.entityName}:`, error);
-            throw error;
-        }
-    }
-
-    /**
-     * Publish an entity
-     */
-    async publish(id: string): Promise<void> {
-        await this.update(id, {
-            published: true,
-            draft: false,
-            inReview: false,
-            publishedAt: new Date(),
-        } as unknown as Partial<T>);
-    }
-
-    /**
-     * Unpublish an entity
-     */
-    async unpublish(id: string): Promise<void> {
-        await this.update(id, {
-            published: false,
-            draft: true,
-            inReview: false,
-        } as unknown as Partial<T>);
-    }
-
-    /**
-     * Duplicate an entity
-     */
-    async duplicate(id: string): Promise<string> {
-        try {
-            const original = await this.getById(id);
-            if (!original) {
-                throw new Error(`${this.config.entityName} not found`);
-            }
-
-            // Create a copy
-            const duplicate = { ...original } as Record<string, unknown>;
-            delete duplicate.id;
-            delete duplicate.createdAt;
-            delete duplicate.updatedAt;
-
-            // Modify title to indicate it's a copy
-            if ('title' in duplicate) {
-                duplicate.title = `${duplicate.title as string} (Copy)`;
-            }
-
-            // Set as draft
-            if ('published' in duplicate) {
-                duplicate.published = false;
-                duplicate.draft = true;
-                duplicate.inReview = false;
-            }
-
-            return await this.create(duplicate as Partial<T>);
-        } catch (error) {
-            console.error(`Error duplicating ${this.config.entityName}:`, error);
-            throw error;
-        }
-    }
+  async duplicate(id: string): Promise<string> {
+    const duplicated = await xtaraApi.post<{ id: string }>(`/admin/content/${this.slug}/${id}/duplicate`);
+    return duplicated.id;
+  }
 }
+
+export default AdminService;

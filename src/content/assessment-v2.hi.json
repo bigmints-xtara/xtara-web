@@ -1,0 +1,1247 @@
+{
+  "ui": {
+    "eyebrow": "एक simple adaptive career discovery",
+    "title": "आपको अभी यह पता होना जरूरी नहीं कि आप क्या बनना चाहते हैं।",
+    "description": "हमें बताइए आपको क्या interesting लगता है, आप कैसे काम करते हैं, क्या strength जैसा लगता है, और आपके आसपास क्या matter करता है। Xtara इन answers को explore करने लायक Career Directions में बदलेगा।",
+    "loading": "आपकी discovery journey तैयार हो रही है...",
+    "errorTitle": "हम आगे नहीं बढ़ पाए",
+    "retry": "फिर try करें",
+    "startAssessment": "Assessment शुरू करें",
+    "chooseGrade": "पहले अपनी grade चुनें",
+    "stepOf": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "finish": "मेरी Career Directions देखें",
+    "chooseUpTo": "{count} तक चुनें",
+    "textPlaceholder": "अपना answer यहाँ लिखें",
+    "gradeQuestion": {
+      "label": "आप अभी किस grade में पढ़ रहे हैं?",
+      "description": "आपकी grade assessment की detail और next steps बदलती है। यह आपकी explore कर सकने वाली directions को limit नहीं करती।",
+      "options": {
+        "grade8": "Grade 8",
+        "grade9": "Grade 9",
+        "grade10": "Grade 10"
+      }
+    },
+    "processingTitle": "आपकी Career Directions बन रही हैं",
+    "processingDescription": "हम आपकी interests, strengths, personality, values और family context में patterns देख रहे हैं। यह perfect-career score नहीं है।",
+    "privacy": "आपके answers guidance बनाने के लिए use होते हैं। आप बाद में अपना plan बदल सकते हैं।",
+    "noQuestions": "इस grade के लिए questions अभी available नहीं हैं।"
+  },
+  "questions": [
+    {
+      "id": "activityCuriosity",
+      "fieldType": "multiSelect",
+      "label": "कौन-सी activities आपको curious बनाती हैं, भले आपने उन्हें कभी try न किया हो?",
+      "description": "Curiosity शुरुआत है। इसका मतलब यह नहीं कि आपको वही career चुनना ही है।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "performMusic",
+          "label": "गाना, music बजाना, perform करना या entertain करना",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2,
+              "trait:socialEnergy": 1
+            }
+          }
+        },
+        {
+          "id": "createStory",
+          "label": "Draw, design, write, film बनाना या story बताना",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2,
+              "signal:communication": 1
+            }
+          }
+        },
+        {
+          "id": "buildDigital",
+          "label": "App, game, website या digital tool बनाना",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "signal:making": 2
+            }
+          }
+        },
+        {
+          "id": "makeRepair",
+          "label": "कुछ बनाना, ठीक करना, पकाना, उगाना या improve करना",
+          "metadata": {
+            "scores": {
+              "signal:making": 2,
+              "trait:practical": 1
+            }
+          }
+        },
+        {
+          "id": "helpHealth",
+          "label": "किसी को health समझने या improve करने में मदद करना",
+          "metadata": {
+            "scores": {
+              "signal:care": 2,
+              "signal:communication": 1
+            }
+          }
+        },
+        {
+          "id": "investigate",
+          "label": "Facts या experiments से किसी सवाल की जांच करना",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 2,
+              "trait:conceptual": 1
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "label": "Event, project, budget या छोटा venture plan करना",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 2,
+              "trait:structured": 1
+            }
+          }
+        },
+        {
+          "id": "community",
+          "label": "Community problem समझना और solve करने में मदद करना",
+          "metadata": {
+            "scores": {
+              "signal:care": 1,
+              "signal:organizing": 1,
+              "signal:communication": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "activityExperience",
+      "fieldType": "multiSelect",
+      "label": "किस तरह की activities आपने सच में try की हैं और enjoy की हैं?",
+      "description": "इससे curiosity और real experience अलग समझने में मदद मिलती है। कम experience होना normal है।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "expression",
+          "label": "Art, music, writing, performance या content creation",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2
+            }
+          }
+        },
+        {
+          "id": "problemSolving",
+          "label": "Puzzles, science investigations, coding या research",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 2
+            }
+          }
+        },
+        {
+          "id": "handsOn",
+          "label": "Building, repairing, cooking, crafts, gardening या practical work",
+          "metadata": {
+            "scores": {
+              "signal:making": 2,
+              "trait:practical": 1
+            }
+          }
+        },
+        {
+          "id": "people",
+          "label": "किसी को पढ़ाना, समझाना, support करना या care करना",
+          "metadata": {
+            "scores": {
+              "signal:communication": 1,
+              "signal:care": 2
+            }
+          }
+        },
+        {
+          "id": "lead",
+          "label": "Lead करना, plan करना, sell करना, coordinate करना या responsibility लेना",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 2,
+              "trait:socialEnergy": 1
+            }
+          }
+        },
+        {
+          "id": "noneYet",
+          "label": "मुझे अभी जानने के लिए enough chances नहीं मिले हैं",
+          "metadata": {
+            "exclusive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "strengthConfidence",
+      "fieldType": "multiSelect",
+      "label": "आज इनमें से क्या आपकी strengths जैसा लगता है?",
+      "description": "आप natural strength या practice से बनी strength दोनों चुन सकते हैं।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "express",
+          "label": "Idea, feeling या story express करना",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2
+            }
+          }
+        },
+        {
+          "id": "understand",
+          "label": "कुछ कैसे या क्यों काम करता है यह समझना",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 2,
+              "trait:conceptual": 1
+            }
+          }
+        },
+        {
+          "id": "make",
+          "label": "करके, बनाकर या fix करके सीखना",
+          "metadata": {
+            "scores": {
+              "signal:making": 2,
+              "trait:practical": 1
+            }
+          }
+        },
+        {
+          "id": "explain",
+          "label": "सुनना, समझाना या किसी को समझने में help करना",
+          "metadata": {
+            "scores": {
+              "signal:communication": 2,
+              "signal:care": 1
+            }
+          }
+        },
+        {
+          "id": "care",
+          "label": "लोगों को क्या चाहिए यह notice करना और support करना",
+          "metadata": {
+            "scores": {
+              "signal:care": 2
+            }
+          }
+        },
+        {
+          "id": "coordinate",
+          "label": "Responsibility लेना और लोगों या tasks को साथ लाना",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 2,
+              "trait:structured": 1
+            }
+          }
+        },
+        {
+          "id": "notSure",
+          "label": "मैं अभी अपनी strengths discover कर रहा/रही हूँ",
+          "metadata": {
+            "exclusive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "strengthEvidence",
+      "fieldType": "multiSelect",
+      "label": "आपको क्यों लगता है कि ये आपकी strengths हो सकती हैं?",
+      "description": "Marks useful evidence हो सकते हैं, लेकिन सिर्फ marks ही evidence नहीं हैं।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "practice",
+          "label": "Difficult होने पर भी मैं practice जारी रखता/रखती हूँ",
+          "metadata": {
+            "scores": {
+              "trait:persistence": 2
+            }
+          }
+        },
+        {
+          "id": "project",
+          "label": "मैंने इससे कुछ बनाया या complete किया है",
+          "metadata": {
+            "scores": {
+              "evidence:demonstrated": 2
+            }
+          }
+        },
+        {
+          "id": "feedback",
+          "label": "Teacher, friend या family member ने इसे notice किया है",
+          "metadata": {
+            "scores": {
+              "evidence:observed": 2
+            }
+          }
+        },
+        {
+          "id": "responsibility",
+          "label": "लोग related responsibilities में मुझ पर भरोसा करते हैं",
+          "metadata": {
+            "scores": {
+              "evidence:observed": 2,
+              "trait:responsibility": 1
+            }
+          }
+        },
+        {
+          "id": "marks",
+          "label": "मेरे schoolwork या marks यह दिखाते हैं",
+          "metadata": {
+            "scores": {
+              "evidence:academic": 2
+            }
+          }
+        },
+        {
+          "id": "feeling",
+          "label": "अभी यह mainly एक feeling है; मैंने test नहीं किया है",
+          "metadata": {
+            "scores": {
+              "evidence:early": 1
+            }
+          }
+        },
+        {
+          "id": "noneYet",
+          "label": "मेरे पास अभी clear evidence नहीं है",
+          "metadata": {
+            "exclusive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "weaknessPattern",
+      "fieldType": "multiSelect",
+      "label": "जब कुछ weakness जैसा लगता है, आम तौर पर क्या हो रहा होता है?",
+      "description": "Low mark, low confidence, कम exposure और सच में dislike करना अलग-अलग बातें हैं।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "dislike",
+          "label": "मैंने try किया है और आम तौर पर enjoy नहीं करता/करती"
+        },
+        {
+          "id": "confidence",
+          "label": "मुझे डर रहता है कि मैं गलत कर दूँगा/दूँगी"
+        },
+        {
+          "id": "marks",
+          "label": "मेरे marks मेरी expectation से कम हैं"
+        },
+        {
+          "id": "exposure",
+          "label": "मुझे properly try करने का enough chance नहीं मिला"
+        },
+        {
+          "id": "teaching",
+          "label": "जिस तरह मैंने सीखा, वह मेरे लिए काम नहीं आया"
+        },
+        {
+          "id": "improve",
+          "label": "यह difficult है, लेकिन मैं improve करना चाहता/चाहती हूँ",
+          "metadata": {
+            "scores": {
+              "trait:persistence": 1
+            }
+          }
+        },
+        {
+          "id": "notSure",
+          "label": "मुझे अभी sure नहीं है",
+          "metadata": {
+            "exclusive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "groupProjectStyle",
+      "fieldType": "singleSelect",
+      "label": "आपकी class में नया group project शुरू होता है। आप natural रूप से सबसे पहले क्या करेंगे?",
+      "description": "जो आप normally करते हैं उसके सबसे करीब answer चुनें, जो impressive लगे वह नहीं।",
+      "validation": {
+        "required": true
+      },
+      "options": [
+        {
+          "id": "ideas",
+          "label": "Interesting ideas suggest करना",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 1,
+              "trait:flexible": 1
+            }
+          }
+        },
+        {
+          "id": "problem",
+          "label": "Problem समझना और information इकट्ठा करना",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "trait:reflective": 1
+            }
+          }
+        },
+        {
+          "id": "plan",
+          "label": "Plan बनाना और काम divide करना",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 1,
+              "trait:structured": 2
+            }
+          }
+        },
+        {
+          "id": "start",
+          "label": "पहला version बनाना शुरू करना",
+          "metadata": {
+            "scores": {
+              "signal:making": 1,
+              "trait:practical": 2
+            }
+          }
+        },
+        {
+          "id": "include",
+          "label": "यह देखना कि सबकी बात सुनी जाए",
+          "metadata": {
+            "scores": {
+              "signal:care": 1,
+              "trait:collaborative": 2
+            }
+          }
+        },
+        {
+          "id": "observe",
+          "label": "Role चुनने से पहले थोड़ी देर observe करना",
+          "metadata": {
+            "scores": {
+              "trait:reflective": 2,
+              "trait:independent": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "newProblemStyle",
+      "fieldType": "singleSelect",
+      "label": "जब आप नई problem face करते हैं, आगे बढ़ने में क्या मदद करता है?",
+      "validation": {
+        "required": true
+      },
+      "options": [
+        {
+          "id": "facts",
+          "label": "Facts ढूँढना और rules समझना",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "trait:structured": 1
+            }
+          }
+        },
+        {
+          "id": "try",
+          "label": "कुछ try करना और जो होता है उससे सीखना",
+          "metadata": {
+            "scores": {
+              "signal:making": 1,
+              "trait:flexible": 2
+            }
+          }
+        },
+        {
+          "id": "talk",
+          "label": "दूसरे लोगों से discuss करना",
+          "metadata": {
+            "scores": {
+              "signal:communication": 1,
+              "trait:collaborative": 2
+            }
+          }
+        },
+        {
+          "id": "imagine",
+          "label": "कई अलग possibilities imagine करना",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 1,
+              "trait:conceptual": 1
+            }
+          }
+        },
+        {
+          "id": "steps",
+          "label": "इसे छोटे steps में तोड़ना",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 1,
+              "trait:structured": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "socialEnergy",
+      "fieldType": "singleSelect",
+      "label": "Group के साथ time बिताने के बाद आप आम तौर पर कैसा feel करते हैं?",
+      "validation": {
+        "required": true
+      },
+      "options": [
+        {
+          "id": "energized",
+          "label": "और energetic, और ready",
+          "metadata": {
+            "scores": {
+              "trait:socialEnergy": 2
+            }
+          }
+        },
+        {
+          "id": "balanced",
+          "label": "लोगों और activity पर depend करता है",
+          "metadata": {
+            "scores": {
+              "trait:adaptive": 2
+            }
+          }
+        },
+        {
+          "id": "recharge",
+          "label": "मुझे usually recharge के लिए quiet time चाहिए",
+          "metadata": {
+            "scores": {
+              "trait:reflective": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "setbackStyle",
+      "fieldType": "singleSelect",
+      "label": "कोई important चीज पहली बार काम नहीं करती। आप सबसे likely क्या करेंगे?",
+      "validation": {
+        "required": true
+      },
+      "options": [
+        {
+          "id": "retry",
+          "label": "दूसरे तरीके से फिर try करना",
+          "metadata": {
+            "scores": {
+              "trait:persistence": 2,
+              "trait:flexible": 1
+            }
+          }
+        },
+        {
+          "id": "analyse",
+          "label": "Exactly क्यों fail हुआ यह पता करना",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "trait:reflective": 1
+            }
+          }
+        },
+        {
+          "id": "ask",
+          "label": "किसी से help या feedback माँगना",
+          "metadata": {
+            "scores": {
+              "signal:communication": 1,
+              "trait:collaborative": 1
+            }
+          }
+        },
+        {
+          "id": "pause",
+          "label": "Break लेकर ready होने पर वापस आना",
+          "metadata": {
+            "scores": {
+              "trait:reflective": 1,
+              "trait:adaptive": 1
+            }
+          }
+        },
+        {
+          "id": "loseConfidence",
+          "label": "मैं अक्सर confidence खो देता/देती हूँ और encouragement चाहिए होता है"
+        }
+      ]
+    },
+    {
+      "id": "workValues",
+      "fieldType": "multiSelect",
+      "label": "आप future work से क्या पाना चाहेंगे?",
+      "description": "आज जो matter करता है उसे चुनें। ज्यादा सीखने पर answers बदल सकते हैं।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "create",
+          "label": "Ideas create या express करने की freedom",
+          "metadata": {
+            "scores": {
+              "value:creativity": 2,
+              "signal:creativeExpression": 1
+            }
+          }
+        },
+        {
+          "id": "help",
+          "label": "लोगों की help करने का clear तरीका",
+          "metadata": {
+            "scores": {
+              "value:service": 2,
+              "signal:care": 1
+            }
+          }
+        },
+        {
+          "id": "mastery",
+          "label": "Difficult problems और लगातार learning",
+          "metadata": {
+            "scores": {
+              "value:mastery": 2,
+              "signal:analysis": 1
+            }
+          }
+        },
+        {
+          "id": "build",
+          "label": "दिखने वाले practical results",
+          "metadata": {
+            "scores": {
+              "value:making": 2,
+              "signal:making": 1
+            }
+          }
+        },
+        {
+          "id": "lead",
+          "label": "Responsibility और influence",
+          "metadata": {
+            "scores": {
+              "value:leadership": 2,
+              "signal:organizing": 1
+            }
+          }
+        },
+        {
+          "id": "security",
+          "label": "Stability और reliable income",
+          "metadata": {
+            "scores": {
+              "value:security": 2
+            }
+          }
+        },
+        {
+          "id": "recognition",
+          "label": "Recognition और respect",
+          "metadata": {
+            "scores": {
+              "value:recognition": 2
+            }
+          }
+        },
+        {
+          "id": "balance",
+          "label": "Work के बाहर time और flexibility",
+          "metadata": {
+            "scores": {
+              "value:balance": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "familyInfluence",
+      "fieldType": "singleSelect",
+      "label": "आपके घर में career conversations आम तौर पर कैसी लगती हैं?",
+      "description": "Family guidance important है। हम इसे आपकी strengths से अलग रखते हैं ताकि यह बेहतर conversation में मदद करे, आपकी potential decide न करे।",
+      "validation": {
+        "required": true
+      },
+      "options": [
+        {
+          "id": "open",
+          "label": "मेरी family अलग possibilities के लिए open है"
+        },
+        {
+          "id": "preferred",
+          "label": "मेरी family कुछ careers prefer करती है, पर हम discuss कर सकते हैं"
+        },
+        {
+          "id": "strong",
+          "label": "मेरी family किसी एक direction को strongly prefer करती है"
+        },
+        {
+          "id": "uncertain",
+          "label": "मेरी family help करना चाहती है, पर options को लेकर unsure है"
+        },
+        {
+          "id": "notDiscussed",
+          "label": "हमने careers पर सच में अभी बात नहीं की है"
+        },
+        {
+          "id": "preferNot",
+          "label": "मैं answer नहीं देना चाहता/चाहती"
+        }
+      ]
+    },
+    {
+      "id": "familyPriorities",
+      "fieldType": "multiSelect",
+      "label": "आपकी family आपके future के लिए आम तौर पर क्या important मानती है?",
+      "description": "ये priorities बाद में pathway conversations में मदद करेंगी; ये आपके career-direction signals नहीं बदलतीं।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
+      "options": [
+        {
+          "id": "security",
+          "label": "Job stability"
+        },
+        {
+          "id": "income",
+          "label": "अच्छी earning potential"
+        },
+        {
+          "id": "respect",
+          "label": "Social recognition या professional status"
+        },
+        {
+          "id": "location",
+          "label": "Family के पास रहना"
+        },
+        {
+          "id": "duration",
+          "label": "Manageable education duration"
+        },
+        {
+          "id": "interest",
+          "label": "Student की genuine interest"
+        },
+        {
+          "id": "notSure",
+          "label": "मुझे sure नहीं है",
+          "metadata": {
+            "exclusive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "familyExposure",
+      "fieldType": "multiSelect",
+      "label": "Family या जान-पहचान के लोगों से आपने किस तरह का work करीब से देखा है?",
+      "description": "Exposure से कुछ careers familiar लग सकते हैं। इससे unfamiliar possibilities बंद नहीं होनी चाहिए।",
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 4
+      },
+      "options": [
+        {
+          "id": "health",
+          "label": "Healthcare या wellbeing"
+        },
+        {
+          "id": "technology",
+          "label": "Technology, engineering या skilled trades"
+        },
+        {
+          "id": "business",
+          "label": "Business, finance, sales या family enterprise"
+        },
+        {
+          "id": "public",
+          "label": "Education, government, law या public service"
+        },
+        {
+          "id": "creative",
+          "label": "Arts, media, design या entertainment"
+        },
+        {
+          "id": "science",
+          "label": "Science, research, agriculture या environment"
+        },
+        {
+          "id": "other",
+          "label": "दूसरे kinds of work"
+        },
+        {
+          "id": "limited",
+          "label": "मुझे different careers का limited exposure मिला है",
+          "metadata": {
+            "exclusive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "experienceLevel",
+      "fieldType": "singleSelect",
+      "label": "Overall, आपको अपनी interests explore करने के कितने मौके मिले हैं?",
+      "description": "Limited opportunity weakness नहीं है। इससे Xtara समझता है कि guidance कितनी certain या tentative रखनी है।",
+      "validation": {
+        "required": true
+      },
+      "options": [
+        {
+          "id": "new",
+          "label": "अब तक बहुत कम"
+        },
+        {
+          "id": "some",
+          "label": "मैंने कुछ related activities try की हैं"
+        },
+        {
+          "id": "regular",
+          "label": "मैं regularly related activities में भाग लेता/लेती हूँ"
+        }
+      ]
+    }
+  ],
+  "stageQuestions": {
+    "grade8": [
+      {
+        "id": "grade8Exposure",
+        "fieldType": "multiSelect",
+        "label": "नई interests discover करने के मौके आपको कहाँ मिले हैं?",
+        "description": "Few opportunities weakness नहीं हैं। इसका मतलब directions broad रहनी चाहिए।",
+        "validation": {
+          "required": true,
+          "minSelect": 1,
+          "maxSelect": 3
+        },
+        "options": [
+          {
+            "id": "school",
+            "label": "School clubs, events, labs या competitions"
+          },
+          {
+            "id": "home",
+            "label": "Home, family work, hobbies या responsibilities"
+          },
+          {
+            "id": "community",
+            "label": "Sports, arts, community groups या volunteering"
+          },
+          {
+            "id": "online",
+            "label": "Online videos, courses, games या communities"
+          },
+          {
+            "id": "noneYet",
+            "label": "मुझे अब तक बहुत कम chances मिले हैं",
+            "metadata": {
+              "exclusive": true
+            }
+          }
+        ]
+      }
+    ],
+    "grade9": [
+      {
+        "id": "grade9Evidence",
+        "fieldType": "multiSelect",
+        "label": "किस experiences ने आपको खुद को बेहतर समझने में help की है?",
+        "description": "यह exposure के बारे में है, achievement के बारे में नहीं।",
+        "validation": {
+          "required": true,
+          "minSelect": 1,
+          "maxSelect": 3
+        },
+        "options": [
+          {
+            "id": "project",
+            "label": "Personal या school project",
+            "metadata": {
+              "scores": {
+                "evidence:demonstrated": 1
+              }
+            }
+          },
+          {
+            "id": "conversation",
+            "label": "किसी के work के बारे में conversation",
+            "metadata": {
+              "scores": {
+                "evidence:exposure": 1
+              }
+            }
+          },
+          {
+            "id": "club",
+            "label": "Club, competition, workshop, sport या volunteering activity",
+            "metadata": {
+              "scores": {
+                "evidence:demonstrated": 1
+              }
+            }
+          },
+          {
+            "id": "familyWork",
+            "label": "Family work या responsibilities में help करना",
+            "metadata": {
+              "scores": {
+                "evidence:observed": 1
+              }
+            }
+          },
+          {
+            "id": "noneYet",
+            "label": "मुझे अभी ऐसे experiences नहीं मिले हैं",
+            "metadata": {
+              "exclusive": true
+            }
+          }
+        ]
+      }
+    ],
+    "grade10": [
+      {
+        "id": "grade10Decision",
+        "fieldType": "singleSelect",
+        "label": "Grade 10 का कौन-सा decision सबसे urgent लगता है?",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "subjects",
+            "label": "कौन-से subjects continue करने हैं यह समझना"
+          },
+          {
+            "id": "stream",
+            "label": "Streams या study routes compare करना"
+          },
+          {
+            "id": "options",
+            "label": "कई future options open रखना"
+          },
+          {
+            "id": "discussion",
+            "label": "Family या school के साथ conversation की तैयारी करना"
+          }
+        ]
+      },
+      {
+        "id": "subjectConfidence",
+        "fieldType": "multiSelect",
+        "label": "कौन-से subjects अभी आपको energy या confidence देते हैं?",
+        "description": "Subjects evidence का एक हिस्सा हैं। ये permanently limit नहीं करते कि आप क्या बन सकते हैं।",
+        "validation": {
+          "required": true,
+          "minSelect": 1,
+          "maxSelect": 4
+        },
+        "options": [
+          {
+            "id": "math",
+            "label": "Mathematics",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1
+              }
+            }
+          },
+          {
+            "id": "science",
+            "label": "Science",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1,
+                "signal:making": 1
+              }
+            }
+          },
+          {
+            "id": "languages",
+            "label": "Languages",
+            "metadata": {
+              "scores": {
+                "signal:creativeExpression": 1,
+                "signal:communication": 1
+              }
+            }
+          },
+          {
+            "id": "socialScience",
+            "label": "Social science",
+            "metadata": {
+              "scores": {
+                "signal:communication": 1,
+                "signal:care": 1
+              }
+            }
+          },
+          {
+            "id": "arts",
+            "label": "Arts या design",
+            "metadata": {
+              "scores": {
+                "signal:creativeExpression": 1,
+                "signal:making": 1
+              }
+            }
+          },
+          {
+            "id": "computing",
+            "label": "Computing",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1,
+                "signal:making": 1
+              }
+            }
+          },
+          {
+            "id": "commerce",
+            "label": "Commerce या economics",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1,
+                "signal:organizing": 1
+              }
+            }
+          },
+          {
+            "id": "stillLearning",
+            "label": "मैं अभी इसे discover कर रहा/रही हूँ",
+            "metadata": {
+              "exclusive": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "signals": {
+    "creativeExpression": {
+      "title": "Creating and sharing ideas",
+      "description": "You may enjoy expressing ideas through stories, sound, images, or performance."
+    },
+    "analysis": {
+      "title": "Solving problems",
+      "description": "You may enjoy asking why, finding patterns, testing ideas, or making things work."
+    },
+    "making": {
+      "title": "Learning by doing",
+      "description": "You may learn well by building, repairing, making, or trying something yourself."
+    },
+    "communication": {
+      "title": "Explaining and listening",
+      "description": "You may enjoy listening, explaining, teaching, or helping an idea make sense."
+    },
+    "care": {
+      "title": "Helping people",
+      "description": "You may notice what people need and enjoy work that improves someone’s life."
+    },
+    "organizing": {
+      "title": "Planning and taking responsibility",
+      "description": "You may enjoy bringing people, tasks, and plans together to finish something."
+    }
+  },
+  "traits": {
+    "socialEnergy": {
+      "title": "Working with people",
+      "description": "Being with a group may give you energy when everyone shares a goal."
+    },
+    "reflective": {
+      "title": "Thinking before responding",
+      "description": "You may like time to observe and understand before you answer."
+    },
+    "structured": {
+      "title": "Following a clear plan",
+      "description": "Clear steps and responsibilities may help you work well."
+    },
+    "flexible": {
+      "title": "Trying and adjusting",
+      "description": "You may like trying an idea and changing your approach as you learn."
+    },
+    "collaborative": {
+      "title": "Working together",
+      "description": "You may think and work well by discussing ideas with other people."
+    },
+    "independent": {
+      "title": "Working on your own",
+      "description": "You may like having space to focus and find your own answer."
+    },
+    "practical": {
+      "title": "Learning by doing",
+      "description": "Trying something yourself may help you learn more than hearing an explanation."
+    },
+    "conceptual": {
+      "title": "Thinking about ideas",
+      "description": "You may enjoy seeing how ideas connect and understanding why things happen."
+    },
+    "persistence": {
+      "title": "Keeping going",
+      "description": "You may continue when something is difficult if the result matters to you."
+    },
+    "adaptive": {
+      "title": "Changing your approach",
+      "description": "You may work differently depending on the people, goal, and situation."
+    },
+    "responsibility": {
+      "title": "Following through",
+      "description": "Other people may trust you to complete an important task."
+    }
+  },
+  "context": {
+    "family": {
+      "open": "Your family appears open to exploration.",
+      "preferred": "Your family has preferred ideas, with room for discussion.",
+      "strong": "Your family has strong ideas about your future. Their view is shown separately from your own interests.",
+      "uncertain": "Your family wants to help but may need clearer career and education information.",
+      "notDiscussed": "Career conversations have not really started at home yet.",
+      "preferNot": "You chose not to share this. It does not change your Career Directions."
+    },
+    "weakness": {
+      "dislike": "Some difficult areas may reflect genuine dislike after experience.",
+      "confidence": "Low confidence may be affecting how you judge some abilities.",
+      "marks": "Marks show only part of what you can do.",
+      "exposure": "You may not know whether you enjoy something until you have a chance to try it.",
+      "teaching": "The way something was taught may have affected your experience of it.",
+      "improve": "You are willing to improve in areas that currently feel difficult.",
+      "notSure": "You are still learning what difficulty means for you."
+    }
+  },
+  "areas": {
+    "technology": {
+      "title": "Technology",
+      "description": "Build apps, solve problems, and create useful digital tools."
+    },
+    "health": {
+      "title": "Health",
+      "description": "Help people stay healthy, recover, and live well."
+    },
+    "science": {
+      "title": "Science",
+      "description": "Ask questions, test ideas, and learn how things work."
+    },
+    "business": {
+      "title": "Business",
+      "description": "Turn ideas into useful products, services, and organisations."
+    },
+    "design": {
+      "title": "Design and Media",
+      "description": "Create clear, useful, and engaging experiences and stories."
+    },
+    "society": {
+      "title": "Education and Society",
+      "description": "Teach, support communities, and help solve public problems."
+    }
+  },
+  "result": {
+    "eyebrow": "Your Career Directions",
+    "title": "खोजने के लिए एक Career Direction चुनें।",
+    "description": "ये आपके जवाबों पर आधारित शुरुआती विकल्प हैं। अभी एक चुनें—आप इसे बाद में बदल सकते हैं।",
+    "patternsTitle": "वे चीज़ें जिनमें आपकी रुचि हो सकती है",
+    "patternsDescription": "",
+    "traitsTitle": "आप किस तरह काम करना पसंद कर सकते हैं",
+    "traitsDescription": "",
+    "why": "आपने जो बताया उसके आधार पर",
+    "evidence": "Evidence level",
+    "early": "Worth exploring",
+    "developing": "Strong pattern",
+    "noticed": "Noticed",
+    "repeated": "Repeated pattern",
+    "nextTitle": "What to do next",
+    "savedTemporarily": "Temporary until signup",
+    "noScore": "No perfect-career percentage",
+    "emptyTitle": "Start with the career discovery assessment.",
+    "areasLabel": "एक Career Direction चुनें",
+    "roleExamples": "Dream Careers you can explore in this direction",
+    "viewArea": "इस दिशा को देखें",
+    "contextTitle": "आपके जवाबों को प्रभावित करने वाली बातें",
+    "familyTitle": "Family influence",
+    "weaknessTitle": "Understanding difficulty",
+    "reflectionTitle": "ये विकल्प सही नहीं लग रहे?",
+    "reflectionDescription": "अपने जवाब दोबारा देखें और जो सही न लगे उसे बदलें।",
+    "reflectionAccurate": "This sounds like me",
+    "reflectionInaccurate": "Not accurate",
+    "reflectionUnsure": "I am unsure",
+    "reflectionMissing": "Something is missing",
+    "reflectionSaved": "Your response has been recorded temporarily.",
+    "personalizeTitle": "Add your study details",
+    "personalizeDescription": "Add your location, school board, language, fee preference, and study-location preference so Xtara can show useful courses, colleges, and scholarships.",
+    "personalize": "Add my study details",
+    "edit": "अपने जवाब देखें",
+    "explore": "अपनी Career Direction देखें",
+    "detailsTitle": "देखें कि आपके जवाबों में क्या दिखा",
+    "detailsDescription": "इन दिशाओं के आने का कारण जानना हो तभी इसे खोलें।"
+  },
+  "nextActions": {
+    "grade8": [
+      "Choose a Career Direction and discover its Dream Careers.",
+      "Tell Xtara which Career Directions feel interesting or inaccurate.",
+      "Add your study details to see useful courses and colleges."
+    ],
+    "grade9": [
+      "Compare Dream Careers by what people actually do each day.",
+      "Choose up to three Dream Careers while you are still exploring.",
+      "Add your study details to see subjects, courses, and colleges."
+    ],
+    "grade10": [
+      "Compare how school subjects and courses keep different Career Directions open.",
+      "Review the suggestions with your family, teacher, or counselor.",
+      "Add your location and fee preference before comparing colleges."
+    ]
+  }
+}

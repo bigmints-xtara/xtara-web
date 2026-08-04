@@ -1,118 +1,163 @@
 "use client";
 
-import { useState } from "react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase/firebase";
+import { Suspense, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  EmailAuthProvider,
+  linkWithCredential,
+  updateProfile,
+} from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { createUserDocument, convertAnonymousUser } from "@/lib/firebase/auth-helpers";
-import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { SignupForm } from "@/components/signup-form";
+import { useAuth } from "@/context/AuthContext";
+import { useTranslations } from "@/i18n/language-provider";
+import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
+import { savePendingAssessmentToAccount, savePendingDiscoveryToAccount } from "@/lib/discovery-save";
+import { getFirebaseAuth } from "@/lib/firebase-client";
 
 function SignupContent() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const careerPathId = searchParams.get('careerPathId');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { configurationError } = useAuth();
+  const { messages } = useTranslations();
+  const careerPathId = searchParams.get("careerPathId");
+  const shouldSaveDiscovery = searchParams.get("saveDiscovery") === "1";
+  const shouldSaveAssessment = searchParams.get("saveAssessment") === "1";
+  const educatorMode = searchParams.get("mode") === "educator";
+  const requestedNext = searchParams.get("next");
+  const commonCopy = messages.auth.common;
+  const signupCopy = messages.auth.signup;
+  const variantKey = shouldSaveDiscovery
+    ? "saveDiscovery"
+    : shouldSaveAssessment
+      ? "saveAssessment"
+      : educatorMode
+        ? "educator"
+        : "default";
+  const variantCopy = signupCopy.variants[variantKey];
+  const loginHref = shouldSaveDiscovery
+    ? "/login?saveDiscovery=1&next=%2Fdashboard"
+    : shouldSaveAssessment && requestedNext
+      ? `/login?saveAssessment=1&next=${encodeURIComponent(requestedNext)}`
+      : educatorMode
+        ? `/login?mode=educator${requestedNext ? `&next=${encodeURIComponent(requestedNext)}` : ""}`
+        : "/login";
 
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-        try {
-            if (auth.currentUser && auth.currentUser.isAnonymous) {
-                // Anonymous user -> Link credential to keep data
-                await convertAnonymousUser(auth.currentUser, email, password, name);
+    try {
+      const auth = getFirebaseAuth();
+      const currentUser = auth.currentUser;
+      const credential =
+        currentUser?.isAnonymous
+          ? await linkWithCredential(currentUser, EmailAuthProvider.credential(email, password))
+          : await createUserWithEmailAndPassword(auth, email, password);
 
-                // Navigate to career path if available, otherwise home
-                if (careerPathId) {
-                    router.push(`/assessment/results/${careerPathId}`);
-                } else {
-                    router.push("/");
-                }
-            } else {
-                // New user
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await updateProfile(userCredential.user, { displayName: name });
-                await createUserDocument(userCredential.user, { displayName: name });
-                router.push("/");
-            }
-        } catch (err: any) {
-            console.error("Signup error:", err);
-            setError(err.message || "Failed to create account. Please try again.");
-            setLoading(false);
-        }
-    };
+      if (name.trim()) {
+        await updateProfile(credential.user, { displayName: name.trim() });
+      }
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-            <div className="w-full max-w-md p-8 bg-card rounded-lg  border border-border">
-                <h1 className="text-3xl font-bold mb-6 text-center">Create Account</h1>
+      await createApiSession(await credential.user.getIdToken(true));
 
-                {error && <p className="text-destructive mb-4">{error}</p>}
+      if (shouldSaveDiscovery) {
+        await savePendingDiscoveryToAccount(credential.user.uid);
+        router.push(safeDestination(requestedNext) ?? "/dashboard");
+        return;
+      }
 
-                <form onSubmit={handleSignup} className="space-y-4">
-                    <div>
-                        <label className="block mb-1 font-medium">Full Name</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full p-2 rounded bg-input border border-input focus:border-ring focus:ring-1 focus:ring-ring outline-none transition-all"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-1 font-medium">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 rounded bg-input border border-input focus:border-ring focus:ring-1 focus:ring-ring outline-none transition-all"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block mb-1 font-medium">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 rounded bg-input border border-input focus:border-ring focus:ring-1 focus:ring-ring outline-none transition-all"
-                            required
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                        {loading && (
-                            <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                        )}
-                        {loading ? "Creating Account..." : "Sign Up"}
-                    </button>
-                </form>
+      if (shouldSaveAssessment) {
+        const didSave = await savePendingAssessmentToAccount(credential.user.uid);
+        if (!didSave) throw new Error("Complete the assessment before joining an institution.");
+        router.push(safeDestination(requestedNext) ?? "/dashboard");
+        return;
+      }
 
-                <p className="mt-6 text-center text-muted-foreground">
-                    Already have an account?{" "}
-                    <Link href="/login" className="text-primary hover:underline">
-                        Log in
-                    </Link>
-                </p>
-            </div>
-        </div>
-    );
+      if (careerPathId) {
+        router.push(`/assessment/results/${careerPathId}`);
+        return;
+      }
+
+      router.push(safeDestination(requestedNext) ?? await getPostAuthDestination());
+    } catch (err) {
+      setError(getFriendlySignupError(err));
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AuthShell
+      backLabel={commonCopy.backHome}
+      imageSrc="/images/home/family-supported-future.jpg"
+      imageAlt={signupCopy.imageAlt}
+      eyebrow={variantCopy.sideEyebrow}
+      title={variantCopy.sideTitle}
+      description={variantCopy.sideDescription}
+      proofs={variantCopy.sideProofs}
+    >
+      <SignupForm
+        copy={{
+          title: variantCopy.title,
+          description: variantCopy.description,
+          name: signupCopy.name,
+          namePlaceholder: signupCopy.namePlaceholder,
+          email: commonCopy.email,
+          emailPlaceholder: commonCopy.emailPlaceholder,
+          password: commonCopy.password,
+          passwordHint: signupCopy.passwordHint,
+          submit: variantCopy.submit,
+          submitting: signupCopy.submitting,
+          loginPrompt: signupCopy.loginPrompt,
+          loginAction: signupCopy.loginAction,
+          termsPrefix: commonCopy.termsPrefix,
+          terms: commonCopy.terms,
+          privacyConnector: commonCopy.privacyConnector,
+          privacy: commonCopy.privacy,
+        }}
+        name={name}
+        email={email}
+        password={password}
+        error={configurationError || error}
+        loading={loading}
+        disabled={Boolean(configurationError)}
+        loginHref={loginHref}
+        onNameChange={setName}
+        onEmailChange={setEmail}
+        onPasswordChange={setPassword}
+        onSubmit={handleSignup}
+      />
+    </AuthShell>
+  );
+}
+
+function getFriendlySignupError(err: unknown) {
+  const code = typeof err === "object" && err && "code" in err ? String(err.code) : "";
+  switch (code) {
+    case "auth/email-already-in-use": return "An account already exists with that email. Log in instead.";
+    case "auth/invalid-email": return "Enter a valid email address.";
+    case "auth/weak-password": return "Use a stronger password with at least 6 characters.";
+    case "auth/network-request-failed": return "Network issue. Check your connection and try again.";
+    default: return err instanceof Error ? err.message : "Failed to create account. Please try again.";
+  }
+}
+
+function safeDestination(value: string | null): string | null {
+  return value?.startsWith("/") && !value.startsWith("//") ? value : null;
 }
 
 export default function SignupPage() {
-    return (
-        <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
-            <SignupContent />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<div className="flex min-h-svh items-center justify-center bg-[#f4f8fb]"><Loader2 className="size-7 animate-spin text-primary" /></div>}>
+      <SignupContent />
+    </Suspense>
+  );
 }

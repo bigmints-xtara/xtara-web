@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { FirestoreService, GoodRead } from "@/lib/firebase/firestore-service";
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ExternalLink, Award } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 
 export default function GoodReadPage() {
@@ -17,7 +17,11 @@ export default function GoodReadPage() {
     
     const [goodRead, setGoodRead] = useState<GoodRead | null>(null);
     const [loading, setLoading] = useState(true);
-    const [pointsAwarded, setPointsAwarded] = useState(false);
+    const [completionSaved, setCompletionSaved] = useState(false);
+    const [savingCompletion, setSavingCompletion] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [rewardError, setRewardError] = useState<string | null>(null);
+    const automaticAttempted = useRef<string | null>(null);
 
     const id = params?.id as string;
 
@@ -34,23 +38,52 @@ export default function GoodReadPage() {
         fetchGoodRead();
     }, [id]);
 
-    useEffect(() => {
-        if (goodRead && user && !user.isAnonymous && !pointsAwarded) {
-            const awardPoints = async () => {
-                try {
-                    const achievements = new AchievementsService();
-                    // Award 5 points for reading
-                    await achievements.addPointsForGoodRead(user.uid, goodRead.id);
-                    setPointsAwarded(true);
-                    // Use a simple timeout to alert without blocking UI
-                    setTimeout(() => alert("You earned 5 points for discovering this Good Read!"), 100);
-                } catch (error) {
-                    console.error("Failed to award points", error);
-                }
-            };
-            awardPoints();
+    const awardPoints = useCallback(async () => {
+        if (!goodRead || !user || user.isAnonymous) return;
+        setRewardError(null);
+        try {
+            const achievements = new AchievementsService();
+            const awarded = await achievements.addPointsForGoodRead(user.uid, goodRead.id);
+            if (awarded) setTimeout(() => alert("You earned 5 points."), 100);
+        } catch (error) {
+            console.error("Failed to award Good Read points", error);
+            setRewardError("Progress saved. Points could not be updated.");
         }
-    }, [goodRead, user, pointsAwarded]);
+    }, [goodRead, user]);
+
+    const saveCompletion = useCallback(async () => {
+        if (!goodRead || !user || user.isAnonymous || completionSaved || savingCompletion) return;
+
+        setSavingCompletion(true);
+        setSaveError(null);
+        try {
+            await FirestoreService.markGoodReadCompleted(goodRead.id);
+            setCompletionSaved(true);
+            await awardPoints();
+        } catch (error) {
+            console.error("Failed to save Good Read completion", error);
+            setSaveError("Your progress was not saved.");
+        } finally {
+            setSavingCompletion(false);
+        }
+    }, [awardPoints, completionSaved, goodRead, savingCompletion, user]);
+
+    useEffect(() => {
+        const attemptKey = goodRead && user ? `${user.uid}:${goodRead.id}` : null;
+        if (!goodRead || !user || user.isAnonymous || automaticAttempted.current === attemptKey) return;
+        automaticAttempted.current = attemptKey;
+        void saveCompletion();
+    }, [goodRead, saveCompletion, user]);
+
+    const openFullArticle = () => {
+        if (!goodRead?.hyperlink) return;
+        window.open(goodRead.hyperlink, "_blank", "noopener,noreferrer");
+        if (user && !user.isAnonymous) {
+            void FirestoreService.markGoodReadLinkOpened(goodRead.id).catch((error) => {
+                console.error("Failed to save Good Read link progress", error);
+            });
+        }
+    };
 
     if (loading) {
         return (
@@ -107,6 +140,22 @@ export default function GoodReadPage() {
                             {goodRead.summary}
                         </div>
                     )}
+                    {saveError && (
+                        <div className="mt-4 flex items-center gap-3 text-sm text-destructive" role="alert">
+                            <span>{saveError}</span>
+                            <Button variant="outline" size="sm" onClick={() => void saveCompletion()} disabled={savingCompletion}>
+                                Retry
+                            </Button>
+                        </div>
+                    )}
+                    {rewardError && (
+                        <div className="mt-4 flex items-center gap-3 text-sm text-destructive" role="alert">
+                            <span>{rewardError}</span>
+                            <Button variant="outline" size="sm" onClick={() => void awardPoints()}>
+                                Retry points
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {goodRead.hyperlink && (
@@ -121,7 +170,7 @@ export default function GoodReadPage() {
                             <Button 
                                 size="lg" 
                                 className="w-full sm:w-auto"
-                                onClick={() => window.open(goodRead.hyperlink, "_blank")}
+                                onClick={openFullArticle}
                             >
                                 Read Full Article
                                 <ExternalLink className="h-4 w-4 ml-2" />

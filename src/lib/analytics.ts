@@ -1,4 +1,4 @@
-export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID || "G-DEV-FALLBACK";
+export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID?.trim() || null;
 
 declare global {
   interface Window {
@@ -14,7 +14,7 @@ type GtagEvent = {
 };
 
 export const trackPageview = (url: string) => {
-  if (typeof window === "undefined" || !("gtag" in window)) {
+  if (!GA_MEASUREMENT_ID || typeof window === "undefined" || !("gtag" in window)) {
     return;
   }
   window.gtag("config", GA_MEASUREMENT_ID, {
@@ -23,7 +23,7 @@ export const trackPageview = (url: string) => {
 };
 
 export const trackEvent = ({ action, category, label, value }: GtagEvent) => {
-  if (typeof window === "undefined" || !("gtag" in window)) {
+  if (!GA_MEASUREMENT_ID || typeof window === "undefined" || !("gtag" in window)) {
     return;
   }
   window.gtag("event", action, {

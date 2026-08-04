@@ -6,7 +6,15 @@ export interface AdminEntity {
   updatedAt?: Date;
 }
 
-export interface Story extends AdminEntity {
+export interface ContentTagFields {
+  futureDirectionIds: string[];
+  dreamCareerIds: string[];
+  skillIds: string[];
+  gradeStages: string[];
+  topics: string[];
+}
+
+export interface Story extends AdminEntity, ContentTagFields {
   title: string;
   description: string;
   image: string;
@@ -26,15 +34,17 @@ export interface Story extends AdminEntity {
   slides: StorySlide[];
 }
 
-export interface Spark extends AdminEntity {
+export interface Spark extends AdminEntity, ContentTagFields {
   title: string;
   type: string;
   published: boolean;
   draft: boolean;
   inReview: boolean;
+  careerClusters?: string[];
+  careerRelevance?: string[];
 }
 
-export interface GameInstance extends AdminEntity {
+export interface GameInstance extends AdminEntity, ContentTagFields {
   title: string;
   mode: 'quiz' | 'puzzle' | 'memory';
   isPublished: boolean;
@@ -44,7 +54,7 @@ export interface GameInstance extends AdminEntity {
   };
 }
 
-export interface GoodRead extends AdminEntity {
+export interface GoodRead extends AdminEntity, ContentTagFields {
   title: string;
   image: string;
   domain: string;
@@ -67,7 +77,7 @@ export interface ChallengeQuestion {
   explanation: string;
 }
 
-export interface Challenge extends AdminEntity {
+export interface Challenge extends AdminEntity, ContentTagFields {
   title: string;
   image: string;
   domain: string;
@@ -112,16 +122,17 @@ export interface AdminCareerPath extends AdminEntity {
   relatedCareers?: RelatedCareer[];
   strengths?: string[];
   description?: string;
-  internshipExamples?: any[];
-  onlineTrainings?: any[];
-  topInstitutions?: any[];
-  toolsAndSoftware?: any[];
+  internshipExamples?: unknown[];
+  onlineTrainings?: unknown[];
+  topInstitutions?: unknown[];
+  toolsAndSoftware?: unknown[];
 }
 
 export interface AdminConfig<T extends AdminEntity> {
   entityName: string;
   entityNamePlural: string;
   collectionName: string;
+  supportsApproval?: boolean;
   hideNewButton?: boolean;
   orderByField?: string | null;
   orderByDirection?: 'asc' | 'desc';

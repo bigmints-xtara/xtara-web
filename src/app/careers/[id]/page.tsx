@@ -19,7 +19,6 @@ import GrowSection from "@/components/careers/sections/GrowSection";
 import RelatedCareersCard from "@/components/careers/sidebar/RelatedCareersCard";
 import WhatYouDoCard from "@/components/careers/sidebar/WhatYouDoCard";
 import SalaryInsightsCard from "@/components/careers/sidebar/SalaryInsightsCard";
-import MatchReasoningCard from "@/components/careers/sidebar/MatchReasoningCard";
 import SlideshowOverlay from "@/components/career-path/SlideshowOverlay";
 import { generateSlidesFromCareer } from "@/lib/career-slides-utils";
 import { useCareerPathQuery } from "@/lib/query/useCareerPath";
@@ -99,10 +98,8 @@ export default function CareerDetailPage() {
 
                     <div className="relative z-10">
                         <div className="flex flex-wrap items-center gap-3 mb-6">
-                            {/* Match Score Badge */}
-                            <div className="px-3 py-1 bg-secondary rounded-lg text-secondary-foreground font-bold text-sm   flex flex-col items-center leading-tight">
-                                <span className="text-lg">{Math.round(careerPath.matchScore || 85)}%</span>
-                                <span className="text-[10px] uppercase font-medium opacity-90">Match</span>
+                            <div className="px-3 py-1 bg-secondary rounded-lg text-secondary-foreground font-bold text-sm">
+                                Role to explore
                             </div>
 
                             {/* Archetypes */}
@@ -121,7 +118,7 @@ export default function CareerDetailPage() {
 
                         {careerPath.quote && (
                             <blockquote className="border-l-4 border-accent pl-4 italic text-primary-foreground/80 mb-8 max-w-2xl">
-                                "{careerPath.quote}"
+                                &ldquo;{careerPath.quote}&rdquo;
                             </blockquote>
                         )}
 
@@ -172,7 +169,6 @@ export default function CareerDetailPage() {
 
                         {/* Sidebar - 1/3 width */}
                         <aside className="space-y-6">
-                            <MatchReasoningCard careerPath={careerPath} />
                             <WhatYouDoCard careerPath={careerPath} />
                             <SalaryInsightsCard careerPath={careerPath} />
                             <RelatedCareersCard careerPath={careerPath} />

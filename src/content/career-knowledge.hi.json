@@ -1,0 +1,516 @@
+{
+  "ui": {
+    "areasEyebrow": "Career Directions",
+    "areasTitle": "Career Direction चुनें, फिर उसके Dream Careers compare करें।",
+    "areasDescription": "Health जैसी Career Direction में बहुत अलग Dream Careers हो सकते हैं। Explore करने के लिए तीन तक चुनने से पहले real work compare करें।",
+    "viewArea": "यह Career Direction चुनें",
+    "rolesTitle": "इस direction के Dream Careers",
+    "viewRole": "Dream Career details देखें",
+    "backToAreas": "मेरी Career Directions",
+    "dailyWork": "Work में क्या हो सकता है",
+    "workSetting": "Work कहाँ होता है",
+    "pathway": "तैयारी कैसे करें",
+    "tradeoffs": "क्या difficult हो सकता है",
+    "specializations": "Possible specializations",
+    "tryThis": "Idea test करें",
+    "saveDirection": "My Dream Careers में जोड़ें",
+    "openDirection": "My Career Path खोलें",
+    "saved": "My Dream Careers में जोड़ा गया",
+    "sourceTitle": "इस guidance को कैसे पढ़ें",
+    "sourceStatusPilot": "Pilot guidance",
+    "lastReviewed": "Content checked",
+    "sourceLinks": "Starting references",
+    "back": "वापस जाएँ",
+    "directionEyebrow": "My Career Path",
+    "directionTitle": "My Next Steps",
+    "directionExplore": "Career Directions देखें",
+    "directionAssessment": "Assessment शुरू करें",
+    "currentHypothesis": "My Dream Careers",
+    "whyHere": "यह यहाँ क्यों है",
+    "nextThree": "आपके अगले तीन actions",
+    "markDone": "Complete mark करें",
+    "completed": "Completed",
+    "reviewTitle": "Review point",
+    "changeDirection": "Career Direction बदलें",
+    "savedLocally": "इस device पर saved. Account के साथ My Career Path रखने के लिए sign in करें।",
+    "savedToAccount": "आपके Xtara account में saved और इस device पर available.",
+    "rolesDescription": "एक direction के अंदर roles काफी अलग हो सकते हैं। Daily work, preparation और trade-offs compare करें।",
+    "sourceNote": "यह starting guidance है। Courses, eligibility और rules को official sources से verify करें।",
+    "notFound": "यह career content अभी available नहीं है।",
+    "directionDescription": "Chosen direction को simple next steps में बदलें।",
+    "directionEmptyTitle": "अभी कोई Dream Career चुना नहीं गया है",
+    "directionEmptyDescription": "Assessment complete करें या Career Directions खोलकर explore करने के लिए roles चुनें।",
+    "whyHereDescription": "यह choice आपके assessment answers और saved interests से जुड़ी है।",
+    "actionLearn": "एक useful skill सीखें",
+    "actionDiscuss": "किसी parent, teacher या counsellor से discuss करें",
+    "reviewDescription": "कुछ नया सीखने या try करने के बाद अपना plan review करें।"
+  },
+  "areas": [
+    {
+      "id": "technology",
+      "title": "Technology",
+      "summary": "Apps बनाएं, समस्याएं हल करें और उपयोगी digital tools तैयार करें।",
+      "prompt": "क्या आपको समस्याएं हल करना, चीजें बनाना या technology को बेहतर करना पसंद है?"
+    },
+    {
+      "id": "health",
+      "title": "Health",
+      "summary": "लोगों को स्वस्थ रहने, ठीक होने और बेहतर जीवन जीने में मदद करें।",
+      "prompt": "क्या आपको health, science और लोगों की मदद करने में रुचि है?"
+    },
+    {
+      "id": "science",
+      "title": "Science",
+      "summary": "सवाल पूछें, ideas को परखें और समझें कि चीजें कैसे काम करती हैं।",
+      "prompt": "क्या आपको ‘क्यों’ पूछना, ideas परखना और नई बातें सीखना पसंद है?"
+    },
+    {
+      "id": "business",
+      "title": "Business",
+      "summary": "Ideas को उपयोगी products, services और organisations में बदलें।",
+      "prompt": "क्या आपको planning, फैसले लेना या किसी idea को सच बनाना पसंद है?"
+    },
+    {
+      "id": "design",
+      "title": "Design and Media",
+      "summary": "उपयोगी और दिलचस्प experiences, visuals और stories बनाएं।",
+      "prompt": "क्या आपको लोगों को समझना, ideas बनाना और चीजों को उपयोग में आसान करना पसंद है?"
+    },
+    {
+      "id": "society",
+      "title": "Education and Society",
+      "summary": "पढ़ाएं, communities की मदद करें और लोगों की साझा समस्याएं हल करें।",
+      "prompt": "क्या आपको लोगों को सीखने, साथ आने या समस्याएं हल करने में मदद करना पसंद है?"
+    }
+  ],
+  "roles": [
+    {
+      "id": "software-developer",
+      "areaId": "technology",
+      "title": "Software Developer",
+      "englishTitle": "Software Developer",
+      "summary": "लोगों या organizations द्वारा use किए जाने वाले software को design, build, test और improve करता है।",
+      "dailyWork": [
+        "Problem को छोटे parts में तोड़ना",
+        "Code लिखना और review करना",
+        "Team के साथ testing, debugging और improvements discuss करना"
+      ],
+      "workSetting": "अक्सर computer-based और collaborative work; product और team programming language जितने ही important हो सकते हैं।",
+      "pathway": "Computing degrees, related diplomas या strong project portfolios से लोग आते हैं। Useful route role और employer पर depend करता है।",
+      "tradeoffs": [
+        "क्या आपको लंबे focused problem-solving periods पसंद हैं?",
+        "लगातार नए tools सीखने के बारे में आप कैसा feel करते हैं?"
+      ],
+      "specializations": [
+        "Web",
+        "Mobile",
+        "Cloud",
+        "Embedded systems"
+      ],
+      "tryThis": "एक tiny webpage बनाइए या कोई repetitive task automate कीजिए, फिर note करें कि कौन-सा part अच्छा लगा।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "cybersecurity-analyst",
+      "areaId": "technology",
+      "title": "Cybersecurity Analyst",
+      "englishTitle": "Cybersecurity Analyst",
+      "summary": "Digital systems और information के risks identify, investigate और reduce करने में help करता है।",
+      "dailyWork": [
+        "Unusual activity और security alerts review करना",
+        "Weakness कैसे use हो सकती है यह investigate करना",
+        "Risks document करना और teams को controls improve करने में help करना"
+      ],
+      "workSetting": "Computer-based work जिसमें routine monitoring और urgent incident response दोनों आ सकते हैं।",
+      "pathway": "Computing basics, networking, operating systems, ethical practice और hands-on labs common preparation areas हैं।",
+      "tradeoffs": [
+        "क्या आप repetitive checks में भी careful रह सकते हैं?",
+        "Incident के समय responsibility handle करना comfortable लगेगा?"
+      ],
+      "specializations": [
+        "Security operations",
+        "Application security",
+        "Digital forensics",
+        "Governance and risk"
+      ],
+      "tryThis": "Beginner cyber-safety lab complete करें और risk और fix किसी और को समझाएँ।",
+      "salaryRange": "AmbitionBox के अनुसार India में 1-5 years experience के लिए typical salary लगभग ₹6.5-7.2 lakh per year है, 12.6k salary reports पर based (updated 2026)।",
+      "growthOutlook": "Cybersecurity government और private sectors दोनों में है, लेकिन opportunities current skills, certifications, location और experience पर depend करती हैं।",
+      "sourceIds": [
+        "ncs",
+        "ambitionbox-cyber-2026"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "physician",
+      "areaId": "health",
+      "title": "Physician",
+      "englishTitle": "Physician",
+      "summary": "Health concerns assess करता है, clinical decisions लेता है और patients तथा care teams के साथ काम करता है।",
+      "dailyWork": [
+        "Symptoms और medical history सुनना",
+        "Examine, investigate और possible causes पर reason करना",
+        "Treatment, prevention और follow-up discuss करना"
+      ],
+      "workSetting": "Clinical environments जहाँ direct human responsibility, teamwork, documentation और कभी irregular hours होते हैं।",
+      "pathway": "यह regulated profession है। Formal medical education, supervised training और current licensing requirements officially check करनी होती हैं।",
+      "tradeoffs": [
+        "क्या आप लंबे और demanding education route के लिए तैयार हैं?",
+        "Uncertainty और emotionally difficult situations में आप कैसे respond करेंगे?"
+      ],
+      "specializations": [
+        "General medicine",
+        "Paediatrics",
+        "Psychiatry",
+        "Radiology"
+      ],
+      "tryThis": "Healthcare professional से normal day के बारे में interview करें, difficult parts भी पूछें।",
+      "sourceIds": [
+        "nmc",
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "physiotherapist",
+      "areaId": "health",
+      "title": "Physiotherapist",
+      "englishTitle": "Physiotherapist",
+      "summary": "Assessment और guided activity से लोगों की movement, function और recovery improve करने में help करता है।",
+      "dailyWork": [
+        "Movement observe करना और person के goals समझना",
+        "Exercises plan और demonstrate करना",
+        "Progress track करके rehabilitation plan adjust करना"
+      ],
+      "workSetting": "Hospitals, clinics, rehabilitation centres, sports settings, community services या home visits।",
+      "pathway": "Formal physiotherapy education और लागू professional requirements central हैं; current eligibility official institutions से verify करें।",
+      "tradeoffs": [
+        "क्या आपको patient, repeated coaching पसंद है?",
+        "Active, people-facing work comfortable लगेगा?"
+      ],
+      "specializations": [
+        "Musculoskeletal",
+        "Neurological",
+        "Sports",
+        "Paediatric rehabilitation"
+      ],
+      "tryThis": "एक common movement कैसे assess होती है यह सीखें और physiotherapist से पूछें कि same exercise सबको suit क्यों नहीं करती।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "biomedical-engineer",
+      "areaId": "health",
+      "title": "Biomedical Engineer",
+      "englishTitle": "Biomedical Engineer",
+      "summary": "Medical devices, health systems और human needs में engineering और design apply करता है।",
+      "dailyWork": [
+        "Clinical या user problem समझना",
+        "Device या system design, test या maintain करना",
+        "Engineers, clinicians, quality और regulatory teams के साथ काम करना"
+      ],
+      "workSetting": "Engineering teams, laboratories, hospitals, manufacturing, quality या research environments।",
+      "pathway": "Engineering, mathematics, science, design और health context इस field में मिलते हैं; routes specialization पर vary करते हैं।",
+      "tradeoffs": [
+        "क्या आपको technical detail और human context दोनों पसंद हैं?",
+        "Careful testing और documentation meaningful लगेगा या frustrating?"
+      ],
+      "specializations": [
+        "Medical devices",
+        "Biomechanics",
+        "Clinical engineering",
+        "Health technology"
+      ],
+      "tryThis": "एक medical device चुनें और उसके पीछे user need, engineering problem और safety questions map करें।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "environmental-scientist",
+      "areaId": "science",
+      "title": "Environmental Scientist",
+      "englishTitle": "Environmental Scientist",
+      "summary": "Environmental systems और evidence study करके problems समझता है और decisions support करता है।",
+      "dailyWork": [
+        "Field या laboratory data collect/examine करना",
+        "Patterns और possible causes analyze करना",
+        "Findings communities, organizations या decision-makers को explain करना"
+      ],
+      "workSetting": "Field sites, laboratories, computers, reports और अलग stakeholders से conversations का mix।",
+      "pathway": "Environmental science, biology, chemistry, earth science, geography, statistics या related study अलग roles की तरफ ले जा सकती है।",
+      "tradeoffs": [
+        "क्या आपको fieldwork और careful analysis combine करना पसंद है?",
+        "जब लोग disagree करें तब evidence communicate कर सकते हैं?"
+      ],
+      "specializations": [
+        "Water",
+        "Air quality",
+        "Ecology",
+        "Environmental impact"
+      ],
+      "tryThis": "एक local environmental issue observe करें और अलग करें: क्या पता है, क्या assume है, और क्या measure करना बाकी है।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "data-scientist",
+      "areaId": "science",
+      "title": "Data Scientist",
+      "englishTitle": "Data Scientist",
+      "summary": "Data, statistics और computing से questions investigate करता है और decisions support करता है।",
+      "dailyWork": [
+        "Data request के पीछे का question clear करना",
+        "Data clean, explore और model करना",
+        "Results, limits और uncertainty explain करना"
+      ],
+      "workSetting": "Mostly computer-based, अक्सर technical और non-technical teams के साथ।",
+      "pathway": "Statistics, mathematics, computing, domain knowledge और practical projects का evidence common foundations हैं।",
+      "tradeoffs": [
+        "Patterns ढूँढने से पहले messy information clean करना आपको पसंद है?",
+        "Result uncertain या misleading हो तो explain कर सकते हैं?"
+      ],
+      "specializations": [
+        "Analytics",
+        "Machine learning",
+        "Experimentation",
+        "Decision science"
+      ],
+      "tryThis": "Small public dataset से एक question answer करें और लिखें कि answer incomplete क्यों हो सकता है।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "product-manager",
+      "areaId": "business",
+      "title": "Product Manager",
+      "englishTitle": "Product Manager",
+      "summary": "Team को user problem समझने, priorities चुनने और product काम कर रहा है या नहीं सीखने में help करता है।",
+      "dailyWork": [
+        "Users और teams से problems पर बात करना",
+        "Options compare करके next test decide करना",
+        "Design, technology और business work align करना"
+      ],
+      "workSetting": "Product organizations में highly collaborative work; responsibilities companies के बीच काफी vary करती हैं।",
+      "pathway": "एक regulated route नहीं है। लोग technology, design, business, research, operations और domain experience से आते हैं।",
+      "tradeoffs": [
+        "Incomplete information में decisions ले सकते हैं?",
+        "हर detail control किए बिना coordinate करना suit करेगा?"
+      ],
+      "specializations": [
+        "Consumer products",
+        "Enterprise products",
+        "Growth",
+        "Platform products"
+      ],
+      "tryThis": "School का एक frustrating experience चुनें, दो users से बात करें और smallest useful improvement propose करें।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "chartered-accountant",
+      "areaId": "business",
+      "title": "Chartered Accountant",
+      "englishTitle": "Chartered Accountant",
+      "summary": "Regulated profession में financial records, assurance, tax, controls और business decisions पर काम करता है।",
+      "dailyWork": [
+        "Financial information और supporting evidence examine करना",
+        "Accounting, audit या tax rules apply करना",
+        "Clients या teams को findings और risks explain करना"
+      ],
+      "workSetting": "Deadlines, documentation, client conversations और professional standards के साथ focused analytical work।",
+      "pathway": "Route ICAI govern करता है और current eligibility, exams तथा practical training requirements officially check करनी होती हैं।",
+      "tradeoffs": [
+        "क्या आपको precision और evidence check करना पसंद है?",
+        "Concentrated study और deadline periods कैसे handle करेंगे?"
+      ],
+      "specializations": [
+        "Audit",
+        "Tax",
+        "Financial reporting",
+        "Advisory"
+      ],
+      "tryThis": "Simple budget review करें और trace करें कि एक error later decision को कैसे affect कर सकता है।",
+      "sourceIds": [
+        "icai",
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "ux-designer",
+      "areaId": "design",
+      "title": "UX Designer",
+      "englishTitle": "UX Designer",
+      "summary": "लोग product या service कैसे use करते हैं यह study करके clearer, more usable experiences design करता है।",
+      "dailyWork": [
+        "Users observe या interview करना",
+        "Problems map करना और possible designs बनाना",
+        "Prototypes test करके evidence से improve करना"
+      ],
+      "workSetting": "Product, service, research या agency teams में conversation और focused design work का mix।",
+      "pathway": "Design, psychology, research, technology, communication और thoughtful portfolio सब contribute कर सकते हैं।",
+      "tradeoffs": [
+        "User feedback के बाद idea revise कर सकते हैं?",
+        "Design decision क्यों help करता है यह explain करना पसंद है?"
+      ],
+      "specializations": [
+        "Interaction design",
+        "User research",
+        "Service design",
+        "Content design"
+      ],
+      "tryThis": "किसी को confusing form use करते देखें, clearer version sketch करें और बिना समझाए test करें।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "journalist",
+      "areaId": "design",
+      "title": "Journalist",
+      "englishTitle": "Journalist",
+      "summary": "Audience के लिए important information find, verify, explain और communicate करता है।",
+      "dailyWork": [
+        "Question research करना और reliable sources identify करना",
+        "People interview करना और claims verify करना",
+        "Story write, record, edit और correct करना"
+      ],
+      "workSetting": "Newsrooms, field reporting, digital media, audio, video या independent work, अक्सर deadlines के साथ।",
+      "pathway": "Strong reporting, writing, verification, media ethics, subject knowledge और published work अलग study routes में matter करते हैं।",
+      "tradeoffs": [
+        "Strong opinion होने पर भी fair रह सकते हैं?",
+        "Deadlines, criticism और mistakes correct करना कैसे handle करेंगे?"
+      ],
+      "specializations": [
+        "Reporting",
+        "Data journalism",
+        "Video",
+        "Audio"
+      ],
+      "tryThis": "School का एक issue दो independent sources से report करें और fact और opinion अलग रखें।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "teacher",
+      "areaId": "society",
+      "title": "Teacher",
+      "englishTitle": "Teacher",
+      "summary": "Learning experiences design करता है, ideas explain करता है, progress observe करता है और learners support करता है।",
+      "dailyWork": [
+        "Students idea समझें और practice करें, ऐसा plan बनाना",
+        "Teach, question, listen और adapt करना",
+        "Work review करना और families या colleagues से coordinate करना"
+      ],
+      "workSetting": "Schools और learning environments जहाँ groups और individual learners की sustained responsibility होती है।",
+      "pathway": "Teacher education और eligibility requirements level, subject और system पर depend करती हैं; current official rules से planning करें।",
+      "tradeoffs": [
+        "Same idea अलग तरीकों से explain करना पसंद है?",
+        "Care, boundaries, planning और administration balance कर सकते हैं?"
+      ],
+      "specializations": [
+        "Primary",
+        "Secondary subject",
+        "Special education",
+        "Educational leadership"
+      ],
+      "tryThis": "Ten-minute concept teach करें, learner से वापस explain करवाएँ, और अपनी explanation revise करें।",
+      "sourceIds": [
+        "ncte",
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    },
+    {
+      "id": "policy-researcher",
+      "areaId": "society",
+      "title": "Policy Researcher",
+      "englishTitle": "Policy Researcher",
+      "summary": "Public problems investigate करता है और evidence, tradeoffs तथा possible policy responses examine करता है।",
+      "dailyWork": [
+        "Public question define करना और evidence gather करना",
+        "कौन benefit होगा या affect होगा compare करना",
+        "Decision-makers और communities के लिए clear analysis लिखना"
+      ],
+      "workSetting": "Research organizations, government, universities, civil society या advisory teams, आम तौर पर analysis और communication का mix।",
+      "pathway": "Social science, economics, law, public policy, statistics, subject expertise और research experience अलग roles की तरफ ले जा सकते हैं।",
+      "tradeoffs": [
+        "Simple answer पर जल्दी jump किए बिना problem examine कर सकते हैं?",
+        "Evidence, values और practical constraints balance करना पसंद है?"
+      ],
+      "specializations": [
+        "Education",
+        "Health",
+        "Environment",
+        "Economic policy"
+      ],
+      "tryThis": "एक local rule चुनें, वह किस problem को address करता है identify करें, और map करें कौन gain करता है, कौन pay करता है, और क्या evidence missing है।",
+      "sourceIds": [
+        "ncs"
+      ],
+      "reviewStatus": "pilot",
+      "lastReviewed": "2026-07-21"
+    }
+  ],
+  "sources": [
+    {
+      "id": "ncs",
+      "label": "National Career Service",
+      "organization": "Ministry of Labour & Employment, Government of India",
+      "url": "https://www.ncs.gov.in/"
+    },
+    {
+      "id": "nmc",
+      "label": "National Medical Commission",
+      "organization": "National Medical Commission",
+      "url": "https://www.nmc.org.in/"
+    },
+    {
+      "id": "icai",
+      "label": "Institute of Chartered Accountants of India",
+      "organization": "ICAI",
+      "url": "https://www.icai.org/"
+    },
+    {
+      "id": "ncte",
+      "label": "National Council for Teacher Education",
+      "organization": "NCTE",
+      "url": "https://ncte.gov.in/"
+    },
+    {
+      "id": "ambitionbox-cyber-2026",
+      "label": "India में Cyber Security Analyst salaries (updated 2026)",
+      "organization": "AmbitionBox / Info Edge India",
+      "url": "https://www.ambitionbox.com/profile/cyber-security-analyst-salary"
+    }
+  ]
+}

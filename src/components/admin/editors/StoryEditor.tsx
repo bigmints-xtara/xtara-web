@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Save, X } from 'lucide-react';
-import type { Story } from '@/types/admin';
-import { formatSnakeCaseToTitleCase } from '@/lib/utils';
+import { useState } from 'react';
+import { Plus, Save, Trash2, X } from 'lucide-react';
+import type { Story, StorySlide } from '@/types/admin';
+import { ContentTagEditor } from '@/components/admin/ContentTagEditor';
 
 interface StoryEditorProps {
     story: Story | null;
@@ -13,12 +13,18 @@ interface StoryEditorProps {
 
 export default function StoryEditor({ story, onSave, onCancel }: StoryEditorProps) {
     const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState<Partial<Story>>(() => ({
         title: story?.title || '',
         description: story?.description || '',
         image: story?.image || '',
         career_clusters: story?.career_clusters || [],
         careerRelevance: story?.careerRelevance || [],
+        futureDirectionIds: story?.futureDirectionIds || story?.career_clusters || [],
+        dreamCareerIds: story?.dreamCareerIds || story?.careerRelevance || [],
+        skillIds: story?.skillIds || [],
+        gradeStages: story?.gradeStages || [],
+        topics: story?.topics || [],
         slides: story?.slides || [],
         published: story?.published || false,
         draft: story?.draft ?? true,
@@ -28,62 +34,34 @@ export default function StoryEditor({ story, onSave, onCancel }: StoryEditorProp
         byXtara: story?.byXtara ?? true,
     }));
 
-    const [clusterInput, setClusterInput] = useState('');
-    const [relevanceInput, setRelevanceInput] = useState('');
-
-    useEffect(() => {
-        if (story) {
-            setFormData(story);
-            setClusterInput(story.career_clusters[0] || '');
-        }
-    }, [story]);
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
+        setError('');
 
         try {
             await onSave(formData);
         } catch (error) {
-            alert(`Error saving story: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            setError(error instanceof Error ? error.message : 'Unable to save this story');
         } finally {
             setIsSaving(false);
         }
     };
 
-    const addCluster = () => {
-        if (clusterInput.trim() && !formData.career_clusters?.includes(clusterInput.trim())) {
-            setFormData({
-                ...formData,
-                career_clusters: [...(formData.career_clusters || []), clusterInput.trim()],
-            });
-            setClusterInput('');
-        }
-    };
+    const addSlide = () => setFormData((current) => ({
+        ...current,
+        slides: [...(current.slides || []), { title: '', description: '' }],
+    }));
 
-    const removeCluster = (cluster: string) => {
-        setFormData({
-            ...formData,
-            career_clusters: formData.career_clusters?.filter((c) => c !== cluster),
-        });
-    };
+    const updateSlide = (index: number, patch: Partial<StorySlide>) => setFormData((current) => ({
+        ...current,
+        slides: (current.slides || []).map((slide, slideIndex) => slideIndex === index ? { ...slide, ...patch } : slide),
+    }));
 
-    const addRelevance = () => {
-        if (relevanceInput.trim() && !formData.careerRelevance?.includes(relevanceInput.trim())) {
-            setFormData({
-                ...formData,
-                careerRelevance: [...(formData.careerRelevance || []), relevanceInput.trim()],
-            });
-            setRelevanceInput('');
-        }
-    };
-
-    const removeRelevance = (relevance: string) => {
-        setFormData({
-            ...formData,
-            careerRelevance: formData.careerRelevance?.filter((r) => r !== relevance),
-        });
-    };
+    const removeSlide = (index: number) => setFormData((current) => ({
+        ...current,
+        slides: (current.slides || []).filter((_, slideIndex) => slideIndex !== index),
+    }));
 
     const getStatus = () => {
         if (formData.published) return 'published';
@@ -126,6 +104,8 @@ export default function StoryEditor({ story, onSave, onCancel }: StoryEditorProp
                     </button>
                 </div>
             </div>
+
+            {error ? <p role="alert" className="shrink-0 border-b border-red-200 bg-red-50 px-6 py-3 text-sm text-red-700">{error}</p> : null}
 
             {/* Form Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -190,89 +170,7 @@ export default function StoryEditor({ story, onSave, onCancel }: StoryEditorProp
                     </div>
                 </div>
 
-                {/* Career Clusters */}
-                <div className="bg-white rounded-lg p-6 border">
-                    <h3 className="text-lg font-semibold mb-4">
-                        Career Clusters <span className="text-red-500">*</span>
-                    </h3>
-
-                    <div className="flex gap-2 mb-3">
-                        <input
-                            type="text"
-                            value={clusterInput}
-                            onChange={(e) => setClusterInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCluster())}
-                            className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Add career cluster"
-                        />
-                        <button
-                            type="button"
-                            onClick={addCluster}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            Add
-                        </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                        {formData.career_clusters?.map((cluster) => (
-                            <span
-                                key={cluster}
-                                className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm flex items-center gap-2"
-                            >
-                                {formatSnakeCaseToTitleCase(cluster)}
-                                <button
-                                    type="button"
-                                    onClick={() => removeCluster(cluster)}
-                                    className="hover:text-blue-900"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Career Relevance */}
-                <div className="bg-white rounded-lg p-6 border">
-                    <h3 className="text-lg font-semibold mb-4">Career Relevance</h3>
-
-                    <div className="flex gap-2 mb-3">
-                        <input
-                            type="text"
-                            value={relevanceInput}
-                            onChange={(e) => setRelevanceInput(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addRelevance())}
-                            className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Add career relevance"
-                        />
-                        <button
-                            type="button"
-                            onClick={addRelevance}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            Add
-                        </button>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                        {formData.careerRelevance?.map((relevance) => (
-                            <span
-                                key={relevance}
-                                className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center gap-2"
-                            >
-                                {formatSnakeCaseToTitleCase(relevance)}
-                                <button
-                                    type="button"
-                                    onClick={() => removeRelevance(relevance)}
-                                    className="hover:text-purple-900"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </span>
-                        ))}
-                    </div>
-                </div>
+                <ContentTagEditor value={formData} onChange={(tags) => setFormData((current) => ({ ...current, ...tags }))} />
 
                 {/* Flags */}
                 <div className="bg-white rounded-lg p-6 border">
@@ -311,15 +209,28 @@ export default function StoryEditor({ story, onSave, onCancel }: StoryEditorProp
                     </div>
                 </div>
 
-                {/* Slides Info */}
+                {/* Slides */}
                 <div className="bg-white rounded-lg p-6 border">
-                    <h3 className="text-lg font-semibold mb-2">Slides</h3>
-                    <p className="text-sm text-gray-600">
-                        This story has {formData.slides?.length || 0} slides.
-                    </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                        Note: Slide editing will be available in a future update.
-                    </p>
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                        <div><h3 className="text-lg font-semibold">Slides</h3><p className="text-sm text-gray-600">Build the story sequence shown to learners.</p></div>
+                        <button className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-gray-50" onClick={addSlide} type="button"><Plus size={16} />Add slide</button>
+                    </div>
+                    {!formData.slides?.length ? <p className="rounded-lg border border-dashed p-4 text-sm text-gray-500">No slides added. The story can remain a summary-only draft.</p> : null}
+                    <div className="space-y-4">
+                        {formData.slides?.map((slide, index) => (
+                            <div className="rounded-lg border p-4" key={`slide-${index}`}>
+                                <div className="mb-3 flex items-center justify-between"><p className="text-sm font-semibold">Slide {index + 1}</p><button aria-label={`Remove slide ${index + 1}`} className="flex items-center gap-1 text-sm text-red-600" onClick={() => removeSlide(index)} type="button"><Trash2 size={15} />Remove</button></div>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <label className="text-sm font-medium">Title<input aria-label={`Slide ${index + 1} title`} className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(event) => updateSlide(index, { title: event.target.value })} value={slide.title} /></label>
+                                    <label className="text-sm font-medium">Date<input aria-label={`Slide ${index + 1} date`} className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(event) => updateSlide(index, { date: event.target.value })} type="date" value={slide.date || ''} /></label>
+                                    <label className="text-sm font-medium md:col-span-2">Description<textarea aria-label={`Slide ${index + 1} description`} className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(event) => updateSlide(index, { description: event.target.value })} rows={3} value={slide.description} /></label>
+                                    <label className="text-sm font-medium">Image URL<input aria-label={`Slide ${index + 1} image URL`} className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(event) => updateSlide(index, { image: event.target.value })} type="url" value={slide.image || ''} /></label>
+                                    <label className="text-sm font-medium">Destination URL<input aria-label={`Slide ${index + 1} destination URL`} className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(event) => updateSlide(index, { hyperlink: event.target.value })} type="url" value={slide.hyperlink || ''} /></label>
+                                    <label className="text-sm font-medium">Link label<input aria-label={`Slide ${index + 1} link label`} className="mt-1 w-full rounded-lg border px-3 py-2" onChange={(event) => updateSlide(index, { hyperlinkText: event.target.value })} value={slide.hyperlinkText || ''} /></label>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </form>

@@ -1,11 +1,25 @@
-import { Timestamp } from 'firebase/firestore';
-import { AdminConfig, Challenge } from '@/types/admin';
+import type { AdminConfig, Challenge, EntityStatus } from '@/types/admin';
+
+function serializeDates(entity: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(entity).map(([key, value]) => [key, value instanceof Date ? value.toISOString() : value])
+  );
+}
+
+function normalizeDates<T extends Record<string, unknown>>(data: T): T {
+  const result = { ...data };
+  for (const [key, value] of Object.entries(result)) {
+    if (value && typeof value === 'object' && 'toDate' in value && typeof value.toDate === 'function') {
+      result[key as keyof T] = value.toDate() as T[keyof T];
+    }
+  }
+  return result;
+}
 
 export const challengesConfig: AdminConfig<Challenge> = {
   entityName: 'Challenge',
   entityNamePlural: 'Challenges',
   collectionName: 'challenges',
-
   createEmpty: () => ({
     title: '',
     image: '',
@@ -13,16 +27,14 @@ export const challengesConfig: AdminConfig<Challenge> = {
     published: false,
     draft: true,
     inReview: false,
-    careerRelevance: [],
     type: '',
     rewardPerQuestion: 0,
     instructions: '',
     questions: [],
   }),
-
   getId: (entity) => entity.id,
   getTitle: (entity) => entity.title,
-  getStatus: (entity) => {
+  getStatus: (entity): EntityStatus => {
     if (entity.published) return 'published';
     if (entity.inReview) return 'inReview';
     return 'draft';
@@ -30,69 +42,19 @@ export const challengesConfig: AdminConfig<Challenge> = {
   getDomain: (entity) => entity.domain,
   getSubtitle: (entity) => entity.type,
   getSearchText: (entity) => `${entity.title} ${entity.instructions}`.toLowerCase(),
-
   availableStatuses: ['all', 'published', 'draft', 'inReview'],
-
-  getAvailableDomains: (entities) => {
-    const domains = new Set<string>();
-    entities.forEach((entity) => {
-      if (entity.domain) {
-        domains.add(entity.domain);
-      }
-    });
-    return ['all', ...Array.from(domains)];
-  },
-
+  getAvailableDomains: (entities) => ['all', ...Array.from(new Set(entities.map((entity) => entity.domain).filter(Boolean)))],
   validateEntity: (entity) => {
-    if (entity.rewardPerQuestion !== undefined && entity.rewardPerQuestion < 0) {
-      return 'Reward per question must be 0 or greater';
-    }
-    if (entity.questions) {
-      for (let i = 0; i < entity.questions.length; i++) {
-        const q = entity.questions[i];
-        if (!q.title || q.title.trim() === '') {
-          return `Question ${i + 1}: Title is required`;
-        }
-        if (q.options.length < 2) {
-          return `Question ${i + 1}: At least 2 options are required`;
-        }
-        if (q.correctAnswer < 0 || q.correctAnswer >= q.options.length) {
-          return `Question ${i + 1}: Correct answer index must be between 0 and ${q.options.length - 1}`;
-        }
-      }
-    }
+    if (!entity.title || entity.title.trim() === '') return 'Title is required';
+    if (entity.rewardPerQuestion !== undefined && entity.rewardPerQuestion < 0) return 'Reward per question must be 0 or greater';
     return null;
   },
-
   toFirestore: (entity) => {
-    const data = { ...entity };
-    delete (data as Record<string, unknown>).id;
-
-    const firestoreData: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(data)) {
-      if (value instanceof Date) {
-        firestoreData[key] = Timestamp.fromDate(value);
-      } else {
-        firestoreData[key] = value;
-      }
-    }
-
-    return {
-      ...firestoreData,
-      updatedAt: new Date(),
-    };
+    const data = { ...entity } as Record<string, unknown>;
+    delete data.id;
+    return { ...serializeDates(data), updatedAt: new Date().toISOString() };
   },
-
-  fromFirestore: (data: Record<string, unknown>, id: string): Challenge => {
-    const result: Record<string, unknown> = { ...data, id };
-
-    // Convert Firestore Timestamps back to Date objects
-    for (const key in result) {
-      if (result[key] instanceof Timestamp) {
-        result[key] = (result[key] as Timestamp).toDate();
-      }
-    }
-
-    return result as unknown as Challenge;
-  },
+  fromFirestore: (data, id) => ({ ...normalizeDates(data as Record<string, unknown>), id } as unknown as Challenge),
 };
+
+export default challengesConfig;

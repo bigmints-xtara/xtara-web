@@ -1,387 +1,341 @@
 "use client";
 
-import { useAuth } from "@/context/AuthContext";
-import { useQueryClient } from "@tanstack/react-query";
-import { BookOpen, Trophy, Zap, Gamepad2, ChevronRight, Bell, Sparkles, TrendingUp, Puzzle, Grid, Target, Award } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import DownloadAppModal from "./DownloadAppModal";
-import CurrentGoalCard from "./CurrentGoalCard";
-import StorySlideshow from "./StorySlideshow";
-import { FirestoreService, Story } from "@/lib/firebase/firestore-service";
-import { useStoriesQuery, useGoodReadsQuery, useChallengesQuery, useGamesQuery, useSparksQuery } from "@/lib/query/useContentQuery";
-import { AchievementsService, TierData, MedalData } from "@/lib/firebase/achievements-service";
-import { getUserCareerPath } from "@/lib/firebase/assessment";
-import Carousel from "@/components/ui/Carousel";
-import Skeleton, { SkeletonCircle } from "@/components/ui/Skeleton";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  CheckCircle2,
+  Compass,
+  Ellipsis,
+  MessageCircleMore,
+} from "lucide-react";
+
+import SlideshowOverlay from "@/components/career-path/SlideshowOverlay";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import StatsCard from "./StatsCard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
+import { assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
+import { getCareerRole } from "@/lib/career-knowledge";
+import {
+  type CareerConversationCareer,
+  generateCareerConversationSlides,
+} from "@/lib/career-slides-utils";
+import { dashboardCopy } from "@/lib/dashboard-copy";
+import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
+import {
+  getDirectionSnapshot,
+  parseDirectionPlan,
+  saveDirectionPlan,
+  subscribeToDirection,
+  toggleDirectionAction,
+  type DirectionActionId,
+} from "@/lib/direction";
+import { saveDirectionToApi } from "@/lib/direction-api";
+import {
+  getMyCareerPathExperience,
+  recommendationHref,
+  recordRecommendationEvent,
+  type MyCareerPathExperience,
+} from "@/lib/experience-api";
+import { AchievementsService } from "@/lib/firebase/achievements-service";
+import { getDirectionCourseQueries } from "@/lib/pathway-recommendations";
+import type { CuratedDreamCareer } from "@/types/curated-career";
+
+type RewardSummary = { points: number; medals: number; level: string };
 
 export default function UserDashboard() {
-    const { user, userProfile } = useAuth();
-    const router = useRouter();
-    const queryClient = useQueryClient();
-    const { t } = useTranslations();
-    const [downloadModalOpen, setDownloadModalOpen] = useState(false);
-    const [selectedFeature, setSelectedFeature] = useState("");
-    const [totalPoints, setTotalPoints] = useState<number>(0);
-    const [medalData, setMedalData] = useState<MedalData | null>(null);
-    const [tierData, setTierData] = useState<TierData | null>(null);
-    const [pursuingCareerId, setPursuingCareerId] = useState<string | undefined>(undefined);
+  const { user, userProfile } = useAuth();
+  const { locale } = useTranslations();
+  const text = dashboardCopy[locale];
+  const [conversationOpen, setConversationOpen] = useState(false);
+  const [rewards, setRewards] = useState<RewardSummary>({ points: 0, medals: 0, level: "Starter" });
+  const [experience, setExperience] = useState<MyCareerPathExperience | null>(null);
+  const impressedRecommendations = useRef(new Set<string>());
+  const rawResult = useSyncExternalStore(subscribeToDiscovery, () => localStorage.getItem(assessmentV2StorageKey), () => null);
+  const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, () => null);
+  const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
+  const result = useMemo(() => storedResult ? localizeDiscoveryResult(storedResult, locale) : null, [locale, storedResult]);
+  const plan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
+  const focusedDirection = result?.areas.find((area) => area.id === plan?.areaId) ?? null;
+  const selectedCareers = useMemo(
+    () => focusedDirection?.roles.filter((career) => plan?.dreamCareerIds.includes(career.id)) ?? [],
+    [focusedDirection, plan?.dreamCareerIds],
+  );
+  const curatedCareers = storedResult?.catalogSnapshot?.roles ?? [];
+  const courseQueries = storedResult && focusedDirection
+    ? getDirectionCourseQueries(storedResult, focusedDirection.id).slice(0, 6)
+    : [];
+  const userId = user?.uid;
+  const isAnonymous = user?.isAnonymous;
 
-    // Story Slideshow State
-    const [selectedStory, setSelectedStory] = useState<Story | null>(null);
-    const [storySlideshowOpen, setStorySlideshowOpen] = useState(false);
+  useEffect(() => {
+    if (userId) void hydrateDiscoveryFromAccount();
+  }, [userId]);
 
-    // Data State
-    const { data: stories = [] } = useStoriesQuery();
-    const { data: goodReads = [] } = useGoodReadsQuery();
-    const { data: challenges = [] } = useChallengesQuery();
-    const { data: games = [] } = useGamesQuery();
-    const { data: sparks = [] } = useSparksQuery();
+  useEffect(() => {
+    if (!userId || isAnonymous) return;
+    let active = true;
+    const service = new AchievementsService();
+    Promise.all([service.getTotalPoints(userId), service.getMedalData(userId), service.getTierData(userId)])
+      .then(([points, medals, tier]) => {
+        if (active) setRewards({ points, medals: medals.total, level: tier?.name || "Starter" });
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [isAnonymous, userId]);
 
-    // Auto-detect career path if not set in profile
-    useEffect(() => {
-        const detectCareerPath = async () => {
-            if (user && !userProfile?.pursuingCareer) {
-                console.log("🔍 No pursuingCareer in profile, auto-detecting...");
-                const careerPath = await getUserCareerPath(user.uid);
-                if (careerPath) {
-                    console.log("✅ Auto-detected career path:", careerPath.id);
-                    setPursuingCareerId(careerPath.id);
-                } else {
-                    console.log("⚠️ No career path found for user");
-                }
-            } else if (userProfile?.pursuingCareer) {
-                setPursuingCareerId(userProfile.pursuingCareer);
-            }
-        };
-
-        detectCareerPath();
-    }, [user, userProfile]);
-
-    // Fetch Achievement Stats
-    useEffect(() => {
-        const fetchStats = async () => {
-            if (user && !user.isAnonymous) {
-                try {
-                    const service = new AchievementsService();
-                    const [points, medals, tier] = await Promise.all([
-                        service.getTotalPoints(user.uid),
-                        service.getMedalData(user.uid),
-                        service.getTierData(user.uid)
-                    ]);
-                    setTotalPoints(points);
-                    setMedalData(medals);
-                    setTierData(tier);
-                } catch (error) {
-                    console.error('Error fetching achievement stats:', error);
-                }
-            }
-        };
-
-        fetchStats();
-    }, [user]);
-
-    const handleStoryClick = async (story: Story) => {
-        // Fetch full story data if slides are empty
-        if (!story.slides || story.slides.length === 0) {
-            const fullStory = await FirestoreService.getStoryById(story.id);
-            if (fullStory) {
-                setSelectedStory(fullStory);
-                setStorySlideshowOpen(true);
-            }
-        } else {
-            setSelectedStory(story);
-            setStorySlideshowOpen(true);
+  useEffect(() => {
+    if (!userId || isAnonymous) {
+      return;
+    }
+    let active = true;
+    getMyCareerPathExperience(locale)
+      .then((next) => {
+        if (!active) return;
+        setExperience(next);
+        const recommendationId = next.nextBest?.id;
+        if (recommendationId && !impressedRecommendations.current.has(recommendationId)) {
+          impressedRecommendations.current.add(recommendationId);
+          void recordRecommendationEvent("impression", recommendationId).catch(() => undefined);
         }
-    };
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [isAnonymous, locale, rawPlan, userId]);
 
-    const handleStoryComplete = async () => {
-        // Refresh stories to update watched status
-        queryClient.invalidateQueries({ queryKey: ['stories'] });
-    };
+  if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
+  if (!focusedDirection) return <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />;
 
-    const handleFeatureClick = (title: string, prefixKey: string) => {
-        const prefix = t(`userDashboard.featurePrefixes.${prefixKey}`);
-        setSelectedFeature(t("userDashboard.featureLabel", { prefix, title }));
-        setDownloadModalOpen(true);
-    };
+  const name = userProfile?.fullName || user?.displayName || "Student";
+  const greeting = text.greeting.replace("{name}", name.split(" ")[0]);
+  const fallbackGoals = ([
+    ["learn", text.learnStep], ["try", text.tryStep], ["discuss", text.discussStep],
+  ] as Array<[DirectionActionId, string]>).map(([id, title]) => ({
+    id,
+    title,
+    completed: Boolean(plan?.actions[id]),
+    recommended: false,
+  }));
+  const progressGoals = experience?.progress.goals ?? fallbackGoals;
+  const completedSteps = experience?.progress.completed ?? progressGoals.filter((step) => step.completed).length;
+  const totalSteps = experience?.progress.total ?? 3;
+  const stepsDone = text.stepsDone.replace("{done}", String(completedSteps)).replace("{total}", String(totalSteps));
+  const conversationCareers = selectedCareers.map((career) => conversationCareer(
+    career.id,
+    career.title,
+    career.summary,
+    locale,
+    curatedCareers,
+  ));
+  const conversationSlides = generateCareerConversationSlides({
+    locale,
+    directionTitle: focusedDirection.title,
+    careers: conversationCareers,
+    strengths: result.signals.map((signal) => text.skillLabels[signal.id] ?? signal.title),
+    courses: courseQueries,
+  });
 
-    // Brand colors for image fallbacks (matching Flutter app)
-    const brandColors = [
-        '#003763', // kPrimaryColor (Ocean Navy)
-        '#61B3E4', // kAccentColor (Sky Blue)
-        '#4EE2E2', // kTertiaryColor (Seafoam Teal)
-        '#F6B333', // kQuaternaryColor (Sun Gold)
-        '#EF7521', // kHighlightColor (Coral Orange)
-        '#61B3E4', // kInfoColor
-        '#4EE2E2', // kSuccessColor
-        '#F6B333', // kWarningColor
-    ];
+  const updateStep = async (actionId: DirectionActionId) => {
+    if (!plan) return;
+    if (experience && actionId !== "discuss") return;
+    const next = toggleDirectionAction(plan, actionId);
+    saveDirectionPlan(next);
+    if (user && !user.isAnonymous) {
+      try {
+        saveDirectionPlan(await saveDirectionToApi(next));
+        setExperience(await getMyCareerPathExperience(locale));
+      } catch { /* Local progress remains available. */ }
+    }
+  };
 
-    const getBrandColor = (index: number) => {
-        return brandColors[index % brandColors.length];
-    };
+  const openNextBest = () => {
+    const recommendation = experience?.nextBest;
+    if (!recommendation) return;
+    void recordRecommendationEvent("start", recommendation.id).catch(() => undefined);
+    if (recommendation.action.type === "confirm_discussion") void updateStep("discuss");
+  };
 
-    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        const target = e.currentTarget;
-        target.style.display = 'none';
-        // Show fallback div if needed (parent background handled via state or css)
-    };
+  return (
+    <main className="mx-auto max-w-6xl px-5 py-8 pb-28 sm:py-10 xl:pb-20">
+      <p className="text-sm font-medium text-muted-foreground">{greeting}</p>
+      <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-primary sm:text-4xl">{text.title}</h1>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{text.nextStepsDescription}</p>
 
-    return (
-        <div className="container mx-auto p-4 md:p-8 max-w-7xl space-y-10 pb-20">
-            {/* Top Grid: Hero (Welcome + Goal) & Sidebar Stats - Equal Height */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-[minmax(300px,auto)]">
-                {/* Hero Card - Left (2/3 width) */}
-                <div className="lg:col-span-2 h-full">
-                    <CurrentGoalCard
-                        pursuingCareerId={pursuingCareerId}
-                        userName={userProfile?.fullName || "Student"}
-                        className="h-full"
-                    />
-                </div>
-
-                {/* Sidebar - Right (1/3 width) - Combined Stats */}
-                <div className="lg:col-span-1 h-full flex flex-col gap-6">
-                    <StatsCard
-                        totalPoints={totalPoints}
-                        medalData={medalData}
-                        tierData={tierData}
-                        className="h-full"
-                    />
-
-                    {/* Weekly Progress - If StatsCard doesn't take full height, this fills remaining, or we can combine logic. 
-                        User asked for "Stats and points as a combined card as sidebar".
-                        I will assume the week progress can stay separate or be part of it.
-                        The request said "Stats and points ... as the sidebar". 
-                        The StatsCard handles Point/Medals/Tier. 
-                        Weekly Progress is separate. 
-                        Let's put Weekly Progress BELOW StatsCard for now, but ensure the whole COLUMN matches height if possible,
-                        OR just let them stack. "Equal height" usually refers to the main visual blocks.
-                        If I make StatsCard h-full, it might stretch too much if there's little content.
-                        Let's keep StatsCard as the main sidebar item for 'Stats & Points'.
-                    */}
-                    <Card className="h-fit">
-                        <CardContent className="p-5">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 rounded-lg bg-accent/10 text-accent">
-                                    <TrendingUp size={20} />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-card-foreground text-sm">{t("userDashboard.weeklyProgress.title")}</h3>
-                                    <p className="text-[10px] text-muted-foreground">{t("userDashboard.weeklyProgress.subtitle")}</p>
-                                </div>
-                            </div>
-                            <div className="relative h-2.5 bg-muted rounded-full mb-3 overflow-hidden">
-                                <div className="absolute top-0 left-0 h-full w-[0%] bg-accent rounded-full" />
-                            </div>
-                            <div className="flex justify-between items-center text-xs text-muted-foreground">
-                                <span>{t("userDashboard.weeklyProgress.remaining", { hours: 23 })}</span>
-                                <span className="font-bold text-foreground">{t("userDashboard.weeklyProgress.completion", { percent: 0 })}</span>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+      <section
+        data-testid="career-direction-hero"
+        className="relative -mx-5 mt-8 overflow-hidden bg-primary text-white sm:mx-0"
+        aria-labelledby="career-direction-title"
+      >
+        <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full border border-white/10 bg-white/[0.04]" />
+        <div className="relative p-6 sm:p-10">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-secondary">
+                <Compass className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/70">{text.careerDirection}</p>
             </div>
-
-            {/* Content Carousels - Full Width Below */}
-            <div className="space-y-12">
-                {/* Stories Carousel */}
-                {stories.length > 0 && (
-                    <DashboardSection title={t("userDashboard.sections.stories")} icon={<Bell className="text-destructive" />}>
-                        <Carousel itemWidth={300}>
-                            {stories.map((story, index) => (
-                                <div
-                                    key={story.id}
-                                    onClick={() => handleStoryClick(story)}
-                                    className="flex-none w-[300px] h-64 rounded-xl relative overflow-hidden cursor-pointer group border border-border bg-card transition-all hover:border-accent/50"
-                                >
-                                    {/* Image or Solid Color Fallback */}
-                                    <div className="absolute inset-0 bg-muted" style={{ backgroundColor: getBrandColor(index) }} />
-                                    {story.image && (
-                                        <img
-                                            src={story.image}
-                                            alt={story.title}
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            onError={handleImageError}
-                                        />
-                                    )}
-
-                                    {/* Overlay Gradient */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-                                    {/* Content - Lower aligned */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                                        <Badge className="mb-2 bg-accent text-accent-foreground border-none backdrop-blur-md">{story.category}</Badge>
-                                        <h3 className="text-lg font-bold text-white leading-tight group-hover:underline decoration-accent underline-offset-4 line-clamp-2">{story.title}</h3>
-                                    </div>
-                                </div>
-                            ))}
-                        </Carousel>
-                    </DashboardSection>
-                )}
-
-                {/* Good Reads Carousel */}
-                {goodReads.length > 0 && (
-                    <DashboardSection title={t("userDashboard.sections.goodReads")} icon={<BookOpen className="text-green-600" />}>
-                        <Carousel itemWidth={300}>
-                            {goodReads.map((read, index) => (
-                                <div
-                                    key={read.id}
-                                    onClick={() => router.push(`/dashboard/good-reads/${read.id}`)}
-                                    className="flex-none w-[300px] h-48 rounded-xl overflow-hidden relative group border border-border bg-card transition-all cursor-pointer hover:border-accent/50"
-                                >
-                                    <div className="absolute inset-0 bg-muted" style={{ backgroundColor: getBrandColor(index + 2) }} />
-                                    {read.image && (
-                                        <img
-                                            src={read.image}
-                                            alt={read.title}
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            onError={handleImageError}
-                                        />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                                        <h3 className="font-bold text-white line-clamp-2 leading-tight">{read.title}</h3>
-                                    </div>
-                                </div>
-                            ))}
-                        </Carousel>
-                    </DashboardSection>
-                )}
-
-                {/* Challenges Carousel */}
-                {challenges.length > 0 && (
-                    <DashboardSection title={t("userDashboard.sections.challenges")} icon={<Trophy className="text-secondary" />}>
-                        <Carousel itemWidth={300}>
-                            {challenges.map((challenge, index) => (
-                                <div
-                                    key={challenge.id}
-                                    onClick={() => router.push(`/dashboard/challenges`)}
-                                    className="flex-none w-[300px] h-48 rounded-xl overflow-hidden relative group border border-border bg-card transition-all cursor-pointer hover:border-secondary/50"
-                                >
-                                    <div className="absolute inset-0 bg-muted" style={{ backgroundColor: getBrandColor(index + 4) }} />
-                                    {challenge.image && (
-                                        <img
-                                            src={challenge.image}
-                                            alt={challenge.title}
-                                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                            onError={handleImageError}
-                                        />
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                                        <h3 className="font-bold text-white line-clamp-2 leading-tight">{challenge.title}</h3>
-                                    </div>
-                                </div>
-                            ))}
-                        </Carousel>
-                    </DashboardSection>
-                )}
-
-                {/* Sparks Carousel */}
-                {sparks.length > 0 && (
-                    <DashboardSection title={t("userDashboard.sections.sparks")} icon={<Zap className="text-accent" />}>
-                        <Carousel itemWidth={300}>
-                            {sparks.map((spark) => (
-                                <div
-                                    key={spark.id}
-                                    onClick={() => router.push(`/dashboard/sparks/${spark.id}`)}
-                                    className="flex-none w-[300px] h-48 rounded-xl relative overflow-hidden cursor-pointer group border border-border bg-card transition-all hover:border-accent flex flex-col justify-between p-5"
-                                >
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-accent/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110" />
-
-                                    <div className="space-y-3 relative z-10">
-                                        <Badge variant="outline" className="w-fit border-accent/30 text-accent bg-accent/5">{spark.type}</Badge>
-                                        <h3 className="font-bold text-card-foreground line-clamp-3 leading-tight text-lg">{spark.title}</h3>
-                                    </div>
-                                    <div className="flex items-center text-xs text-muted-foreground gap-1 mt-2 relative z-10">
-                                        <Sparkles size={14} className="text-accent" />
-                                        <span>{t("userDashboard.spark.quickLearning")}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </Carousel>
-                    </DashboardSection>
-                )}
-
-                {/* Games Carousel */}
-                {games.length > 0 && (
-                    <DashboardSection title={t("userDashboard.sections.games")} icon={<Gamepad2 className="text-purple-500" />}>
-                        <Carousel itemWidth={300}>
-                            {games.map((game) => {
-                                let colorClass = "text-purple-500";
-                                let bgClass = "bg-purple-50 dark:bg-purple-900/20";
-                                let borderClass = "hover:border-purple-500/50 hover:bg-purple-500/5";
-
-                                if (game.mode === 'quiz') { colorClass = "text-blue-500"; bgClass = "bg-blue-50 dark:bg-blue-900/20"; borderClass = "hover:border-blue-500/50 hover:bg-blue-500/5"; }
-                                else if (game.mode === 'puzzle') { colorClass = "text-green-500"; bgClass = "bg-green-50 dark:bg-green-900/20"; borderClass = "hover:border-green-500/50 hover:bg-green-500/5"; }
-                                else if (game.mode === 'memory') { colorClass = "text-orange-500"; bgClass = "bg-orange-50 dark:bg-orange-900/20"; borderClass = "hover:border-orange-500/50 hover:bg-orange-500/5"; }
-
-                                const modeLabel = t(`userDashboard.gameModes.${game.mode}`);
-                                const resolvedModeLabel = modeLabel === `userDashboard.gameModes.${game.mode}` ? game.mode : modeLabel;
-
-                                return (
-                                    <div
-                                        key={game.id}
-                                        onClick={() => handleFeatureClick(game.title, "game")}
-                                        className={`flex-none w-[300px] h-48 rounded-xl relative overflow-hidden cursor-pointer group border border-border bg-card transition-all ${borderClass} flex flex-col justify-between p-5`}
-                                    >
-                                        <div className={`absolute bottom-0 right-0 w-24 h-24 ${bgClass} rounded-tl-full -mb-6 -mr-6 transition-transform group-hover:scale-125 opacity-50`} />
-
-                                        <div className="space-y-3 relative z-10">
-                                            <div className={`p-2 rounded-lg w-fit ${bgClass} ${colorClass}`}>
-                                                {game.mode === 'quiz' ? <BookOpen size={20} /> : game.mode === 'puzzle' ? <Puzzle size={20} /> : <Gamepad2 size={20} />}
-                                            </div>
-                                            <h3 className="font-bold text-card-foreground leading-tight text-lg">{game.title}</h3>
-                                        </div>
-                                        <div className="relative z-10">
-                                            <Badge variant="secondary" className={`text-xs uppercase tracking-wider ${bgClass} ${colorClass}`}>{resolvedModeLabel}</Badge>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </Carousel>
-                    </DashboardSection>
-                )}
-            </div>
-
-            <DownloadAppModal
-                isOpen={downloadModalOpen}
-                onClose={() => setDownloadModalOpen(false)}
-                title={selectedFeature}
-            />
-
-            {selectedStory && (
-                <StorySlideshow
-                    story={selectedStory}
-                    isOpen={storySlideshowOpen}
-                    onClose={() => {
-                        setStorySlideshowOpen(false);
-                        setSelectedStory(null);
-                    }}
-                    onComplete={handleStoryComplete}
-                    userId={user?.uid}
-                />
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="shrink-0 rounded-full bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                  aria-label={`${text.changeDirection}; ${text.editDreamCareers}`}
+                >
+                  <Ellipsis className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <DropdownMenuItem asChild>
+                  <Link href="/assessment/discovery" className="flex items-start gap-3 py-3">
+                    <Compass className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span className="whitespace-normal leading-5">{text.changeDirection}</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/explore/areas/${focusedDirection.id}`} className="flex items-start gap-3 py-3">
+                    <BriefcaseBusiness className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span className="whitespace-normal leading-5">{selectedCareers.length ? text.editDreamCareers : text.chooseDreamCareers}</span>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <h2 id="career-direction-title" className="mt-8 max-w-3xl text-3xl font-semibold tracking-[-0.035em] sm:text-5xl">
+            {focusedDirection.title}
+          </h2>
+          {focusedDirection.description.trim() ? (
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/75 sm:text-base sm:leading-7">{focusedDirection.description}</p>
+          ) : null}
         </div>
-    );
+      </section>
+
+      <section className="mt-7" aria-labelledby="dream-careers-title">
+        <h2 id="dream-careers-title" className="text-xl font-semibold tracking-[-0.02em] text-primary sm:text-2xl">{text.dreamCareers}</h2>
+        {selectedCareers.length ? (
+          <ol data-testid="dream-career-list" className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {selectedCareers.map((career, index) => (
+              <li key={career.id}>
+                <Link
+                  href={`/dream-careers/${career.id}`}
+                  className="group flex min-h-20 h-full items-center gap-4 rounded-2xl border border-primary/10 bg-card px-4 py-4 text-primary transition hover:border-primary/25 hover:bg-secondary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/25 text-sm font-semibold">{index + 1}</span>
+                  <span className="min-w-0 flex-1 text-sm font-semibold leading-5 sm:text-base">{career.title}</span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-primary/50 transition group-hover:translate-x-0.5 group-hover:text-primary" />
+                </Link>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <Button asChild className="mt-4 rounded-full"><Link href={`/explore/areas/${focusedDirection.id}`}>{text.chooseDreamCareers}</Link></Button>
+        )}
+      </section>
+
+      {selectedCareers.length ? (
+        <>
+          <section id="next-steps" className="mt-8 grid scroll-mt-24 gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
+            <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
+              <div className="flex items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold text-primary">{text.myNextSteps}</h2><p className="mt-2 text-sm text-muted-foreground">{stepsDone}</p></div><span className="text-2xl font-semibold text-primary">{completedSteps}/{totalSteps}</span></div>
+              {experience?.nextBest ? (
+                <div className="mt-6 rounded-2xl bg-secondary/25 p-4" data-testid="next-best-recommendation">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.nextBest}</p>
+                  <h3 className="mt-2 text-base font-semibold text-primary">{experience.nextBest.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{experience.nextBest.reason}</p>
+                  {recommendationHref(experience.nextBest) ? (
+                    <Button asChild size="sm" className="mt-4 rounded-full">
+                      <Link href={recommendationHref(experience.nextBest)!} onClick={openNextBest}>{text.open}<ArrowRight className="h-4 w-4" /></Link>
+                    </Button>
+                  ) : (
+                    <Button size="sm" className="mt-4 rounded-full" onClick={openNextBest}>{text.confirmDiscussion}</Button>
+                  )}
+                </div>
+              ) : null}
+              <div className="mt-6 space-y-3">
+                {progressGoals.map((step) => {
+                  const content = <><span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${step.completed ? "bg-emerald-700 text-white" : "bg-slate-100 text-slate-500"}`}>{step.completed ? <Check className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}</span><span className={step.completed ? "text-sm text-muted-foreground line-through" : "text-sm font-medium text-foreground"}>{step.title}</span></>;
+                  return step.id === "discuss" && !step.completed ? (
+                    <button key={step.id} type="button" aria-pressed={false} onClick={() => updateStep(step.id)} className="flex w-full items-center gap-3 rounded-2xl border border-primary/10 p-4 text-left hover:border-primary/30">{content}</button>
+                  ) : (
+                    <div key={step.id} className="flex w-full items-center gap-3 rounded-2xl border border-primary/10 p-4 text-left">{content}</div>
+                  );
+                })}
+              </div>
+            </CardContent></Card>
+            <Card className="border-0 bg-secondary/20 shadow-none"><CardContent className="flex h-full flex-col p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-primary"><MessageCircleMore className="h-5 w-5" /></span>
+              <h2 className="mt-5 text-lg font-semibold text-primary">{text.careerConversation}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{text.careerConversationHelp}</p>
+              <Button className="mt-6 w-full rounded-full lg:mt-auto" onClick={() => setConversationOpen(true)}>{text.start}<ArrowRight className="ml-2 h-4 w-4" /></Button>
+            </CardContent></Card>
+          </section>
+
+          <section className="mt-8" aria-labelledby="career-achievements-title">
+            <Card className="border-0 bg-secondary/20 shadow-none"><CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
+              <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.rewards}</p><h2 id="career-achievements-title" className="mt-2 text-xl font-semibold text-primary">{text.viewRewards}</h2></div>
+              <div className="grid grid-cols-3 gap-2 text-center sm:min-w-80"><RewardValue value={rewards.points.toLocaleString()} label={text.points} /><RewardValue value={String(rewards.medals)} label={text.medals} /><RewardValue value={localizeRewardLevel(rewards.level, locale)} label={text.level} compact /></div>
+              <Button asChild className="rounded-full"><Link href="/achievements">{text.viewRewards}<ArrowRight className="h-4 w-4" /></Link></Button>
+            </CardContent></Card>
+          </section>
+        </>
+      ) : null}
+
+      <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />
+    </main>
+  );
 }
 
-function DashboardSection({ title, icon, children }: { title: string, icon: React.ReactNode, children: React.ReactNode }) {
-    return (
-        <section>
-            <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-gray-100 rounded-lg">
-                    {icon}
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-            </div>
-            {children}
-        </section>
-    );
+function RewardValue({ value, label, compact = false }: { value: string; label: string; compact?: boolean }) {
+  return <div className="rounded-xl bg-slate-50 px-2 py-3"><p className={`${compact ? "text-sm capitalize" : "text-lg"} truncate font-semibold text-primary`}>{value}</p><p className="mt-1 text-[11px] text-muted-foreground">{label}</p></div>;
+}
+
+function EmptyState({ title, description, action, href }: { title: string; description: string; action: string; href: string }) {
+  return <main className="mx-auto max-w-4xl px-5 py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><Button asChild className="mt-7 rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button></main>;
+}
+
+function conversationCareer(id: string, title: string, summary: string, locale: "en" | "ml" | "hi" | "ta", curatedCareers: CuratedDreamCareer[]): CareerConversationCareer {
+  const fallback = getCareerRole(locale, id);
+  const curated = curatedCareers.find((career) => career.id === id || career.slug === id);
+  const translation = curated?.translations[locale] || curated?.translations.en;
+  return {
+    title: translation?.title || fallback?.title || title,
+    summary: translation?.summary || fallback?.summary || summary,
+    dailyWork: translation?.dailyWork?.length ? translation.dailyWork : fallback?.dailyWork || [],
+    workSetting: translation?.workSetting || fallback?.workSetting || "",
+    preparation: translation?.pathway || fallback?.pathway || "Compare current study routes and entry requirements.",
+    tryThis: translation?.tryThis || fallback?.tryThis || "Try one small related activity and discuss what you learned.",
+    difficultParts: translation?.tradeoffs?.length ? translation.tradeoffs : fallback?.tradeoffs || [],
+    salaryRange: curated?.salaryRange || fallback?.salaryRange,
+    growthOutlook: curated?.growthOutlook || fallback?.growthOutlook,
+  };
+}
+
+function subscribeToDiscovery(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener("xtara:assessment-result-changed", onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener("xtara:assessment-result-changed", onChange);
+  };
+}
+
+function localizeRewardLevel(level: string, locale: "en" | "ml" | "hi" | "ta"): string {
+  if (locale === "en") return level;
+  const names = {
+    ml: { starter: "തുടക്കം", bronze: "ബ്രോൺസ്", silver: "സിൽവർ", gold: "ഗോൾഡ്" },
+    hi: { starter: "शुरुआत", bronze: "ब्रॉन्ज़", silver: "सिल्वर", gold: "गोल्ड" },
+    ta: { starter: "தொடக்கம்", bronze: "வெண்கலம்", silver: "வெள்ளி", gold: "தங்கம்" },
+  } as const;
+  return names[locale][level.toLowerCase() as keyof typeof names[typeof locale]] ?? level;
 }

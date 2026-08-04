@@ -55,17 +55,17 @@ NC='\033[0m'
 # Format: "SECRET_NAME=ENV_VAR_KEY"
 declare -A SECRET_TO_ENV
 
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-api-key"]="NEXT_PUBLIC_FIREBASE_API_KEY"
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-auth-domain"]="NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-project-id"]="NEXT_PUBLIC_FIREBASE_PROJECT_ID"
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-storage-bucket"]="NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-messaging-sender-id"]="NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-app-id"]="NEXT_PUBLIC_FIREBASE_APP_ID"
-SECRET_TO_ENV["${SECRET_PREFIX}/firebase-measurement-id"]="NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
-SECRET_TO_ENV["${SECRET_PREFIX}/algolia-app-id"]="NEXT_PUBLIC_ALGOLIA_APP_ID"
-SECRET_TO_ENV["${SECRET_PREFIX}/algolia-search-api-key"]="NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY"
-SECRET_TO_ENV["${SECRET_PREFIX}/nextauth-url"]="NEXTAUTH_URL"
-SECRET_TO_ENV["${SECRET_PREFIX}/nextauth-secret"]="NEXTAUTH_SECRET"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-api-key"]="NEXT_PUBLIC_FIREBASE_API_KEY"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-auth-domain"]="NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-project-id"]="NEXT_PUBLIC_FIREBASE_PROJECT_ID"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-storage-bucket"]="NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-messaging-sender-id"]="NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-app-id"]="NEXT_PUBLIC_FIREBASE_APP_ID"
+SECRET_TO_ENV["${SECRET_PREFIX}-firebase-measurement-id"]="NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID"
+SECRET_TO_ENV["${SECRET_PREFIX}-algolia-app-id"]="NEXT_PUBLIC_ALGOLIA_APP_ID"
+SECRET_TO_ENV["${SECRET_PREFIX}-algolia-search-api-key"]="NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY"
+SECRET_TO_ENV["${SECRET_PREFIX}-nextauth-url"]="NEXTAUTH_URL"
+SECRET_TO_ENV["${SECRET_PREFIX}-nextauth-secret"]="NEXTAUTH_SECRET"
 
 # ===========================
 # Utility Functions
@@ -210,8 +210,8 @@ cmd_add() {
     local value="$2"
 
     # Prefix the secret name if not already prefixed
-    if [[ "$secret_name" != "${SECRET_PREFIX}/"* ]]; then
-        secret_name="${SECRET_PREFIX}/${secret_name}"
+    if [[ "$secret_name" != "${SECRET_PREFIX}-"* ]]; then
+        secret_name="${SECRET_PREFIX}-${secret_name}"
     fi
 
     print_info "Adding secret: $secret_name"

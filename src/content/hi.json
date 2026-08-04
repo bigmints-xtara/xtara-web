@@ -12,6 +12,124 @@
     "title": "Xtara - करियर गाइडेंस",
     "description": "सफलता की ओर आपका पहला कदम"
   },
+  "auth": {
+    "common": {
+      "backHome": "Xtara पर वापस जाएँ",
+      "email": "ईमेल",
+      "emailPlaceholder": "you@example.com",
+      "password": "पासवर्ड",
+      "termsPrefix": "आगे बढ़कर आप Xtara के",
+      "terms": "Terms of Use",
+      "privacyConnector": "और",
+      "privacy": "Privacy Policy"
+    },
+    "login": {
+      "chooseType": "आप Xtara कैसे इस्तेमाल करते हैं?",
+      "learnerTab": "Student",
+      "educatorTab": "Educator",
+      "divider": "अपने account में जाएँ",
+      "assessmentPrompt": "अभी account नहीं है?",
+      "assessmentAction": "पहले अपना career path देखें",
+      "signupPrompt": "नया account चाहिए?",
+      "signupAction": "Account बनाएँ",
+      "learner": {
+        "title": "वापस स्वागत है",
+        "description": "अपनी Career Directions, Dream Careers, learning और अगले steps आगे बढ़ाएँ।",
+        "submit": "मेरा career path खोलें",
+        "submitting": "खोल रहे हैं...",
+        "google": "Google से जारी रखें",
+        "sideEyebrow": "आपका career path",
+        "sideTitle": "एक-एक step से future साफ हो सकता है।",
+        "sideDescription": "आपने जो directions चुनी हैं, skills बनाएँ, family या teacher से बात की तैयारी करें, और अपना plan update करते रहें।",
+        "sideProofs": [
+          "Career Directions और Careers एक जगह",
+          "Skills और छोटे next steps saved",
+          "Family conversation के लिए clear notes"
+        ],
+        "imageAlt": "अपने future पर साथ में बात करते भारतीय students"
+      },
+      "educator": {
+        "title": "Educator login",
+        "description": "Students की progress, choices और guidance notes देखने के लिए sign in करें।",
+        "submit": "Institution dashboard खोलें",
+        "submitting": "खोल रहे हैं...",
+        "google": "Google से जारी रखें",
+        "educatorNote": "Institution access से educator dashboard खुलता है।",
+        "sideEyebrow": "Schools और mentors के लिए",
+        "sideTitle": "Students के career conversations को बेहतर support दें।",
+        "sideDescription": "Class की progress देखें, students की choices समझें, और सही समय पर practical guidance दें।",
+        "sideProofs": [
+          "Class-wise career insights",
+          "Student progress एक जगह",
+          "Guidance conversations के लिए simple notes"
+        ],
+        "imageAlt": "Students के साथ career plan discuss करते teacher"
+      }
+    },
+    "signup": {
+      "name": "नाम",
+      "namePlaceholder": "आपका नाम",
+      "passwordHint": "कम से कम 8 characters रखें।",
+      "submitting": "Account बन रहा है...",
+      "loginPrompt": "पहले से account है?",
+      "loginAction": "Log in करें",
+      "imageAlt": "Career planning देखते students",
+      "variants": {
+        "default": {
+          "title": "अपना Xtara account बनाएँ",
+          "description": "Career choices save करें और अपना plan आगे बढ़ाते रहें।",
+          "submit": "Account बनाएँ",
+          "sideEyebrow": "Possibility से शुरू करें",
+          "sideTitle": "Career plan student के साथ grow होना चाहिए।",
+          "sideDescription": "Xtara interests और situations बदलने पर exploration, learning और family conversations को साथ रखता है।",
+          "sideProofs": [
+            "Career Directions और Dream Careers एक जगह रखें",
+            "छोटी learning से skills बनाएँ",
+            "Family conversations के लिए clear plan रखें"
+          ]
+        },
+        "saveDiscovery": {
+          "title": "अपना future plan save करें",
+          "description": "Assessment, Career Directions, Dream Careers और next steps अपने account में रखें।",
+          "submit": "Plan save करें",
+          "sideEyebrow": "आपने शुरुआत कर दी है",
+          "sideTitle": "Assessment शुरुआत है, final answer नहीं।",
+          "sideDescription": "अपना काम save करें, suggested directions explore करें, और सीखते समय plan refine करते रहें।",
+          "sideProofs": [
+            "Assessment answers सुरक्षित रखें",
+            "Suggested directions compare करें",
+            "Next steps account में रखें"
+          ]
+        },
+        "saveAssessment": {
+          "title": "Assessment save करें",
+          "description": "Institution join करने से पहले अपना personal Xtara account बनाएँ।",
+          "submit": "Assessment save करें",
+          "sideEyebrow": "आपकी assessment आपकी है",
+          "sideTitle": "Institution support बाद में जुड़ सकता है।",
+          "sideDescription": "आपका personal account आपकी assessment और choices रखता है। School support जुड़े तो sharing साफ तरीके से होगी।",
+          "sideProofs": [
+            "Personal account पहले",
+            "Institution sharing अलग से",
+            "Choices और progress आपके साथ रहती हैं"
+          ]
+        },
+        "educator": {
+          "title": "Educator account बनाएँ",
+          "description": "Students को practical career guidance देने के लिए institution access बनाएँ।",
+          "submit": "Educator account बनाएँ",
+          "sideEyebrow": "Institution support",
+          "sideTitle": "Students को एक ही simple language में guide करें।",
+          "sideDescription": "Xtara reviewed career information, student choices और class progress को एक जगह लाता है।",
+          "sideProofs": [
+            "Educator access institution membership से control होता है",
+            "Student choices साफ दिखते हैं",
+            "Reports practical conversations में मदद करते हैं"
+          ]
+        }
+      }
+    }
+  },
   "home": {
     "hero": {
       "badge": "AI-पावर्ड करियर गाइडेंस",
@@ -23,16 +141,16 @@
       "ctaSecondary": "करियर एक्सप्लोर करें",
       "highlights": [
         {
-          "title": "करियर फिट असेसमेंट",
-          "description": "अपनी रुचि और स्वभाव के अनुसार सही करियर चुनें।"
+          "title": "Career fit assessment",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "सही लर्निंग प्लान",
-          "description": "क्या पढ़ना है, कहां एडमिशन लेना है और जॉब के लिए कैसे तैयार होना है - सब कुछ जानें।"
+          "title": "Step-by-step learning plan",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "कॉलेज और कोर्स मैच",
-          "description": "अपने लक्ष्यों के हिसाब से बेस्ट कॉलेज और कोर्स खोजें।"
+          "title": "College और course match",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         }
       ]
     },
@@ -48,28 +166,28 @@
       "description": "Xtara आपको करियर से जुड़े जरूरी फैसले सही समय पर लेने में मदद करता है।",
       "audiences": [
         {
-          "title": "छात्र",
-          "description": "अपनी स्किल्स और पसंद के हिसाब से करियर चुनें।"
+          "title": "Students",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "माता-पिता",
-          "description": "बच्चों के भविष्य को लेकर सही जानकारी और गाइडेंस पाएं।"
+          "title": "Parents",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "करियर कोच",
-          "description": "सही डेटा के साथ छात्रों को बेहतर सलाह दें।"
+          "title": "Career coaches",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "शिक्षक",
-          "description": "क्लास में छात्रों को करियर के बारे में सही जानकारी दें।"
+          "title": "Teachers",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "संस्थान",
-          "description": "बड़े पैमाने पर करियर गाइडेंस दें और रिजल्ट्स ट्रैक करें।"
+          "title": "Institutions",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "कंपनियां",
-          "description": "इंटर्नशिप और जॉब्स के लिए टैलेंटेड छात्रों को खोजें।"
+          "title": "Businesses",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         }
       ],
       "featuresBadge": "खास फीचर्स",
@@ -77,30 +195,30 @@
       "featuresDescription": "सरल और आसान टूल्स, हर किसी की जरूरत के हिसाब से।",
       "segments": [
         {
-          "badge": "छात्र और माता-पिता",
-          "title": "सही कोर्स और कॉलेज चुनें, बिना किसी कंफ्यूजन के।",
+          "badge": "Xtara",
+          "title": "Courses और colleges confidence से चुनें।",
           "bullets": [
-            "आगे क्या पढ़ना है, यह बताने वाला कोर्स फाइंडर।",
-            "बजट और शहर के हिसाब से कॉलेज लिस्ट।",
-            "आसान भाषा में करियर की जानकारी।"
+            "Career path को साफ रखने वाला step",
+            "Career path को साफ रखने वाला step",
+            "Career path को साफ रखने वाला step"
           ]
         },
         {
-          "badge": "शिक्षक",
-          "title": "छात्रों को सही दिशा दिखाएं।",
+          "badge": "Xtara",
+          "title": "Students को practical tools से guide करें।",
           "bullets": [
-            "पूरी क्लास की करियर रिपोर्ट शेयर करें।",
-            "छात्रों की प्रोग्रेस एक ही जगह देखें।",
-            "क्लास या बैच के हिसाब से इनसाइट्स पाएं।"
+            "Career path को साफ रखने वाला step",
+            "Career path को साफ रखने वाला step",
+            "Career path को साफ रखने वाला step"
           ]
         },
         {
-          "badge": "कंपनियां",
-          "title": "इंटर्नशिप और हायरिंग के लिए सही छात्र चुनें।",
+          "badge": "Xtara",
+          "title": "Internship और hiring के लिए students खोजें।",
           "bullets": [
-            "कोर्स और स्किल के आधार पर टैलेंट खोजें।",
-            "रुचि और क्षमता के आधार पर शॉर्टलिस्ट करें।",
-            "कॉलेज और शहर के हिसाब से कनेक्ट करें।"
+            "Career path को साफ रखने वाला step",
+            "Career path को साफ रखने वाला step",
+            "Career path को साफ रखने वाला step"
           ]
         }
       ]
@@ -112,35 +230,363 @@
       "contactEmail": "help@xtara.ai",
       "items": [
         {
-          "question": "क्या Xtara फ्री है?",
-          "answer": "जी हां। छात्रों के लिए Xtara बिल्कुल फ्री है। असेसमेंट, करियर जानकारी और कोर्स सुझावों के लिए कोई चार्ज नहीं है।"
+          "question": "क्या Xtara free है?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
         },
         {
-          "question": "सुझाव कितने सटीक होते हैं?",
-          "answer": "हम आपकी स्किल्स, रुचि और लक्ष्यों के आधार पर करियर सुझाते हैं। हमारा काम आपको सही राह दिखाना है, फैसला आपका है।"
+          "question": "Recommendations कितनी accurate हैं?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
         },
         {
-          "question": "क्या कॉलेज या कोर्स भी बताए जाएंगे?",
-          "answer": "बिल्कुल! Xtara आपको सही कोर्स, एन्ट्रेंस एग्जाम और कॉलेज के बारे में भी जानकारी देता है।"
+          "question": "क्या college और course suggestions भी मिलेंगे?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
         },
         {
-          "question": "अगर कम मार्क्स आए हैं तो क्या यह मदद करेगा?",
-          "answer": "हां! जो छात्र कंफ्यूज्ड हैं, उनके लिए ही Xtara बना है। हमारा असेसमेंट आपको स्टेप-बाय-स्टेप गाइड करेगा।"
+          "question": "Stream या marks को लेकर unsure हूँ तो भी use कर सकता/सकती हूँ?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
         },
         {
-          "question": "क्या इसे माता-पिता या शिक्षक भी इस्तेमाल कर सकते हैं?",
-          "answer": "हम माता-पिता और मेंटर्स के लिए अलग डैशबोर्ड बना रहे हैं ताकि वे बच्चों की बेहतर मदद कर सकें - यह जल्द ही आ रहा है!"
+          "question": "क्या parents या teachers को access मिलता है?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
         }
       ]
     },
     "cta": {
       "badge": "अभी शुरू करें",
-      "title": "ऐप डाउनलोड करें और आगे बढ़ें",
+      "title": "App download करें और explore शुरू करें",
       "description": "Android और iOS पर उपलब्ध - छात्र, माता-पिता और शिक्षकों के लिए एकदम फ्री।"
     },
     "waitlist": {
       "title": "Xtara वेटलिस्ट में जुड़ें",
       "description": "सबसे पहले अर्ली एक्सेस पाने के लिए अभी साइन अप करें।"
+    }
+  },
+  "trustedDiscovery": {
+    "home": {
+      "hero": {
+        "eyebrow": "Career conversations Grade 8 से शुरू हो सकते हैं",
+        "title": "Students को career चुनने से पहले समझने दें।",
+        "description": "Xtara interests, strengths, family context और real career information को जोड़कर student को साफ next steps देता है।",
+        "primaryLoggedOut": "Career path शुरू करें",
+        "primaryLoggedIn": "अपनी progress देखें",
+        "login": "Log in करें",
+        "imageAlt": "Career planning देखते students",
+        "proofs": [
+          "Career path को साफ रखने वाला step",
+          "Career path को साफ रखने वाला step",
+          "Career path को साफ रखने वाला step"
+        ],
+        "resultLabel": "Assessment के बाद",
+        "resultTitle": "Career Direction और next steps",
+        "resultDescription": "Assessment के बाद student को direction, roles और next steps मिलते हैं।"
+      },
+      "outcomes": {
+        "eyebrow": "Assessment के बाद",
+        "title": "Direction, choices और एक next step लेकर निकलें।",
+        "description": "Assessment एक perfect job बताने की कोशिश नहीं करता। यह student को areas समझने, roles compare करने और आगे क्या try करना है यह तय करने में मदद करता है।",
+        "items": [
+          {
+            "step": "1",
+            "title": "Up to 3 Career Directions",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "step": "2",
+            "title": "1-3 Dream Careers",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "step": "3",
+            "title": "My Career Path",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          }
+        ]
+      },
+      "conversation": {
+        "eyebrow": "Parents और teachers के लिए",
+        "title": "Career conversation आसान बनाएँ।",
+        "description": "Students को डराने या pressure देने के बजाय, उनकी choices के पीछे की वजह, evidence और trade-offs पर बात करें।",
+        "imageAlt": "Career planning देखते students",
+        "studentLabel": "Student कहता है",
+        "studentValue": "मुझे options समझने हैं।",
+        "parentLabel": "Parent पूछता है",
+        "parentValue": "हम कैसे support करें?",
+        "togetherLabel": "साथ में conversation",
+        "togetherValue": "We can compare real work, preparation, costs, salary, and trade-offs.",
+        "action": "Conversation guide देखें"
+      },
+      "momentum": {
+        "eyebrow": "Plan रुकता नहीं",
+        "title": "एक plan जो आगे बढ़ता रहता है।",
+        "description": "Career clarity experience से आती है। Xtara chosen direction को छोटे learning, trying और discussion steps में बदलता है।",
+        "imageAlt": "Laptop पर plan discuss करते दो young adults",
+        "items": [
+          {
+            "title": "Useful skill सीखें",
+            "description": "Student ने जो Dream Careers चुने हैं उनसे जुड़े short lessons लें।"
+          },
+          {
+            "title": "Decide करने से पहले try करें",
+            "description": "Games और challenges से notice करें कि क्या interesting, difficult या practice करने लायक लगता है।"
+          },
+          {
+            "title": "Realistic routes देखें",
+            "description": "Student की location और study details के हिसाब से courses और colleges compare करें।"
+          },
+          {
+            "title": "Plan में दूसरों को जोड़ें",
+            "description": "Parent, teacher या counsellor के साथ Career Conversation slideshow use करें।"
+          }
+        ]
+      },
+      "trust": {
+        "eyebrow": "Thoughtful decisions के लिए",
+        "title": "Guidance भरोसे के लायक होनी चाहिए।",
+        "description": "Students को clear reasoning, realistic information और safe language चाहिए। Xtara certainty दिखाने के बजाय decision को समझने लायक बनाता है।",
+        "items": [
+          {
+            "title": "Perfect match का झूठा promise नहीं",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Curated content, generated answer नहीं",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Change होना normal है",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Context matter करता है",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          }
+        ]
+      },
+      "educators": {
+        "eyebrow": "Schools, teachers और counsellors के लिए",
+        "title": "Give every learner thoughtful, personal guidance.",
+        "description": "Students की readiness, interests और next steps समझें ताकि बातचीत timely और useful रहे।",
+        "pageTitle": "Educators के लिए career guidance",
+        "pageDescription": "Xtara gives educators a structured view of learner discovery and progress without turning assessment results into rankings, labels, or permanent decisions.",
+        "primary": "शुरू करें",
+        "primaryLoggedIn": "Dashboard खोलें",
+        "secondary": "और देखें",
+        "login": "Log in करें",
+        "proofs": [
+          "Career path को साफ रखने वाला step",
+          "Career path को साफ रखने वाला step",
+          "Career path को साफ रखने वाला step"
+        ],
+        "features": [
+          {
+            "title": "Class-level visibility",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Useful learner summaries",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Responsible cohort insights",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Scoped और consent-based",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          }
+        ],
+        "capabilitiesEyebrow": "Educator tools",
+        "capabilitiesTitle": "Know who needs support, and what conversation to have.",
+        "capabilitiesDescription": "The educator workspace turns learner activity into a focused support queue instead of another collection of charts.",
+        "stepsEyebrow": "A simple institution journey",
+        "stepsTitle": "Set up a school, invite a class, begin guiding.",
+        "stepsDescription": "Students complete the normal Xtara discovery journey before joining, so every educator view begins with learner-owned context and explicit sharing.",
+        "steps": [
+          {
+            "title": "Institution बनाएँ",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Learners invite करें",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          },
+          {
+            "title": "Next step guide करें",
+            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+          }
+        ],
+        "finalTitle": "Build a stronger guidance practice without taking over the student's decision.",
+        "finalDescription": "Start an institution workspace for your school or educational program. Students keep their individual Xtara journey while educators gain the context needed to support them responsibly.",
+        "preview": {
+          "label": "Class snapshot",
+          "title": "Career discussion ready",
+          "classLabel": "Learner needing follow-up",
+          "learnersLabel": "Learners",
+          "assessedLabel": "Assessed",
+          "followUpLabel": "Follow-up",
+          "learnerName": "एक learner discussion के लिए ready है",
+          "learnerStatus": "Ready"
+        }
+      },
+      "questions": {
+        "eyebrow": "Students और parents के सवाल",
+        "title": "Clear answers before you begin.",
+        "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+        "items": [
+          {
+            "question": "क्या Grade 8 career बात के लिए बहुत जल्दी है?",
+            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+          },
+          {
+            "question": "क्या assessment student के लिए एक career decide करेगा?",
+            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+          },
+          {
+            "question": "क्या personality, strengths, family background और finances matter करते हैं?",
+            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+          },
+          {
+            "question": "Parent या teacher कैसे जुड़ सकते हैं?",
+            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+          },
+          {
+            "question": "Start करने से पहले account चाहिए?",
+            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+          },
+          {
+            "question": "क्या Xtara Malayalam में use कर सकते हैं?",
+            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+          }
+        ]
+      },
+      "cta": {
+        "eyebrow": "आज शुरू करें",
+        "title": "एक final answer मत खोजिए। Explore करने लायक direction से शुरू करें।",
+        "description": "Assessment शुरू करें, या login करके अपना Career Path आगे बढ़ाएँ।",
+        "primary": "Career path explore करें",
+        "primaryLoggedIn": "मेरी progress खोलें",
+        "login": "Log in करें",
+        "imageAlt": "Supportive parents के बीच खड़ी young student"
+      }
+    },
+    "hero": {
+      "badge": "Grade 8 से career guidance",
+      "title": "आज explore करें। Confidence से decide करें।",
+      "description": "आपकी interests, strengths और context समझकर Xtara Career Directions देता है। Xtara सोचने में guide करता है, future decide नहीं करता।",
+      "primaryLoggedOut": "Career path शुरू करें",
+      "primaryLoggedIn": "मेरा career path खोलें",
+      "secondary": "कैसे काम करता है देखें"
+    },
+    "journey": {
+      "eyebrow": "आपके लिए बनाया गया",
+      "title": "Decide करने से पहले broad explore करें।",
+      "description": "Xtara हर step पर detail बढ़ाता है, जब आप ready हों। शुरुआत broad रहती है, फिर roles और plans साफ होते जाते हैं।",
+      "stages": [
+        {
+          "grade": "Grade 8",
+          "action": "Explore",
+          "description": "Interests notice करें और broad directions देखें।"
+        },
+        {
+          "grade": "Grade 9",
+          "action": "Compare",
+          "description": "Activities, skills और real roles compare करें।"
+        },
+        {
+          "grade": "Grade 10",
+          "action": "Plan",
+          "description": "Subjects और study routes पर better conversation करें।"
+        }
+      ]
+    },
+    "trust": {
+      "eyebrow": "Trust built in",
+      "title": "Result को profile की तरह पढ़ें, verdict की तरह नहीं।",
+      "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+      "principles": [
+        {
+          "title": "खुद को समझें",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "Real possibilities explore करें",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "Next step लें",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        }
+      ]
+    },
+    "questions": {
+      "eyebrow": "Questions",
+      "title": "Career guidance साफ और भरोसेमंद होनी चाहिए",
+      "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+      "items": [
+        {
+          "question": "क्या Xtara एक perfect career बताएगा?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+        },
+        {
+          "question": "Xtara Career Direction या Dream Career क्यों suggest करता है?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+        },
+        {
+          "question": "क्या Grade 8 career explore करने के लिए बहुत जल्दी है?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+        },
+        {
+          "question": "अगर मेरा mind बदल जाए तो?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+        },
+        {
+          "question": "क्या मैं Xtara Malayalam में use कर सकता/सकती हूँ?",
+          "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+        }
+      ]
+    },
+    "explore": {
+      "eyebrow": "Choosing शुरू करें",
+      "title": "Career areas पहले समझें। Job title बाद में चुनें।",
+      "description": "एक area के अंदर अलग-अलग roles हो सकते हैं। पहले work, pathway और trade-offs compare करें।",
+      "chooseGrade": "अपनी grade चुनें",
+      "areasTitle": "Explore शुरू करने के छह areas",
+      "areasDescription": "Career Directions शुरुआत करने की जगह हैं, बंद डिब्बे नहीं। हर direction में कई Dream Careers हो सकते हैं।",
+      "areas": [
+        {
+          "title": "Technology",
+          "description": "Apps बनाएं, समस्याएं हल करें और उपयोगी digital tools तैयार करें।"
+        },
+        {
+          "title": "Health",
+          "description": "लोगों को स्वस्थ रहने, ठीक होने और बेहतर जीवन जीने में मदद करें।"
+        },
+        {
+          "title": "Science",
+          "description": "सवाल पूछें, ideas को परखें और समझें कि चीजें कैसे काम करती हैं।"
+        },
+        {
+          "title": "Business",
+          "description": "Ideas को उपयोगी products, services और organisations में बदलें।"
+        },
+        {
+          "title": "Design and Media",
+          "description": "उपयोगी और दिलचस्प experiences, visuals और stories बनाएं।"
+        },
+        {
+          "title": "Education and Society",
+          "description": "पढ़ाएं, communities की मदद करें और साझा समस्याएं हल करें।"
+        }
+      ],
+      "trustTitle": "आप possibilities explore कर रहे हैं, future lock नहीं कर रहे।",
+      "trustDescription": "अधिकांश students को अभी final answer नहीं पता होता। यह normal है। Xtara pressure और guessing को simple exploration से replace करता है।",
+      "cta": "Career path शुरू करें"
+    },
+    "cta": {
+      "eyebrow": "एक useful next step",
+      "title": "Start with curiosity, not a final answer.",
+      "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+      "action": "Career path शुरू करें"
     }
   },
   "common": {
@@ -166,63 +612,111 @@
       "ogImage": "/images/og-about.jpg"
     },
     "hero": {
+      "eyebrow": "Xtara क्यों है",
       "title": "हर छात्र को मिले सही करियर, यही है हमारा लक्ष्य।",
-      "subtitle": "AI की मदद से और सही डेटा के साथ, Xtara छात्रों को अपने भविष्य के लिए सही फैसले लेने में मदद करता है।"
+      "subtitle": "AI की मदद से और सही डेटा के साथ, Xtara छात्रों को अपने भविष्य के लिए सही फैसले लेने में मदद करता है।",
+      "primary": "शुरू करें",
+      "login": "Log in करें",
+      "proofs": [
+        "Career path को साफ रखने वाला step",
+        "Career path को साफ रखने वाला step",
+        "Career path को साफ रखने वाला step"
+      ],
+      "imageAlt": "Career planning देखते students"
     },
-    "sections": [
-      {
-        "title": "हमारा मिशन",
-        "description": "हम मानते हैं कि हर छात्र को उसकी क्षमता के अनुसार करियर चुनने का मौका मिलना चाहिए। Xtara का AI प्लेटफॉर्म आपको वो सभी जरूरी टूल्स देता है जिससे आप अपने भविष्य के लिए सही फैसला ले सकें।",
-        "imageSrc": "/images/001.png",
-        "bullets": [
-          {
-            "title": "पर्सनल गाइडेंस",
-            "description": "AI असेसमेंट जो हर छात्र की यूनिक प्रोफाइल को समझता है।"
-          },
-          {
-            "title": "सही डेटा",
-            "description": "पूरी रिसर्च और डेटा पर आधारित करियर सलाह।"
-          },
-          {
-            "title": "सबके लिए",
-            "description": "भारत के हर कोने में छात्रों के लिए उपलब्ध।"
-          }
-        ]
-      },
-      {
-        "title": "हमारी कहानी",
-        "description": "2024 में हमने महसूस किया कि बहुत से छात्र बिना सही जानकारी के करियर चुन रहे हैं। इसी समस्या को सुलझाने के लिए शिक्षकों और टेक्नोलॉजी एक्सपर्ट्स ने मिलकर Xtara की शुरुआत की।",
-        "imageSrc": "/images/002.png",
-        "bullets": [
-          {
-            "title": "समस्या",
-            "description": "सही गाइडेंस के बिना करियर के फैसले लेना।"
-          },
-          {
-            "title": "समाधान",
-            "description": "AI प्लेटफॉर्म जो करियर गाइडेंस को आसान बनाए।"
-          },
-          {
-            "title": "टीम",
-            "description": "एजुकेटर्स और करियर एक्सपर्ट्स की एक समर्पित टीम।"
-          }
-        ]
-      }
-    ],
-    "stats": [
-      {
-        "title": "1M+",
-        "description": "लाखों छात्रों को सही करियर चुनने में मदद की।"
-      },
-      {
-        "title": "95%",
-        "description": "असेसमेंट और गाइडेंस के लिए पॉजिटिव फीडबैक।"
-      },
-      {
-        "title": "250+",
-        "description": "लोकल और ग्लोबल करियर ऑप्शन्स।"
-      }
-    ]
+    "mission": {
+      "eyebrow": "हमारा mission",
+      "title": "Give every student a direction they can explore and explain.",
+      "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+      "imageAlt": "Career planning देखते students",
+      "principles": [
+        {
+          "title": "पूरे student को समझें",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "हर direction explain करें",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "Direction को action में बदलें",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        }
+      ]
+    },
+    "story": {
+      "eyebrow": "हम कौन-सी problem solve कर रहे हैं",
+      "title": "A better question than “What will you become?”",
+      "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+      "imageAlt": "Career planning देखते students",
+      "studentTitle": "Students के लिए",
+      "studentDescription": "Confusion normal है। पहले explore करें, फिर compare करें, फिर plan बनाएँ।",
+      "adultTitle": "Parents और educators के लिए",
+      "adultDescription": "Student को support करें, decision उसके लिए न लें। Realistic information और calm conversation से plan बेहतर बनता है।"
+    },
+    "journey": {
+      "eyebrow": "Xtara कैसे मदद करता है",
+      "title": "Confusion से moving career path तक।",
+      "description": "पहला result verdict नहीं है। यह exploration, learning और conversation के repeatable cycle की शुरुआत है।",
+      "steps": [
+        {
+          "step": "Step 1",
+          "title": "Discover",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "step": "Step 2",
+          "title": "Compare",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "step": "Step 3",
+          "title": "Plan",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        }
+      ]
+    },
+    "trust": {
+      "eyebrow": "भरोसा",
+      "title": "Guidance को student का trust earn करना चाहिए।",
+      "description": "Xtara thoughtful choices में मदद के लिए design किया गया है, impressive-looking certainty दिखाने के लिए नहीं।",
+      "items": [
+        {
+          "title": "Curated content, generated answer नहीं",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "Perfect match का झूठा promise नहीं",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "Context, limits नहीं",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        },
+        {
+          "title": "Change होना normal है",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+        }
+      ]
+    },
+    "people": {
+      "eyebrow": "किसके लिए",
+      "title": "Students और उन्हें guide करने वाले लोग।",
+      "items": [
+        {
+          "title": "Students",
+          "description": "अपनी interests, strengths और possible careers explore करें।"
+        },
+        {
+          "title": "Parents",
+          "description": "Pressure कम करके better career conversations करें।"
+        },
+        {
+          "title": "Educators",
+          "description": "Students की choices और next steps साफ देखें।"
+        }
+      ]
+    }
   },
   "contact": {
     "metadata": {
@@ -260,24 +754,24 @@
       },
       "subjectOptions": [
         {
-          "value": "General Inquiry",
-          "label": "सामान्य पूछताछ"
+          "value": "General question",
+          "label": "General inquiry"
         },
         {
-          "value": "Technical Support",
-          "label": "टेक्निकल सपोर्ट"
+          "value": "Student support",
+          "label": "Technical support"
         },
         {
-          "value": "Partnership",
-          "label": "पार्टनरशिप"
+          "value": "School partnership",
+          "label": "Partnership"
         },
         {
-          "value": "Feedback",
-          "label": "फीडबैक"
+          "value": "Business partnership",
+          "label": "Feedback"
         },
         {
           "value": "Other",
-          "label": "अन्य"
+          "label": "Other"
         }
       ],
       "status": {
@@ -338,16 +832,16 @@
       "subtitle": "सही फैसलों के लिए स्मार्ट गाइडेंस।",
       "items": [
         {
-          "title": "पर्सनल असेसमेंट",
-          "description": "अपनी ताकत और रुचि को पहचानें।"
+          "title": "Personalized assessments",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "करियर प्लान",
-          "description": "आगे क्या करना है और कैसे अप्लाई करना है, जानें।"
+          "title": "Step-by-step plans",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         },
         {
-          "title": "अवसर",
-          "description": "अपने आसपास के कॉलेज और कोर्स खोजें।"
+          "title": "Local opportunities",
+          "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
         }
       ]
     },
@@ -382,15 +876,28 @@
       "open": "मेन्यू"
     },
     "nav": {
+      "career": "करियर",
+      "learn": "सीखें",
       "dashboard": "डैशबोर्ड",
+      "direction": "Direction",
       "profile": "प्रोफाइल",
       "achievements": "अचीवमेंट्स",
+      "notifications": "सूचनाएँ",
+      "learnerNavigation": "विद्यार्थी नेविगेशन",
+      "explore": "Explore",
+      "howItWorks": "कैसे काम करता है",
+      "educators": "Educators",
+      "organization": "Workspace",
+      "learners": "Students",
+      "classes": "Classes",
+      "educatorProfile": "My profile",
       "about": "हमारे बारे में",
       "news": "न्यूज़",
       "contact": "संपर्क"
     },
     "cta": {
-      "joinWaitlist": "वेटलिस्ट जॉइन करें"
+      "joinWaitlist": "वेटलिस्ट जॉइन करें",
+      "login": "Log in"
     }
   },
   "footer": {
@@ -421,58 +928,95 @@
   },
   "achievements": {
     "hero": {
-      "title": "आपकी उपलब्धियां",
-      "subtitle": "अपनी प्रोग्रेस ट्रैक करें और हर जीत का जश्न मनाएं।"
+      "eyebrow": "मेरा करियर पथ",
+      "title": "मेरी करियर प्रोग्रेस",
+      "subtitle": "देखें कि हर लेसन, एजुकेशनल गेम, चैलेंज और करियर रीडिंग आपको अपने लक्ष्यों की ओर कैसे बढ़ा रहे हैं।"
     },
-    "stats": {
+    "empty": {
+      "eyebrow": "एक दिशा से शुरुआत करें",
+      "title": "आपकी करियर प्रोग्रेस यहां से शुरू होती है",
+      "description": "असेसमेंट पूरा करके एक करियर दिशा चुनें। जैसे-जैसे आपका प्लान आगे बढ़ेगा, आपकी लर्निंग, प्रैक्टिस और अगले कदम यहां दिखेंगे।",
+      "action": "मेरी करियर दिशा खोजें"
+    },
+    "career": {
+      "direction": "करियर दिशा",
+      "description": "आपकी लर्निंग और अगले कदम इस दिशा और उन ड्रीम करियर्स के साथ दिखाए गए हैं जिन्हें आप एक्सप्लोर करना चाहते हैं।",
+      "chooseCareers": "1–3 ड्रीम करियर्स चुनें",
+      "stepsComplete": "करियर के कदम पूरे",
+      "pathProgress": "मेरे करियर पथ की प्रोग्रेस"
+    },
+    "recognition": {
+      "title": "पहचान",
+      "description": "पॉइंट्स और मेडल आपके करियर पथ में की गई मेहनत का सम्मान करते हैं।",
       "points": "पॉइंट्स",
-      "currentTier": "वर्तमान लेवल",
-      "tier": "लेवल",
       "medals": "मेडल",
-      "loading": "लोड हो रहा है...",
-      "fallbackTier": "स्पार्क"
+      "level": "लेवल",
+      "whyTitle": "पॉइंट्स से ज्यादा जरूरी है प्रोग्रेस",
+      "whyDescription": "पॉइंट्स आपकी मेहनत की पहचान हैं। करियर्स के बारे में सीखना, उपयोगी स्किल्स की प्रैक्टिस करना और समझदारी से चुनाव करना आपकी असली उपलब्धि है।"
     },
-    "weeklyProgress": {
-      "title": "इस हफ्ते की प्रोग्रेस",
-      "goodReads": "रीडिंग",
-      "challenges": "चैलेंज",
-      "sparks": "स्पार्क्स"
-    },
-    "medals": {
-      "title": "मेडल",
-      "common": "कॉमन",
-      "rare": "रेयर",
-      "epic": "एपिक"
-    },
-    "allTime": {
-      "title": "अब तक की उपलब्धियां",
-      "games": "गेम्स",
-      "sparks": "स्पार्क्स",
-      "challenges": "चैलेंज",
-      "goodReads": "रीडिंग"
-    },
-    "pointsByCategory": {
-      "title": "कैटेगरी के हिसाब से पॉइंट्स",
+    "learning": {
+      "eyebrow": "सीखने का प्रमाण",
+      "title": "मैं करियर के लिए कैसे तैयार हो रहा हूं",
+      "description": "ये पूरी की गई एक्टिविटीज़ दिखाती हैं कि आपने किन तरीकों से सीखा, प्रैक्टिस की और एक्सप्लोर किया।",
+      "total": "{count} एक्टिविटीज़ पूरी हुईं",
+      "completed": "पूरी हुईं",
+      "points": "पॉइंट्स मिले",
+      "action": "सीखना जारी रखें",
       "games": {
-        "title": "गेम्स",
-        "description": "क्विज़ और वर्ड गेम्स"
+        "title": "एजुकेशनल गेम्स",
+        "description": "खेलते हुए प्रॉब्लम सॉल्विंग, मेमोरी, निर्णय लेने और करियर ज्ञान की प्रैक्टिस करें।",
+        "label": "खेलकर सीखें"
       },
       "sparks": {
-        "title": "स्पार्क्स",
-        "description": "शॉर्ट लेसन्स और कोर्सेस"
+        "title": "छोटे लेसन",
+        "description": "छोटे और स्पष्ट कदमों में उपयोगी करियर आइडिया और स्किल्स सीखें।"
       },
       "challenges": {
         "title": "चैलेंज",
-        "description": "मुकाबले और क्विज़"
+        "description": "सीखी हुई बातों को इस्तेमाल करें, समस्याएं हल करें और अपनी समझ जांचें।"
       },
-      "goodReads": {
-        "title": "रीडिंग",
-        "description": "करियर आर्टिकल्स"
+      "reads": {
+        "title": "करियर रीडिंग",
+        "description": "असल काम, पढ़ाई के रास्ते, चुनाव और अवसरों को समझें।"
       },
-      "streaks": {
-        "title": "स्ट्रीक्स",
-        "description": "लगातार बने रहने का बोनस"
+      "gameNote": {
+        "title": "गेम्स भी सीखने का हिस्सा हैं",
+        "description": "Xtara के गेम्स एजुकेशनल एक्टिविटीज़ हैं। ये सिर्फ पॉइंट्स के लिए नहीं, बल्कि आइडिया और उपयोगी स्किल्स की एक्टिव प्रैक्टिस के लिए हैं।"
       }
+    },
+    "steps": {
+      "title": "मेरे लक्ष्यों की ओर मेरी प्रोग्रेस",
+      "description": "करियर का चुनाव सिर्फ स्कोर से नहीं, सीखने, आजमाने और चर्चा करने से साफ होता है।",
+      "direction": {
+        "title": "करियर दिशा चुनें",
+        "description": "एक बड़ा क्षेत्र चुनें जिसे आप एक्सप्लोर करना चाहते हैं।"
+      },
+      "careers": {
+        "title": "ड्रीम करियर्स चुनें",
+        "description": "तुलना और खोज के लिए तीन करियर्स तक चुनें।"
+      },
+      "learn": {
+        "title": "करियर पथ के बारे में सीखें",
+        "description": "एक छोटा लेसन पूरा करें या किसी करियर के बारे में पढ़ें।",
+        "evidence": "{count} लर्निंग एक्टिविटीज़ पूरी हुईं"
+      },
+      "try": {
+        "title": "स्किल्स और आइडिया आजमाएं",
+        "description": "एजुकेशनल गेम, चैलेंज या प्रैक्टिकल एक्टिविटी करें।",
+        "evidence": "{count} गेम्स या चैलेंज पूरे हुए"
+      },
+      "discuss": {
+        "title": "प्लान पर चर्चा करें",
+        "description": "जो सीखा है उस पर माता-पिता, शिक्षक या काउंसलर से बात करें।"
+      }
+    },
+    "next": {
+      "eyebrow": "मेरा अगला सही कदम",
+      "action": "यह कदम उठाएं",
+      "completeEyebrow": "प्लान अपडेट है",
+      "completeTitle": "एक्सप्लोर करते रहें",
+      "completeDescription": "आपने अपने मौजूदा प्लान के मुख्य कदम पूरे कर लिए हैं। सीखते रहें और नई बातें जानने पर अपने चुनावों को दोबारा देखें।",
+      "completeAction": "मेरा करियर पथ खोलें"
     }
   },
   "currentGoalCard": {

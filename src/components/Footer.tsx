@@ -20,8 +20,8 @@ const Footer = () => {
                         <Image
                             src="/images/logo-dark.svg"
                             alt={t("header.logoAlt")}
-                            width={50}
-                            height={0}
+                            width={66}
+                            height={24}
                         />
 
                     </Link>

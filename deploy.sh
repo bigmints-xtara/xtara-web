@@ -13,10 +13,9 @@
 #   ./deploy.sh v1.2.3 --dry-run
 #
 # Authentication:
-#   Uses Application Default Credentials (ADC). Configure via:
-#     Local:  gcloud auth application-default login
-#     CI/CD:   Workload Identity Federation (preferred)
-#              or set GOOGLE_APPLICATION_CREDENTIALS env var
+#   Uses the dedicated xtara-deployer service account. Set
+#   XTARA_DEPLOY_CREDENTIALS or GOOGLE_APPLICATION_CREDENTIALS when the key is
+#   not at ../.secrets/xtara-deployer.json.
 #
 # Prerequisites:
 #   gcloud CLI, Docker (with Buildx), git
@@ -32,8 +31,11 @@ PROJECT_ID="bigmints-xtara"
 SERVICE_NAME="xtara-web"
 REGION="us-central1"
 PLATFORM="managed"
-# Dedicated Artifact Registry repository (not the default cloud-run-source-deploy)
-ARTIFACT_REPO="us-docker.pkg.dev/${PROJECT_ID}/xtara-web-artifacts"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEPLOY_CREDENTIALS="${XTARA_DEPLOY_CREDENTIALS:-${GOOGLE_APPLICATION_CREDENTIALS:-${SCRIPT_DIR}/../.secrets/xtara-deployer.json}}"
+# Use the existing production Artifact Registry repository. The dedicated
+# xtara-web-artifacts repository documented below has not been provisioned.
+ARTIFACT_REPO="us-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy"
 IMAGE_NAME="${ARTIFACT_REPO}/${SERVICE_NAME}"
 
 # Colors for output
@@ -63,6 +65,10 @@ print_error() {
 
 print_info() {
     echo -e "${YELLOW}ℹ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠ $1${NC}"
 }
 
 # Compute version tag from git commit short hash + timestamp.
@@ -166,47 +172,42 @@ print_success "Git is installed"
 # ===========================
 # AUTHENTICATION
 # ===========================
-# Use Application Default Credentials (ADC) instead of a hardcoded service account
-# key file. This avoids committing a JSON key or hardcoding paths and works
-# seamlessly with Workload Identity Federation in CI/CD pipelines.
-#
-# Setup options:
-#   Local development:
-#     gcloud auth application-default login
-#   CI/CD (set the env var):
-#     export GOOGLE_APPLICATION_CREDENTIALS=<path-to-key>
-#   Workload Identity Federation (recommended for CI/CD pipelines):
-#     gcloud auth application-default set-credentials
-
 print_header "Authenticating with Google Cloud"
 
-# Verify that ADC is configured. This check catches missing credentials early
-# so the build does not start before failing on auth.
-if gcloud auth application-default print-access-token &> /dev/null; then
-    print_success "Application Default Credentials (ADC) are configured"
-    print_info "Using Workload Identity Federation (preferred for CI/CD) or local ADC"
-else
-    print_error "Application Default Credentials (ADC) not configured."
-    echo ""
-    echo "Please configure ADC using one of the following methods:"
-    echo ""
-    echo "  Local development:"
-    echo "    gcloud auth application-default login"
-    echo ""
-    echo "  CI/CD (set the env var):"
-    echo "    export GOOGLE_APPLICATION_CREDENTIALS=<path-to-key>"
-    echo ""
-    echo "  Workload Identity Federation (recommended for CI/CD pipelines):"
-    echo "    gcloud auth application-default set-credentials"
-    echo ""
-    exit 1
-fi
-
-# Set project
 if [[ "$DRY_RUN" != "true" ]]; then
-    gcloud config set project "$PROJECT_ID"
+    if [[ ! -r "$DEPLOY_CREDENTIALS" ]]; then
+        print_error "Deployment service-account key is not readable: $DEPLOY_CREDENTIALS"
+        echo "Set XTARA_DEPLOY_CREDENTIALS to the downloaded xtara-deployer JSON key."
+        exit 1
+    fi
+    gcloud auth activate-service-account --key-file="$DEPLOY_CREDENTIALS" --project="$PROJECT_ID" --quiet
 fi
-print_success "Project set to: $PROJECT_ID"
+print_success "Deployment service account configured for project: $PROJECT_ID"
+
+# Next.js embeds Firebase's public web configuration into the browser bundle at
+# build time. Resolve it automatically after service-account authentication so
+# a plain ./deploy.sh cannot publish an image with a disabled sign-in screen.
+# The resolver prefers Secret Manager and falls back to the currently verified
+# public Xtara application while the missing managed secrets are provisioned.
+if [[ "$DRY_RUN" != "true" && "${XTARA_DEPLOY_ENV_RESOLVED:-}" != "1" ]]; then
+    missing_public_config="false"
+    for env_name in \
+        NEXT_PUBLIC_FIREBASE_API_KEY \
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN \
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID \
+        NEXT_PUBLIC_FIREBASE_APP_ID; do
+        if [[ -z "${!env_name:-}" ]]; then
+            missing_public_config="true"
+            break
+        fi
+    done
+
+    if [[ "$missing_public_config" == "true" ]]; then
+        print_info "Resolving Firebase web configuration for the production build..."
+        exec env XTARA_DEPLOY_ENV_RESOLVED=1 \
+            node "$SCRIPT_DIR/scripts/run-with-gcp-secrets.mjs" -- "$0" "$@"
+    fi
+fi
 
 # Configure Docker to use gcloud as credential helper for Artifact Registry.
 # This enables docker push and docker buildx build --push to authenticate
@@ -227,13 +228,39 @@ print_header "Building Docker Image"
 # slow QEMU emulation during local development.
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 
+# Next.js replaces NEXT_PUBLIC_* references and compiles rewrites at build time.
+# Forward public client configuration plus the non-secret API proxy target;
+# server credentials remain runtime-only Cloud Run configuration.
+BUILD_TIME_VARS=(
+    NEXT_PUBLIC_FIREBASE_API_KEY
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    NEXT_PUBLIC_FIREBASE_APP_ID
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    NEXT_PUBLIC_GA_ID
+    NEXT_PUBLIC_ALGOLIA_APP_ID
+    NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY
+    NEXT_PUBLIC_ALGOLIA_INDEX_NAME
+    NEXT_PUBLIC_XTARA_API_BASE_URL
+    XTARA_API_PROXY_TARGET
+)
+BUILD_ARGS=()
+for env_name in "${BUILD_TIME_VARS[@]}"; do
+    if [[ -n "${!env_name:-}" ]]; then
+        BUILD_ARGS+=(--build-arg "${env_name}=${!env_name}")
+    fi
+done
+
 print_info "Building image: $IMAGE_NAME:$VERSION_TAG"
 print_info "Platforms: $PLATFORMS"
+print_info "Build-time variables supplied: ${#BUILD_ARGS[@]} argument tokens"
 print_info "Using Docker Buildx with BuildKit cache"
 
 # Build using docker buildx for multi-platform support with BuildKit cache.
 # --push pushes directly to the registry during the build (avoids a separate
-# docker push step). --provenance=maximum stores build metadata for traceability.
+# docker push step). Maximum provenance stores build metadata for traceability.
 # --cache-from/to enables distributed BuildKit cache (useful for CI/CD).
 if [[ "$DRY_RUN" == "true" ]]; then
     print_info "[DRY-RUN] docker buildx build --platform $PLATFORMS \\"
@@ -245,15 +272,23 @@ if [[ "$DRY_RUN" == "true" ]]; then
     print_info "  -t $IMAGE_NAME:latest \\"
     print_info "  ."
 else
-    docker buildx build \
-        --platform "$PLATFORMS" \
-        --provenance=maximum \
-        --cache-from=type=registry,ref=${IMAGE_NAME}:cache \
-        --cache-to=type=registry,ref=${IMAGE_NAME}:cache,mode=max \
-        --push \
-        -t "${IMAGE_NAME}:${VERSION_TAG}" \
-        -t "${IMAGE_NAME}:latest" \
+    BUILD_COMMAND=(
+        docker buildx build
+        --platform "$PLATFORMS"
+        --provenance=mode=max
+        --cache-from=type=registry,ref=${IMAGE_NAME}:cache
+        --cache-to=type=registry,ref=${IMAGE_NAME}:cache,mode=max
+    )
+    if [[ ${#BUILD_ARGS[@]} -gt 0 ]]; then
+        BUILD_COMMAND+=("${BUILD_ARGS[@]}")
+    fi
+    BUILD_COMMAND+=(
+        --push
+        -t "${IMAGE_NAME}:${VERSION_TAG}"
+        -t "${IMAGE_NAME}:latest"
         .
+    )
+    "${BUILD_COMMAND[@]}"
 fi
 print_success "Docker image built and pushed to Artifact Registry"
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { Story, StorySlide as StorySlideType } from "@/lib/firebase/firestore-service";
+import { Story } from "@/lib/firebase/firestore-service";
 import StorySlide from "./StorySlide";
 
 interface StorySlideshowProps {
@@ -22,6 +22,8 @@ export default function StorySlideshow({ story, isOpen, onClose, onComplete, use
     const [progress, setProgress] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
+    const [savingCompletion, setSavingCompletion] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
 
     // Brand colors for fallback (matching Flutter app)
     const brandColors = [
@@ -87,18 +89,31 @@ export default function StorySlideshow({ story, isOpen, onClose, onComplete, use
     };
 
     const handleComplete = async () => {
-        if (userId) {
-            const { FirestoreService } = await import("@/lib/firebase/firestore-service");
-            await FirestoreService.markStoryWatched(userId, story.id);
+        if (savingCompletion) return;
+        setSavingCompletion(true);
+        setSaveError(null);
+        try {
+            if (userId) {
+                const { FirestoreService } = await import("@/lib/firebase/firestore-service");
+                await FirestoreService.markStoryWatched(userId, story.id);
+            }
+            onComplete?.();
+            handleClose();
+        } catch (error) {
+            console.error("Failed to save story completion", error);
+            setIsPaused(true);
+            setSaveError("Your progress was not saved.");
+        } finally {
+            setSavingCompletion(false);
         }
-        onComplete?.();
-        handleClose();
     };
 
     const handleClose = () => {
         setCurrentIndex(0);
         setProgress(0);
         setFadeOut(false);
+        setSaveError(null);
+        setSavingCompletion(false);
         onClose();
     };
 
@@ -167,6 +182,23 @@ export default function StorySlideshow({ story, isOpen, onClose, onComplete, use
                 >
                     <X size={24} />
                 </button>
+
+                {saveError && (
+                    <div className="absolute inset-x-4 bottom-6 z-[130] rounded-xl bg-black/85 p-4 text-center" role="alert">
+                        <p className="text-sm">{saveError}</p>
+                        <button
+                            type="button"
+                            className="mt-3 rounded-md bg-white px-4 py-2 text-sm font-medium text-black disabled:opacity-50"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                void handleComplete();
+                            }}
+                            disabled={savingCompletion}
+                        >
+                            {savingCompletion ? "Saving…" : "Retry"}
+                        </button>
+                    </div>
+                )}
 
                 {/* Story content */}
                 <div

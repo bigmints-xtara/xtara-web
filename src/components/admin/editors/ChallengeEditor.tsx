@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Save, X, Plus, Trash2 } from 'lucide-react';
 import type { Challenge, ChallengeQuestion } from '@/types/admin';
-import { formatSnakeCaseToTitleCase } from '@/lib/utils';
+import { ContentTagEditor } from '@/components/admin/ContentTagEditor';
 
 interface ChallengeEditorProps {
   challenge: Challenge | null;
@@ -33,6 +33,11 @@ export default function ChallengeEditor({ challenge, onSave, onCancel }: Challen
     hyperlinkText: challenge?.hyperlinkText || '',
     callToAction: challenge?.callToAction || '',
     careerRelevance: challenge?.careerRelevance || [],
+    futureDirectionIds: challenge?.futureDirectionIds || [],
+    dreamCareerIds: challenge?.dreamCareerIds || challenge?.careerRelevance || [],
+    skillIds: challenge?.skillIds || [],
+    gradeStages: challenge?.gradeStages || [],
+    topics: challenge?.topics || [],
     type: challenge?.type || '',
     rewardPerQuestion: challenge?.rewardPerQuestion || 0,
     instructions: challenge?.instructions || '',
@@ -40,15 +45,7 @@ export default function ChallengeEditor({ challenge, onSave, onCancel }: Challen
     publishedAt: challenge?.publishedAt,
     publishedUntil: challenge?.publishedUntil,
   }));
-  const [relevanceInput, setRelevanceInput] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (challenge) {
-      setFormData(challenge);
-    }
-    setErrors([]);
-  }, [challenge]);
 
   const getStatus = () => {
     if (formData.published) return 'published';
@@ -62,23 +59,6 @@ export default function ChallengeEditor({ challenge, onSave, onCancel }: Challen
       published: status === 'published',
       draft: status === 'draft',
       inReview: status === 'inReview',
-    });
-  };
-
-  const addRelevance = () => {
-    if (relevanceInput.trim() && !(formData.careerRelevance || []).includes(relevanceInput.trim())) {
-      setFormData({
-        ...formData,
-        careerRelevance: [...(formData.careerRelevance || []), relevanceInput.trim()],
-      });
-      setRelevanceInput('');
-    }
-  };
-
-  const removeRelevance = (relevance: string) => {
-    setFormData({
-      ...formData,
-      careerRelevance: formData.careerRelevance?.filter((r) => r !== relevance),
     });
   };
 
@@ -362,44 +342,7 @@ export default function ChallengeEditor({ challenge, onSave, onCancel }: Challen
           </div>
         </div>
 
-        {/* Career Relevance */}
-        <div className="bg-white rounded-lg p-6 border">
-          <h3 className="text-lg font-semibold mb-4">Career Relevance</h3>
-          <div className="flex gap-2 mb-3">
-            <input
-              type="text"
-              value={relevanceInput}
-              onChange={(e) => setRelevanceInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addRelevance())}
-              className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Add career relevance"
-            />
-            <button
-              type="button"
-              onClick={addRelevance}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Add
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.careerRelevance?.map((relevance) => (
-              <span
-                key={relevance}
-                className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center gap-2"
-              >
-                {formatSnakeCaseToTitleCase(relevance)}
-                <button
-                  type="button"
-                  onClick={() => removeRelevance(relevance)}
-                  className="hover:text-purple-900"
-                >
-                  <X size={14} />
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
+        <ContentTagEditor value={formData} onChange={(tags) => setFormData((current) => ({ ...current, ...tags }))} />
 
         {/* Schedule */}
         <div className="bg-white rounded-lg p-6 border">
@@ -535,7 +478,7 @@ export default function ChallengeEditor({ challenge, onSave, onCancel }: Challen
 
             {(!formData.questions || formData.questions.length === 0) && (
               <p className="text-sm text-gray-500 text-center py-4">
-                No questions added yet. Click "Add Question" to get started.
+                {'No questions added yet. Click "Add Question" to get started.'}
               </p>
             )}
           </div>

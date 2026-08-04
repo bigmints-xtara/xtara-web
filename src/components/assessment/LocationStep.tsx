@@ -30,6 +30,7 @@ export default function LocationStep({ onComplete }: LocationStepProps) {
     const [cities, setCities] = useState<string[]>([]);
     const [loadingStates, setLoadingStates] = useState(true);
     const [loadingDetails, setLoadingDetails] = useState(false);
+    const [locationError, setLocationError] = useState(false);
 
     useEffect(() => {
         async function load() {
@@ -50,12 +51,14 @@ export default function LocationStep({ onComplete }: LocationStepProps) {
         }));
         setDistricts([]);
         setCities([]);
+        setLocationError(false);
 
         if (newState) {
             setLoadingDetails(true);
             const details = await getStateDetails(newState);
             setDistricts(details.districts.sort());
             setCities(details.cities.sort());
+            setLocationError(Boolean(details.unavailable));
             setLoadingDetails(false);
         }
     };
@@ -108,11 +111,17 @@ export default function LocationStep({ onComplete }: LocationStepProps) {
                     </Select>
                 </div>
 
+                {locationError ? (
+                    <div role="alert" className="rounded-xl bg-amber-50 p-4 text-sm text-amber-950">
+                        We could not load districts and cities. Check your connection and select the state again.
+                    </div>
+                ) : null}
+
                 <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">District *</label>
                     <Select
                         value={data.district}
-                        onValueChange={(value) => setData({ ...data, district: value })}
+                        onValueChange={(value) => setData({ ...data, district: value, city: "", locationPreference: "" })}
                     >
                         <SelectTrigger disabled={!data.state || loadingDetails}>
                             <SelectValue placeholder={loadingDetails ? "Loading..." : "Select district"} />
@@ -128,12 +137,12 @@ export default function LocationStep({ onComplete }: LocationStepProps) {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">City *</label>
+                    <label className="block text-sm font-medium text-gray-700">Nearest major city *</label>
                     <Select
                         value={data.city}
                         onValueChange={(value) => setData({ ...data, city: value })}
                     >
-                        <SelectTrigger disabled={!data.state || loadingDetails}>
+                        <SelectTrigger disabled={!data.district || loadingDetails}>
                             <SelectValue placeholder={loadingDetails ? "Loading..." : "Select city"} />
                         </SelectTrigger>
                         <SelectContent>

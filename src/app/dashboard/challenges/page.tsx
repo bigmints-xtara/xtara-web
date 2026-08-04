@@ -7,7 +7,7 @@ import { useChallengesQuery } from "@/lib/query/useContentQuery";
 import { FirestoreService, Challenge } from "@/lib/firebase/firestore-service";
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CheckCircle2, Trophy, BookOpen, ChevronRight } from "lucide-react";
+import { ArrowLeft, Trophy, BookOpen, ChevronRight } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
 import confetti from "canvas-confetti";
@@ -15,6 +15,8 @@ import confetti from "canvas-confetti";
 export default function ChallengesPage() {
     const router = useRouter();
     const { user } = useAuth();
+    const userId = user?.uid;
+    const userIsAnonymous = user?.isAnonymous;
     
     const { data: challengesList = [], isLoading: listLoading } = useChallengesQuery(20);
     
@@ -33,6 +35,9 @@ export default function ChallengesPage() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [quizScore, setQuizScore] = useState(0);
     const [isPractice, setIsPractice] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [rewardError, setRewardError] = useState<string | null>(null);
 
     // Load full challenge details when selected
     useEffect(() => {
@@ -43,29 +48,34 @@ export default function ChallengesPage() {
 
         const fetchDetails = async () => {
             setChallengeLoading(true);
-            const data = await FirestoreService.getChallengeById(selectedChallengeId);
-            setActiveChallenge(data);
-            
-            // Reset states
-            setHasReadContent(false);
-            setShowQuiz(false);
-            setCurrentQuestionIndex(0);
-            setSelectedAnswers({});
-            setIsSubmitted(false);
-            setQuizScore(0);
-            
-            // Check if already completed (for practice mode)
-            if (user) {
-                // In a full implementation, we'd query the 'points' collection to check if already completed
-                // For now, we'll assume it's not practice unless we add that specific query.
-                setIsPractice(false);
+            setSaveError(null);
+            setRewardError(null);
+            try {
+                const data = await FirestoreService.getChallengeById(selectedChallengeId);
+                let completedBefore = false;
+                if (userId && !userIsAnonymous) {
+                    try {
+                        completedBefore = await FirestoreService.hasChallengeSubmission(selectedChallengeId);
+                    } catch (error) {
+                        console.error("Failed to load challenge progress", error);
+                        setSaveError("Previous progress could not be loaded.");
+                    }
+                }
+                setActiveChallenge(data);
+                setHasReadContent(false);
+                setShowQuiz(false);
+                setCurrentQuestionIndex(0);
+                setSelectedAnswers({});
+                setIsSubmitted(false);
+                setQuizScore(0);
+                setIsPractice(completedBefore);
+            } finally {
+                setChallengeLoading(false);
             }
-            
-            setChallengeLoading(false);
         };
 
         fetchDetails();
-    }, [selectedChallengeId, user]);
+    }, [selectedChallengeId, userId, userIsAnonymous]);
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const bottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 100;
@@ -103,12 +113,25 @@ export default function ChallengesPage() {
             }
         });
 
-        setQuizScore(correctCount);
-        setIsSubmitted(true);
-
+        setSubmitting(true);
+        setSaveError(null);
         try {
-            const achievements = new AchievementsService();
-            await achievements.addPointsForChallenge(user.uid, activeChallenge.id, correctCount, isPractice);
+            await FirestoreService.submitChallenge(activeChallenge.id, {
+                answers: questions.map((_, index) => selectedAnswers[index]),
+                score: correctCount,
+                isPractice,
+            });
+            let awarded: boolean | null = null;
+            try {
+                const achievements = new AchievementsService();
+                awarded = await achievements.addPointsForChallenge(user.uid, activeChallenge.id, correctCount, isPractice);
+            } catch (error) {
+                console.error("Challenge saved but points failed", error);
+                setRewardError("Result saved. Points could not be updated.");
+            }
+            setQuizScore(correctCount);
+            setIsSubmitted(true);
+            if (awarded === false) setIsPractice(true);
             
             confetti({
                 particleCount: 100,
@@ -116,13 +139,28 @@ export default function ChallengesPage() {
                 origin: { y: 0.6 }
             });
             
-            if (!isPractice) {
+            if (awarded === true) {
                 alert(`You earned 10 base points + ${correctCount} bonus points!`);
-            } else {
-                alert("Practice run completed!");
+            } else if (awarded === false) {
+                alert("Challenge saved.");
             }
         } catch (error) {
-            console.error("Failed to submit challenge points", error);
+            console.error("Failed to save challenge completion", error);
+            setSaveError("Your result was not saved. Try again.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const retryPoints = async () => {
+        if (!activeChallenge || !user || user.isAnonymous) return;
+        setRewardError(null);
+        try {
+            const achievements = new AchievementsService();
+            await achievements.addPointsForChallenge(user.uid, activeChallenge.id, quizScore, isPractice);
+        } catch (error) {
+            console.error("Failed to retry challenge points", error);
+            setRewardError("Result saved. Points could not be updated.");
         }
     };
 
@@ -303,12 +341,13 @@ export default function ChallengesPage() {
                                                     ) : (
                                                         <Button 
                                                             onClick={submitQuiz}
-                                                            disabled={Object.keys(selectedAnswers).length < (activeChallenge.questions?.length || 0)}
+                                                            disabled={submitting || Object.keys(selectedAnswers).length < (activeChallenge.questions?.length || 0)}
                                                         >
-                                                            Submit Challenge
+                                                            {submitting ? "Saving…" : "Submit Challenge"}
                                                         </Button>
                                                     )}
                                                 </div>
+                                                {saveError && <p className="text-sm text-destructive" role="alert">{saveError}</p>}
                                             </div>
                                         ) : (
                                             <div className="text-center space-y-8 py-8">
@@ -330,6 +369,14 @@ export default function ChallengesPage() {
 
                                                 {isPractice && (
                                                     <p className="text-muted-foreground">Practice runs do not award additional points.</p>
+                                                )}
+                                                {rewardError && (
+                                                    <div className="space-y-3 text-sm text-destructive" role="alert">
+                                                        <p>{rewardError}</p>
+                                                        <Button variant="outline" size="sm" onClick={() => void retryPoints()}>
+                                                            Retry points
+                                                        </Button>
+                                                    </div>
                                                 )}
 
                                                 <div className="pt-8">

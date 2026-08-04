@@ -1,0 +1,399 @@
+{
+  "ui": {
+    "eyebrow": "One adaptive career discovery",
+    "title": "You do not need to know what you want to become.",
+    "description": "Tell us what interests you, how you work, what feels like a strength, and what matters around you. Xtara will turn those answers into Career Directions to explore.",
+    "loading": "Preparing your discovery journey…",
+    "processingTitle": "Building your Career Directions",
+    "processingDescription": "We are looking for patterns across your interests, strengths, personality, values, and family context—not calculating a perfect-career score.",
+    "errorTitle": "We could not continue",
+    "retry": "Try again",
+    "privacy": "Your answers remain temporary until you create an account to save them.",
+    "startAssessment": "Start assessment",
+    "chooseGrade": "First, choose your grade",
+    "stepOf": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "finish": "See my Career Directions",
+    "chooseUpTo": "Choose up to {count}",
+    "noQuestions": "No questions are available for this journey.",
+    "textPlaceholder": "Type your answer here",
+    "gradeQuestion": {
+      "label": "Which grade are you currently studying in?",
+      "description": "Your grade changes the detail and next steps in the assessment. It does not limit the directions you can explore.",
+      "options": {
+        "grade8": "Grade 8",
+        "grade9": "Grade 9",
+        "grade10": "Grade 10"
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "activityCuriosity",
+      "fieldType": "multiSelect",
+      "label": "Which activities make you curious, even if you have never tried them?",
+      "description": "Curiosity is a starting point, not proof that you should choose a related career.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "performMusic", "label": "Sing, play music, perform, or entertain", "metadata": { "scores": { "signal:creativeExpression": 2, "trait:socialEnergy": 1 } } },
+        { "id": "createStory", "label": "Draw, design, write, film, or tell a story", "metadata": { "scores": { "signal:creativeExpression": 2, "signal:communication": 1 } } },
+        { "id": "buildDigital", "label": "Build an app, game, website, or digital tool", "metadata": { "scores": { "signal:analysis": 1, "signal:making": 2 } } },
+        { "id": "makeRepair", "label": "Make, repair, cook, grow, or improve something", "metadata": { "scores": { "signal:making": 2, "trait:practical": 1 } } },
+        { "id": "helpHealth", "label": "Help someone understand or improve their health", "metadata": { "scores": { "signal:care": 2, "signal:communication": 1 } } },
+        { "id": "investigate", "label": "Investigate a question through facts or experiments", "metadata": { "scores": { "signal:analysis": 2, "trait:conceptual": 1 } } },
+        { "id": "organize", "label": "Plan an event, project, budget, or small venture", "metadata": { "scores": { "signal:organizing": 2, "trait:structured": 1 } } },
+        { "id": "community", "label": "Understand a community problem and help solve it", "metadata": { "scores": { "signal:care": 1, "signal:organizing": 1, "signal:communication": 1 } } }
+      ]
+    },
+    {
+      "id": "activityExperience",
+      "fieldType": "multiSelect",
+      "label": "Which kinds of activities have you actually tried and enjoyed?",
+      "description": "This helps us separate curiosity from real experience. Having little experience is completely normal.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "expression", "label": "Art, music, writing, performance, or content creation", "metadata": { "scores": { "signal:creativeExpression": 2 } } },
+        { "id": "problemSolving", "label": "Puzzles, science investigations, coding, or research", "metadata": { "scores": { "signal:analysis": 2 } } },
+        { "id": "handsOn", "label": "Building, repairing, cooking, crafts, gardening, or practical work", "metadata": { "scores": { "signal:making": 2, "trait:practical": 1 } } },
+        { "id": "people", "label": "Teaching, explaining, supporting, or caring for someone", "metadata": { "scores": { "signal:communication": 1, "signal:care": 2 } } },
+        { "id": "lead", "label": "Leading, planning, selling, coordinating, or taking responsibility", "metadata": { "scores": { "signal:organizing": 2, "trait:socialEnergy": 1 } } },
+        { "id": "noneYet", "label": "I have not had enough opportunities to know yet", "metadata": { "exclusive": true } }
+      ]
+    },
+    {
+      "id": "strengthConfidence",
+      "fieldType": "multiSelect",
+      "label": "Which of these feel like strengths today?",
+      "description": "You can choose something that comes naturally or something you have developed through practice.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "express", "label": "Expressing an idea, feeling, or story", "metadata": { "scores": { "signal:creativeExpression": 2 } } },
+        { "id": "understand", "label": "Understanding how or why something works", "metadata": { "scores": { "signal:analysis": 2, "trait:conceptual": 1 } } },
+        { "id": "make", "label": "Learning by doing, making, or fixing", "metadata": { "scores": { "signal:making": 2, "trait:practical": 1 } } },
+        { "id": "explain", "label": "Listening, explaining, or helping someone understand", "metadata": { "scores": { "signal:communication": 2, "signal:care": 1 } } },
+        { "id": "care", "label": "Noticing what people need and supporting them", "metadata": { "scores": { "signal:care": 2 } } },
+        { "id": "coordinate", "label": "Taking responsibility and bringing people or tasks together", "metadata": { "scores": { "signal:organizing": 2, "trait:structured": 1 } } },
+        { "id": "notSure", "label": "I am still discovering my strengths", "metadata": { "exclusive": true } }
+      ]
+    },
+    {
+      "id": "strengthEvidence",
+      "fieldType": "multiSelect",
+      "label": "What makes you think these may be strengths?",
+      "description": "Marks can be useful evidence, but they are not the only evidence.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "practice", "label": "I continue practising even when it is difficult", "metadata": { "scores": { "trait:persistence": 2 } } },
+        { "id": "project", "label": "I have made or completed something using it", "metadata": { "scores": { "evidence:demonstrated": 2 } } },
+        { "id": "feedback", "label": "A teacher, friend, or family member noticed it", "metadata": { "scores": { "evidence:observed": 2 } } },
+        { "id": "responsibility", "label": "People trust me with related responsibilities", "metadata": { "scores": { "evidence:observed": 2, "trait:responsibility": 1 } } },
+        { "id": "marks", "label": "My schoolwork or marks show it", "metadata": { "scores": { "evidence:academic": 2 } } },
+        { "id": "feeling", "label": "It is mainly a feeling; I have not tested it yet", "metadata": { "scores": { "evidence:early": 1 } } },
+        { "id": "noneYet", "label": "I do not have clear evidence yet", "metadata": { "exclusive": true } }
+      ]
+    },
+    {
+      "id": "weaknessPattern",
+      "fieldType": "multiSelect",
+      "label": "When something feels like a weakness, what is usually happening?",
+      "description": "A low mark, low confidence, limited exposure, and genuine dislike mean different things.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "dislike", "label": "I have tried it and usually do not enjoy it" },
+        { "id": "confidence", "label": "I worry that I will get it wrong" },
+        { "id": "marks", "label": "My marks are lower than I want" },
+        { "id": "exposure", "label": "I have not had enough chance to try it properly" },
+        { "id": "teaching", "label": "The way I learned it did not work well for me" },
+        { "id": "improve", "label": "It is difficult, but I want to improve", "metadata": { "scores": { "trait:persistence": 1 } } },
+        { "id": "notSure", "label": "I am not sure yet", "metadata": { "exclusive": true } }
+      ]
+    },
+    {
+      "id": "groupProjectStyle",
+      "fieldType": "singleSelect",
+      "label": "Your class starts a new group project. What would you naturally do first?",
+      "description": "Choose the response closest to what you normally do—not what sounds impressive.",
+      "validation": { "required": true },
+      "options": [
+        { "id": "ideas", "label": "Suggest interesting ideas", "metadata": { "scores": { "signal:creativeExpression": 1, "trait:flexible": 1 } } },
+        { "id": "problem", "label": "Understand the problem and gather information", "metadata": { "scores": { "signal:analysis": 1, "trait:reflective": 1 } } },
+        { "id": "plan", "label": "Create a plan and divide the work", "metadata": { "scores": { "signal:organizing": 1, "trait:structured": 2 } } },
+        { "id": "start", "label": "Start making a first version", "metadata": { "scores": { "signal:making": 1, "trait:practical": 2 } } },
+        { "id": "include", "label": "Make sure everyone is heard", "metadata": { "scores": { "signal:care": 1, "trait:collaborative": 2 } } },
+        { "id": "observe", "label": "Observe for a while before choosing a role", "metadata": { "scores": { "trait:reflective": 2, "trait:independent": 1 } } }
+      ]
+    },
+    {
+      "id": "newProblemStyle",
+      "fieldType": "singleSelect",
+      "label": "When you face a new problem, what helps you move forward?",
+      "validation": { "required": true },
+      "options": [
+        { "id": "facts", "label": "Find facts and understand the rules", "metadata": { "scores": { "signal:analysis": 1, "trait:structured": 1 } } },
+        { "id": "try", "label": "Try something and learn from what happens", "metadata": { "scores": { "signal:making": 1, "trait:flexible": 2 } } },
+        { "id": "talk", "label": "Discuss it with other people", "metadata": { "scores": { "signal:communication": 1, "trait:collaborative": 2 } } },
+        { "id": "imagine", "label": "Imagine several unusual possibilities", "metadata": { "scores": { "signal:creativeExpression": 1, "trait:conceptual": 1 } } },
+        { "id": "steps", "label": "Break it into smaller steps", "metadata": { "scores": { "signal:organizing": 1, "trait:structured": 2 } } }
+      ]
+    },
+    {
+      "id": "socialEnergy",
+      "fieldType": "singleSelect",
+      "label": "After spending time with a group of people, how do you usually feel?",
+      "validation": { "required": true },
+      "options": [
+        { "id": "energized", "label": "More energetic and ready for more", "metadata": { "scores": { "trait:socialEnergy": 2 } } },
+        { "id": "balanced", "label": "It depends on the people and activity", "metadata": { "scores": { "trait:adaptive": 2 } } },
+        { "id": "recharge", "label": "I usually need quiet time to recharge", "metadata": { "scores": { "trait:reflective": 2 } } }
+      ]
+    },
+    {
+      "id": "setbackStyle",
+      "fieldType": "singleSelect",
+      "label": "Something important does not work the first time. What are you most likely to do?",
+      "validation": { "required": true },
+      "options": [
+        { "id": "retry", "label": "Try again in a different way", "metadata": { "scores": { "trait:persistence": 2, "trait:flexible": 1 } } },
+        { "id": "analyse", "label": "Find out exactly why it failed", "metadata": { "scores": { "signal:analysis": 1, "trait:reflective": 1 } } },
+        { "id": "ask", "label": "Ask someone for help or feedback", "metadata": { "scores": { "signal:communication": 1, "trait:collaborative": 1 } } },
+        { "id": "pause", "label": "Take a break and return when I am ready", "metadata": { "scores": { "trait:reflective": 1, "trait:adaptive": 1 } } },
+        { "id": "loseConfidence", "label": "I often lose confidence and need encouragement" }
+      ]
+    },
+    {
+      "id": "workValues",
+      "fieldType": "multiSelect",
+      "label": "What would you want your future work to give you?",
+      "description": "Choose what matters to you today. Your answers can change as you learn more.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "create", "label": "Freedom to create or express ideas", "metadata": { "scores": { "value:creativity": 2, "signal:creativeExpression": 1 } } },
+        { "id": "help", "label": "A clear way to help people", "metadata": { "scores": { "value:service": 2, "signal:care": 1 } } },
+        { "id": "mastery", "label": "Difficult problems and continuous learning", "metadata": { "scores": { "value:mastery": 2, "signal:analysis": 1 } } },
+        { "id": "build", "label": "Visible and practical results", "metadata": { "scores": { "value:making": 2, "signal:making": 1 } } },
+        { "id": "lead", "label": "Responsibility and influence", "metadata": { "scores": { "value:leadership": 2, "signal:organizing": 1 } } },
+        { "id": "security", "label": "Stability and a reliable income", "metadata": { "scores": { "value:security": 2 } } },
+        { "id": "recognition", "label": "Recognition and respect", "metadata": { "scores": { "value:recognition": 2 } } },
+        { "id": "balance", "label": "Time and flexibility outside work", "metadata": { "scores": { "value:balance": 2 } } }
+      ]
+    },
+    {
+      "id": "familyInfluence",
+      "fieldType": "singleSelect",
+      "label": "How do career conversations usually feel in your family?",
+      "description": "Family guidance matters. We keep it separate from your strengths so it can support a better conversation rather than decide your potential.",
+      "validation": { "required": true },
+      "options": [
+        { "id": "open", "label": "My family is open to different possibilities" },
+        { "id": "preferred", "label": "My family has preferred careers, but we can discuss them" },
+        { "id": "strong", "label": "My family strongly prefers a particular direction" },
+        { "id": "uncertain", "label": "My family wants to help but is unsure about the options" },
+        { "id": "notDiscussed", "label": "We have not really discussed careers yet" },
+        { "id": "preferNot", "label": "I prefer not to answer" }
+      ]
+    },
+    {
+      "id": "familyPriorities",
+      "fieldType": "multiSelect",
+      "label": "What does your family usually consider important for your future?",
+      "description": "These priorities will help with later pathway conversations; they do not change your career-direction signals.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "options": [
+        { "id": "security", "label": "Job stability" },
+        { "id": "income", "label": "Strong earning potential" },
+        { "id": "respect", "label": "Social recognition or professional status" },
+        { "id": "location", "label": "Staying near family" },
+        { "id": "duration", "label": "A manageable education duration" },
+        { "id": "interest", "label": "The student’s genuine interest" },
+        { "id": "notSure", "label": "I am not sure", "metadata": { "exclusive": true } }
+      ]
+    },
+    {
+      "id": "familyExposure",
+      "fieldType": "multiSelect",
+      "label": "Which kinds of work have you seen closely through family or people you know?",
+      "description": "Exposure can make some careers feel more familiar. It should not close unfamiliar possibilities.",
+      "validation": { "required": true, "minSelect": 1, "maxSelect": 4 },
+      "options": [
+        { "id": "health", "label": "Healthcare or wellbeing" },
+        { "id": "technology", "label": "Technology, engineering, or skilled trades" },
+        { "id": "business", "label": "Business, finance, sales, or family enterprise" },
+        { "id": "public", "label": "Education, government, law, or public service" },
+        { "id": "creative", "label": "Arts, media, design, or entertainment" },
+        { "id": "science", "label": "Science, research, agriculture, or environment" },
+        { "id": "other", "label": "Other kinds of work" },
+        { "id": "limited", "label": "I have had limited exposure to different careers", "metadata": { "exclusive": true } }
+      ]
+    },
+    {
+      "id": "experienceLevel",
+      "fieldType": "singleSelect",
+      "label": "Overall, how much opportunity have you had to explore your interests?",
+      "description": "Limited opportunity is not a weakness. It tells Xtara how certain or tentative the guidance should be.",
+      "validation": { "required": true },
+      "options": [
+        { "id": "new", "label": "Very little so far" },
+        { "id": "some", "label": "I have tried a few related activities" },
+        { "id": "regular", "label": "I regularly take part in related activities" }
+      ]
+    }
+  ],
+  "stageQuestions": {
+    "grade8": [
+      {
+        "id": "grade8Exposure",
+        "fieldType": "multiSelect",
+        "label": "Where have you had chances to discover new interests?",
+        "description": "Having few opportunities is not a weakness; it simply means your directions should remain broad.",
+        "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+        "options": [
+          { "id": "school", "label": "School clubs, events, labs, or competitions" },
+          { "id": "home", "label": "Home, family work, hobbies, or responsibilities" },
+          { "id": "community", "label": "Sports, arts, community groups, or volunteering" },
+          { "id": "online", "label": "Online videos, courses, games, or communities" },
+          { "id": "noneYet", "label": "I have had very few chances so far", "metadata": { "exclusive": true } }
+        ]
+      }
+    ],
+    "grade9": [
+      {
+        "id": "grade9Evidence",
+        "fieldType": "multiSelect",
+        "label": "Which experiences have helped you understand yourself better?",
+        "description": "This is about exposure, not achievement.",
+        "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+        "options": [
+          { "id": "project", "label": "A personal or school project", "metadata": { "scores": { "evidence:demonstrated": 1 } } },
+          { "id": "conversation", "label": "A conversation with someone about their work", "metadata": { "scores": { "evidence:exposure": 1 } } },
+          { "id": "club", "label": "A club, competition, workshop, sport, or volunteering activity", "metadata": { "scores": { "evidence:demonstrated": 1 } } },
+          { "id": "familyWork", "label": "Helping with family work or responsibilities", "metadata": { "scores": { "evidence:observed": 1 } } },
+          { "id": "noneYet", "label": "I have not had these experiences yet", "metadata": { "exclusive": true } }
+        ]
+      }
+    ],
+    "grade10": [
+      {
+        "id": "grade10Decision",
+        "fieldType": "singleSelect",
+        "label": "Which Grade 10 decision feels most urgent?",
+        "validation": { "required": true },
+        "options": [
+          { "id": "subjects", "label": "Understanding which subjects to continue" },
+          { "id": "stream", "label": "Comparing streams or study routes" },
+          { "id": "options", "label": "Keeping several future options open" },
+          { "id": "discussion", "label": "Preparing for a conversation with my family or school" }
+        ]
+      },
+      {
+        "id": "subjectConfidence",
+        "fieldType": "multiSelect",
+        "label": "Which subjects currently give you energy or confidence?",
+        "description": "Subjects are one piece of evidence, not a permanent limit on what you can become.",
+        "validation": { "required": true, "minSelect": 1, "maxSelect": 4 },
+        "options": [
+          { "id": "math", "label": "Mathematics", "metadata": { "scores": { "signal:analysis": 1 } } },
+          { "id": "science", "label": "Science", "metadata": { "scores": { "signal:analysis": 1, "signal:making": 1 } } },
+          { "id": "languages", "label": "Languages", "metadata": { "scores": { "signal:creativeExpression": 1, "signal:communication": 1 } } },
+          { "id": "socialScience", "label": "Social science", "metadata": { "scores": { "signal:communication": 1, "signal:care": 1 } } },
+          { "id": "arts", "label": "Arts or design", "metadata": { "scores": { "signal:creativeExpression": 1, "signal:making": 1 } } },
+          { "id": "computing", "label": "Computing", "metadata": { "scores": { "signal:analysis": 1, "signal:making": 1 } } },
+          { "id": "commerce", "label": "Commerce or economics", "metadata": { "scores": { "signal:analysis": 1, "signal:organizing": 1 } } },
+          { "id": "stillLearning", "label": "I am still discovering this", "metadata": { "exclusive": true } }
+        ]
+      }
+    ]
+  },
+  "signals": {
+    "creativeExpression": { "title": "Creating and sharing ideas", "description": "You may enjoy expressing ideas through stories, sound, images, or performance." },
+    "analysis": { "title": "Solving problems", "description": "You may enjoy asking why, finding patterns, testing ideas, or making things work." },
+    "making": { "title": "Learning by doing", "description": "You may learn well by building, repairing, making, or trying something yourself." },
+    "communication": { "title": "Explaining and listening", "description": "You may enjoy listening, explaining, teaching, or helping an idea make sense." },
+    "care": { "title": "Helping people", "description": "You may notice what people need and enjoy work that improves someone’s life." },
+    "organizing": { "title": "Planning and taking responsibility", "description": "You may enjoy bringing people, tasks, and plans together to finish something." }
+  },
+  "traits": {
+    "socialEnergy": { "title": "Working with people", "description": "Being with a group may give you energy when everyone shares a goal." },
+    "reflective": { "title": "Thinking before responding", "description": "You may like time to observe and understand before you answer." },
+    "structured": { "title": "Following a clear plan", "description": "Clear steps and responsibilities may help you work well." },
+    "flexible": { "title": "Trying and adjusting", "description": "You may like trying an idea and changing your approach as you learn." },
+    "collaborative": { "title": "Working together", "description": "You may think and work well by discussing ideas with other people." },
+    "independent": { "title": "Working on your own", "description": "You may like having space to focus and find your own answer." },
+    "practical": { "title": "Learning by doing", "description": "Trying something yourself may help you learn more than hearing an explanation." },
+    "conceptual": { "title": "Thinking about ideas", "description": "You may enjoy seeing how ideas connect and understanding why things happen." },
+    "persistence": { "title": "Keeping going", "description": "You may continue when something is difficult if the result matters to you." },
+    "adaptive": { "title": "Changing your approach", "description": "You may work differently depending on the people, goal, and situation." },
+    "responsibility": { "title": "Following through", "description": "Other people may trust you to complete an important task." }
+  },
+  "context": {
+    "family": {
+      "open": "Your family appears open to exploration.",
+      "preferred": "Your family has preferred ideas, with room for discussion.",
+      "strong": "Your family has strong ideas about your future. Their view is shown separately from your own interests.",
+      "uncertain": "Your family wants to help but may need clearer career and education information.",
+      "notDiscussed": "Career conversations have not really started at home yet.",
+      "preferNot": "You chose not to share this. It does not change your Career Directions."
+    },
+    "weakness": {
+      "dislike": "Some difficult areas may reflect genuine dislike after experience.",
+      "confidence": "Low confidence may be affecting how you judge some abilities.",
+      "marks": "Marks show only part of what you can do.",
+      "exposure": "You may not know whether you enjoy something until you have a chance to try it.",
+      "teaching": "The way something was taught may have affected your experience of it.",
+      "improve": "You are willing to improve in areas that currently feel difficult.",
+      "notSure": "You are still learning what difficulty means for you."
+    }
+  },
+  "areas": {
+    "technology": { "title": "Technology", "description": "Build apps, solve problems, and create useful digital tools." },
+    "health": { "title": "Health", "description": "Help people stay healthy, recover, and live well." },
+    "science": { "title": "Science", "description": "Ask questions, test ideas, and learn how things work." },
+    "business": { "title": "Business", "description": "Turn ideas into useful products, services, and organisations." },
+    "design": { "title": "Design and Media", "description": "Create clear, useful, and engaging experiences and stories." },
+    "society": { "title": "Education and Society", "description": "Teach, support communities, and help solve public problems." }
+  },
+  "result": {
+    "eyebrow": "Your Career Directions",
+    "title": "Choose a Career Direction to explore.",
+    "description": "These are starting points based on your answers. Choose one now—you can change it later.",
+    "patternsTitle": "Things you may enjoy",
+    "patternsDescription": "",
+    "traitsTitle": "How you may like to work",
+    "traitsDescription": "",
+    "why": "Based on what you told us",
+    "evidence": "Evidence level",
+    "early": "Worth exploring",
+    "developing": "Strong pattern",
+    "noticed": "Noticed",
+    "repeated": "Repeated pattern",
+    "nextTitle": "What to do next",
+    "savedTemporarily": "Temporary until signup",
+    "noScore": "No perfect-career percentage",
+    "emptyTitle": "Start with the career discovery assessment.",
+    "areasLabel": "Choose a Career Direction",
+    "roleExamples": "Dream Careers you can explore in this direction",
+    "viewArea": "Explore this direction",
+    "contextTitle": "Things that may affect your answers",
+    "familyTitle": "Family influence",
+    "weaknessTitle": "Understanding difficulty",
+    "reflectionTitle": "These choices do not feel right?",
+    "reflectionDescription": "Review your answers and change anything that does not feel true to you.",
+    "reflectionAccurate": "This sounds like me",
+    "reflectionInaccurate": "Not accurate",
+    "reflectionUnsure": "I am unsure",
+    "reflectionMissing": "Something is missing",
+    "reflectionSaved": "Your response has been recorded temporarily.",
+    "personalizeTitle": "Add your study details",
+    "personalizeDescription": "Add your location, school board, language, fee preference, and study-location preference so Xtara can show useful courses, colleges, and scholarships.",
+    "personalize": "Add my study details",
+    "edit": "Review my answers",
+    "explore": "Review my Career Direction",
+    "detailsTitle": "See what we noticed in your answers",
+    "detailsDescription": "Open this only if you want to understand why these directions appeared."
+  },
+  "nextActions": {
+    "grade8": ["Choose a Career Direction and discover its Dream Careers.", "Tell Xtara which Career Directions feel interesting or inaccurate.", "Add your study details to see useful courses and colleges."],
+    "grade9": ["Compare Dream Careers by what people actually do each day.", "Choose up to three Dream Careers while you are still exploring.", "Add your study details to see subjects, courses, and colleges."],
+    "grade10": ["Compare how school subjects and courses keep different Career Directions open.", "Review the suggestions with your family, teacher, or counselor.", "Add your location and fee preference before comparing colleges."]
+  }
+}

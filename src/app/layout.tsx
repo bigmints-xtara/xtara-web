@@ -10,6 +10,8 @@ import { getLocaleFromCookie } from "@/i18n/server";
 import { getMessages } from "@/i18n/messages";
 import type { Metadata } from "next";
 import WaitlistScript from "@/components/WaitlistScript";
+import { OrganizationProvider } from "@/context/OrganizationContext";
+import WorkspaceRouteBoundary from "@/components/auth/WorkspaceRouteBoundary";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -29,29 +31,34 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocaleFromCookie();
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_ID?.trim();
 
   return (
     <html lang={locale}>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga-setup" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
+        {gaMeasurementId ? <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-setup" strategy="afterInteractive">
+            {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');`}
-        </Script>
+gtag('config', '${gaMeasurementId}');`}
+          </Script>
+        </> : null}
         <WaitlistScript />
         <ReactQueryProvider>
         <AuthProvider>
-          <LanguageProvider initialLocale={locale}>
-            <Suspense fallback={null}>
-              <AnalyticsProvider />
-            </Suspense>
-            {children}
-          </LanguageProvider>
+          <OrganizationProvider>
+            <LanguageProvider initialLocale={locale}>
+              <Suspense fallback={null}>
+                <AnalyticsProvider />
+              </Suspense>
+              <WorkspaceRouteBoundary>{children}</WorkspaceRouteBoundary>
+            </LanguageProvider>
+          </OrganizationProvider>
         </AuthProvider>
         </ReactQueryProvider>
       </body>

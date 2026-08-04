@@ -8,20 +8,19 @@ interface MatchReasoningCardProps {
 }
 
 export default function MatchReasoningCard({ careerPath }: MatchReasoningCardProps) {
-    const matchScore = Math.round(careerPath.matchScore || 85);
-    const reasoning = careerPath.matchReasoning || "You enjoy writing, helping others, and explaining things clearly. You're organized and outgoing, which makes you great at working with tech teams.";
+    const reasoning = careerPath.matchReasoning || "This role appeared from signals in your earlier answers. Review the reasoning and gather real evidence before deciding what it means.";
 
     // Logic from Flutter CareerSlideData.whyCareerFits
     const archetypes = careerPath.archetypes || [];
     const technicalSkills = careerPath.technicalSkills || [];
 
     const personalityText = archetypes.length > 0
-        ? `Your ${archetypes.join(", ")} nature helps in team communication.`
-        : "Your extroverted and organized nature helps in team communication.";
+        ? `${archetypes.join(", ")} appeared as work-style clues in your profile.`
+        : "Your work-style evidence is still developing.";
 
     const skillsText = technicalSkills.length > 0
-        ? `You're good at ${technicalSkills.slice(0, 2).join(" and ")}—perfect for technical topics.`
-        : "You're good at communication and analysis—perfect for professional growth.";
+        ? `${technicalSkills.slice(0, 2).join(" and ")} are signals worth testing through real activity.`
+        : "More real activity can show which capabilities matter for this role.";
 
     return (
         <div className="bg-white rounded-2xl p-6  border border-gray-100 overflow-hidden relative">
@@ -35,12 +34,7 @@ export default function MatchReasoningCard({ careerPath }: MatchReasoningCardPro
                     <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
                         <Star size={20} className="fill-orange-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900">Why This Career Fits You</h3>
-                </div>
-
-                <div className="flex items-end gap-2 mb-6">
-                    <span className="text-4xl font-black text-orange-500">{matchScore}%</span>
-                    <span className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Match Score</span>
+                    <h3 className="text-lg font-bold text-gray-900">Why this role appeared</h3>
                 </div>
 
                 <div className="mb-6">
@@ -55,7 +49,7 @@ export default function MatchReasoningCard({ careerPath }: MatchReasoningCardPro
                             <CheckCircle2 size={14} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Skills Match</p>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Capability signals</p>
                             <p className="text-sm text-gray-700 font-medium">{skillsText}</p>
                         </div>
                     </div>
@@ -65,7 +59,7 @@ export default function MatchReasoningCard({ careerPath }: MatchReasoningCardPro
                             <Zap size={14} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Personality Fit</p>
+                            <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Work-style clues</p>
                             <p className="text-sm text-gray-700 font-medium">{personalityText}</p>
                         </div>
                     </div>

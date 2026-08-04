@@ -24,7 +24,7 @@ const faqs = [
     },
     {
         question: "How accurate are the recommendations?",
-        answer: "Our AI-powered assessment uses validated psychometric models combined with real-world career data. We've helped over 2000+ students find their ideal career path with a 95% satisfaction rate."
+        answer: "Our discovery activity organizes the answers you provide into early signals and explains why an area appeared. It is guidance to investigate, not a validated psychometric verdict or perfect-career score."
     },
     {
         question: "Will I get college or course suggestions too?",

@@ -82,7 +82,7 @@ export default function CareerPathsPage() {
                                 <Link href={`/careers/${featuredPath.id}`} className="group block">
                                     <div className="bg-gradient-to-r from-blue-900/40 to-[#1e2746] hover:from-blue-900/60 transition-all border border-blue-500/30 rounded-3xl p-8 md:p-10 relative overflow-hidden group-hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]">
                                         <div className="relative z-10 max-w-3xl">
-                                            <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full mb-4">98% MATCH</span>
+                                            <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-full mb-4">ROLE TO EXPLORE</span>
                                             <h3 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-blue-100 transition-colors">{featuredPath.title}</h3>
                                             <p className="text-gray-300 text-lg leading-relaxed mb-8 line-clamp-3">{featuredPath.description}</p>
 

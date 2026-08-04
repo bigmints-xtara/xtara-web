@@ -1,43 +1,22 @@
-# xtara-web — Agent Instructions
+# xtara-web agent instructions
 
-## Role
-You are a senior developer working on **xtara-web**.
-Always read .factory/logs/state.yaml before starting work.
-Write heartbeat on every significant step.
+Read `../AGENTS.md`, `../workspace.yaml`, and the active feature manifest before
+product work. Use `../bin/xtara status` for repository state. There is no
+`.factory` development workflow for this repository.
 
-**Stack:** next.js, npm, eslint
+This Next.js application owns web learner and administrative presentation. For
+learner features, inspect and implement the Flutter equivalent. Shared rules and
+signed-in state belong to `xtara-api`, not React ranking or local persistence.
+Firebase Auth may provide identity tokens; new signed-in domain writes must use
+authenticated API contracts.
 
-## Factory Agentic Scaffold
-
-This project is connected to [Factory](https://github.com/Bigmints-com/factory) — an autonomous build engine.
-
-### Quick Commands
+Focused commands:
 
 ```bash
-factory pulse "<msg>"            # Write liveness heartbeat
-factory task list                # Show task queue
-factory task start <id>          # Claim a task
-factory blueprint update "<msg>" # Append to worklog
-factory validate                 # Run tsc + lint
-factory worker --queue <file>     # Run YAML prompt queue
-factory hooks install            # Install git hooks
+./node_modules/.bin/tsc --noEmit
+npm test -- <focused-test-path>
+npm run lint
 ```
 
-### Factory Files
-
-| File | Purpose |
-|------|---------|
-| `.factory/factory.yaml` | Bridge config (links to Factory install) |
-| `.factory/logs/state.yaml` | Project state snapshot (read by agent on start) |
-| `.factory/logs/heartbeat.yaml` | Liveness signal (written every build step) |
-| `.factory/logs/worklog.yaml` | Append-only session log |
-| `.factory/skill-index.yaml` | Available agentic skills |
-| `.factory/task-manager/todo.yaml` | Task queue (human + agent readable) |
-| `.factory/task-manager/manage.sh` | Task lifecycle CLI |
-
-### Workflow
-
-1. Start: `factory task start <id>` → `factory pulse "starting <id>"`
-2. Work: agent reads logs/state.yaml, builds, writes heartbeat on each step
-3. Done: `factory task complete --id <id> --summary "what was done"`
-4. Commit: `factory blueprint update "summary"` → git commit
+Use `../bin/xtara verify web --quick` for the declared repository gate. Verify
+loading, empty, error, retry, dark mode, localization, and compact web states.

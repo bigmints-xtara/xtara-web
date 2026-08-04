@@ -1,141 +1,142 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Question, AssessmentAnswers } from "@/types/assessment";
+import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { updateMultiSelectSelection } from "@/lib/assessment-selection";
+import { getVisibleAssessmentQuestions, validateAssessmentAnswer } from "@/modules/assessment";
+import type {
+    AssessmentAnswer,
+    AssessmentAnswers,
+    Question,
+} from "@/types/assessment";
 
 interface AssessmentEngineProps {
     questions: Question[];
     onComplete: (answers: AssessmentAnswers) => void;
     isRetake?: boolean;
+    initialAnswers?: AssessmentAnswers;
+    onAnswersChange?: (answers: AssessmentAnswers) => void;
+    labels?: AssessmentEngineLabels;
 }
 
-export default function AssessmentEngine({ questions, onComplete, isRetake = false }: AssessmentEngineProps) {
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [answers, setAnswers] = useState<AssessmentAnswers>({});
-    const [visibleQuestions, setVisibleQuestions] = useState<Question[]>([]);
+export interface AssessmentEngineLabels {
+    stepOf: string;
+    back: string;
+    next: string;
+    finish: string;
+    chooseUpTo: string;
+    noQuestions: string;
+    textPlaceholder: string;
+    chooseGrade: string;
+}
 
-    // Filter visible questions (handle conditional logic)
-    useEffect(() => {
-        // Basic implementation of showIf logic
-        // We assume showIf strings are simple enough (e.g. "currentGrade == 'grade12'")
-        // We need to replace .contains with .includes for JS compatibility if needed
+const defaultLabels: AssessmentEngineLabels = {
+    stepOf: "Step {current} of {total}",
+    back: "Back",
+    next: "Next",
+    finish: "See my exploration map",
+    chooseUpTo: "Choose up to {count}",
+    noQuestions: "No questions are available for this journey.",
+    textPlaceholder: "Type your answer here",
+    chooseGrade: "First, choose your grade",
+};
 
-        // Flatten helper - since the logic is "Dynamic Assessment Engine", usually it shows one by one or groups.
-        // Assuming simple linear flow for now, filtering out those that don't meet criteria.
-        // However, dependencies might refer to *future* answers? No, usually previous.
-        // We'll re-calculate the "active" list of questions whenever answers change.
+export default function AssessmentEngine({
+    questions,
+    onComplete,
+    isRetake = false,
+    initialAnswers = {},
+    onAnswersChange,
+    labels = defaultLabels,
+}: AssessmentEngineProps) {
+    const [currentIndex, setCurrentIndex] = useState(() => {
+        const initialVisibleQuestions = getVisibleAssessmentQuestions(questions, initialAnswers, isRetake);
+        const firstIncomplete = initialVisibleQuestions.findIndex(
+            (question) => !validateAssessmentAnswer(question, initialAnswers[question.id]),
+        );
+        return firstIncomplete === -1
+            ? Math.max(initialVisibleQuestions.length - 1, 0)
+            : firstIncomplete;
+    });
+    const [answers, setAnswers] = useState<AssessmentAnswers>(initialAnswers);
 
-        const evaluateShowIf = (condition: string, context: any) => {
-            try {
-                // Replace simple Python-like/Dart-like syntax with JS
-                let jsCondition = condition
-                    .replace(/ and /g, ' && ')
-                    .replace(/ or /g, ' || ')
-                    .replace(/.contains\(/g, '.includes('); // Very basic heuristic
+    const visibleQuestions = useMemo(
+        () => getVisibleAssessmentQuestions(questions, answers, isRetake),
+        [answers, isRetake, questions],
+    );
 
-                // Create a function with context keys as variables
-                const keys = Object.keys(context);
-                const values = Object.values(context);
-                const func = new Function(...keys, `return ${jsCondition};`);
-                return func(...values);
-            } catch (e) {
-                console.warn(`Failed to evaluate condition: ${condition}`, e);
-                return true; // fail safe
-            }
-        };
+    const safeIndex = Math.min(currentIndex, Math.max(visibleQuestions.length - 1, 0));
+    const currentQuestion = visibleQuestions[safeIndex];
 
-        const filtered = questions.filter(q => {
-            if (isRetake && q.skipOnRetake) return false;
-            if (!q.showIf) return true;
-            return evaluateShowIf(q.showIf, answers);
-        });
-
-        setVisibleQuestions(filtered);
-
-        // Adjust current index if it went out of bounds after filtering
-        // Actually, this is tricky. If we filter 'on the fly', the index '5' might mean a different question.
-        // Better strategy: Keep original questions, skip them during navigation if condition not met.
-
-    }, [questions, answers, isRetake]);
-
-
-    const currentQuestion = visibleQuestions[currentIndex];
-
-    const handleNext = () => {
-        if (currentIndex < visibleQuestions.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-        } else {
-            onComplete(answers);
-        }
+    const handleAnswer = (value: AssessmentAnswer) => {
+        if (!currentQuestion) return;
+        const nextAnswers = { ...answers, [currentQuestion.id]: value };
+        setAnswers(nextAnswers);
+        onAnswersChange?.(nextAnswers);
     };
 
-    const handlePrevious = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(prev => prev - 1);
-        }
-    };
-
-    const handleAnswer = (val: any) => {
-        setAnswers(prev => ({
-            ...prev,
-            [currentQuestion.id]: val
-        }));
-    };
-
-    if (!currentQuestion) return <div>Loading...</div>;
+    if (!currentQuestion) {
+        return <div className="py-16 text-center text-sm text-slate-600">{labels.noQuestions}</div>;
+    }
 
     const currentAnswer = answers[currentQuestion.id];
-    const progress = ((currentIndex + 1) / visibleQuestions.length) * 100;
+    const selectingStage = currentQuestion.id === "currentGrade" && visibleQuestions.length === 1;
+    const progress = selectingStage ? 0 : ((safeIndex + 1) / visibleQuestions.length) * 100;
+
+    const handleNext = () => {
+        if (safeIndex < visibleQuestions.length - 1) {
+            setCurrentIndex(safeIndex + 1);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+        }
+        onComplete(answers);
+    };
 
     return (
-        <div className="max-w-2xl mx-auto px-4 pb-28">
-            <div className="mb-6">
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>Step {currentIndex + 1} of {visibleQuestions.length}</span>
+        <div className="mx-auto max-w-2xl px-4 pb-28 sm:px-6">
+            <div className="mb-5 sm:mb-7">
+                <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                    <span>{selectingStage ? labels.chooseGrade : formatLabel(labels.stepOf, { current: safeIndex + 1, total: visibleQuestions.length })}</span>
                     <span>{Math.round(progress)}%</span>
                 </div>
                 <Progress value={progress} className="mt-2 h-2" />
             </div>
 
-            <div className="space-y-6">
-                <div>
-                    <h2 className="text-2xl font-semibold text-gray-900">{currentQuestion.label}</h2>
-                    {currentQuestion.description && (
-                        <p className="text-sm text-gray-500 mt-2">{currentQuestion.description}</p>
-                    )}
-                </div>
+            <div className="rounded-2xl border border-primary/10 bg-white p-5 shadow-sm sm:p-7">
+                <h1 className="text-xl font-semibold leading-tight text-primary sm:text-2xl">{currentQuestion.label}</h1>
+                {currentQuestion.description ? (
+                    <p className="mt-3 text-sm leading-6 text-slate-600">{currentQuestion.description}</p>
+                ) : null}
 
-                <QuestionInput
-                    question={currentQuestion}
-                    value={currentAnswer}
-                    onChange={handleAnswer}
-                />
+                <div className="mt-7">
+                    <QuestionInput question={currentQuestion} value={currentAnswer} onChange={handleAnswer} labels={labels} />
+                </div>
             </div>
 
-            <div className="fixed inset-x-0 bottom-0 border-t border-gray-200 bg-white px-4 py-3">
-                <div className="mx-auto max-w-2xl flex items-center gap-3">
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+                <div className="mx-auto flex max-w-2xl items-center gap-3">
                     <Button
                         type="button"
                         variant="ghost"
-                        onClick={handlePrevious}
-                        disabled={currentIndex === 0}
-                        className="shrink-0"
+                        onClick={() => setCurrentIndex(Math.max(0, safeIndex - 1))}
+                        disabled={safeIndex === 0}
+                        className="min-h-12 shrink-0 rounded-xl px-4"
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back
+                        {labels.back}
                     </Button>
                     <Button
                         type="button"
                         onClick={handleNext}
-                        disabled={!isValid(currentQuestion, currentAnswer)}
-                        className="ml-auto bg-primary text-white"
+                        disabled={!validateAssessmentAnswer(currentQuestion, currentAnswer)}
+                        className="ml-auto min-h-12 rounded-xl px-5"
                         size="lg"
                     >
-                        {currentIndex === visibleQuestions.length - 1 ? "Finish" : "Next"}
+                        {safeIndex === visibleQuestions.length - 1 && !selectingStage ? labels.finish : labels.next}
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </div>
@@ -144,100 +145,133 @@ export default function AssessmentEngine({ questions, onComplete, isRetake = fal
     );
 }
 
-function isValid(question: Question, answer: any): boolean {
-    if (!question.validation?.required) return true;
-    if (answer === undefined || answer === null || answer === '') return false;
-    if (Array.isArray(answer) && answer.length === 0) return false;
-    return true;
-}
+function QuestionInput({
+    question,
+    value,
+    onChange,
+    labels,
+}: {
+    question: Question;
+    value: AssessmentAnswer;
+    onChange: (value: AssessmentAnswer) => void;
+    labels: AssessmentEngineLabels;
+}) {
+    if (question.fieldType === "text") {
+        return (
+            <Input
+                type="text"
+                placeholder={labels.textPlaceholder}
+                value={typeof value === "string" ? value : ""}
+                onChange={(event) => onChange(event.target.value)}
+            />
+        );
+    }
 
-function QuestionInput({ question, value, onChange }: { question: Question, value: any, onChange: (val: any) => void }) {
-    switch (question.fieldType) {
-        case 'text':
-            return (
-                <Input
-                    type="text"
-                    placeholder="Type your answer here..."
-                    value={value || ''}
-                    onChange={(e) => onChange(e.target.value)}
-                />
-            );
-        case 'number':
-            return (
-                <Input
-                    type="number"
-                    placeholder="Enter a number..."
-                    value={value || ''}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                />
-            );
-        case 'singleSelect':
-            return (
-                <div className="space-y-3">
-                    {question.options?.map(opt => {
-                        const isSelected = value === opt.id;
+    if (question.fieldType === "number") {
+        return (
+            <Input
+                type="number"
+                value={typeof value === "number" ? value : ""}
+                onChange={(event) => onChange(event.target.value === "" ? undefined : Number(event.target.value))}
+            />
+        );
+    }
+
+    if (question.fieldType === "singleSelect") {
+        return (
+            <div className="space-y-3" role="radiogroup" aria-label={question.label}>
+                {question.options?.map((option) => {
+                    const selected = value === option.id;
+                    return (
+                        <button
+                            type="button"
+                            key={option.id}
+                            role="radio"
+                            aria-checked={selected}
+                            onClick={() => onChange(option.id)}
+                            className={`flex min-h-12 w-full items-start justify-between rounded-xl border px-4 py-3 text-left transition ${
+                                selected
+                                    ? "border-primary bg-primary/5 text-primary"
+                                    : "border-slate-200 bg-white text-slate-700 hover:border-primary/40"
+                            }`}
+                        >
+                            <span className="min-w-0 pr-3">
+                                <span className="font-medium">{option.label}</span>
+                                {option.description ? <span className="mt-1 block text-sm opacity-75">{option.description}</span> : null}
+                            </span>
+                            <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${selected ? "bg-primary text-white" : "border border-slate-300"}`}>
+                                {selected ? <Check size={12} /> : null}
+                            </span>
+                        </button>
+                    );
+                })}
+            </div>
+        );
+    }
+
+    if (question.fieldType === "multiSelect") {
+        const selectedValues = Array.isArray(value) ? value : [];
+        const max = question.validation?.maxSelect;
+        return (
+            <div>
+                {max ? <p className="mb-3 text-xs font-medium text-slate-500">{formatLabel(labels.chooseUpTo, { count: max })}</p> : null}
+                <div className="space-y-3" role="group" aria-label={question.label}>
+                    {question.options?.map((option) => {
+                        const selected = selectedValues.includes(option.id);
+                        const exclusive = option.metadata?.exclusive === true;
+                        const disabled = !selected && !exclusive && max !== undefined && selectedValues.length >= max;
                         return (
                             <button
                                 type="button"
-                                key={opt.id}
-                                onClick={() => onChange(opt.id)}
-                                className={`w-full rounded-lg border px-4 py-3 text-left transition ${isSelected ? 'border-sky-500 bg-sky-500/10 text-foreground' : 'border-gray-200 bg-white text-gray-700 hover:border-sky-500/50'}`}
+                                key={option.id}
+                                role="checkbox"
+                                aria-checked={selected}
+                                disabled={disabled}
+                                onClick={() => onChange(updateMultiSelectSelection(question, selectedValues, option.id))}
+                                className={`flex min-h-12 w-full items-start justify-between rounded-xl border px-4 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-45 ${
+                                    selected
+                                        ? "border-primary bg-primary/5 text-primary"
+                                        : "border-slate-200 bg-white text-slate-700 hover:border-primary/40"
+                                }`}
                             >
-                                <span className="font-medium">{opt.label}</span>
-                                {isSelected && (
-                                    <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-500 text-white">
-                                        <Check size={12} />
-                                    </span>
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
-            );
-        case 'multiSelect':
-            return (
-                <div className="space-y-3">
-                    {question.options?.map(opt => {
-                        const current = (value as string[]) || [];
-                        const isSelected = current.includes(opt.id);
-                        return (
-                            <button
-                                type="button"
-                                key={opt.id}
-                                onClick={() => {
-                                    if (isSelected) {
-                                        onChange(current.filter(id => id !== opt.id));
-                                    } else {
-                                        onChange([...current, opt.id]);
-                                    }
-                                }}
-                                className={`w-full rounded-lg border px-4 py-3 text-left transition ${isSelected ? 'border-sky-500 bg-sky-500/10 text-foreground' : 'border-gray-200 bg-white text-gray-700 hover:border-sky-500/50'}`}
-                            >
-                                <span className="font-medium">{opt.label}</span>
-                                <span className={`ml-2 inline-flex h-5 w-5 items-center justify-center rounded border ${isSelected ? 'bg-sky-500 border-sky-500 text-white' : 'border-gray-300 text-transparent'}`}>
-                                    <Check size={12} />
+                                <span className="min-w-0 pr-3">
+                                    <span className="font-medium">{option.label}</span>
+                                    {option.description ? <span className="mt-1 block text-sm opacity-75">{option.description}</span> : null}
+                                </span>
+                                <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded ${selected ? "bg-primary text-white" : "border border-slate-300"}`}>
+                                    {selected ? <Check size={12} /> : null}
                                 </span>
                             </button>
                         );
                     })}
                 </div>
-            );
-        case 'slider':
-            // Basic slider implementation
-            return (
-                <div className="py-6">
-                    <input
-                        type="range"
-                        min={question.validation?.minValue || 0}
-                        max={question.validation?.maxValue || 100}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-sky-500"
-                        value={value || 0}
-                        onChange={(e) => onChange(Number(e.target.value))}
-                    />
-                    <div className="mt-3 text-center text-xl font-semibold text-foreground">{value || 0}</div>
-                </div>
-            );
-        default:
-            return <div className="text-red-400">Unsupported question type: {question.fieldType}</div>;
+            </div>
+        );
     }
+
+    if (question.fieldType === "slider") {
+        const numericValue = typeof value === "number" ? value : question.validation?.minValue ?? 0;
+        return (
+            <div className="py-4">
+                <input
+                    type="range"
+                    min={question.validation?.minValue ?? 0}
+                    max={question.validation?.maxValue ?? 100}
+                    className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary"
+                    value={numericValue}
+                    onChange={(event) => onChange(Number(event.target.value))}
+                />
+                <div className="mt-3 text-center text-xl font-semibold text-primary">{numericValue}</div>
+            </div>
+        );
+    }
+
+    return <div className="text-sm text-red-600">Unsupported question type: {question.fieldType}</div>;
+}
+
+function formatLabel(template: string, values: Record<string, string | number>): string {
+    return Object.entries(values).reduce(
+        (result, [key, value]) => result.replaceAll(`{${key}}`, String(value)),
+        template,
+    );
 }

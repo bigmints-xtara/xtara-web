@@ -9,15 +9,133 @@
     }
   },
   "metadata": {
-    "title": "Xtara - Career Guide",
-    "description": "Find your path to success"
+    "title": "Xtara - Explore your future with confidence",
+    "description": "Trusted career exploration and decision guidance for students from Grade 8 onward."
+  },
+  "auth": {
+    "common": {
+      "backHome": "Back to Xtara",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "termsPrefix": "By continuing, you agree to Xtara's",
+      "terms": "Terms of Use",
+      "privacyConnector": "and",
+      "privacy": "Privacy Policy"
+    },
+    "login": {
+      "chooseType": "Choose how you use Xtara",
+      "learnerTab": "Student",
+      "educatorTab": "Educator",
+      "divider": "or continue with",
+      "assessmentPrompt": "Not sure where to begin?",
+      "assessmentAction": "Explore your career path first",
+      "signupPrompt": "Need a new account?",
+      "signupAction": "Create one",
+      "learner": {
+        "title": "Welcome back",
+        "description": "Continue your Career Directions, Dream Careers, learning, and next steps.",
+        "submit": "Open my career path",
+        "submitting": "Opening your path…",
+        "google": "Continue with Google",
+        "sideEyebrow": "Your career path",
+        "sideTitle": "Your future can become clearer one step at a time.",
+        "sideDescription": "Return to the directions you chose, build useful skills, and prepare for better conversations with parents and teachers.",
+        "sideProofs": [
+          "Your Career Directions and Dream Careers stay together",
+          "Learning, games, and challenges move your plan forward",
+          "You can change your choices as you learn more"
+        ],
+        "imageAlt": "A group of Indian students exploring their future together"
+      },
+      "educator": {
+        "title": "Educator login",
+        "description": "Open your institution workspace and support the students assigned to you.",
+        "submit": "Open educator workspace",
+        "submitting": "Opening your workspace…",
+        "google": "Continue with Google as educator",
+        "educatorNote": "Institution membership determines educator access. Choosing this tab does not grant additional permissions.",
+        "sideEyebrow": "Better career conversations",
+        "sideTitle": "Help every student explore a future they can explain.",
+        "sideDescription": "Bring structure to career conversations without forcing students into a permanent choice too early.",
+        "sideProofs": [
+          "See only the learners assigned to your institution",
+          "Use clear directions and career evidence in conversations",
+          "Support progress without deciding for the student"
+        ],
+        "imageAlt": "Two young adults discussing a plan using a laptop"
+      }
+    },
+    "signup": {
+      "name": "Full name",
+      "namePlaceholder": "Your full name",
+      "passwordHint": "Use at least 6 characters.",
+      "submitting": "Creating your account…",
+      "loginPrompt": "Already have an account?",
+      "loginAction": "Log in",
+      "imageAlt": "A student standing with supportive parents",
+      "variants": {
+        "default": {
+          "title": "Create your Xtara account",
+          "description": "Save your career choices and keep your plan moving across every visit.",
+          "submit": "Create account",
+          "sideEyebrow": "Start with possibility",
+          "sideTitle": "A career plan should grow with the student.",
+          "sideDescription": "Xtara keeps exploration, learning, and family conversations connected as interests and circumstances change.",
+          "sideProofs": [
+            "Keep Career Directions and Dream Careers in one place",
+            "Build skills through short learning and challenges",
+            "Use your plan in conversations with adults you trust"
+          ]
+        },
+        "saveDiscovery": {
+          "title": "Save your future plan",
+          "description": "Create an account to keep the assessment, Career Directions, Dream Careers, and learning progress you started.",
+          "submit": "Create account and save",
+          "sideEyebrow": "Keep what you discovered",
+          "sideTitle": "Your assessment is the beginning, not the final answer.",
+          "sideDescription": "Save your work, explore the suggested directions, and keep refining the plan through real learning and conversations.",
+          "sideProofs": [
+            "Your completed assessment stays with your account",
+            "Prefer up to three Dream Careers to explore",
+            "Return to learning, challenges, and your conversation slides"
+          ]
+        },
+        "saveAssessment": {
+          "title": "Save your assessment",
+          "description": "Create your personal Xtara account before joining the institution. Your assessment remains yours.",
+          "submit": "Create account and save",
+          "sideEyebrow": "Your personal career path",
+          "sideTitle": "Institution support without losing personal ownership.",
+          "sideDescription": "Your account keeps your assessment and career plan together while an institution supports your progress.",
+          "sideProofs": [
+            "Your assessment belongs to your personal account",
+            "Institution access follows verified membership",
+            "You keep control of your career choices"
+          ]
+        },
+        "educator": {
+          "title": "Create an educator account",
+          "description": "Create or join an institution workspace. Your role will be verified through institution membership.",
+          "submit": "Create educator account",
+          "sideEyebrow": "Guidance with responsibility",
+          "sideTitle": "Give career conversations a clearer structure.",
+          "sideDescription": "Use shared language, reviewed career information, and student progress to support thoughtful decisions.",
+          "sideProofs": [
+            "Educator access is controlled by institution membership",
+            "Student choices remain visible and explainable",
+            "Reports support conversations rather than replace them"
+          ]
+        }
+      }
+    }
   },
   "home": {
     "hero": {
       "badge": "AI-powered career guidance",
       "titleLine1": "Discover Your True",
       "titleEmphasis": "Career Potential",
-      "description": "Stop guessing about your future. Let our advanced AI analyze your unique personality, skills, and passions to build match scores for over 800 career paths.",
+      "description": "Understand your interests, explore real career areas and roles, and gather evidence before you decide.",
       "ctaPrimaryLoggedIn": "View your progress",
       "ctaPrimaryLoggedOut": "Join waitlist",
       "ctaSecondary": "Explore Careers",
@@ -39,8 +157,8 @@
     "logos": {
       "badge": "Trusted network",
       "trustedByPrefix": "Trusted by",
-      "trustedByCount": "2000+",
-      "trustedBySuffix": "customers worldwide"
+      "trustedByCount": "learners",
+      "trustedBySuffix": "who want clearer next steps"
     },
     "benefits": {
       "badge": "Who it helps",
@@ -143,6 +261,316 @@
       "description": "Be the first to know when we open early access for students, parents, and schools."
     }
   },
+  "trustedDiscovery": {
+    "home": {
+      "hero": {
+        "eyebrow": "Career conversations can start in Grade 8",
+        "title": "Turn “I don’t know” into a future worth exploring.",
+        "description": "Xtara helps students understand themselves, discover Career Directions, choose Dream Careers, and build a practical plan they can discuss with parents and teachers.",
+        "primaryLoggedOut": "Explore my career path",
+        "primaryLoggedIn": "Open my career path",
+        "login": "Log in to my plan",
+        "imageAlt": "A joyful group of Indian school students",
+        "proofs": [
+          "For Grade 8 and above",
+          "English and Malayalam",
+          "Clear reasons behind every direction"
+        ],
+        "resultLabel": "What you will discover",
+        "resultTitle": "Up to 3 Career Directions",
+        "resultDescription": "Starting points to explore—not a permanent label."
+      },
+      "outcomes": {
+        "eyebrow": "A useful result—not a label",
+        "title": "Leave with direction, choices, and a next step.",
+        "description": "The assessment does not try to name one perfect job. It gives the student a clear way to explore and decide over time.",
+        "items": [
+          {
+            "step": "01",
+            "title": "Up to 3 Career Directions",
+            "description": "See broad futures worth exploring and understand why each one appeared."
+          },
+          {
+            "step": "02",
+            "title": "1–3 Dream Careers",
+            "description": "Compare real work, study routes, salary, and difficult parts before preferring a role."
+          },
+          {
+            "step": "03",
+            "title": "My Career Path",
+            "description": "Build skills, try activities, discuss choices, and keep the plan moving."
+          }
+        ]
+      },
+      "conversation": {
+        "eyebrow": "For students and the adults who support them",
+        "title": "Make the next career conversation easier.",
+        "description": "Instead of asking “What will you become?”, start with what the student has noticed, what they want to explore, and what evidence to gather next.",
+        "imageAlt": "A young woman sharing a warm moment with an older family member",
+        "studentLabel": "For the student",
+        "studentValue": "I can explain what interests me and what I want to try.",
+        "parentLabel": "For the parent",
+        "parentValue": "I can support the decision without making it for them.",
+        "togetherLabel": "Together",
+        "togetherValue": "We can compare real work, preparation, costs, salary, and trade-offs.",
+        "action": "Start our first conversation"
+      },
+      "momentum": {
+        "eyebrow": "After the first answer",
+        "title": "A plan that keeps moving.",
+        "description": "Career clarity grows through experience. Xtara turns a chosen direction into small things a student can learn, try, and discuss.",
+        "imageAlt": "Two young adults discussing a plan on a laptop",
+        "items": [
+          {
+            "title": "Learn a useful skill",
+            "description": "Take short lessons connected to the Dream Careers the student chose."
+          },
+          {
+            "title": "Try before deciding",
+            "description": "Use games and challenges to notice what feels interesting, difficult, or worth practising."
+          },
+          {
+            "title": "See realistic routes",
+            "description": "Compare courses and colleges using the student’s location and study details."
+          },
+          {
+            "title": "Bring others into the plan",
+            "description": "Use the Career Conversation slideshow with a parent, teacher, or counsellor."
+          }
+        ]
+      },
+      "trust": {
+        "eyebrow": "Built for thoughtful decisions",
+        "title": "Guidance should earn your trust.",
+        "description": "Students deserve clear reasoning, realistic information, and room to change their minds.",
+        "items": [
+          {
+            "title": "No perfect-match claims",
+            "description": "Suggestions are possibilities to investigate, not verdicts about a student."
+          },
+          {
+            "title": "Curated, not generated",
+            "description": "Assessment and recommendation results follow reviewed rules and data—not AI-generated answers."
+          },
+          {
+            "title": "Change is expected",
+            "description": "Students can change Career Directions and Dream Careers as they learn more."
+          },
+          {
+            "title": "Context matters",
+            "description": "Family priorities, location, study needs, and affordability shape planning without lowering a student’s potential."
+          }
+        ]
+      },
+      "educators": {
+        "eyebrow": "For schools, teachers, and counsellors",
+        "title": "Give every learner thoughtful, personal guidance.",
+        "description": "Bring classes into one responsible guidance workspace. See who has completed discovery, understand shared learner signals, and know where a human conversation can help next.",
+        "pageTitle": "Help more students move from uncertainty to a practical next step.",
+        "pageDescription": "Xtara gives educators a structured view of learner discovery and progress without turning assessment results into rankings, labels, or permanent decisions.",
+        "primary": "Create an educator account",
+        "primaryLoggedIn": "Open educator workspace",
+        "secondary": "See how it works",
+        "login": "Educator login",
+        "proofs": [
+          "Create classes and invite learners securely",
+          "See only consented, role-scoped guidance",
+          "Keep each student's Xtara account independent"
+        ],
+        "features": [
+          {
+            "title": "Class-level visibility",
+            "description": "See invitations, joining progress, assessment completion, and follow-up needs for the classes assigned to you."
+          },
+          {
+            "title": "Useful learner summaries",
+            "description": "Review shared directions and signals with plain-language prompts for a constructive conversation."
+          },
+          {
+            "title": "Responsible cohort insights",
+            "description": "Understand patterns only after a privacy threshold is reached—without student rankings or perfect-fit scores."
+          },
+          {
+            "title": "Scoped and consented",
+            "description": "Role and class boundaries are enforced by the API, while learners keep ownership of their accounts and data."
+          }
+        ],
+        "capabilitiesEyebrow": "Built around educator decisions",
+        "capabilitiesTitle": "Know who needs support, and what conversation to have.",
+        "capabilitiesDescription": "The educator workspace turns learner activity into a focused support queue instead of another collection of charts.",
+        "stepsEyebrow": "A simple institution journey",
+        "stepsTitle": "Set up a school, invite a class, begin guiding.",
+        "stepsDescription": "Students complete the normal Xtara discovery journey before joining, so every educator view begins with learner-owned context and explicit sharing.",
+        "steps": [
+          {
+            "title": "Create your institution",
+            "description": "Set up the school workspace, academic year, classes, and the educators responsible for each group."
+          },
+          {
+            "title": "Invite learners",
+            "description": "Share an expiring, capacity-limited class code. Learners complete assessment and review sharing before membership activates."
+          },
+          {
+            "title": "Guide the next step",
+            "description": "Use shared summaries, open questions, and follow-up needs to plan a useful conversation with each learner."
+          }
+        ],
+        "finalTitle": "Build a stronger guidance practice without taking over the student's decision.",
+        "finalDescription": "Start an institution workspace for your school or educational program. Students keep their individual Xtara journey while educators gain the context needed to support them responsibly.",
+        "preview": {
+          "label": "Consent-aware guidance",
+          "title": "Class 9A",
+          "classLabel": "Learner needing follow-up",
+          "learnersLabel": "Learners",
+          "assessedLabel": "Assessed",
+          "followUpLabel": "Follow-up",
+          "learnerName": "A learner is ready to discuss",
+          "learnerStatus": "Ready"
+        }
+      },
+      "questions": {
+        "eyebrow": "Questions from students and parents",
+        "title": "Clear answers before you begin.",
+        "description": "Know what the assessment will—and will not—do.",
+        "items": [
+          {
+            "question": "Is Grade 8 too early to talk about careers?",
+            "answer": "It is too early to force a final choice, but it is a good time to discover unfamiliar possibilities, notice strengths, and learn how different kinds of work feel."
+          },
+          {
+            "question": "Will the assessment decide one career for the student?",
+            "answer": "No. It suggests up to three Career Directions with reasons. The student chooses one to explore, then prefers up to three Dream Careers inside it."
+          },
+          {
+            "question": "Do personality, strengths, family background, and finances matter?",
+            "answer": "The assessment considers interests, strengths, experiences, confidence, personality signals, and challenges. After the result, location, study details, family priorities, and affordability help shape practical course and college planning."
+          },
+          {
+            "question": "How can a parent or teacher take part?",
+            "answer": "The student can open a Career Conversation slideshow that explains the suggested direction, chosen careers, daily work, preparation, salary, and difficult parts in a format designed for discussion."
+          },
+          {
+            "question": "Do I need an account before starting?",
+            "answer": "No. Start the assessment first. Sign up or log in when you want to save the result, Dream Careers, study details, and learning progress."
+          },
+          {
+            "question": "Can we use Xtara in Malayalam?",
+            "answer": "Yes. The student journey is available in English and Malayalam."
+          }
+        ]
+      },
+      "cta": {
+        "eyebrow": "A better question starts here",
+        "title": "Do not ask for one final answer. Start with a direction worth exploring.",
+        "description": "Begin the assessment now, or log in to continue a Career Path already in progress.",
+        "primary": "Explore my career path",
+        "primaryLoggedIn": "Open my career path",
+        "login": "Log in to my plan",
+        "imageAlt": "A young woman standing between two supportive parents"
+      }
+    },
+    "hero": {
+      "badge": "Career guidance from Grade 8 onward",
+      "title": "Explore today. Decide with confidence.",
+      "description": "Understand what interests you, explore Career Directions and Dream Careers, and take one clear next step. Xtara guides your thinking—it does not decide your future for you.",
+      "primaryLoggedOut": "Explore my career path",
+      "primaryLoggedIn": "Open my career path",
+      "secondary": "See how it works"
+    },
+    "journey": {
+      "eyebrow": "A journey that grows with you",
+      "title": "Explore broadly before you decide.",
+      "description": "Each grade has a different goal. Xtara increases detail only when you are ready for it.",
+      "stages": [
+        {
+          "grade": "Grade 8",
+          "action": "Explore",
+          "description": "Notice what you enjoy, discover unfamiliar Career Directions, and stay curious."
+        },
+        {
+          "grade": "Grade 9",
+          "action": "Deepen",
+          "description": "Compare Dream Careers, build useful skills, and learn through stories, tools, and games."
+        },
+        {
+          "grade": "Grade 10",
+          "action": "Decide",
+          "description": "Understand what may be difficult and choose a current Career Direction with clear next steps."
+        }
+      ]
+    },
+    "trust": {
+      "eyebrow": "Guidance you can question",
+      "title": "No perfect-match score. No permanent label.",
+      "description": "Important suggestions should show their reasoning, uncertainty, and evidence.",
+      "principles": [
+        {
+          "title": "Understand yourself",
+          "description": "Build a living profile that separates interests, experience, confidence, and demonstrated strengths."
+        },
+        {
+          "title": "Explore real possibilities",
+          "description": "Start with Career Directions, then understand Dream Careers, daily work, what may be difficult, and how to prepare."
+        },
+        {
+          "title": "Take the next step",
+          "description": "Use Dream Career comparisons, short lessons, tools, and games to understand a Career Direction before deciding."
+        }
+      ]
+    },
+    "questions": {
+      "eyebrow": "Questions",
+      "title": "What career guidance should feel like",
+      "description": "Clear answers without false promises.",
+      "items": [
+        {
+          "question": "Will Xtara tell me the one perfect career?",
+          "answer": "No. Xtara helps you explore several possibilities, understand why they may be worth considering, and collect more evidence before you decide."
+        },
+        {
+          "question": "Why does Xtara suggest a Career Direction or Dream Career?",
+          "answer": "You will see which answers and activities influenced the suggestion, what information is still missing, and how you can disagree or update your profile."
+        },
+        {
+          "question": "Is Grade 8 too early to explore careers?",
+          "answer": "It is too early to force a final choice, but it is a good time to discover different kinds of work, notice your interests, and try new experiences."
+        },
+        {
+          "question": "What if I change my mind?",
+          "answer": "That is expected. Your direction is revisable, and Xtara should show how new experiences change your evidence over time."
+        },
+        {
+          "question": "Can I use Xtara in Malayalam?",
+          "answer": "Yes. The first multilingual journey supports English and Malayalam, with important guidance reviewed as part of the content workflow."
+        }
+      ]
+    },
+    "explore": {
+      "eyebrow": "Begin without choosing",
+      "title": "Start by exploring what different futures look like.",
+      "description": "Choose where you are today. You can change this later without losing your progress.",
+      "chooseGrade": "Choose your current grade",
+      "areasTitle": "Six places to begin exploring",
+      "areasDescription": "Career Directions are starting points, not boxes. Each one contains many Dream Careers.",
+      "areas": [
+        { "title": "Technology", "description": "Build apps, solve problems, and create useful digital tools." },
+        { "title": "Health", "description": "Help people stay healthy, recover, and live well." },
+        { "title": "Science", "description": "Ask questions, test ideas, and learn how things work." },
+        { "title": "Business", "description": "Turn ideas into useful products, services, and organisations." },
+        { "title": "Design and Media", "description": "Create clear, useful, and engaging experiences and stories." },
+        { "title": "Education and Society", "description": "Teach, support communities, and help solve public problems." }
+      ],
+      "trustTitle": "You are exploring, not locking in a future.",
+      "trustDescription": "Xtara will show several possibilities and help you gather evidence. You can disagree, change your profile, and revisit your direction.",
+      "cta": "Begin my discovery"
+    },
+    "cta": {
+      "eyebrow": "One useful next step",
+      "title": "Start with curiosity, not a final answer.",
+      "description": "Start with your class and assessment. Create an account when you want to save your Career Direction, Dream Careers, study details, and learning progress.",
+      "action": "Explore my career path"
+    }
+  },
   "common": {
     "breadcrumb": {
       "home": "Home",
@@ -161,68 +589,70 @@
   "about": {
     "metadata": {
       "title": "About - Xtara",
-      "description": "Learn about Xtara's mission, story, and commitment to personalized career guidance.",
-      "keywords": "about xtara, career guidance mission, ai career platform",
-      "ogImage": "/images/og-about.jpg"
+      "description": "Why Xtara helps students from Grade 8 onward explore Career Directions, compare Dream Careers, and build a practical career path.",
+      "keywords": "about xtara, student career guidance, career exploration India, career conversations",
+      "ogImage": "/images/home/hero-career-exploration.jpg"
     },
     "hero": {
-      "title": "Built to guide every learner toward their best path.",
-      "subtitle": "Xtara combines AI-powered insights with trusted guidance to help students make confident career decisions."
+      "eyebrow": "Why Xtara exists",
+      "title": "Career decisions should open possibilities—not close them too early.",
+      "subtitle": "Xtara helps students understand themselves, discover Career Directions, compare real Dream Careers, and take useful next steps with the adults who support them.",
+      "primary": "Explore my career path",
+      "login": "Log in to my plan",
+      "proofs": ["Designed for Grade 8 onward", "English and Malayalam", "No perfect-match claims"],
+      "imageAlt": "A joyful group of Indian school students"
     },
-    "sections": [
-      {
-        "title": "Our Mission",
-        "description": "At Xtara, we believe every student deserves access to personalized career guidance that helps them discover their true potential. Our AI-powered platform combines cutting-edge technology with deep educational insights to provide students with the tools they need to make informed decisions about their future.",
-        "imageSrc": "/images/001.png",
-        "bullets": [
-          {
-            "title": "Personalized Guidance",
-            "description": "AI-powered assessments that understand each student's unique profile."
-          },
-          {
-            "title": "Data-Driven Insights",
-            "description": "Evidence-based recommendations backed by comprehensive career data."
-          },
-          {
-            "title": "Accessible to All",
-            "description": "Democratizing career guidance for every student across India."
-          }
-        ]
-      },
-      {
-        "title": "Our Story",
-        "description": "Founded in 2024, Xtara emerged from a simple observation: too many students were making career decisions without adequate guidance or understanding of their options. Our team of educators, technologists, and career counselors came together with a shared vision.",
-        "imageSrc": "/images/002.png",
-        "bullets": [
-          {
-            "title": "The Problem",
-            "description": "Students making career decisions without proper guidance or understanding."
-          },
-          {
-            "title": "The Solution",
-            "description": "AI-powered platform that makes career guidance accessible to every student."
-          },
-          {
-            "title": "The Team",
-            "description": "Educators, technologists, and career counselors united by a shared vision."
-          }
-        ]
-      }
-    ],
-    "stats": [
-      {
-        "title": "1M+",
-        "description": "Students across India guided toward meaningful career paths."
-      },
-      {
-        "title": "95%",
-        "description": "Positive feedback for personalized assessments and clarity."
-      },
-      {
-        "title": "250+",
-        "description": "Career domains and specializations covered with local context."
-      }
-    ]
+    "mission": {
+      "eyebrow": "Our mission",
+      "title": "Give every student a direction they can explore and explain.",
+      "description": "Most students do not know what they want to become—and they should not be expected to. Our job is to replace pressure and guesswork with a clear way to discover possibilities, understand trade-offs, and keep learning.",
+      "imageAlt": "A young woman sharing a warm moment with an older family member",
+      "principles": [
+        { "title": "Understand the whole student", "description": "Interests, personality, strengths, challenges, family context, location, and affordability all matter." },
+        { "title": "Explain every direction", "description": "Students should understand why a Career Direction appeared and what they can investigate next." },
+        { "title": "Turn direction into action", "description": "Dream Careers connect to learning, skills, games, challenges, courses, colleges, and conversations." }
+      ]
+    },
+    "story": {
+      "eyebrow": "The problem we are solving",
+      "title": "A better question than “What will you become?”",
+      "description": "Career conversations in India often begin around Grade 8, when students know very little about the work available to them. A forced answer can narrow their future. Xtara gives families and educators a better starting point: what the student has noticed, what they can explore, and what evidence to gather next.",
+      "imageAlt": "Two young adults discussing a plan using a laptop",
+      "studentTitle": "For the student",
+      "studentDescription": "I can name possibilities, compare them, and say what I want to try next.",
+      "adultTitle": "For parents and educators",
+      "adultDescription": "I can support the decision with realistic information without making it for the student."
+    },
+    "journey": {
+      "eyebrow": "How Xtara helps",
+      "title": "From uncertainty to a career path that keeps moving.",
+      "description": "The first result is not a verdict. It is the beginning of a repeatable cycle of exploration and progress.",
+      "steps": [
+        { "step": "01", "title": "Discover Career Directions", "description": "Use one assessment to identify up to three broad directions worth exploring." },
+        { "step": "02", "title": "Compare Dream Careers", "description": "See real work, study routes, salary, difficult parts, and opportunities before preferring up to three careers." },
+        { "step": "03", "title": "Build My Career Path", "description": "Use learning, games, challenges, courses, college guidance, rewards, and conversation slides to move forward." }
+      ]
+    },
+    "trust": {
+      "eyebrow": "What we promise",
+      "title": "Guidance must earn the student's trust.",
+      "description": "Xtara is designed to help students make thoughtful choices—not to produce impressive-looking certainty.",
+      "items": [
+        { "title": "Curated, not generated", "description": "Assessment and recommendation results follow reviewed rules and curated career data, not AI-generated answers." },
+        { "title": "No perfect-match claims", "description": "Career suggestions are possibilities to investigate, not permanent labels or predictions." },
+        { "title": "Context without limits", "description": "Family, location, and affordability shape planning without lowering a student's potential." },
+        { "title": "Change is expected", "description": "Students can revisit Career Directions and Dream Careers as they learn more about themselves and the world." }
+      ]
+    },
+    "people": {
+      "eyebrow": "A shared career conversation",
+      "title": "Built around the student, with support from the people who matter.",
+      "items": [
+        { "title": "Students", "description": "Explore without needing to know the final answer." },
+        { "title": "Parents", "description": "Understand options, costs, routes, and useful next steps." },
+        { "title": "Educators", "description": "Guide structured conversations while keeping student choice visible." }
+      ]
+    }
   },
   "contact": {
     "metadata": {
@@ -382,20 +812,33 @@
       "open": "Open menu"
     },
     "nav": {
-      "dashboard": "Dashboard",
+      "career": "Career",
+      "learn": "Learn",
+      "dashboard": "My Career Path",
+      "direction": "My Direction",
       "profile": "Profile",
       "achievements": "Achievements",
+      "notifications": "Notifications",
+      "learnerNavigation": "Learner navigation",
+      "explore": "Explore",
+      "howItWorks": "How it works",
+      "educators": "For educators",
+      "organization": "Workspace",
+      "learners": "Learners",
+      "classes": "Classes",
+      "educatorProfile": "My profile",
       "about": "About",
       "news": "News",
       "contact": "Contact"
     },
     "cta": {
-      "joinWaitlist": "Join waitlist"
+      "joinWaitlist": "Explore my career path",
+      "login": "Log in"
     }
   },
   "footer": {
     "brand": "Xtara",
-    "about": "Personalized career guidance platform helping students discover their perfect career path.",
+    "about": "Career exploration and decision guidance that helps students understand possibilities, test ideas, and take a clear next step.",
     "quickLinksTitle": "Quick Links",
     "contactTitle": "Contact Us",
     "labels": {
@@ -421,58 +864,95 @@
   },
   "achievements": {
     "hero": {
-      "title": "Your Achievements",
-      "subtitle": "Track your progress and celebrate your milestones"
+      "eyebrow": "My Career Path",
+      "title": "My career progress",
+      "subtitle": "See how every lesson, educational game, challenge, and career read is helping you move towards your goals."
     },
-    "stats": {
-      "points": "Points",
-      "currentTier": "Current Tier",
-      "tier": "Tier",
-      "medals": "Medals",
-      "loading": "Loading...",
-      "fallbackTier": "Spark"
+    "empty": {
+      "eyebrow": "Start with a direction",
+      "title": "Your career progress starts here",
+      "description": "Complete the assessment and choose a Career Direction. Your learning, practice, and next steps will appear here as your plan grows.",
+      "action": "Find my Career Direction"
     },
-    "weeklyProgress": {
-      "title": "This Week's Progress",
-      "goodReads": "Good Reads",
-      "challenges": "Challenges",
-      "sparks": "Sparks"
+    "career": {
+      "direction": "Career Direction",
+      "description": "Your learning activity and next steps are gathered around this direction and the Dream Careers you want to explore.",
+      "chooseCareers": "Choose 1–3 Dream Careers",
+      "stepsComplete": "career steps complete",
+      "pathProgress": "My Career Path progress"
     },
-    "medals": {
-      "title": "Medals",
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic"
+    "recognition": {
+      "title": "Recognition",
+      "description": "Points and medals celebrate the work you put into your career path.",
+      "points": "points",
+      "medals": "medals",
+      "level": "level",
+      "whyTitle": "Progress matters more than points",
+      "whyDescription": "Points recognise effort. Your real achievement is learning about careers, practising useful skills, and making better-informed choices."
     },
-    "allTime": {
-      "title": "All-Time Achievements",
-      "games": "Games",
-      "sparks": "Sparks",
-      "challenges": "Challenges",
-      "goodReads": "Good Reads"
-    },
-    "pointsByCategory": {
-      "title": "Points by Category",
+    "learning": {
+      "eyebrow": "Learning evidence",
+      "title": "How I am building career readiness",
+      "description": "These completed activities show the different ways you have learned, practised, and explored.",
+      "total": "Activities completed: {count}",
+      "completed": "completed",
+      "points": "points earned",
+      "action": "Continue learning",
       "games": {
-        "title": "Games",
-        "description": "Complete quizzes and WordQuest games"
+        "title": "Educational games",
+        "description": "Practise problem-solving, memory, decision-making, and career knowledge by playing.",
+        "label": "Learn by playing"
       },
       "sparks": {
-        "title": "Sparks",
-        "description": "Complete learning sparks and courses"
+        "title": "Short lessons",
+        "description": "Learn useful career ideas and skills in small, focused steps."
       },
       "challenges": {
         "title": "Challenges",
-        "description": "Complete challenges and quizzes"
+        "description": "Apply what you learned, solve problems, and check your understanding."
       },
-      "goodReads": {
-        "title": "Good Reads",
-        "description": "Read career articles"
+      "reads": {
+        "title": "Career reads",
+        "description": "Understand real work, study routes, choices, and opportunities."
       },
-      "streaks": {
-        "title": "Streaks",
-        "description": "Tier completion bonuses"
+      "gameNote": {
+        "title": "Games are part of learning",
+        "description": "Xtara games are educational activities. They help you practise ideas and useful skills in an active way—not just collect points."
       }
+    },
+    "steps": {
+      "title": "My progress towards my goals",
+      "description": "A career choice becomes clearer when you learn, try, and discuss—not when you collect a score.",
+      "direction": {
+        "title": "Choose a Career Direction",
+        "description": "Choose a broad area you want to explore."
+      },
+      "careers": {
+        "title": "Choose Dream Careers",
+        "description": "Choose up to three careers to compare and explore."
+      },
+      "learn": {
+        "title": "Learn about the path",
+        "description": "Complete a short lesson or read about a career.",
+        "evidence": "Learning activities completed: {count}"
+      },
+      "try": {
+        "title": "Try skills and ideas",
+        "description": "Use an educational game, challenge, or practical activity.",
+        "evidence": "Games or challenges completed: {count}"
+      },
+      "discuss": {
+        "title": "Discuss the plan",
+        "description": "Talk about what you learned with a parent, teacher, or counsellor."
+      }
+    },
+    "next": {
+      "eyebrow": "My next best step",
+      "action": "Take this step",
+      "completeEyebrow": "Path up to date",
+      "completeTitle": "Keep exploring",
+      "completeDescription": "You have completed the main steps in your current plan. Keep learning and review your choices as you discover more.",
+      "completeAction": "Open My Career Path"
     }
   },
   "currentGoalCard": {

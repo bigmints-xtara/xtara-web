@@ -84,7 +84,7 @@ Since our launch, we've helped over 50,000 students:
 - **92%** report feeling more confident about their career choices
 - **87%** have improved their academic performance
 - **78%** have secured admission to their preferred institutions
-- **95%** would recommend Xtara to their peers
+- Pilot outcomes will be published only after the methodology and evidence are reviewable
 
 ### Awards & Recognition
 - **Best EdTech Innovation 2024** - Education World
@@ -142,4 +142,4 @@ Ready to discover your perfect career path? Join thousands of students who have 
 
 *"Education is not preparation for life; education is life itself."* - John Dewey
 
-At Xtara, we're not just preparing students for careers—we're helping them build lives they love. 
+At Xtara, we're not just preparing students for careers—we're helping them build lives they love.

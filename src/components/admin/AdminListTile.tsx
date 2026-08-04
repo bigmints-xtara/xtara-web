@@ -1,121 +1,97 @@
 'use client';
 
-import { MoreVertical } from 'lucide-react';
+import { Copy, Edit3, MoreHorizontal, Send, Trash2, Undo2 } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { formatSnakeCaseToTitleCase } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface AdminListTileProps {
-    title: string;
-    subtitle: string;
-    domain: string;
-    status: string;
-    isSelected: boolean;
-    onTap: () => void;
-    onAction: (action: string) => void;
+  title: string;
+  subtitle: string;
+  domain: string;
+  status: string;
+  isSelected: boolean;
+  onTap: () => void;
+  onAction: (action: string) => void;
+  canPublish?: boolean;
+  canDelete?: boolean;
 }
 
 export default function AdminListTile({
-    title,
-    subtitle,
-    domain,
-    status,
-    isSelected,
-    onTap,
-    onAction,
+  title,
+  subtitle,
+  domain,
+  status,
+  isSelected,
+  onTap,
+  onAction,
+  canPublish = true,
+  canDelete = true,
 }: AdminListTileProps) {
-    const statusColors: Record<string, string> = {
-        published: 'bg-green-100 text-green-800',
-        draft: 'bg-orange-100 text-orange-800',
-        'in review': 'bg-blue-100 text-blue-800',
-    };
+  const published = status.toLowerCase() === 'published';
 
-    return (
-        <div
-            className={`w-full border-b transition-all relative group/tile ${
-                isSelected
-                    ? 'bg-blue-50 border-l-4 border-l-blue-600'
-                    : 'hover:bg-gray-50 hover:border-l-4 hover:border-l-gray-300'
-            }`}
-        >
-            <button
-                type="button"
-                aria-pressed={isSelected}
-                onClick={onTap}
-                className="w-full text-left p-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
-            >
-                <div className="flex items-start justify-between pr-8">
-                    <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">{formatSnakeCaseToTitleCase(title)}</h3>
-                        {domain && (
-                            <span className="inline-block mt-1 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
-                                {formatSnakeCaseToTitleCase(domain)}
-                            </span>
-                        )}
-                        <p className="text-sm text-gray-600 mt-1">{formatSnakeCaseToTitleCase(subtitle)}</p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span
-                            className={`px-2 py-1 text-xs rounded font-medium ${
-                                statusColors[status.toLowerCase()] || 'bg-gray-100 text-gray-800'
-                            }`}
-                        >
-                            {status}
-                        </span>
-                    </div>
-                </div>
-            </button>
-
-            <div className="absolute right-4 top-4 z-20">
-                <div className="relative group">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                        }}
-                        className="p-1 hover:bg-gray-200 rounded text-gray-500"
-                    >
-                        <MoreVertical size={18} />
-                    </button>
-
-                    <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg border hidden group-hover:block shadow-lg">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onAction('edit');
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                        >
-                            Edit
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onAction('duplicate');
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                        >
-                            Duplicate
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onAction(status === 'Published' ? 'unpublish' : 'publish');
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
-                        >
-                            {status === 'Published' ? 'Unpublish' : 'Publish'}
-                        </button>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onAction('delete');
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-600"
-                        >
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className={cn('group relative border-b transition-colors', isSelected ? 'bg-accent/12' : 'hover:bg-muted/45')}>
+      <button
+        aria-pressed={isSelected}
+        className="w-full px-4 py-4 pr-12 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        onClick={onTap}
+        type="button"
+      >
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-foreground">{formatSnakeCaseToTitleCase(title || 'Untitled')}</p>
+            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{formatSnakeCaseToTitleCase(subtitle || 'No description')}</p>
+          </div>
+          <Badge
+            className={cn(
+              'shrink-0 border-0 text-[10px]',
+              published ? 'bg-emerald-100 text-emerald-800' : status.toLowerCase().includes('review') ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800',
+            )}
+            variant="secondary"
+          >
+            {status}
+          </Badge>
         </div>
-    );
+        {domain ? <p className="mt-2 truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground/75">{formatSnakeCaseToTitleCase(domain)}</p> : null}
+      </button>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            aria-label={`Actions for ${title}`}
+            className="absolute right-2 top-12 -translate-y-1/2 opacity-70 group-hover:opacity-100"
+            size="icon-sm"
+            variant="ghost"
+          >
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem onSelect={() => onAction('edit')}><Edit3 /> Edit</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => onAction('duplicate')}><Copy /> Duplicate</DropdownMenuItem>
+          {canPublish ? (
+            <DropdownMenuItem onSelect={() => onAction(published ? 'unpublish' : 'publish')}>
+              {published ? <Undo2 /> : <Send />}{published ? 'Unpublish' : 'Publish'}
+            </DropdownMenuItem>
+          ) : null}
+          {canDelete ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => onAction('delete')} variant="destructive"><Trash2 /> Archive</DropdownMenuItem>
+            </>
+          ) : null}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
 }

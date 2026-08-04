@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Save, X } from 'lucide-react';
 import type { Spark } from '@/types/admin';
 import { formatSnakeCaseToTitleCase } from '@/lib/utils';
+import { ContentTagEditor } from '@/components/admin/ContentTagEditor';
 
 interface SparkEditorProps {
   spark: Spark | null;
@@ -13,28 +14,29 @@ interface SparkEditorProps {
 
 export default function SparkEditor({ spark, onSave, onCancel }: SparkEditorProps) {
     const [isSaving, setIsSaving] = useState(false);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState<Partial<Spark>>(() => ({
         title: spark?.title || '',
         type: spark?.type || '',
         published: spark?.published || false,
         draft: spark?.draft ?? true,
         inReview: spark?.inReview || false,
+        futureDirectionIds: spark?.futureDirectionIds || spark?.careerClusters || [],
+        dreamCareerIds: spark?.dreamCareerIds || spark?.careerRelevance || [],
+        skillIds: spark?.skillIds || [],
+        gradeStages: spark?.gradeStages || [],
+        topics: spark?.topics || [],
     }));
-
-    useEffect(() => {
-        if (spark) {
-            setFormData(spark);
-        }
-    }, [spark]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSaving(true);
+        setError('');
 
         try {
             await onSave(formData);
         } catch (error) {
-            alert(`Error saving spark: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            setError(error instanceof Error ? error.message : 'Unable to save this spark');
         } finally {
             setIsSaving(false);
         }
@@ -82,7 +84,10 @@ export default function SparkEditor({ spark, onSave, onCancel }: SparkEditorProp
                         {isSaving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
+                <ContentTagEditor value={formData} onChange={(tags) => setFormData((current) => ({ ...current, ...tags }))} />
             </div>
+
+            {error ? <p role="alert" className="shrink-0 border-b border-red-200 bg-red-50 px-6 py-3 text-sm text-red-700">{error}</p> : null}
 
             {/* Form Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">

@@ -1,62 +1,23 @@
-// ============================================================================
-// Assessment Service Tests
-// Tests: getQuestionnaire, saveAssessment, waitForCareerPath,
-//        getCareerPath, generateRecommendations
-// ============================================================================
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-
-// --- Mock Firebase modules ---
-vi.mock("./firebase", () => ({
-  db: {},
-  auth: { currentUser: null },
-  storage: {},
-  functions: {},
-  app: {},
+const api = vi.hoisted(() => ({
+  get: vi.fn(),
+  post: vi.fn(),
 }));
 
-const { mockGetDoc, mockSetDoc, mockUpdateDoc, mockGetDocs, mockServerTimestamp } = vi.hoisted(() => ({
-  mockGetDoc: vi.fn(),
-  mockSetDoc: vi.fn(),
-  mockUpdateDoc: vi.fn(),
-  mockGetDocs: vi.fn(),
-  mockServerTimestamp: vi.fn(() => new Date("2025-01-01")),
+vi.mock('@/lib/api/client', () => ({
+  xtaraApi: api,
 }));
 
-vi.mock("firebase/firestore", () => ({
-  getFirestore: vi.fn(() => ({})),
-  doc: vi.fn(() => ({ _ref: true })),
-  collection: vi.fn(() => ({ _ref: true })),
-  getDoc: mockGetDoc,
-  setDoc: mockSetDoc,
-  updateDoc: mockUpdateDoc,
-  query: vi.fn(() => ({})),
-  where: vi.fn(() => ({})),
-  orderBy: vi.fn(() => ({})),
-  limit: vi.fn(() => ({})),
-  getDocs: mockGetDocs,
-  serverTimestamp: mockServerTimestamp,
-  Timestamp: class {
-    toDate() {
-      return new Date();
-    }
-  },
-}));
+import {
+  generateRecommendations,
+  getCareerPath,
+  getQuestionnaire,
+  saveAssessment,
+  waitForCareerPath,
+} from './assessment';
 
-vi.mock("firebase/functions", () => ({
-  getFunctions: vi.fn(() => ({})),
-  httpsCallable: vi.fn(() =>
-    vi.fn(() => Promise.resolve({ data: { id: "mock-fn-response" } })),
-  ),
-}));
-
-vi.mock("firebase/storage", () => ({
-  getStorage: vi.fn(() => ({})),
-}));
-
-import { getQuestionnaire, saveAssessment, waitForCareerPath, getCareerPath, generateRecommendations } from "./assessment";
-
-describe("Assessment Service", () => {
+describe('Assessment Service API boundary', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.clearAllMocks();
@@ -66,156 +27,96 @@ describe("Assessment Service", () => {
     vi.useRealTimers();
   });
 
-  describe("getQuestionnaire", () => {
-    it("returns parsed steps when snapshot exists with data.value string", async () => {
-      const mockSnapshot = {
-        exists: vi.fn(() => true),
-        data: vi.fn(() => ({
-          value: JSON.stringify({ steps: [{ id: "q1", label: "Name", fieldType: "text" }] }),
-        })),
-      };
-      mockGetDoc.mockResolvedValueOnce(mockSnapshot);
+  describe('getQuestionnaire', () => {
+    it('returns a questionnaire array response', async () => {
+      api.get.mockResolvedValueOnce([{ id: 'q1', label: 'Name', fieldType: 'text' }]);
 
-      const result = await getQuestionnaire();
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual({ id: "q1", label: "Name", fieldType: "text" });
+      await expect(getQuestionnaire()).resolves.toEqual([
+        { id: 'q1', label: 'Name', fieldType: 'text' },
+      ]);
+      expect(api.get).toHaveBeenCalledWith('/questionnaire');
     });
 
-    it("returns steps when snapshot has data.steps array", async () => {
-      const mockSnapshot = {
-        exists: vi.fn(() => true),
-        data: vi.fn(() => ({
-          steps: [{ id: "q2", label: "Age", type: "number" }],
-        })),
-      };
-      mockGetDoc.mockResolvedValueOnce(mockSnapshot);
+    it('returns steps from an enveloped questionnaire response', async () => {
+      api.get.mockResolvedValueOnce({ steps: [{ id: 'q2', label: 'Age', fieldType: 'number' }] });
 
-      const result = await getQuestionnaire();
-      expect(result).toHaveLength(1);
-      expect(result[0].fieldType).toBe("number");
+      await expect(getQuestionnaire()).resolves.toEqual([
+        { id: 'q2', label: 'Age', fieldType: 'number' },
+      ]);
     });
 
-    it("returns empty array when snapshot does not exist", async () => {
-      const mockSnapshot = {
-        exists: vi.fn(() => false),
-        data: vi.fn(() => ({})),
-      };
-      mockGetDoc.mockResolvedValueOnce(mockSnapshot);
-
-      const result = await getQuestionnaire();
-      expect(result).toEqual([]);
+    it('returns an empty array when the API has no steps', async () => {
+      api.get.mockResolvedValueOnce({});
+      await expect(getQuestionnaire()).resolves.toEqual([]);
     });
 
-    it("returns empty array on error", async () => {
-      mockGetDoc.mockRejectedValueOnce(new Error("Network error"));
-
-      const result = await getQuestionnaire();
-      expect(result).toEqual([]);
-    });
-
-    it("returns empty array when JSON parse fails", async () => {
-      const mockSnapshot = {
-        exists: vi.fn(() => true),
-        data: vi.fn(() => ({ value: "{invalid json}" })),
-      };
-      mockGetDoc.mockResolvedValueOnce(mockSnapshot);
-
-      const result = await getQuestionnaire();
-      expect(result).toEqual([]);
+    it('surfaces API failures to the caller', async () => {
+      api.get.mockRejectedValueOnce(new Error('Network error'));
+      await expect(getQuestionnaire()).rejects.toThrow('Network error');
     });
   });
 
-  describe("saveAssessment", () => {
-    it("saves assessment data with merge and updates user profile", async () => {
-      mockSetDoc.mockResolvedValueOnce(undefined);
+  describe('saveAssessment', () => {
+    it('sends answers and returns the created assessment ID', async () => {
+      api.post.mockResolvedValueOnce({ assessmentId: 'assessment-1' });
 
-      const result = await saveAssessment("user-1", { interests: ["coding"], skippedFields: ["age"], isRetake: true }, true);
-
-      expect(result).toBe("user-1");
-      expect(mockSetDoc).toHaveBeenCalledTimes(2);
-    });
-
-    it("throws error on failure", async () => {
-      mockSetDoc.mockRejectedValueOnce(new Error("Firestore error"));
-
-      await expect(saveAssessment("user-2", { interests: ["art"] }, false)).rejects.toThrow();
-    });
-  });
-
-  describe("generateRecommendations", () => {
-    it("formats data and calls Cloud Function", async () => {
-      const result = await generateRecommendations("assess-1", {
-        results: { fullName: "Alice", interests: ["math"], currentGrade: "grade10" },
+      await expect(saveAssessment('user-1', { interests: ['coding'] }, true)).resolves.toBe('assessment-1');
+      expect(api.post).toHaveBeenCalledWith('/assessment', {
+        answers: { interests: ['coding'] },
+        isRetake: true,
       });
+    });
 
-      expect(result).toEqual({ id: "mock-fn-response" });
+    it('surfaces save failures', async () => {
+      api.post.mockRejectedValueOnce(new Error('Save failed'));
+      await expect(saveAssessment('user-2', { interests: ['art'] })).rejects.toThrow('Save failed');
     });
   });
 
-  describe("getCareerPath", () => {
-    it("returns career path data when doc exists", async () => {
-      const mockSnapshot = {
-        id: "cp-1",
-        exists: vi.fn(() => true),
-        data: vi.fn(() => ({ title: "Software Engineer" })),
-      };
-      mockGetDoc.mockResolvedValueOnce(mockSnapshot);
+  it('queues recommendation generation with the assessment context', async () => {
+    api.post.mockResolvedValueOnce({ jobId: 'job-1' });
+    const assessmentData = { results: { fullName: 'Alice' } };
 
-      const result = await getCareerPath("cp-1");
-      expect(result).toEqual({ id: "cp-1", title: "Software Engineer" });
-    });
-
-    it("returns null when doc does not exist", async () => {
-      const mockSnapshot = {
-        exists: vi.fn(() => false),
-        data: vi.fn(() => ({})),
-      };
-      mockGetDoc.mockResolvedValueOnce(mockSnapshot);
-
-      const result = await getCareerPath("cp-2");
-      expect(result).toBeNull();
+    await expect(generateRecommendations('assessment-1', assessmentData)).resolves.toEqual({ jobId: 'job-1' });
+    expect(api.post).toHaveBeenCalledWith('/recommendations/jobs', {
+      assessmentId: 'assessment-1',
+      assessmentData,
     });
   });
 
-  describe("waitForCareerPath", () => {
-    it("returns career path ID when found within max attempts", async () => {
-      // First call returns empty, second returns match
-      mockGetDocs.mockResolvedValueOnce({
-        empty: true,
-        docs: [],
-      });
-      mockGetDocs.mockResolvedValueOnce({
-        empty: false,
-        docs: [{ id: "cp-1" }],
-      });
-      mockUpdateDoc.mockResolvedValueOnce(undefined);
-      const promise = waitForCareerPath("assess-1", 5);
-      
-      // Attempt 1: delay 2000ms
+  describe('getCareerPath', () => {
+    it('returns an API career path', async () => {
+      api.get.mockResolvedValueOnce({ id: 'cp-1', title: 'Software Engineer' });
+      await expect(getCareerPath('cp-1')).resolves.toEqual({ id: 'cp-1', title: 'Software Engineer' });
+    });
+
+    it('returns null when the path cannot be loaded', async () => {
+      api.get.mockRejectedValueOnce(new Error('Not found'));
+      await expect(getCareerPath('cp-2')).resolves.toBeNull();
+    });
+  });
+
+  describe('waitForCareerPath', () => {
+    it('returns a career path ID when a later poll finds one', async () => {
+      api.get
+        .mockResolvedValueOnce({ items: [] })
+        .mockResolvedValueOnce({ items: [{ id: 'cp-1' }] });
+
+      const result = waitForCareerPath('assessment-1', 3);
       await vi.advanceTimersByTimeAsync(2000);
-      
-      const result = await promise;
-      expect(result).toBe("cp-1");
-      expect(mockUpdateDoc).toHaveBeenCalled();
+
+      await expect(result).resolves.toBe('cp-1');
+      expect(api.get).toHaveBeenCalledTimes(2);
     });
 
-    it("returns null when max attempts exceeded", async () => {
-      mockGetDocs.mockResolvedValue({
-        empty: true,
-        docs: [],
-      });
+    it('returns null after the configured attempts', async () => {
+      api.get.mockResolvedValue({ items: [] });
 
-      const promise = waitForCareerPath("assess-1", 3);
-      
-      // Attempt 1: delay 2000ms
-      await vi.advanceTimersByTimeAsync(2000);
-      // Attempt 2: delay 4000ms
-      await vi.advanceTimersByTimeAsync(4000);
-      // Attempt 3: delay 8000ms
-      await vi.advanceTimersByTimeAsync(8000);
-      
-      const resolved = await promise;
-      expect(resolved).toBeNull();
+      const result = waitForCareerPath('assessment-1', 3);
+      await vi.advanceTimersByTimeAsync(14000);
+
+      await expect(result).resolves.toBeNull();
+      expect(api.get).toHaveBeenCalledTimes(3);
     });
   });
 });

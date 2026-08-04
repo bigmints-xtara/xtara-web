@@ -1,180 +1,117 @@
-"use client";
+'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-    BookOpen,
-    Trophy,
-    FileText,
-    Sparkles,
-    Star,
-    Library,
-    Settings,
-    BarChart3,
-    Loader2,
-    Gamepad2
+  ArrowRight,
+  BookOpen,
+  Bot,
+  Building2,
+  FileText,
+  Gamepad2,
+  Route,
+  Sparkles,
+  Star,
+  Trophy,
 } from 'lucide-react';
-import { useTenant } from '@/lib/hooks/useTenant';
-import { SchoolDashboard } from '@/components/admin/SchoolDashboard';
-import { MentorDashboard } from '@/components/admin/MentorDashboard';
 
-const adminCards = [
-    {
-        title: 'Stories',
-        subtitle: 'Manage career stories and content',
-        icon: BookOpen,
-        color: 'bg-blue-500',
-        href: '/admin/stories',
-    },
-    {
-        title: 'Challenges',
-        subtitle: 'Manage career challenges and quizzes',
-        icon: Trophy,
-        color: 'bg-green-500',
-        href: '/admin/challenges',
-    },
-    {
-        title: 'Good Reads',
-        subtitle: 'Manage educational articles and resources',
-        icon: FileText,
-        color: 'bg-teal-500',
-        href: '/admin/good-reads',
-    },
-    {
-        title: 'Sparks',
-        subtitle: 'Manage motivational sparks and insights',
-        icon: Sparkles,
-        color: 'bg-pink-500',
-        href: '/admin/sparks',
-    },
-    {
-        title: 'Games',
-        subtitle: 'Manage active game instances and schedules',
-        icon: Gamepad2,
-        color: 'bg-indigo-500',
-        href: '/admin/games',
-    },
-    {
-        title: 'Dream Careers',
-        subtitle: 'Manage and vote on dream career entries',
-        icon: Star,
-        color: 'bg-orange-500',
-        href: '/admin/dream-careers',
-    },
-    {
-        title: 'Content Resources',
-        subtitle: 'Manage career cluster resources and links',
-        icon: Library,
-        color: 'bg-purple-500',
-        href: '/admin/resources',
-        comingSoon: true,
-    },
-    {
-        title: 'Analytics',
-        subtitle: 'View usage statistics and insights',
-        icon: BarChart3,
-        color: 'bg-red-500',
-        href: '/admin/analytics',
-        comingSoon: true,
-    },
-    {
-        title: 'Settings',
-        subtitle: 'App configuration and preferences',
-        icon: Settings,
-        color: 'bg-gray-500',
-        href: '/admin/settings',
-        comingSoon: true,
-    },
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { xtaraApi } from '@/lib/api/client';
+
+type Stats = {
+  grandTotal: number;
+  totalByCollection: Record<string, number>;
+  collections: Array<{ byStatus: { published?: number; draft?: number; inReview?: number } }>;
+};
+
+const modules = [
+  { title: 'Stories', description: 'Career narratives and slide content', href: '/admin/stories', key: 'stories', icon: BookOpen },
+  { title: 'Good reads', description: 'Articles and external learning resources', href: '/admin/good-reads', key: 'good-reads', icon: FileText },
+  { title: 'Sparks', description: 'Short motivational learning moments', href: '/admin/sparks', key: 'sparks', icon: Sparkles },
+  { title: 'Challenges', description: 'Quizzes, prompts, and rewards', href: '/admin/challenges', key: 'challenges', icon: Trophy },
+  { title: 'Games', description: 'Interactive activities and schedules', href: '/admin/games', key: 'games', icon: Gamepad2 },
+  { title: 'Colleges', description: 'Accepted institutions, courses, and career mappings', href: '/admin/colleges', key: '', icon: Building2 },
+  { title: 'Dream careers', description: 'Curated career role profiles', href: '/admin/dream-careers', key: 'dream_careers', icon: Star },
+  { title: 'Future directions', description: 'Assessment pathways and evidence rules', href: '/admin/future-directions', key: 'future_directions', icon: Route },
 ];
 
 export default function AdminDashboard() {
-    const { tenant, loading } = useTenant();
+  const [stats, setStats] = useState<Stats | null>(null);
 
-    if (loading) {
-        return (
-            <div className="h-full flex items-center justify-center bg-gray-50">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+  useEffect(() => {
+    let active = true;
+    xtaraApi.get<Stats>('/admin/content/stats')
+      .then((value) => active && setStats(value))
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
+  const published = stats?.collections.reduce((total, collection) => total + (collection.byStatus.published || 0), 0) || 0;
+  const drafts = stats?.collections.reduce((total, collection) => total + (collection.byStatus.draft || 0), 0) || 0;
+
+  return (
+    <div className="h-full overflow-y-auto">
+      <div className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6 lg:p-8">
+        <section className="relative overflow-hidden rounded-2xl border bg-primary px-6 py-8 text-primary-foreground shadow-sm md:px-8">
+          <div className="absolute -right-20 -top-24 size-72 rounded-full bg-white/8" />
+          <div className="absolute -bottom-24 right-24 size-56 rounded-full bg-secondary/15" />
+          <div className="relative max-w-2xl">
+            <Badge className="mb-4 border-white/20 bg-white/10 text-white" variant="outline">Platform workspace</Badge>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Run Xtara from one clear workspace.</h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-primary-foreground/75 sm:text-base">
+              Curate content, review guidance data, and ask the admin assistant to complete operational work for you.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild className="bg-white text-primary hover:bg-white/90">
+                <Link href="/admin/assistant"><Bot /> Open admin assistant</Link>
+              </Button>
+              <Button asChild className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white" variant="outline">
+                <Link href="/admin/good-reads">Create content <ArrowRight /></Link>
+              </Button>
             </div>
-        );
-    }
+          </div>
+        </section>
 
-    // Role-based rendering
-    if (tenant?.type === 'institution' && tenant?.category === 'school') {
-        return (
-            <div className="h-full overflow-y-auto bg-gray-50">
-                 <div className="p-8">
-                    <SchoolDashboard tenant={tenant} />
-                </div>
-            </div>
-        );
-    }
+        {stats ? (
+          <section className="grid gap-4 sm:grid-cols-3" aria-label="Content totals">
+            <Card className="gap-2 py-5 shadow-none">
+              <CardHeader className="px-5"><CardDescription>Total content</CardDescription><CardTitle className="text-3xl">{stats.grandTotal}</CardTitle></CardHeader>
+            </Card>
+            <Card className="gap-2 py-5 shadow-none">
+              <CardHeader className="px-5"><CardDescription>Published</CardDescription><CardTitle className="text-3xl">{published}</CardTitle></CardHeader>
+            </Card>
+            <Card className="gap-2 py-5 shadow-none">
+              <CardHeader className="px-5"><CardDescription>Drafts</CardDescription><CardTitle className="text-3xl">{drafts}</CardTitle></CardHeader>
+            </Card>
+          </section>
+        ) : null}
 
-    if (tenant?.category === 'mentor') {
-        return (
-             <div className="h-full overflow-y-auto bg-gray-50">
-                 <div className="p-8">
-                    <MentorDashboard tenant={tenant} />
-                </div>
-            </div>
-        );
-    }
-
-    // Default Admin View (Super Admin or Content Admin)
-    return (
-        <div className="h-full overflow-y-auto bg-gray-50">
-            <div className="p-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                    <p className="text-gray-600 mt-2">Content Management System</p>
-                    {tenant && (
-                        <p className="text-xs text-gray-400 mt-1">
-                            Logged in as: {tenant.displayName} ({tenant.category})
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {adminCards.map((card) => {
-                        const Icon = card.icon;
-                        const cardClasses = `p-6 bg-white border-2 rounded-xl transition-all h-full ${
-                            card.comingSoon
-                                ? 'opacity-60 cursor-not-allowed'
-                                : 'cursor-pointer hover:border-blue-500 hover:shadow-md'
-                        }`;
-
-                        const content = (
-                            <div className="flex flex-col items-center text-center">
-                                <div
-                                    className={`${card.color} w-16 h-16 rounded-full flex items-center justify-center mb-4`}
-                                >
-                                    <Icon className="text-white" size={28} />
-                                </div>
-                                <h3 className="font-bold text-lg mb-2">{card.title}</h3>
-                                <p className="text-sm text-gray-600">{card.subtitle}</p>
-                                {card.comingSoon && (
-                                    <span className="mt-3 px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                                        Coming Soon
-                                    </span>
-                                )}
-                            </div>
-                        );
-
-                        if (card.comingSoon) {
-                            return (
-                                <div key={card.title} className={cardClasses}>
-                                    {content}
-                                </div>
-                            );
-                        }
-
-                        return (
-                            <Link key={card.title} href={card.href} className={cardClasses}>
-                                {content}
-                            </Link>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    );
+        <section>
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold tracking-tight">Content and guidance</h2>
+            <p className="text-sm text-muted-foreground">Open a workspace to review and manage its records.</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {modules.map((module) => {
+              const Icon = module.icon;
+              return (
+                <Link className="group" href={module.href} key={module.href}>
+                  <Card className="h-full gap-0 py-5 shadow-none transition-colors group-hover:border-primary/35 group-hover:bg-accent/5">
+                    <CardHeader className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5">
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-primary/8 text-primary"><Icon className="size-5" /></div>
+                      <div className="min-w-0"><CardTitle className="text-base">{module.title}</CardTitle><CardDescription className="mt-1 line-clamp-1">{module.description}</CardDescription></div>
+                      <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                    </CardHeader>
+                    {module.key && stats ? <p className="mt-4 px-5 text-xs text-muted-foreground">{stats.totalByCollection[module.key] || 0} records</p> : module.href === '/admin/colleges' ? <p className="mt-4 px-5 text-xs text-muted-foreground">Active Supabase release</p> : null}
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 }
-

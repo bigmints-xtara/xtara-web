@@ -4,18 +4,18 @@ import { IStats } from "@/types";
 
 export const stats: IStats[] = [
   {
-    title: "1M+",
+    title: "Explore",
     icon: <GraduationCap size={34} className="text-indigo-600" />,
-    description: "Students across India guided toward meaningful career paths."
+    description: "Understand broad possibilities before narrowing."
   },
   {
-    title: "95%",
+    title: "Test",
     icon: <Star size={34} className="text-yellow-500" />,
-    description: "Positive feedback for personalized assessments and clarity."
+    description: "Gather evidence through real activities and conversations."
   },
   {
-    title: "250+",
+    title: "Decide",
     icon: <Globe size={34} className="text-green-600" />,
-    description: "Career domains and specializations covered with local context."
+    description: "Choose a current direction and review it later."
   }
 ];
