@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const PRODUCTION_API_PROXY_TARGET = "https://xtara-api-h7awati5ja-uc.a.run.app";
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  turbopack: {
+    root: projectRoot,
+  },
   async rewrites() {
     const proxyTarget = (
       process.env.XTARA_API_PROXY_TARGET
