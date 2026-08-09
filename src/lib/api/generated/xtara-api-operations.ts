@@ -21,6 +21,7 @@ export const XTARA_API_OPERATIONS = {
   "postAdminContentTypeIdReview": { method: "POST", path: "/api/v1/admin/content/{type}/{id}/review", authenticated: true },
   "postAdminContentTypeIdUnpublish": { method: "POST", path: "/api/v1/admin/content/{type}/{id}/unpublish", authenticated: true },
   "postAdminMediaImages": { method: "POST", path: "/api/v1/admin/media/images", authenticated: true },
+  "getAdminNotificationCampaignsCampaignId": { method: "GET", path: "/api/v1/admin/notification-campaigns/{campaignId}", authenticated: true },
   "postAdminSearchReindex": { method: "POST", path: "/api/v1/admin/search/reindex", authenticated: true },
   "postAssessment": { method: "POST", path: "/api/v1/assessment", authenticated: true },
   "getAssessmentDefinition": { method: "GET", path: "/api/v1/assessment/definition", authenticated: false },

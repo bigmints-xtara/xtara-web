@@ -35,6 +35,7 @@ export function safeNotificationHref(route: string | null | undefined): string |
   const read = route.match(/^\/learn\/good-reads\/([A-Za-z0-9_-]{1,160})$/);
   if (read) return `/dashboard/good-reads/${read[1]}`;
   if (/^\/learn\/challenges\/[A-Za-z0-9_-]{1,160}$/.test(route)) return "/dashboard/challenges";
+  if (route === "/games") return "/learn";
 
   const exact = [
     "/achievements",

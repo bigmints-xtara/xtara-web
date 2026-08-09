@@ -7,6 +7,7 @@ describe("safeNotificationHref", () => {
     expect(safeNotificationHref("/dashboard/sparks/spark-1")).toBe("/dashboard/sparks/spark-1");
     expect(safeNotificationHref("/learn/sparks/spark-1")).toBe("/dashboard/sparks/spark-1");
     expect(safeNotificationHref("/learn")).toBe("/learn");
+    expect(safeNotificationHref("/games")).toBe("/learn");
     expect(safeNotificationHref("/profile")).toBe("/profile");
   });
 
