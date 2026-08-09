@@ -17,6 +17,7 @@ export const goodReadsConfig: AdminConfig<GoodRead> = {
   entityName: 'Good Read',
   entityNamePlural: 'Good Reads',
   collectionName: 'good_reads',
+  supportsApproval: true,
   createEmpty: () => ({
     title: '',
     image: '',

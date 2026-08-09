@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DreamCareerProfileCards from '@/components/careers/DreamCareerProfileCards';
-import type { Challenge, GameInstance, GoodRead, Spark, Story } from '@/types/admin';
+import type { Challenge, GameInstance, GameTemplate, GoodRead, Spark, Story } from '@/types/admin';
 import type { CuratedCareerSource, CuratedDreamCareer, FutureDirection } from '@/types/curated-career';
 
 export function StoryPreview({ entity }: { entity: Story }) {
@@ -43,6 +43,11 @@ export function SparkPreview({ entity }: { entity: Spark }) {
   return (
     <div className="mx-auto flex min-h-[28rem] max-w-3xl items-center justify-center p-6">
       <Card className="w-full overflow-hidden border-primary/20 bg-gradient-to-br from-background to-primary/5 shadow-none">
+        {entity.image ? (
+          // Admin previews accept editor-provided URLs from arbitrary content providers.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt="" className="aspect-[16/7] w-full object-cover" src={entity.image} />
+        ) : null}
         <CardContent className="p-8 sm:p-12">
           <Badge variant="secondary">{entity.type || 'Spark'}</Badge>
           <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl">{entity.title}</h1>
@@ -79,6 +84,11 @@ export function GamePreview({ entity }: { entity: GameInstance }) {
   return (
     <div className="mx-auto max-w-3xl p-6 sm:p-10">
       <Card className="overflow-hidden shadow-none">
+        {entity.image ? (
+          // Admin previews accept editor-provided URLs from arbitrary content providers.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img alt="" className="aspect-[16/7] w-full object-cover" src={entity.image} />
+        ) : null}
         <div className="bg-primary px-6 py-10 text-primary-foreground sm:px-10">
           <Badge className="border-white/20 bg-white/10 text-white" variant="outline">{entity.mode}</Badge>
           <h1 className="mt-5 text-3xl font-semibold tracking-tight">{entity.title}</h1>
@@ -89,6 +99,15 @@ export function GamePreview({ entity }: { entity: GameInstance }) {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export function GameTemplatePreview({ entity }: { entity: GameTemplate }) {
+  return (
+    <PreviewArticle image={entity.thumbnail} kicker={`Game template · ${entity.mode}`} title={entity.title}>
+      <RichText value={entity.description} />
+      <section><h2 className="text-sm font-semibold">Configuration</h2><pre className="mt-3 overflow-x-auto rounded-xl border bg-muted/30 p-4 text-xs">{JSON.stringify(entity.config || {}, null, 2)}</pre></section>
+    </PreviewArticle>
   );
 }
 

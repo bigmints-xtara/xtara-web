@@ -8,7 +8,7 @@ describe('admin content registry', () => {
 
   it('covers every content type exposed in admin navigation', () => {
     expect(Object.keys(ADMIN_CONTENT_DEFINITIONS)).toEqual([
-      'stories', 'good-reads', 'sparks', 'challenges', 'games',
+      'stories', 'good-reads', 'sparks', 'challenges', 'games', 'game-templates',
       'dream-careers', 'future-directions', 'career-sources',
     ]);
   });

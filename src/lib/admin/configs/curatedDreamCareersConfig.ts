@@ -1,5 +1,5 @@
 import type { AdminConfig, EntityStatus } from '@/types/admin';
-import type { CuratedDreamCareer } from '@/types/curated-career';
+import type { CareerRoleTranslation, CuratedDreamCareer } from '@/types/curated-career';
 
 export const curatedDreamCareersConfig: AdminConfig<CuratedDreamCareer> = {
   entityName: 'Dream Career',
@@ -54,7 +54,7 @@ export function createEmptyDreamCareer(): Omit<CuratedDreamCareer, 'id'> {
   };
 }
 
-function emptyTranslation() {
+function emptyTranslation(): CareerRoleTranslation {
   return {
     title: '', summary: '', dailyWork: [], workSetting: '', pathway: '',
     tradeoffs: [], specializations: [], tryThis: '',
@@ -65,15 +65,17 @@ function normalizeDreamCareer(data: Record<string, unknown>, id: string): Curate
   const empty = createEmptyDreamCareer();
   const legacyTitle = String(data.title || data.careerName || '');
   const legacyDescription = String(data.description || data.whatYouDo || '');
+  const translations = isRecord(data.translations) ? data.translations : {};
   return {
     ...empty,
     ...data,
     id,
     slug: String(data.slug || id),
-    translations: data.translations as CuratedDreamCareer['translations'] || {
-      en: { ...empty.translations.en, title: legacyTitle, summary: legacyDescription },
-      ml: empty.translations.ml,
-      hi: empty.translations.hi,
+    translations: {
+      en: normalizeTranslation(translations.en, legacyTitle, legacyDescription),
+      ml: normalizeTranslation(translations.ml),
+      hi: normalizeTranslation(translations.hi),
+      ...(translations.ta ? { ta: normalizeTranslation(translations.ta) } : {}),
     },
     futureDirectionIds: (data.futureDirectionIds as string[]) || (data.career_clusters as string[]) || [],
     primaryFutureDirectionId: String(data.primaryFutureDirectionId || (data.careerCluster as string) || ''),
@@ -91,6 +93,27 @@ function normalizeDreamCareer(data: Record<string, unknown>, id: string): Curate
       origin: 'legacy_migration', sourceVersion: 'unknown-legacy', sourceIds: [], legacyDocumentIds: [id],
     },
   } as CuratedDreamCareer;
+}
+
+function normalizeTranslation(value: unknown, fallbackTitle = '', fallbackSummary = ''): CareerRoleTranslation {
+  const translation = isRecord(value) ? value : {};
+  return {
+    ...emptyTranslation(),
+    ...translation,
+    title: typeof translation.title === 'string' ? translation.title : fallbackTitle,
+    summary: typeof translation.summary === 'string' ? translation.summary : fallbackSummary,
+    dailyWork: stringArray(translation.dailyWork),
+    tradeoffs: stringArray(translation.tradeoffs),
+    specializations: stringArray(translation.specializations),
+  } as CareerRoleTranslation;
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
 function validateDreamCareer(entity: Partial<CuratedDreamCareer>): string | null {

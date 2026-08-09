@@ -20,6 +20,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/good-reads': 'Good reads',
   '/admin/sparks': 'Sparks',
   '/admin/games': 'Games',
+  '/admin/game-templates': 'Game templates',
   '/admin/colleges': 'College catalogue',
   '/admin/dream-careers': 'Dream careers',
   '/admin/future-directions': 'Future directions',

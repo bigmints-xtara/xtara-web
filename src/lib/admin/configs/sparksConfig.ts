@@ -4,6 +4,7 @@ export const sparksConfig: AdminConfig<Spark> = {
   entityName: 'Spark',
   entityNamePlural: 'Sparks',
   collectionName: 'sparks',
+  supportsApproval: true,
 
   createEmpty: () => ({
     title: '',

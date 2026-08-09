@@ -20,6 +20,7 @@ export const challengesConfig: AdminConfig<Challenge> = {
   entityName: 'Challenge',
   entityNamePlural: 'Challenges',
   collectionName: 'challenges',
+  supportsApproval: true,
   createEmpty: () => ({
     title: '',
     image: '',

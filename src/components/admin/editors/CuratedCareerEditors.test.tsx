@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import exampleProfile from '../../../../../xtara-factory/campaigns/manual/cybersecurity-analyst.enrichment-v3.manual-curation.json';
+import exampleProfile from '../../../../../xtara-api/scripts/fixtures/cybersecurity-analyst.detail-profile-v3.json';
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
 import type { DreamCareerDetailProfileReview, DreamCareerDetailProfileV3 } from '@/types/dream-career-detail-profile';
 import DreamCareerDetailProfileEditor, { createEmptyProfile, validateAdminProfile } from './DreamCareerDetailProfileEditor';
@@ -78,7 +78,7 @@ describe('curated career admin editors', () => {
         onChange={() => undefined}
       />,
     );
-    expect(html).toContain('Awaiting Xtara Factory processing');
+    expect(html).toContain('Awaiting processing metadata');
     expect(html).not.toContain('Processing version');
   });
 

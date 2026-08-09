@@ -4,6 +4,7 @@ export const storiesConfig: AdminConfig<Story> = {
   entityName: 'Story',
   entityNamePlural: 'Stories',
   collectionName: 'stories',
+  supportsApproval: true,
 
   createEmpty: () => ({
     title: '',

@@ -11,7 +11,11 @@
     "stepOf": "Step {current} of {total}",
     "back": "Back",
     "next": "Next",
-    "finish": "मेरी Career Directions देखें",
+    "finish": "नतीजे देखें",
+    "exit": "बाहर निकलें",
+    "exitTitle": "बाहर निकलें?",
+    "exitDescription": "Assessment छोड़ें? आप बाद में लौटकर जारी रख सकते हैं।",
+    "stay": "यहीं रहें",
     "chooseUpTo": "{count} तक चुनें",
     "textPlaceholder": "अपना answer यहाँ लिखें",
     "gradeQuestion": {

@@ -49,6 +49,7 @@ const groups: Array<{ label: string; items: NavItem[] }> = [
       { name: 'Sparks', href: '/admin/sparks', icon: Sparkles },
       { name: 'Challenges', href: '/admin/challenges', icon: Trophy },
       { name: 'Games', href: '/admin/games', icon: Gamepad2 },
+      { name: 'Game templates', href: '/admin/game-templates', icon: Gamepad2 },
     ],
   },
   {

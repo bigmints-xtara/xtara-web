@@ -75,10 +75,10 @@ describe('Dream Career college mappings', () => {
   it('loads mapped colleges directly on the Dream Career page', async () => {
     render(<DreamCareerPage />);
 
-    expect(await screen.findByRole('heading', { name: 'Colleges for this Dream Career' })).toBeInTheDocument();
-    expect(await screen.findByText('National Institute of Design')).toBeInTheDocument();
-    expect(screen.getAllByText('Bachelor of Design').length).toBeGreaterThan(0);
-    expect(screen.getByRole('link', { name: /View college/ })).toHaveAttribute('href', '/colleges/institution%3Adesign-1');
+    expect(await screen.findByRole('heading', { name: 'Courses to learn' })).toBeInTheDocument();
+    expect(await screen.findByText('National Institute of Design · Ahmedabad')).toBeInTheDocument();
+    expect(screen.getByText('Bachelor of Design')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'National Institute of Design · Ahmedabad' })).toHaveAttribute('href', '/colleges/institution%3Adesign-1');
     expect(mocks.searchColleges).toHaveBeenCalledWith('ux-designer', 6);
   });
 

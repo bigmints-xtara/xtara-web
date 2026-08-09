@@ -195,10 +195,10 @@ function toLearnItem(
     };
   }
   if (section === "sparks") {
-    return { id: `spark-${record.id}`, contentId: record.id, title, kind, href: `/dashboard/sparks/${record.id}`, image: stringValue(record.image) };
+    return { id: `spark-${record.id}`, contentId: record.id, title, kind, href: `/dashboard/sparks/${record.id}`, image: contentCover(record) };
   }
   if (section === "games") {
-    return { id: `game-${record.id}`, contentId: record.id, title, kind, opensDownload: true, meta: stringValue(record.mode), image: stringValue(record.image) };
+    return { id: `game-${record.id}`, contentId: record.id, title, kind, opensDownload: true, meta: stringValue(record.mode), image: contentCover(record) };
   }
   if (section === "challenges") {
     const points = Number(record.points);
@@ -242,6 +242,19 @@ function stringArray(value: unknown): string[] {
 
 function stringValue(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function contentCover(record: Record<string, unknown>): string | undefined {
+  const direct = stringValue(record.image);
+  if (direct) return direct;
+  const content = record.content;
+  if (content && !Array.isArray(content) && typeof content === "object") {
+    return stringValue((content as Record<string, unknown>).coverImage);
+  }
+  if (Array.isArray(content) && content[0] && typeof content[0] === "object") {
+    return stringValue((content[0] as Record<string, unknown>).coverImage);
+  }
+  return undefined;
 }
 
 function cleanTitle(title: string) {

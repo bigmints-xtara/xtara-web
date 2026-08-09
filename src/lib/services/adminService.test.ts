@@ -17,6 +17,9 @@ describe('AdminService pagination', () => {
         title: 'Page two game',
         mode: 'quiz',
         isPublished: false,
+        published: false,
+        draft: true,
+        inReview: false,
         schedule: {
           startDateTime: '2026-07-22T08:00:00.000Z',
           endDateTime: '2026-07-29T08:00:00.000Z',

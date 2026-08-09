@@ -36,6 +36,7 @@ export interface Story extends AdminEntity, ContentTagFields {
 
 export interface Spark extends AdminEntity, ContentTagFields {
   title: string;
+  image?: string;
   type: string;
   published: boolean;
   draft: boolean;
@@ -46,12 +47,29 @@ export interface Spark extends AdminEntity, ContentTagFields {
 
 export interface GameInstance extends AdminEntity, ContentTagFields {
   title: string;
-  mode: 'quiz' | 'puzzle' | 'memory';
+  image?: string;
+  mode: 'quiz' | 'puzzle' | 'memory' | 'simulation';
   isPublished: boolean;
+  published: boolean;
+  draft: boolean;
+  inReview: boolean;
+  content?: Record<string, unknown>;
+  embeddedQuestions?: Array<Record<string, unknown>>;
   schedule: {
     startDateTime: Date;
     endDateTime: Date;
   };
+}
+
+export interface GameTemplate extends AdminEntity, ContentTagFields {
+  title: string;
+  description: string;
+  mode: 'quiz' | 'puzzle' | 'memory' | 'simulation';
+  config: Record<string, unknown>;
+  thumbnail?: string;
+  published: boolean;
+  draft: boolean;
+  inReview: boolean;
 }
 
 export interface GoodRead extends AdminEntity, ContentTagFields {

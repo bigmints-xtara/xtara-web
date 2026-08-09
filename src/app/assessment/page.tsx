@@ -218,6 +218,7 @@ function AssessmentJourney() {
             saveAssessmentDraft(selectedStage ?? effectiveStage ?? "grade8", answers);
           }}
           onComplete={handleComplete}
+          onExit={() => router.push("/")}
         />
       </main>
     </div>

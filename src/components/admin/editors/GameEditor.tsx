@@ -131,6 +131,7 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
                 <option value="quiz">Quiz</option>
                 <option value="puzzle">Puzzle</option>
                 <option value="memory">Memory</option>
+                <option value="simulation">Simulation</option>
               </select>
             </div>
 

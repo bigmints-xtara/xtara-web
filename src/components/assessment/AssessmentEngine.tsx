@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ interface AssessmentEngineProps {
     isRetake?: boolean;
     initialAnswers?: AssessmentAnswers;
     onAnswersChange?: (answers: AssessmentAnswers) => void;
+    onExit?: () => void;
     labels?: AssessmentEngineLabels;
 }
 
@@ -32,17 +33,25 @@ export interface AssessmentEngineLabels {
     noQuestions: string;
     textPlaceholder: string;
     chooseGrade: string;
+    exit: string;
+    exitTitle: string;
+    exitDescription: string;
+    stay: string;
 }
 
 const defaultLabels: AssessmentEngineLabels = {
     stepOf: "Step {current} of {total}",
     back: "Back",
     next: "Next",
-    finish: "See my exploration map",
+    finish: "See Results",
     chooseUpTo: "Choose up to {count}",
     noQuestions: "No questions are available for this journey.",
     textPlaceholder: "Type your answer here",
     chooseGrade: "First, choose your grade",
+    exit: "Exit",
+    exitTitle: "Exit assessment?",
+    exitDescription: "Leave this assessment? You can return and continue later.",
+    stay: "Stay",
 };
 
 export default function AssessmentEngine({
@@ -51,6 +60,7 @@ export default function AssessmentEngine({
     isRetake = false,
     initialAnswers = {},
     onAnswersChange,
+    onExit,
     labels = defaultLabels,
 }: AssessmentEngineProps) {
     const [currentIndex, setCurrentIndex] = useState(() => {
@@ -63,6 +73,7 @@ export default function AssessmentEngine({
             : firstIncomplete;
     });
     const [answers, setAnswers] = useState<AssessmentAnswers>(initialAnswers);
+    const [confirmingExit, setConfirmingExit] = useState(false);
 
     const visibleQuestions = useMemo(
         () => getVisibleAssessmentQuestions(questions, answers, isRetake),
@@ -119,16 +130,27 @@ export default function AssessmentEngine({
 
             <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
                 <div className="mx-auto flex max-w-2xl items-center gap-3">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setCurrentIndex(Math.max(0, safeIndex - 1))}
-                        disabled={safeIndex === 0}
-                        className="min-h-12 shrink-0 rounded-xl px-4"
-                    >
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        {labels.back}
-                    </Button>
+                    {safeIndex === 0 ? (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setConfirmingExit(true)}
+                            className="min-h-12 shrink-0 rounded-xl px-4"
+                        >
+                            <X className="mr-2 h-4 w-4" />
+                            {labels.exit}
+                        </Button>
+                    ) : (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setCurrentIndex(safeIndex - 1)}
+                            className="min-h-12 shrink-0 rounded-xl px-4"
+                        >
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            {labels.back}
+                        </Button>
+                    )}
                     <Button
                         type="button"
                         onClick={handleNext}
@@ -141,6 +163,23 @@ export default function AssessmentEngine({
                     </Button>
                 </div>
             </div>
+            {confirmingExit ? (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
+                    <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="assessment-exit-title"
+                        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+                    >
+                        <h2 id="assessment-exit-title" className="text-xl font-semibold text-primary">{labels.exitTitle}</h2>
+                        <p className="mt-3 text-sm leading-6 text-slate-600">{labels.exitDescription}</p>
+                        <div className="mt-6 flex justify-end gap-3">
+                            <Button type="button" variant="ghost" onClick={() => setConfirmingExit(false)}>{labels.stay}</Button>
+                            <Button type="button" onClick={onExit}>{labels.exit}</Button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 }

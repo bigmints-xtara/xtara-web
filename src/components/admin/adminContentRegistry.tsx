@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import ChallengeEditor from '@/components/admin/editors/ChallengeEditor';
 import { CareerSourceEditor, DreamCareerEditor, FutureDirectionEditor } from '@/components/admin/editors/CuratedCareerEditors';
 import GameEditor from '@/components/admin/editors/GameEditor';
+import GameTemplateEditor from '@/components/admin/editors/GameTemplateEditor';
 import GoodReadEditor from '@/components/admin/editors/GoodReadEditor';
 import SparkEditor from '@/components/admin/editors/SparkEditor';
 import StoryEditor from '@/components/admin/editors/StoryEditor';
@@ -11,10 +12,11 @@ import { challengesConfig } from '@/lib/admin/configs/challengesConfig';
 import { curatedDreamCareersConfig } from '@/lib/admin/configs/curatedDreamCareersConfig';
 import { futureDirectionsConfig } from '@/lib/admin/configs/futureDirectionsConfig';
 import { gamesConfig } from '@/lib/admin/configs/gamesConfig';
+import { gameTemplatesConfig } from '@/lib/admin/configs/gameTemplatesConfig';
 import { goodReadsConfig } from '@/lib/admin/configs/goodReadsConfig';
 import { sparksConfig } from '@/lib/admin/configs/sparksConfig';
 import { storiesConfig } from '@/lib/admin/configs/storiesConfig';
-import type { AdminConfig, AdminEntity, Challenge, GameInstance, GoodRead, Spark, Story } from '@/types/admin';
+import type { AdminConfig, AdminEntity, Challenge, GameInstance, GameTemplate, GoodRead, Spark, Story } from '@/types/admin';
 import type { CuratedCareerSource, CuratedDreamCareer, FutureDirection } from '@/types/curated-career';
 import {
   CareerSourcePreview,
@@ -22,6 +24,7 @@ import {
   DreamCareerPreview,
   FutureDirectionPreview,
   GamePreview,
+  GameTemplatePreview,
   GoodReadPreview,
   SparkPreview,
   StoryPreview,
@@ -81,6 +84,11 @@ export const ADMIN_CONTENT_DEFINITIONS: Record<string, AdminContentDefinition> =
     slug: 'games', config: gamesConfig,
     editor: (entity, onSave, onCancel) => <GameEditor game={entity} onCancel={onCancel} onSave={onSave} />,
     preview: (entity) => <GamePreview entity={entity} />,
+  }),
+  'game-templates': defineContent<GameTemplate>({
+    slug: 'game-templates', config: gameTemplatesConfig,
+    editor: (entity, onSave, onCancel) => <GameTemplateEditor onCancel={onCancel} onSave={onSave} template={entity} />,
+    preview: (entity) => <GameTemplatePreview entity={entity} />,
   }),
   'dream-careers': defineContent<CuratedDreamCareer>({
     slug: 'dream-careers', config: curatedDreamCareersConfig,
