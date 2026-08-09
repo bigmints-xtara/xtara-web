@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteUser, sendEmailVerification, signOut } from "firebase/auth";
 import {
-  BadgeCheck, Bell, Building2, Check, ChevronLeft, ChevronRight, FileText, GraduationCap, HelpCircle, Info, Languages, Loader2, LockKeyhole, LogOut,
+  BadgeCheck, Building2, Check, ChevronLeft, ChevronRight, FileText, GraduationCap, HelpCircle, Info, Languages, Loader2, LockKeyhole, LogOut,
   Palette, Pencil, Plus, Settings, ShieldCheck, Trash2, User, X,
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -43,10 +43,10 @@ const scholarshipOptions = ["Yes, show scholarships and financial aid", "Maybe, 
 const standardSubjects = ["Mathematics", "Science", "English", "Malayalam", "Hindi", "Social Science", "Computer Science", "Physics", "Chemistry", "Biology", "History", "Geography", "Economics", "Business Studies", "Accountancy", "Political Science", "Psychology", "Physical Education"];
 
 const structureCopy = {
-  en: { learner: "Learner information", learnerHelp: "Personal and academic details Xtara holds for you.", preferences: "Preferences", preferencesHelp: "Choose appearance, language, and learning notifications.", appearance: "Appearance", system: "System", light: "Light", dark: "Dark", notifications: "Learning notifications", support: "Support and legal", supportHelp: "Get help and read the policies that apply to your account.", help: "Help and support", about: "About Xtara", privacy: "Privacy Policy", terms: "Terms of Use", savePreferenceError: "We could not save that preference. Try again." },
-  ml: { learner: "വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ", learnerHelp: "Xtara സൂക്ഷിക്കുന്ന വ്യക്തിഗതവും പഠനവുമായി ബന്ധപ്പെട്ടതുമായ വിവരങ്ങൾ.", preferences: "മുൻഗണനകൾ", preferencesHelp: "രൂപം, ഭാഷ, പഠന അറിയിപ്പുകൾ എന്നിവ തിരഞ്ഞെടുക്കൂ.", appearance: "രൂപം", system: "സിസ്റ്റം", light: "ലൈറ്റ്", dark: "ഡാർക്ക്", notifications: "പഠന അറിയിപ്പുകൾ", support: "സഹായവും നിയമ വിവരങ്ങളും", supportHelp: "സഹായം നേടുകയും അക്കൗണ്ടിന് ബാധകമായ നയങ്ങൾ വായിക്കുകയും ചെയ്യൂ.", help: "സഹായം", about: "Xtara-യെക്കുറിച്ച്", privacy: "സ്വകാര്യതാ നയം", terms: "ഉപയോഗ നിബന്ധനകൾ", savePreferenceError: "മുൻഗണന സേവ് ചെയ്യാനായില്ല. വീണ്ടും ശ്രമിക്കൂ." },
-  hi: { learner: "विद्यार्थी की जानकारी", learnerHelp: "Xtara में रखी आपकी व्यक्तिगत और पढ़ाई की जानकारी।", preferences: "पसंद", preferencesHelp: "रूप, भाषा और सीखने की सूचनाएँ चुनें।", appearance: "रूप", system: "सिस्टम", light: "लाइट", dark: "डार्क", notifications: "सीखने की सूचनाएँ", support: "सहायता और कानूनी जानकारी", supportHelp: "मदद पाएँ और अपने खाते से जुड़ी नीतियाँ पढ़ें।", help: "मदद और सहायता", about: "Xtara के बारे में", privacy: "गोपनीयता नीति", terms: "उपयोग की शर्तें", savePreferenceError: "यह पसंद सेव नहीं हो सकी। फिर कोशिश करें।" },
-  ta: { learner: "கற்றவர் தகவல்", learnerHelp: "Xtara வைத்திருக்கும் உங்கள் தனிப்பட்ட மற்றும் கல்வித் தகவல்.", preferences: "விருப்பங்கள்", preferencesHelp: "தோற்றம், மொழி மற்றும் கற்றல் அறிவிப்புகளைத் தேர்ந்தெடுக்கவும்.", appearance: "தோற்றம்", system: "சிஸ்டம்", light: "லைட்", dark: "டார்க்", notifications: "கற்றல் அறிவிப்புகள்", support: "உதவி மற்றும் சட்ட தகவல்", supportHelp: "உதவி பெற்று உங்கள் கணக்கிற்கான கொள்கைகளைப் படிக்கவும்.", help: "உதவி மற்றும் ஆதரவு", about: "Xtara பற்றி", privacy: "தனியுரிமைக் கொள்கை", terms: "பயன்பாட்டு விதிமுறைகள்", savePreferenceError: "இந்த விருப்பத்தைச் சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்." },
+  en: { learner: "Learner information", learnerHelp: "Personal and academic details Xtara holds for you.", preferences: "Preferences", preferencesHelp: "Choose your appearance and language.", appearance: "Appearance", system: "System", light: "Light", dark: "Dark", support: "Support and legal", supportHelp: "Get help and read the policies that apply to your account.", help: "Help and support", about: "About Xtara", privacy: "Privacy Policy", terms: "Terms of Use", savePreferenceError: "We could not save that preference. Try again." },
+  ml: { learner: "വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ", learnerHelp: "Xtara സൂക്ഷിക്കുന്ന വ്യക്തിഗതവും പഠനവുമായി ബന്ധപ്പെട്ടതുമായ വിവരങ്ങൾ.", preferences: "മുൻഗണനകൾ", preferencesHelp: "രൂപവും ഭാഷയും തിരഞ്ഞെടുക്കൂ.", appearance: "രൂപം", system: "സിസ്റ്റം", light: "ലൈറ്റ്", dark: "ഡാർക്ക്", support: "സഹായവും നിയമ വിവരങ്ങളും", supportHelp: "സഹായം നേടുകയും അക്കൗണ്ടിന് ബാധകമായ നയങ്ങൾ വായിക്കുകയും ചെയ്യൂ.", help: "സഹായം", about: "Xtara-യെക്കുറിച്ച്", privacy: "സ്വകാര്യതാ നയം", terms: "ഉപയോഗ നിബന്ധനകൾ", savePreferenceError: "മുൻഗണന സേവ് ചെയ്യാനായില്ല. വീണ്ടും ശ്രമിക്കൂ." },
+  hi: { learner: "विद्यार्थी की जानकारी", learnerHelp: "Xtara में रखी आपकी व्यक्तिगत और पढ़ाई की जानकारी।", preferences: "पसंद", preferencesHelp: "रूप और भाषा चुनें।", appearance: "रूप", system: "सिस्टम", light: "लाइट", dark: "डार्क", support: "सहायता और कानूनी जानकारी", supportHelp: "मदद पाएँ और अपने खाते से जुड़ी नीतियाँ पढ़ें।", help: "मदद और सहायता", about: "Xtara के बारे में", privacy: "गोपनीयता नीति", terms: "उपयोग की शर्तें", savePreferenceError: "यह पसंद सेव नहीं हो सकी। फिर कोशिश करें।" },
+  ta: { learner: "கற்றவர் தகவல்", learnerHelp: "Xtara வைத்திருக்கும் உங்கள் தனிப்பட்ட மற்றும் கல்வித் தகவல்.", preferences: "விருப்பங்கள்", preferencesHelp: "தோற்றத்தையும் மொழியையும் தேர்ந்தெடுக்கவும்.", appearance: "தோற்றம்", system: "சிஸ்டம்", light: "லைட்", dark: "டார்க்", support: "உதவி மற்றும் சட்ட தகவல்", supportHelp: "உதவி பெற்று உங்கள் கணக்கிற்கான கொள்கைகளைப் படிக்கவும்.", help: "உதவி மற்றும் ஆதரவு", about: "Xtara பற்றி", privacy: "தனியுரிமைக் கொள்கை", terms: "பயன்பாட்டு விதிமுறைகள்", savePreferenceError: "இந்த விருப்பத்தைச் சேமிக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்." },
 } as const;
 
 const hubCopy = {
@@ -543,7 +543,6 @@ function ProfilePreferences({ locale }: { locale: keyof typeof structureCopy }) 
   const text = structureCopy[locale];
   const [preferences, setPreferences] = useState<Record<string, unknown>>({});
   const [theme, setTheme] = useState("system");
-  const [notifications, setNotifications] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -557,7 +556,6 @@ function ProfilePreferences({ locale }: { locale: keyof typeof structureCopy }) 
         const nextTheme = next.theme === "light" || next.theme === "dark" ? next.theme : "system";
         setPreferences(next);
         setTheme(nextTheme);
-        setNotifications(typeof next.notifications === "boolean" ? next.notifications : true);
         applyTheme(nextTheme);
       })
       .catch(() => undefined)
@@ -587,16 +585,10 @@ function ProfilePreferences({ locale }: { locale: keyof typeof structureCopy }) 
     void savePreferences({ theme: next });
   };
 
-  const changeNotifications = (enabled: boolean) => {
-    setNotifications(enabled);
-    void savePreferences({ notifications: enabled });
-  };
-
   return <ProfileCard id="preferences" icon={Palette} title={text.preferences} description={text.preferencesHelp}>
     <div className="divide-y divide-primary/10 rounded-2xl border border-primary/10">
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><Palette className="h-5 w-5 text-primary" /><span className="text-sm font-semibold text-primary">{text.appearance}</span></div><div className="w-full sm:w-48"><Choice value={theme} options={["system", "light", "dark"]} placeholder={text.system} getLabel={(value) => value === "light" ? text.light : value === "dark" ? text.dark : text.system} onChange={changeTheme} disabled={loading || saving} /></div></div>
       <div className="flex items-center justify-between gap-4 p-4"><div className="flex items-center gap-3"><Languages className="h-5 w-5 text-primary" /><span className="text-sm font-semibold text-primary">Language</span></div><LanguageSwitcher /></div>
-      <label className="flex cursor-pointer items-center justify-between gap-4 p-4"><span className="flex items-center gap-3"><Bell className="h-5 w-5 text-primary" /><span className="text-sm font-semibold text-primary">{text.notifications}</span></span><input type="checkbox" checked={notifications} disabled={loading || saving} onChange={(event) => changeNotifications(event.target.checked)} className="h-5 w-5 accent-primary" /></label>
     </div>
     {saving ? <p role="status" className="mt-3 text-sm text-muted-foreground">Saving…</p> : null}
     {error ? <p role="alert" className="mt-3 text-sm text-red-700">{error}</p> : null}

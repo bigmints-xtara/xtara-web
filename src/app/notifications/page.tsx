@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, CheckCircle2, ChevronRight, Loader2, RefreshCw, Settings, X } from "lucide-react";
+import { Bell, CheckCircle2, ChevronRight, Loader2, RefreshCw, X } from "lucide-react";
 
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
@@ -48,7 +47,7 @@ export default function NotificationsPage() {
       {loading || (user && inbox.isLoading) ? <InboxState icon={<Loader2 className="h-12 w-12 animate-spin" />} title={text.loading} /> : null}
       {!loading && user && inbox.isError ? <InboxState icon={<Bell className="h-12 w-12" />} title={text.loadError}><Button onClick={() => inbox.refetch()} variant="outline" className="mt-6 rounded-full"><RefreshCw className="h-4 w-4" />{text.retry}</Button></InboxState> : null}
       {actions.read.isError || actions.dismiss.isError ? <p role="alert" className="mt-6 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800 dark:bg-red-950/40 dark:text-red-200">{text.updateError}</p> : null}
-      {!loading && user && inbox.isSuccess && visible.length === 0 ? <InboxState icon={<CheckCircle2 className="h-14 w-14" />} title={text.caughtUp} description={text.empty}><Button asChild variant="outline" className="mt-6 rounded-full"><Link href="/profile#preferences"><Settings className="h-4 w-4" />{text.settings}</Link></Button></InboxState> : null}
+      {!loading && user && inbox.isSuccess && visible.length === 0 ? <InboxState icon={<CheckCircle2 className="h-14 w-14" />} title={text.caughtUp} description={text.empty} /> : null}
 
       {!loading && user && visible.length > 0 ? <section className="mt-8 space-y-3" aria-live="polite">
         {visible.map((item) => {
