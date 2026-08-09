@@ -398,6 +398,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
     print_info "  --min-instances 0 \\"
     print_info "  --max-instances 10 \\"
     print_info "  --timeout 60s \\"
+    print_info "  --to-latest \\"
     print_info "  --service-account firebase-adminsdk-fbsvc@${PROJECT_ID}.iam.gserviceaccount.com \\"
     if [[ "$USE_SECRETS" == "true" && -n "$SECRET_DEPLOY_FLAGS" ]]; then
         print_info "  --update-secrets $(echo $SECRET_DEPLOY_FLAGS | xargs | sed 's/ /\\ /g') \\"
@@ -416,6 +417,7 @@ else
             --min-instances 0 \
             --max-instances 10 \
             --timeout 60s \
+            --to-latest \
             --service-account "firebase-adminsdk-fbsvc@${PROJECT_ID}.iam.gserviceaccount.com" \
             --update-secrets $SECRET_DEPLOY_FLAGS \
             --project "$PROJECT_ID"
@@ -431,6 +433,7 @@ else
             --min-instances 0 \
             --max-instances 10 \
             --timeout 60s \
+            --to-latest \
             --service-account "firebase-adminsdk-fbsvc@${PROJECT_ID}.iam.gserviceaccount.com" \
             --project "$PROJECT_ID"
     fi
