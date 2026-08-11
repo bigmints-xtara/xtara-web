@@ -61,6 +61,8 @@ export const XTARA_API_OPERATIONS = {
   "putMeAcademicPeriod": { method: "PUT", path: "/api/v1/me/academic-period", authenticated: true },
   "getMeCurrentCareer": { method: "GET", path: "/api/v1/me/current-career", authenticated: true },
   "putMeCurrentCareer": { method: "PUT", path: "/api/v1/me/current-career", authenticated: true },
+  "deleteMeDeviceInstallationsInstallationId": { method: "DELETE", path: "/api/v1/me/device-installations/{installationId}", authenticated: true },
+  "putMeDeviceInstallationsInstallationId": { method: "PUT", path: "/api/v1/me/device-installations/{installationId}", authenticated: true },
   "getMeDirection": { method: "GET", path: "/api/v1/me/direction", authenticated: true },
   "putMeDirection": { method: "PUT", path: "/api/v1/me/direction", authenticated: true },
   "getMeEngagementProgress": { method: "GET", path: "/api/v1/me/engagement-progress", authenticated: true },
