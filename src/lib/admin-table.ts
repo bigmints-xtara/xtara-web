@@ -34,6 +34,10 @@ export type AdminBulkResult = {
   failed: Array<{ id: string; title?: string; code: string; message: string }>;
 };
 
+export type AdminTableQueryConstraints = {
+  sortFields?: readonly string[];
+};
+
 export function adminTableQueryParams(query: AdminTableQuery): URLSearchParams {
   const params = new URLSearchParams({
     page: String(query.page), pageSize: String(query.pageSize), search: query.search,
@@ -46,27 +50,45 @@ export function adminTableQueryParams(query: AdminTableQuery): URLSearchParams {
   return params;
 }
 
-export function parseAdminTableQueryParams(params: URLSearchParams, defaults: AdminTableQuery): AdminTableQuery {
+export function parseAdminTableQueryParams(
+  params: URLSearchParams,
+  defaults: AdminTableQuery,
+  constraints: AdminTableQueryConstraints = {},
+): AdminTableQuery {
   const page = Number(params.get('page'));
   const requestedSize = Number(params.get('pageSize'));
   const pageSize = ([10, 20, 25, 50, 100] as const).find((size) => size === requestedSize) || defaults.pageSize;
   const filters: Record<string, string[]> = {};
   for (const key of Array.from(new Set(params.keys()))) if (key.startsWith('filter.')) filters[key.slice(7)] = params.getAll(key);
+  const requestedSort = params.get('sort');
+  const sortSupported = !requestedSort
+    || !constraints.sortFields
+    || constraints.sortFields.includes(requestedSort);
+  const sort = sortSupported
+    ? {
+        field: requestedSort || defaults.sort.field,
+        direction: params.get('direction') === 'asc' || params.get('direction') === 'desc'
+          ? params.get('direction') as 'asc' | 'desc'
+          : defaults.sort.direction,
+      }
+    : defaults.sort;
   return {
     page: Number.isSafeInteger(page) && page > 0 ? page : defaults.page,
     pageSize,
     search: params.get('search') || defaults.search,
     filters,
-    sort: {
-      field: params.get('sort') || defaults.sort.field,
-      direction: params.get('direction') === 'asc' || params.get('direction') === 'desc' ? params.get('direction') as 'asc' | 'desc' : defaults.sort.direction,
-    },
+    sort,
     ...(params.get('groupBy') ? { groupBy: params.get('groupBy') || undefined } : {}),
   };
 }
 
-export function useAdminTableQuery(defaults: AdminTableQuery) {
-  const [query, setQuery] = useState<AdminTableQuery>(() => typeof window === 'undefined' ? defaults : parseAdminTableQueryParams(new URLSearchParams(window.location.search), defaults));
+export function useAdminTableQuery(
+  defaults: AdminTableQuery,
+  constraints: AdminTableQueryConstraints = {},
+) {
+  const [query, setQuery] = useState<AdminTableQuery>(() => typeof window === 'undefined'
+    ? defaults
+    : parseAdminTableQueryParams(new URLSearchParams(window.location.search), defaults, constraints));
   useEffect(() => {
     const params = adminTableQueryParams(query);
     const url = `${window.location.pathname}${params.size ? `?${params.toString()}` : ''}${window.location.hash}`;

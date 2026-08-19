@@ -12,7 +12,10 @@ import { useAdminTableQuery, type AdminTableSelection } from '@/lib/admin-table'
 const EMPTY: AdminCollegeCatalogPage = { items: [], page: 1, pageSize: 25, total: 0, totalPages: 0, facets: [], groups: [], summaries: [], release: { id: '', status: '', active: false, productionReady: false }, counts: { institutions: 0, courseConcepts: 0, courseOfferings: 0, careerCourseLinks: 0 }, immutable: true };
 
 export default function AdminCollegesPage() {
-  const [query, setQuery] = useAdminTableQuery({ page: 1, pageSize: 25, search: '', filters: {}, sort: { field: 'name', direction: 'asc' } });
+  const [query, setQuery] = useAdminTableQuery(
+    { page: 1, pageSize: 25, search: '', filters: {}, sort: { field: 'name', direction: 'asc' } },
+    { sortFields: ['name', 'city', 'state', 'type', 'providerId'] },
+  );
   const [catalog, setCatalog] = useState(EMPTY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
