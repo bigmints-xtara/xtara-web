@@ -1,6 +1,7 @@
 import type { AdminEntity } from '@/types/admin';
 import type {
   DreamCareerDetailProfileReview,
+  DreamCareerDetailProfileTranslations,
   DreamCareerDetailProfileV3,
 } from '@/types/dream-career-detail-profile';
 
@@ -106,6 +107,19 @@ export interface CuratedDreamCareer extends AdminEntity {
   growthOutlook?: string;
   detailProfile?: DreamCareerDetailProfileV3;
   detailProfileReview?: DreamCareerDetailProfileReview;
+  detailProfileTranslations?: DreamCareerDetailProfileTranslations;
+  translationOperation?: {
+    schemaVersion: 1;
+    operation: 'dream-career-translation';
+    sourceReleaseId: string;
+    sourceTaskId: string;
+    sourceCareerId: string;
+    sourceSha256: string;
+    translationSha256: string;
+    runId: string;
+    idempotencyKey: string;
+    priorDraftId?: string;
+  };
   review: ReviewMetadata;
   provenance: ProvenanceMetadata;
 }

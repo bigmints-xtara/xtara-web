@@ -57,4 +57,32 @@ describe('curatedDreamCareersConfig', () => {
     expect(career.translations.en.tradeoffs).toEqual([]);
     expect(career.translations.en.specializations).toEqual(['Biomechanics']);
   });
+
+  it('shows translation coverage, source release, and run in Admin list rows', () => {
+    const localized = (title: string) => ({ title, summary: `${title} summary` });
+    const career = curatedDreamCareersConfig.fromFirestore({
+      translations: {
+        en: localized('English'),
+        ml: localized('Malayalam'),
+        hi: localized('Hindi'),
+        ta: localized('Tamil'),
+      },
+      detailProfile: { locale: 'en' },
+      detailProfileTranslations: {
+        ml: { locale: 'ml' },
+        hi: { locale: 'hi' },
+        ta: { locale: 'ta' },
+      },
+      translationOperation: {
+        sourceReleaseId: 'dream-careers-approved-52-e205d2beeb4c',
+        runId: 'run-20260819-001',
+      },
+      futureDirectionIds: ['technology'],
+      skillIds: ['analysis'],
+    }, 'translated-career');
+
+    expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
+      '4/4 languages • dream-careers-approved-52-e205d2beeb4c • run-20260819-001',
+    );
+  });
 });

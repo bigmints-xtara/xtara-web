@@ -100,6 +100,55 @@ describe('curated career admin editors', () => {
     expect(html).toContain('Outlook metrics');
   });
 
+  it('lets Admin reviewers inspect standard and rich translation coverage by locale', () => {
+    const profile = exampleProfile as DreamCareerDetailProfileV3;
+    const translated = (locale: 'ml' | 'hi' | 'ta', summary: string) => ({
+      ...structuredClone(profile),
+      locale,
+      work: { ...structuredClone(profile.work), summary },
+    });
+    const sourceReleaseId = 'dream-careers-approved-52-e205d2beeb4c';
+    const entity = {
+      ...createEmptyDreamCareer(),
+      id: profile.careerId,
+      slug: profile.careerId,
+      detailProfile: profile,
+      translations: {
+        en: { ...createEmptyDreamCareer().translations.en, title: 'Cybersecurity Analyst', summary: 'English standard summary' },
+        ml: { ...createEmptyDreamCareer().translations.en, title: 'സൈബർ സുരക്ഷാ അനലിസ്റ്റ്', summary: 'Malayalam standard summary' },
+        hi: { ...createEmptyDreamCareer().translations.en, title: 'साइबर सुरक्षा विश्लेषक', summary: 'Hindi standard summary' },
+        ta: { ...createEmptyDreamCareer().translations.en, title: 'இணையப் பாதுகாப்புப் பகுப்பாய்வாளர்', summary: 'Tamil standard summary' },
+      },
+      detailProfileTranslations: {
+        ml: translated('ml', 'Malayalam rich profile summary'),
+        hi: translated('hi', 'Hindi rich profile summary'),
+        ta: translated('ta', 'Tamil rich profile summary'),
+      },
+      translationOperation: {
+        schemaVersion: 1,
+        operation: 'dream-career-translation',
+        sourceReleaseId,
+        sourceTaskId: '019fb4e3-0bd4-7c03-b711-3ee428ac5039',
+        sourceCareerId: profile.careerId,
+        sourceSha256: 'a'.repeat(64),
+        translationSha256: 'b'.repeat(64),
+        runId: 'run-20260819-001',
+        idempotencyKey: `${sourceReleaseId}:${profile.careerId}`,
+      },
+    } as unknown as import('@/types/curated-career').CuratedDreamCareer;
+
+    render(<DreamCareerEditor entity={entity} onSave={async () => undefined} onCancel={() => undefined} />);
+
+    expect(screen.getByText('Machine translation draft — not approved')).toBeInTheDocument();
+    expect(screen.getByText('4 of 4 languages complete')).toBeInTheDocument();
+    expect(screen.getByText(sourceReleaseId)).toBeInTheDocument();
+    expect(screen.getByText('run-20260819-001')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Malayalam' }));
+    expect(screen.getAllByText('Malayalam standard summary')).not.toHaveLength(0);
+    expect(screen.getByText('Malayalam rich profile summary')).toBeInTheDocument();
+    expect(screen.getByText('Complete rich profile')).toBeInTheDocument();
+  });
+
   it('shows approval blockers until every profile source is reviewed', () => {
     const profile = exampleProfile as DreamCareerDetailProfileV3;
     const review: DreamCareerDetailProfileReview = {

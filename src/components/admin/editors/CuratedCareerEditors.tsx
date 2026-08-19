@@ -10,6 +10,7 @@ import { createEmptyFutureDirection } from '@/lib/admin/configs/futureDirections
 import { AdminService } from '@/lib/services/adminService';
 import type { CuratedCareerSource, CuratedDreamCareer, CurationStatus, FutureDirection } from '@/types/curated-career';
 import DreamCareerDetailProfileEditor from './DreamCareerDetailProfileEditor';
+import DreamCareerTranslationReviewPanel from './DreamCareerTranslationReviewPanel';
 
 type EditorProps<T> = {
   entity: T | null;
@@ -193,6 +194,8 @@ export function DreamCareerEditor({ entity, onSave, onCancel }: EditorProps<Cura
           onChange={(authoritySourceIds) => setForm({ ...form, regulation: { status: form.regulation?.status || 'requirements-vary', jurisdiction: form.regulation?.jurisdiction || 'India', authoritySourceIds }, regulated: isRegulatedStatus(form.regulation?.status || 'requirements-vary') })}
         />
       </Section>
+
+      <DreamCareerTranslationReviewPanel career={{ ...form, id: entity?.id || form.slug } as CuratedDreamCareer} />
 
       <DreamCareerDetailProfileEditor
         careerId={entity?.id || form.slug}

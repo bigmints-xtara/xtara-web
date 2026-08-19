@@ -305,6 +305,17 @@ export interface DreamCareerDetailProfileV3 {
   };
 }
 
+export type DreamCareerDetailTranslationLocale = 'ml' | 'hi' | 'ta';
+
+export type DreamCareerDetailProfileTranslationV3 = Omit<DreamCareerDetailProfileV3, 'locale'> & {
+  locale: DreamCareerDetailTranslationLocale;
+};
+
+export type DreamCareerDetailProfileTranslations = Partial<Record<
+  DreamCareerDetailTranslationLocale,
+  DreamCareerDetailProfileTranslationV3
+>>;
+
 export const DETAIL_PROFILE_REVIEW_STATUSES = ['pending', 'inReview', 'changesRequested', 'approved'] as const;
 export type DetailProfileReviewStatus = (typeof DETAIL_PROFILE_REVIEW_STATUSES)[number];
 export type DetailProfileSourceReviewStatus = 'pending' | 'approved' | 'rejected';
