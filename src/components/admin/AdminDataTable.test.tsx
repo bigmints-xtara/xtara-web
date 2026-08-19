@@ -18,6 +18,29 @@ const result: AdminTableResult<Row> = {
 };
 
 describe('AdminDataTable', () => {
+  it('shows an accessible loading state and disables query controls while records load', () => {
+    render(<AdminDataTable
+      columns={[
+        { id: 'name', label: 'Name', sortable: true, cell: (row) => row.name },
+        { id: 'status', label: 'Status', cell: (row) => row.status },
+      ]}
+      groupFields={[{ value: 'status', label: 'Status' }]}
+      loading
+      onQueryChange={() => undefined}
+      query={query}
+      result={result}
+      rowId={(row) => row.id}
+      title="Records"
+    />);
+
+    expect(screen.getByLabelText('Records table')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByRole('status')).toHaveTextContent('Loading records…');
+    expect(screen.getByLabelText('Loading records')).toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: 'Search Records' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Sort by Name' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+  });
+
   it('drives server sort, filters, grouping, pagination, and search', () => {
     const onQueryChange = vi.fn();
     render(<AdminDataTable
