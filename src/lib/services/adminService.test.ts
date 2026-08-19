@@ -5,6 +5,7 @@ const api = vi.hoisted(() => ({ get: vi.fn() }));
 vi.mock('@/lib/api/client', () => ({ xtaraApi: api }));
 
 import { gamesConfig } from '@/lib/admin/configs/gamesConfig';
+import { careerSourcesConfig } from '@/lib/admin/configs/careerSourcesConfig';
 import { AdminService } from './adminService';
 
 describe('AdminService pagination', () => {
@@ -63,5 +64,13 @@ describe('AdminService pagination', () => {
     });
     expect(result.items.map((item) => item.id)).toEqual(['game-1']);
     expect(result).toMatchObject({ total: 1, pageSize: 20, facets: [], groups: [], summaries: [] });
+  });
+
+  it('maps legacy editor ordering to the standardized title sort', async () => {
+    api.get.mockResolvedValueOnce({ data: [], total: 0, page: 1, limit: 50, totalPages: 0 });
+    await new AdminService(careerSourcesConfig).getPage({ page: 1, limit: 50 });
+    expect(api.get).toHaveBeenCalledWith(
+      '/admin/content/career_sources?page=1&limit=50&sort=title&order=asc',
+    );
   });
 });

@@ -93,7 +93,8 @@ export class AdminService<T extends AdminEntity> {
     if (params.status && params.status !== 'all') query.set('status', params.status);
     if (params.domain && params.domain !== 'all') query.set('domain', params.domain);
     if (params.searchQuery?.trim()) query.set('q', params.searchQuery.trim());
-    if (this.config.orderByField) query.set('sort', this.config.orderByField);
+    // The table API exposes semantic columns, not legacy Firestore field names.
+    if (this.config.orderByField) query.set('sort', 'title');
     if (this.config.orderByDirection) query.set('order', this.config.orderByDirection);
 
     const response = await xtaraApi.get<ListResponse<T>>(
