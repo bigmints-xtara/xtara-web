@@ -96,6 +96,18 @@ export async function apiRequest<T>(path: string, init: XtaraRequestInit = {}): 
   return unwrap<T>(payload as ApiEnvelope<T>);
 }
 
+export async function apiDownload(path: string): Promise<Blob> {
+  const response = await fetch(getXtaraApiUrl(path), {
+    method: 'GET', credentials: 'include', headers: await authHeader(),
+  });
+  if (!response.ok) {
+    let message = response.statusText || `Download failed (${response.status})`;
+    try { const payload = await response.json() as { error?: { message?: string } }; message = payload.error?.message || message; } catch { /* response was not JSON */ }
+    throw new XtaraApiError(message, response.status, response.headers.get('x-request-id') || undefined);
+  }
+  return response.blob();
+}
+
 export const xtaraApi = {
   get: <T>(path: string, init?: RequestInit) => apiRequest<T>(path, { ...init, method: "GET" }),
   post: <T>(path: string, body?: unknown, init?: RequestInit) =>

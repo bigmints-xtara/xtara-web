@@ -1,5 +1,6 @@
 import { xtaraApi } from '@/lib/api/client';
 import type { AdminRole } from '@/lib/admin-access';
+import { adminTableQueryParams, type AdminBulkResult, type AdminTableQuery, type AdminTableResult, type AdminTableSelection } from '@/lib/admin-table';
 
 export type AdminUserProfileSummary = {
   fullName?: string;
@@ -30,20 +31,11 @@ export type AdminUser = {
   profile: AdminUserProfileSummary;
 };
 
-export type AdminUsersPage = {
-  users: AdminUser[];
-  pageSize: number;
-  nextPageToken?: string;
-  query?: string;
-};
+export type AdminUsersPage = AdminTableResult<AdminUser>;
 
 export const adminUsersApi = {
-  list: (input: { pageSize: number; pageToken?: string; query?: string }) => {
-    const params = new URLSearchParams({ pageSize: String(input.pageSize) });
-    if (input.pageToken) params.set('pageToken', input.pageToken);
-    if (input.query) params.set('query', input.query);
-    return xtaraApi.get<AdminUsersPage>(`/admin/users?${params.toString()}`);
-  },
+  list: (input: AdminTableQuery) => xtaraApi.get<AdminUsersPage>(`/admin/users?${adminTableQueryParams(input).toString()}`),
+  bulk: (action: string, selection: AdminTableSelection) => xtaraApi.post<AdminBulkResult>('/admin/users/bulk', { action, selection }),
   get: (uid: string) => xtaraApi.get<{ user: AdminUser }>(`/admin/users/${encodeURIComponent(uid)}`),
   update: (uid: string, input: { displayName: string; disabled: boolean; adminRole: AdminRole | null }) =>
     xtaraApi.patch<{ user: AdminUser }>(`/admin/users/${encodeURIComponent(uid)}`, input),

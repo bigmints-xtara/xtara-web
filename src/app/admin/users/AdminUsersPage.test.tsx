@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const usersApi = vi.hoisted(() => ({ list: vi.fn() }));
+const usersApi = vi.hoisted(() => ({ list: vi.fn(), bulk: vi.fn() }));
 vi.mock('@/lib/admin-users', () => ({ adminUsersApi: usersApi }));
 
 import AdminUsersPage from './page';
@@ -20,7 +20,7 @@ const users = [
 describe('AdminUsersPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    usersApi.list.mockResolvedValue({ users, pageSize: 25, nextPageToken: 'next-token' });
+    usersApi.list.mockImplementation(async (query) => ({ items: users, page: query.page, pageSize: query.pageSize, total: 52, totalPages: 3, facets: [], groups: [], summaries: [{ key: 'total', label: 'Matching', value: 52 }] }));
   });
 
   it('renders a paginated user table with working management links', async () => {
@@ -31,26 +31,17 @@ describe('AdminUsersPage', () => {
     expect(screen.getByText('Disabled')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Manage Student One' })).toHaveAttribute('href', '/admin/users/user-1');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Next users page' }));
-    await waitFor(() => expect(usersApi.list).toHaveBeenLastCalledWith({
-      pageSize: 25,
-      pageToken: 'next-token',
-      query: undefined,
-    }));
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await waitFor(() => expect(usersApi.list).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2, pageSize: 25 })));
   });
 
   it('runs exact account search through the server API', async () => {
-    usersApi.list.mockResolvedValue({ users: [users[0]], pageSize: 25, query: 'student@example.com' });
+    usersApi.list.mockResolvedValue({ items: [users[0]], page: 1, pageSize: 25, total: 1, totalPages: 1, facets: [], groups: [], summaries: [] });
     render(<AdminUsersPage />);
 
     await screen.findByText('Student One');
-    fireEvent.change(screen.getByRole('textbox', { name: 'Exact email or user ID' }), { target: { value: 'student@example.com' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search Users' }), { target: { value: 'student@example.com' } });
 
-    await waitFor(() => expect(usersApi.list).toHaveBeenLastCalledWith({
-      pageSize: 25,
-      pageToken: undefined,
-      query: 'student@example.com',
-    }));
+    await waitFor(() => expect(usersApi.list).toHaveBeenLastCalledWith(expect.objectContaining({ search: 'student@example.com' })));
   });
 });

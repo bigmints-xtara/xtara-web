@@ -1,5 +1,6 @@
 import { xtaraApi } from '@/lib/api/client';
 import type { AdminConfig, AdminEntity } from '@/types/admin';
+import { adminTableQueryParams, type AdminBulkResult, type AdminTableQuery, type AdminTableResult, type AdminTableSelection } from '@/lib/admin-table';
 
 type Unsubscribe = () => void;
 
@@ -57,6 +58,20 @@ export class AdminService<T extends AdminEntity> {
   constructor(config: AdminConfig<T>) {
     this.config = config;
     this.slug = ENTITY_SLUGS[config.collectionName] || config.collectionName;
+  }
+
+  async getTable(query: AdminTableQuery): Promise<AdminTableResult<T>> {
+    const response = await xtaraApi.get<AdminTableResult<T>>(
+      `/admin/content/${this.slug}?${adminTableQueryParams(query).toString()}`,
+    );
+    return {
+      ...response,
+      items: response.items.map((item) => this.config.fromFirestore(item as unknown as Record<string, unknown>, item.id)),
+    };
+  }
+
+  async bulk(action: string, selection: AdminTableSelection): Promise<AdminBulkResult> {
+    return xtaraApi.post<AdminBulkResult>(`/admin/content/${this.slug}/bulk`, { action, selection });
   }
 
   async getPage(params: AdminPageParams): Promise<AdminPage<T>> {

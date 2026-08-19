@@ -1,5 +1,6 @@
-import { xtaraApi } from '@/lib/api/client';
+import { apiDownload, xtaraApi } from '@/lib/api/client';
 import type { CollegeInfo } from '@/lib/firebase/college-service';
+import { adminTableQueryParams, type AdminTableQuery, type AdminTableResult } from '@/lib/admin-table';
 
 export type AdminCollegeSummary = {
   id: string;
@@ -14,7 +15,7 @@ export type AdminCollegeSummary = {
   affiliatedTo?: string;
 };
 
-export type AdminCollegeCatalogPage = {
+export type AdminCollegeCatalogPage = AdminTableResult<AdminCollegeSummary> & {
   release: {
     id: string;
     status: string;
@@ -29,32 +30,11 @@ export type AdminCollegeCatalogPage = {
     courseOfferings: number;
     careerCourseLinks: number;
   };
-  items: AdminCollegeSummary[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
-  filters: { query: string; city: string; state: string; type: string };
   immutable: boolean;
 };
-
-export type AdminCollegeCatalogFilters = {
-  page?: number;
-  limit?: number;
-  query?: string;
-  city?: string;
-  state?: string;
-  type?: string;
-};
-
-export async function getAdminCollegeCatalog(filters: AdminCollegeCatalogFilters = {}) {
-  const params = new URLSearchParams({
-    page: String(filters.page || 1),
-    limit: String(filters.limit || 25),
-  });
-  if (filters.query?.trim()) params.set('query', filters.query.trim());
-  if (filters.city?.trim()) params.set('city', filters.city.trim());
-  if (filters.state?.trim()) params.set('state', filters.state.trim());
-  if (filters.type?.trim()) params.set('type', filters.type.trim());
-  return xtaraApi.get<AdminCollegeCatalogPage>(`/admin/catalog/colleges?${params.toString()}`);
-}
+export async function getAdminCollegeCatalog(query: AdminTableQuery) { return xtaraApi.get<AdminCollegeCatalogPage>(`/admin/catalog/colleges?${adminTableQueryParams(query).toString()}`); }
+export function adminCollegeExportUrl(query: AdminTableQuery, ids: string[] = []) { const params = adminTableQueryParams(query); ids.forEach((id) => params.append('id', id)); return `/api/v1/admin/catalog/colleges/export?${params.toString()}`; }
+export async function downloadAdminCollegeCsv(query: AdminTableQuery, ids: string[] = []) { const blob = await apiDownload(adminCollegeExportUrl(query, ids)); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'xtara-colleges.csv'; link.click(); URL.revokeObjectURL(url); }
 
 export async function getAdminCollegeDetail(id: string) {
   return xtaraApi.get<CollegeInfo>(`/colleges/${encodeURIComponent(id)}`);
