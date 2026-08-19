@@ -52,4 +52,16 @@ describe('AdminService pagination', () => {
     });
     expect(result.items.map((item) => item.id)).toEqual(['game-21']);
   });
+
+  it('normalizes the legacy list envelope during staggered API and web deployments', async () => {
+    api.get.mockResolvedValueOnce({
+      data: [{ id: 'game-1', title: 'Legacy game', mode: 'quiz', published: false, draft: true, inReview: false, schedule: {} }],
+      total: 1, page: 1, limit: 20, totalPages: 1, availableDomains: ['quiz'],
+    });
+    const result = await new AdminService(gamesConfig).getTable({
+      page: 1, pageSize: 20, search: '', filters: {}, sort: { field: 'updatedAt', direction: 'desc' },
+    });
+    expect(result.items.map((item) => item.id)).toEqual(['game-1']);
+    expect(result).toMatchObject({ total: 1, pageSize: 20, facets: [], groups: [], summaries: [] });
+  });
 });

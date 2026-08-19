@@ -61,12 +61,23 @@ export class AdminService<T extends AdminEntity> {
   }
 
   async getTable(query: AdminTableQuery): Promise<AdminTableResult<T>> {
-    const response = await xtaraApi.get<AdminTableResult<T>>(
+    const response = await xtaraApi.get<AdminTableResult<T> | Exclude<ListResponse<T>, T[]>>(
       `/admin/content/${this.slug}?${adminTableQueryParams(query).toString()}`,
     );
+    const rawItems: T[] = Array.isArray(response.items)
+      ? response.items
+      : ('data' in response && Array.isArray(response.data) ? response.data : []);
+    const normalized = 'facets' in response ? response : {
+      items: rawItems,
+      page: response.page ?? query.page,
+      pageSize: response.limit ?? query.pageSize,
+      total: response.total ?? rawItems.length,
+      totalPages: response.totalPages ?? (rawItems.length ? 1 : 0),
+      facets: [], groups: [], summaries: [],
+    };
     return {
-      ...response,
-      items: response.items.map((item) => this.config.fromFirestore(item as unknown as Record<string, unknown>, item.id)),
+      ...normalized,
+      items: rawItems.map((item) => this.config.fromFirestore(item as unknown as Record<string, unknown>, item.id)),
     };
   }
 
