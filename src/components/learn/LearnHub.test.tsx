@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { assessmentV2StorageKey, type DiscoveryResult } from "@/lib/assessment-v2";
 import { createAreaDirectionPlan, directionStorageKey, selectDirectionRole } from "@/lib/direction";
+import { getMyCareerPathExperience } from "@/lib/experience-api";
 
 vi.mock("@/context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "learner-1" } }) }));
 vi.mock("@/i18n/language-provider", () => ({ useTranslations: () => ({ locale: "en" }) }));
@@ -108,5 +109,25 @@ describe("Learn information architecture", () => {
     const story = [...container.querySelectorAll("button")].find((button) => button.textContent?.includes("A designer at work"));
     await act(async () => { story?.click(); });
     expect(container.textContent).toContain("Story slideshow: A designer at work");
+  });
+
+  it("shows a caught-up state when no actionable content remains", async () => {
+    vi.mocked(getMyCareerPathExperience).mockResolvedValueOnce({
+      version: "1.3.0",
+      surface: "my-career-path",
+      progress: { completed: 2, total: 3, goals: [] },
+      nextBest: null,
+      alternatives: [],
+      contentGroups: ["stories", "lessons", "games", "challenges", "reads"]
+        .map((id) => ({ id, title: id, description: "", items: [] })),
+      contentLibraries: ["stories", "lessons", "games", "challenges", "reads"]
+        .map((id) => ({ id, title: id, description: "", items: [] })),
+    } as never);
+
+    await act(async () => { root?.render(<LearnHub />); });
+
+    expect(container.textContent).toContain("You're all caught up");
+    expect(container.textContent).toContain("New activities will appear here when they're ready.");
+    expect(container.querySelectorAll('[id^="learn-"]')).toHaveLength(1);
   });
 });
