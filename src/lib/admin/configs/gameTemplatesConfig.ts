@@ -26,7 +26,7 @@ export const gameTemplatesConfig: AdminConfig<GameTemplate> = {
   getDomain: (entity) => entity.mode,
   getSearchText: (entity) => `${entity.title} ${entity.description} ${entity.mode}`.toLowerCase(),
   availableStatuses: ['all', 'published', 'draft', 'inReview'],
-  getAvailableDomains: () => ['all', 'quiz', 'puzzle', 'memory', 'simulation'],
+  getAvailableDomains: () => ['all', 'quiz', 'wordquest', 'puzzle', 'memory', 'simulation'],
   validateEntity: (entity) => {
     if (!entity.title?.trim()) return 'Title is required';
     if (!entity.description?.trim()) return 'Description is required';
