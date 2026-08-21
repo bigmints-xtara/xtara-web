@@ -22,7 +22,7 @@ import {
   setDreamCareers,
   subscribeToDirection,
 } from "@/lib/direction";
-import { saveDirectionToApi } from "@/lib/direction-api";
+import { savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
 import { canAccessPursuedArea } from "@/lib/exploration-access";
 import type { CareerAreaId } from "@/types/career-knowledge";
 import type { CuratedDreamCareer } from "@/types/curated-career";
@@ -44,6 +44,7 @@ const copy = {
     "build": "Build My Career Path",
     "chooseOne": "Choose at least one Dream Career to continue.",
     "saving": "Saving…",
+    "saveFailed": "We could not save your choices yet. Check your connection and try again.",
     "loading": "Loading Dream Careers…"
   },
   "ml": {
@@ -59,6 +60,7 @@ const copy = {
     "build": "എന്റെ കരിയർ പ്ലാൻ തയ്യാറാക്കാം",
     "chooseOne": "തുടരാൻ കുറഞ്ഞത് ഒരു കരിയർ തിരഞ്ഞെടുക്കൂ.",
     "saving": "സൂക്ഷിക്കുന്നു…",
+    "saveFailed": "നിങ്ങളുടെ തിരഞ്ഞെടുപ്പുകൾ ഇപ്പോൾ സൂക്ഷിക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കൂ.",
     "loading": "കരിയറുകൾ ലോഡ് ചെയ്യുന്നു…"
   },
   "hi": {
@@ -74,6 +76,7 @@ const copy = {
     "build": "My Career Path बनाएँ",
     "chooseOne": "कम से कम एक Dream Career चुनें।",
     "saving": "Save हो रहा है...",
+    "saveFailed": "आपके choices अभी save नहीं हो पाए। Connection check करके फिर try करें।",
     "loading": "Loading..."
   },
   "ta": {
@@ -89,6 +92,7 @@ const copy = {
     "build": "என் தொழில் பாதையை உருவாக்கு",
     "chooseOne": "தொடர்ந்து செயல்பட குறைந்தபட்சம் ஒரு கனவுத் தொழிலையாவது தேர்ந்தெடுங்கள்.",
     "saving": "சேமிப்பு...",
+    "saveFailed": "உங்கள் தேர்வுகளை இப்போது சேமிக்க முடியவில்லை. இணைய இணைப்பை சரிபார்த்து மீண்டும் முயலுங்கள்.",
     "loading": "கனவு வேலைகளை ஏற்றுகிறது..."
   }
 } as const;
@@ -182,9 +186,17 @@ export default function CareerDirectionPage() {
     const nextPlan = setDreamCareers(plan, selectedIds);
     saveDirectionPlan(nextPlan);
     if (user && !user.isAnonymous) {
-      try { saveDirectionPlan(await saveDirectionToApi(nextPlan)); } catch { /* Keep the local choice for retry. */ }
+      try {
+        const didSave = await savePendingCareerChoiceToAccount(user.uid);
+        if (!didSave) throw new Error(text.chooseOne);
+        router.push("/assessment/pathway");
+      } catch {
+        setError(text.saveFailed);
+        setSaving(false);
+      }
+      return;
     }
-    router.push(user && !user.isAnonymous ? "/dashboard" : "/assessment/pathway");
+    router.push("/signup?saveDiscovery=1&next=%2Fassessment%2Fpathway");
   };
 
   return (

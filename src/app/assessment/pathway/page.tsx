@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, LockKeyhole, MapPin } from "lucide-react";
 
 import Header from "@/components/Header";
@@ -167,6 +168,7 @@ const scholarshipOptions = ["Yes, show scholarships and financial aid", "Maybe, 
 export default function PathwayPersonalizationPage() {
   const { locale } = useTranslations();
   const { user } = useAuth();
+  const router = useRouter();
   const text = copy[locale];
   const [profile, setProfile] = useState<PathwayProfileDraft>(emptyPathwayProfile);
   const [storedResult, setStoredResult] = useState<DiscoveryResult | null>(null);
@@ -226,12 +228,26 @@ export default function PathwayPersonalizationPage() {
 
   const complete = Object.values(profile).every(Boolean);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!complete) return;
     savePathwayProfile(profile);
-    setCompleted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!user) {
+      setCompleted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    setSaveError("");
+    setSaving(true);
+    try {
+      const didSave = await savePendingDiscoveryToAccount(user.uid);
+      if (!didSave) throw new Error(text.saveFailed);
+      setSaved(true);
+      router.push("/dashboard");
+    } catch {
+      setSaveError(text.saveFailed);
+      setSaving(false);
+    }
   };
 
   const handleAccountSave = async () => {
@@ -291,7 +307,7 @@ export default function PathwayPersonalizationPage() {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LockKeyhole className="mr-2 h-4 w-4" />}{saving ? text.saving : text.save}
                   </Button>
                 ) : (
-                  <Button asChild className="rounded-full"><Link href="/signup?saveDiscovery=1&next=%2Fdashboard"><LockKeyhole className="mr-2 h-4 w-4" />{text.signup}</Link></Button>
+                  <Button asChild className="rounded-full"><Link href="/signup?saveDiscovery=1&next=%2Fassessment%2Fpathway"><LockKeyhole className="mr-2 h-4 w-4" />{text.signup}</Link></Button>
                 )}
                 <Button asChild variant="outline" className="rounded-full"><Link href={`/explore/areas/${directionPlan.areaId}`}><ArrowLeft className="mr-2 h-4 w-4" />{text.back}</Link></Button>
               </div>
@@ -329,7 +345,12 @@ export default function PathwayPersonalizationPage() {
           <Field label={text.affordability}><Choice value={profile.affordability} options={affordabilityOptions} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(affordability) => setProfile({ ...profile, affordability })} /></Field>
           <Field label={text.scholarship}><Choice value={profile.scholarshipInterest} options={scholarshipOptions} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(scholarshipInterest) => setProfile({ ...profile, scholarshipInterest })} /></Field>
           {!complete ? <p className="text-sm text-slate-500">{text.required}</p> : null}
-          <Button type="submit" disabled={!complete} size="lg" className="w-full rounded-xl">{text.continue}<ArrowRight className="ml-2 h-4 w-4" /></Button>
+          {saveError ? <p role="alert" className="text-sm text-red-700">{saveError}</p> : null}
+          <Button type="submit" disabled={!complete || saving} size="lg" className="w-full rounded-xl">
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {saving ? text.saving : text.continue}
+            {!saving ? <ArrowRight className="ml-2 h-4 w-4" /> : null}
+          </Button>
         </form>
       </main>
     </div>

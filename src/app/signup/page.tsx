@@ -14,7 +14,7 @@ import { SignupForm } from "@/components/signup-form";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
-import { savePendingAssessmentToAccount, savePendingDiscoveryToAccount } from "@/lib/discovery-save";
+import { savePendingAssessmentToAccount, savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 
 function SignupContent() {
@@ -43,7 +43,7 @@ function SignupContent() {
         : "default";
   const variantCopy = signupCopy.variants[variantKey];
   const loginHref = shouldSaveDiscovery
-    ? "/login?saveDiscovery=1&next=%2Fdashboard"
+    ? "/login?saveDiscovery=1&next=%2Fassessment%2Fpathway"
     : shouldSaveAssessment && requestedNext
       ? `/login?saveAssessment=1&next=${encodeURIComponent(requestedNext)}`
       : educatorMode
@@ -70,8 +70,9 @@ function SignupContent() {
       await createApiSession(await credential.user.getIdToken(true));
 
       if (shouldSaveDiscovery) {
-        await savePendingDiscoveryToAccount(credential.user.uid);
-        router.push(safeDestination(requestedNext) ?? "/dashboard");
+        const didSave = await savePendingCareerChoiceToAccount(credential.user.uid);
+        if (!didSave) throw new Error("Choose your Career Direction and Dream Careers before creating an account.");
+        router.push(safeDestination(requestedNext) ?? "/assessment/pathway");
         return;
       }
 

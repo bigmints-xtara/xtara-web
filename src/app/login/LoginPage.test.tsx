@@ -45,6 +45,18 @@ describe("login modes", () => {
       "/signup?mode=educator&next=%2Forganization",
     );
   });
+
+  it("keeps the account continuation pointed at location", () => {
+    vi.mocked(useSearchParams).mockReturnValue(
+      new URLSearchParams("saveDiscovery=1&next=%2Fassessment%2Fpathway") as ReturnType<typeof useSearchParams>,
+    );
+    renderLogin();
+
+    expect(screen.getByRole("link", { name: "Create one" })).toHaveAttribute(
+      "href",
+      "/signup?saveDiscovery=1&next=%2Fassessment%2Fpathway",
+    );
+  });
 });
 
 function renderLogin() {

@@ -10,7 +10,7 @@ import { LoginForm } from "@/components/login-form";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
-import { savePendingAssessmentToAccount, savePendingDiscoveryToAccount } from "@/lib/discovery-save";
+import { savePendingAssessmentToAccount, savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import { getOrganizationContext } from "@/lib/organization";
 import { friendlyLoginError } from "@/lib/login-error";
@@ -46,8 +46,9 @@ function LoginContent() {
   async function finishLogin(userId: string, idToken: string) {
     await createApiSession(idToken);
     if (searchParams.get("saveDiscovery") === "1") {
-      await savePendingDiscoveryToAccount(userId);
-      router.push(requestedNext || WORKSPACE_MANIFESTS.student.homePath);
+      const didSave = await savePendingCareerChoiceToAccount(userId);
+      if (!didSave) throw new Error("Choose your Career Direction and Dream Careers before signing in.");
+      router.push(requestedNext || "/assessment/pathway");
       return;
     }
     if (searchParams.get("saveAssessment") === "1") {
