@@ -145,7 +145,7 @@ describe('Dream Career Student Guide page', () => {
     render(<DreamCareerPage />);
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer', level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'About career' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'About this career' })).toBeInTheDocument();
     expect(screen.getByText('Designs and maintains reliable data systems.')).toBeInTheDocument();
     expect(screen.queryByText('Choose this Career Direction')).not.toBeInTheDocument();
     expect(mocks.getGuide).toHaveBeenCalledWith('data-engineer', expect.objectContaining({ locale: 'en' }));
@@ -271,7 +271,7 @@ describe('Dream Career Student Guide page', () => {
     expect(await screen.findByRole('heading', { name: 'Data Engineer', level: 1 })).toBeInTheDocument();
     expect(screen.getByText('Reviewed career summary.')).toBeInTheDocument();
     expect(screen.getByText('Student Guide is not available for this career yet.')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'About career' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'About this career' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   });
 

@@ -136,7 +136,7 @@ describe('DreamCareerStudentGuide', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
-      'About career',
+      'About this career',
       'How to get there',
       'What I can do now',
     ]);
@@ -149,8 +149,8 @@ describe('DreamCareerStudentGuide', () => {
       'Related careers',
       'Subjects to focus on now',
       'Study routes',
-      'Courses, colleges, cost',
-      'From graduation first job',
+      'Courses, colleges, and cost',
+      'From graduation to first job',
       'Career progression',
       'Companies that hire for this career',
       'Internship opportunities',
@@ -158,7 +158,7 @@ describe('DreamCareerStudentGuide', () => {
       'Skills to build',
       'Tools to learn',
       'Entrance exams to consider',
-      'Try it week',
+      'Try it this week',
     ]);
   });
 
@@ -275,7 +275,7 @@ describe('DreamCareerStudentGuide', () => {
   it('provides keyboard-focusable chapter anchors with exact destinations', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
-    const about = screen.getByRole('link', { name: 'About career' });
+    const about = screen.getByRole('link', { name: 'About this career' });
     const path = screen.getByRole('link', { name: 'How to get there' });
     const now = screen.getByRole('link', { name: 'What I can do now' });
     expect(about).toHaveAttribute('href', '#about-career');
@@ -286,11 +286,22 @@ describe('DreamCareerStudentGuide', () => {
   });
 
   it('uses localized chapter and learner-question labels', () => {
-    render(<DreamCareerStudentGuide response={response()} locale="hi" />);
+    const value = response();
+    const { rerender } = render(<DreamCareerStudentGuide response={value} locale="hi" />);
 
-    expect(screen.getByRole('heading', { name: 'करियर के बारे में' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'इस करियर के बारे में' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी किन विषयों पर ध्यान दें' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'विकसित करने योग्य कौशल' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी क्या कर सकता/सकती हूँ' })).toBeInTheDocument();
+
+    rerender(<DreamCareerStudentGuide response={value} locale="ml" />);
+    expect(screen.getByRole('heading', { name: 'ഈ കരിയറിനെക്കുറിച്ച്' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'കോഴ്സുകൾ, കോളേജുകൾ, ചെലവ് എന്നിവ' })).toBeInTheDocument();
+
+    rerender(<DreamCareerStudentGuide response={value} locale="ta" />);
+    expect(screen.getByRole('heading', { name: 'இந்தத் தொழிலைப் பற்றி' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'வேலையில் ஒரு நாள்' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'படிப்புகள், கல்லூரிகள் மற்றும் செலவு' })).toBeInTheDocument();
   });
 
   it('localizes the relationship retry accessible-label prefix', () => {
