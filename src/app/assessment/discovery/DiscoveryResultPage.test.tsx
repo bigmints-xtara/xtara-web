@@ -30,7 +30,7 @@ const result: DiscoveryResult = {
     id: "adaptive",
     evidenceRefs: [{ questionId: "socialEnergy", optionId: "depends" }],
   }],
-  areas: ["technology", "science", "business"].map((id) => ({
+  areas: ["health", "technology", "science"].map((id) => ({
     id,
     evidence: "developing" as const,
     evidenceRefs: [
@@ -38,7 +38,11 @@ const result: DiscoveryResult = {
       { questionId: "activityCuriosity", optionId: "investigate" },
       { questionId: "activityExperience", optionId: "problemSolving" },
     ],
-    roleIds: [],
+    roleIds: id === "health"
+      ? ["physician", "physiotherapist", "biomedical-engineer"]
+      : id === "technology"
+        ? ["software-developer", "cybersecurity-analyst"]
+        : ["environmental-scientist", "data-scientist"],
   })),
   context: { familyInfluence: "open", familyPriorities: [], weaknessPatterns: ["confidence"] },
   syncStatus: "temporary",
@@ -68,6 +72,9 @@ describe("discovery result chooser", () => {
 
     expect(await screen.findByRole("heading", { name: "Choose a Career Direction to explore." })).toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /Explore this direction:/ })).toHaveLength(3);
+    expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physician");
+    expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physiotherapist");
+    expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Biomedical Engineer");
     expect(screen.getByRole("link", { name: "Review my answers" })).toHaveAttribute("href", "/assessment");
     expect(container.querySelector("[data-slot='badge']")).toBeNull();
     expect(container.textContent).not.toContain("Strong pattern");

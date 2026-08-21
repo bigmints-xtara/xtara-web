@@ -259,7 +259,7 @@ export function buildDiscoveryResult(
       id,
       evidence: sourceCount >= 3 && experience !== "new" ? "developing" as const : "early" as const,
       evidenceRefs: evidenceRefs.slice(0, 3),
-      roleIds: getCareerRolesByArea("en", id as CareerAreaId).slice(0, 4).map((role) => role.id),
+      roleIds: getCareerRolesByArea("en", id as CareerAreaId).slice(0, 3).map((role) => role.id),
     }));
   const areas = curatedCatalog?.directions.length
     ? buildCuratedAreas(curatedCatalog, channels, experience)
@@ -380,7 +380,7 @@ function buildCuratedAreas(
       id: direction.id,
       evidence: sourceCount >= 3 && experience !== "new" ? "developing" as const : "early" as const,
       evidenceRefs: evidenceRefs.slice(0, 3),
-      roleIds: direction.roleIds.filter((roleId) => availableRoleIds.has(roleId)).slice(0, 4),
+      roleIds: direction.roleIds.filter((roleId) => availableRoleIds.has(roleId)).slice(0, 3),
       contentVersion: direction.version,
     }));
 }

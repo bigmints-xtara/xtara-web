@@ -92,6 +92,16 @@ export default function DiscoveryResultPage() {
                 <Card key={area.id} className="border-primary/10 bg-white shadow-none"><CardContent className="flex h-full flex-col p-6 sm:p-7">
                   <h3 className="text-2xl font-semibold text-primary">{area.title}</h3>
                   <p className="mt-3 leading-7 text-slate-600">{area.description}</p>
+                  {area.roles.length ? (
+                    <ul className="mt-5 space-y-2" aria-label={`${area.title} careers`}>
+                      {area.roles.slice(0, 3).map((career) => (
+                        <li key={career.id} className="flex items-center gap-2 text-sm font-semibold text-primary">
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                          {career.title}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                   {reasonsByArea[area.id]?.length ? <div className="mt-6 border-t border-slate-100 pt-5"><p className="text-sm font-semibold text-primary">{catalog.result.why}</p><ul className="mt-3 space-y-3">{reasonsByArea[area.id].map((reason) => <li key={reason} className="flex gap-3 text-sm leading-6 text-slate-600"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />{reason}</li>)}</ul></div> : null}
                   <Button type="button" className="mt-7 min-h-12 w-full justify-between rounded-xl" aria-label={`${catalog.result.viewArea}: ${area.title}`} onClick={() => pursueArea(area.id)}>{catalog.result.viewArea}<ArrowRight className="h-4 w-4" /></Button>
                 </CardContent></Card>
