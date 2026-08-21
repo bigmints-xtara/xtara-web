@@ -59,6 +59,7 @@ function response(): DreamCareerStudentGuideResponse {
       title: 'Data Engineer',
       summary: 'Builds dependable data systems that help people make better decisions.',
       imageUrl: 'https://images.example/data-engineer.jpg',
+      primaryFutureDirectionId: 'technology',
       futureDirectionIds: ['technology'],
     },
     guide: {
@@ -117,8 +118,11 @@ function response(): DreamCareerStudentGuideResponse {
         skills: [{ id: 'skill-problem-solving', label: 'Problem solving' }],
         occupationalTools: [{ id: 'tool-sql', label: 'SQL' }],
       },
-      relatedCareers: [{ id: 'analytics-engineer', title: 'Analytics Engineer', summary: 'Turns prepared data into useful models.', futureDirectionIds: ['technology'] }],
-      courseOptions: [{ id: 'offering-1', courseConceptId: 'course-computing', courseTitle: 'BTech Computer Science', institution: { id: 'college-1', name: 'IIT Example', city: 'Kochi', state: 'Kerala', country: 'India' }, match: 'direct', releaseId: 'release-1' }],
+      relatedCareers: [{ id: 'analytics-engineer', title: 'Analytics Engineer', summary: 'Turns prepared data into useful models.', primaryFutureDirectionId: 'technology', futureDirectionIds: ['technology'] }],
+      courseOptions: {
+        status: 'available',
+        items: [{ id: 'offering-1', courseConceptId: 'course-computing', courseTitle: 'BTech Computer Science', institution: { id: 'college-1', name: 'IIT Example', city: 'Kochi', state: 'Kerala', country: 'India' }, match: 'direct', releaseId: 'release-1' }],
+      },
       employers: [{ id: 'employer-1', name: 'Data Systems India', geography: 'India', verifiedAt: '2026-08-01T00:00:00Z', website: 'https://example.com/employer', evidenceSourceIds: ['source-one'] }],
       opportunities: [{ id: 'opportunity-1', providerId: 'provider-1', providerName: 'Learning Lab', title: 'Data engineering internship', kind: 'internship', opensAt: '2026-08-01T00:00:00Z', closesAt: '2026-09-01T00:00:00Z' }],
       learningResources: [{ id: 'resource-1', title: 'SQL for beginners', providerName: 'Open Learning', url: 'https://example.com/sql', level: 'beginner', cost: 'free' }],
@@ -226,6 +230,27 @@ describe('DreamCareerStudentGuide', () => {
 
     expect(screen.getByRole('link', { name: 'Analytics Engineer' })).toHaveAttribute('href', '/explore/roles/analytics-engineer');
     expect(screen.getByRole('link', { name: /IIT Example/i })).toHaveAttribute('href', '/colleges/college-1');
+  });
+
+  it('omits an honestly empty available course mapping', () => {
+    const value = response();
+    value.resolved.courseOptions = { status: 'available', items: [] };
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    expect(screen.queryByRole('heading', { name: 'Courses, colleges, and cost' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/matches are not available yet/i)).not.toBeInTheDocument();
+  });
+
+  it('distinguishes an unavailable course mapping from an honest empty result', () => {
+    const value = response();
+    value.resolved.courseOptions = { status: 'mapping_unavailable', items: [] };
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    expect(screen.getByRole('heading', { name: 'Courses, colleges, and cost' })).toBeInTheDocument();
+    expect(screen.getByText('Course and college matches are not available yet.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Retry courses/i })).not.toBeInTheDocument();
   });
 
   it('discloses long lists progressively with an explicit See all control', () => {

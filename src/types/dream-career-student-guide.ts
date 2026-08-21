@@ -193,6 +193,7 @@ export interface CareerIdentityView {
   title: string;
   summary: string;
   imageUrl?: string;
+  primaryFutureDirectionId: string | null;
   futureDirectionIds: string[];
 }
 
@@ -210,6 +211,11 @@ export interface CareerCourseOptionView {
   };
   match: 'direct' | 'adjacent';
   releaseId: string;
+}
+
+export interface CareerCourseOptionsView {
+  status: 'available' | 'mapping_unavailable';
+  items: CareerCourseOptionView[];
 }
 
 export interface CareerEmployerView {
@@ -268,7 +274,7 @@ export interface DreamCareerStudentGuideResponse {
       occupationalTools: CareerGuideLabelView[];
     };
     relatedCareers: CareerIdentityView[];
-    courseOptions: CareerCourseOptionView[];
+    courseOptions: CareerCourseOptionsView;
     employers: CareerEmployerView[];
     opportunities: CareerOpportunityView[];
     learningResources: CareerLearningResourceView[];

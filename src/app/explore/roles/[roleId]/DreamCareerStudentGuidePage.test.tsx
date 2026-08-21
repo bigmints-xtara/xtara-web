@@ -64,6 +64,7 @@ function guideResponse(): DreamCareerStudentGuideResponse {
       id: 'data-engineer',
       title: 'Data Engineer',
       summary: 'Builds dependable data systems that help people make better decisions.',
+      primaryFutureDirectionId: 'technology',
       futureDirectionIds: ['technology'],
     },
     guide: {
@@ -101,7 +102,10 @@ function guideResponse(): DreamCareerStudentGuideResponse {
     resolved: {
       labels: { subjects: [], skills: [], occupationalTools: [] },
       relatedCareers: [],
-      courseOptions: [{ id: 'offering-1', courseConceptId: 'course-computing', courseTitle: 'BTech Computer Science', institution: { id: 'college-1', name: 'IIT Example' }, match: 'direct', releaseId: 'release-1' }],
+      courseOptions: {
+        status: 'available',
+        items: [{ id: 'offering-1', courseConceptId: 'course-computing', courseTitle: 'BTech Computer Science', institution: { id: 'college-1', name: 'IIT Example' }, match: 'direct', releaseId: 'release-1' }],
+      },
       employers: [], opportunities: [], learningResources: [],
     },
     coverage: {
@@ -196,6 +200,9 @@ describe('Dream Career Student Guide page', () => {
 
   it('derives signed-in mutations from the remote Direction plan and updates only after readback', async () => {
     mocks.user = { uid: 'student-1', isAnonymous: false };
+    const response = guideResponse();
+    response.career.futureDirectionIds = ['health', 'technology'];
+    mocks.getGuide.mockResolvedValue(response);
     const remote = createAreaDirectionPlan('technology');
     const saved = toggleDreamCareer(remote, 'data-engineer');
     saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('technology'), 'another-career'));
@@ -263,7 +270,7 @@ describe('Dream Career Student Guide page', () => {
       'Published Student Guide not found',
       404,
       'request-guide-missing',
-      { career: { id: 'data-engineer', title: 'Data Engineer', summary: 'Reviewed career summary.', futureDirectionIds: ['technology'] } },
+      { career: { id: 'data-engineer', title: 'Data Engineer', summary: 'Reviewed career summary.', primaryFutureDirectionId: 'technology', futureDirectionIds: ['technology'] } },
     ));
 
     render(<DreamCareerPage />);

@@ -42,6 +42,7 @@ type GuideLabels = {
   tryAgain: string;
   retryAccessiblePrefix: string;
   relationshipUnavailable: string;
+  courseMappingUnavailable: string;
   loading: string;
   unavailable: string;
   sources: string;
@@ -84,6 +85,7 @@ const english: GuideLabels = {
   tryAgain: 'Try again',
   retryAccessiblePrefix: 'Retry',
   relationshipUnavailable: 'This information is temporarily unavailable.',
+  courseMappingUnavailable: 'Course and college matches are not available yet.',
   loading: 'Loading career guide',
   unavailable: 'This career guide is temporarily unavailable.',
   sources: 'Sources and evidence',
@@ -129,6 +131,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     retryAccessiblePrefix: 'വീണ്ടും ശ്രമിക്കൂ:',
     starterActivity: 'ഈ ആഴ്ച ഇത് പരീക്ഷിക്കൂ',
     relationshipUnavailable: 'ഈ വിവരം ഇപ്പോൾ ലഭ്യമല്ല.',
+    courseMappingUnavailable: 'കോഴ്‌സ്, കോളേജ് പൊരുത്തങ്ങൾ ഇപ്പോൾ ലഭ്യമല്ല.',
     loading: 'കരിയർ ഗൈഡ് ലോഡ് ചെയ്യുന്നു',
     unavailable: 'ഈ കരിയർ ഗൈഡ് ഇപ്പോൾ ലഭ്യമല്ല.',
     sources: 'ഉറവിടങ്ങളും തെളിവുകളും',
@@ -171,6 +174,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     retryAccessiblePrefix: 'फिर कोशिश करें:',
     starterActivity: 'इस हफ़्ते इसे आज़माएँ',
     relationshipUnavailable: 'यह जानकारी अभी उपलब्ध नहीं है।',
+    courseMappingUnavailable: 'कोर्स और कॉलेज के मेल अभी उपलब्ध नहीं हैं।',
     loading: 'करियर गाइड लोड हो रही है',
     unavailable: 'यह करियर गाइड अभी उपलब्ध नहीं है।',
     sources: 'स्रोत और प्रमाण',
@@ -213,6 +217,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     retryAccessiblePrefix: 'மீண்டும் முயற்சிக்கவும்:',
     starterActivity: 'இந்த வாரம் இதை முயற்சிக்கவும்',
     relationshipUnavailable: 'இந்தத் தகவல் இப்போது கிடைக்கவில்லை.',
+    courseMappingUnavailable: 'பாடநெறி மற்றும் கல்லூரிப் பொருத்தங்கள் இன்னும் கிடைக்கவில்லை.',
     loading: 'தொழில் வழிகாட்டி ஏற்றப்படுகிறது',
     unavailable: 'இந்தத் தொழில் வழிகாட்டி இப்போது கிடைக்கவில்லை.',
     sources: 'ஆதாரங்களும் சான்றுகளும்',
@@ -388,11 +393,11 @@ export function DreamCareerStudentGuide({
             </AnswerSection>
           ) : null}
 
-          {current('coursesAndColleges') && (resolved.courseOptions.length || relationshipError('courseOptions')) ? (
+          {current('coursesAndColleges') && (resolved.courseOptions.items.length || resolved.courseOptions.status === 'mapping_unavailable' || relationshipError('courseOptions')) ? (
             <AnswerSection title={text.coursesAndColleges}>
-              {resolved.courseOptions.length ? (
+              {resolved.courseOptions.items.length ? (
                 <ProgressiveList
-                  items={resolved.courseOptions}
+                  items={resolved.courseOptions.items}
                   labels={text}
                   renderItem={(option) => {
                     const location = [option.institution.city, option.institution.state, option.institution.country].filter(Boolean).join(', ');
@@ -404,6 +409,15 @@ export function DreamCareerStudentGuide({
                       </GuideItem>
                     );
                   }}
+                />
+              ) : null}
+              {resolved.courseOptions.status === 'mapping_unavailable' ? (
+                <RelationshipUnavailable
+                  label={text.coursesAndColleges}
+                  message={text.courseMappingUnavailable}
+                  retryLabel={text.tryAgain}
+                  retryAccessiblePrefix={text.retryAccessiblePrefix}
+                  retrying={false}
                 />
               ) : null}
               {relationFailure('courseOptions', text.coursesAndColleges)}

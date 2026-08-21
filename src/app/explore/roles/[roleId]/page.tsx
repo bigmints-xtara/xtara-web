@@ -167,7 +167,9 @@ export default function DreamCareerPage() {
   }, [roleId, user]);
 
   const careerId = response?.career.id ?? roleId;
-  const area = response?.career.futureDirectionIds.map((directionId) => getCareerArea(locale, directionId)).find(Boolean) ?? null;
+  const area = response?.career.primaryFutureDirectionId
+    ? getCareerArea(locale, response.career.primaryFutureDirectionId)
+    : null;
   const signedIn = Boolean(user && !user.isAnonymous);
   const isSelected = signedIn
     ? Boolean(studentContext?.saved)
@@ -283,8 +285,8 @@ export default function DreamCareerPage() {
       growthOutlook: undefined,
     }],
     strengths: studentContext?.assessmentReasons.map((reason) => reason.label) ?? [],
-    courses: covered('coursesAndColleges')
-      ? response.resolved.courseOptions.map((option) => option.courseTitle)
+    courses: covered('coursesAndColleges') && response.resolved.courseOptions.status === 'available'
+      ? response.resolved.courseOptions.items.map((option) => option.courseTitle)
       : [],
   });
 
@@ -343,6 +345,7 @@ function careerIdentityFromMissingGuide(error: unknown): CareerIdentityView | nu
   if (typeof value.id !== 'string'
     || typeof value.title !== 'string'
     || typeof value.summary !== 'string'
+    || (value.primaryFutureDirectionId !== null && typeof value.primaryFutureDirectionId !== 'string')
     || !Array.isArray(value.futureDirectionIds)
     || !value.futureDirectionIds.every((id) => typeof id === 'string')) {
     return null;
@@ -351,6 +354,7 @@ function careerIdentityFromMissingGuide(error: unknown): CareerIdentityView | nu
     id: value.id,
     title: value.title,
     summary: value.summary,
+    primaryFutureDirectionId: value.primaryFutureDirectionId,
     futureDirectionIds: value.futureDirectionIds,
     ...(typeof value.imageUrl === 'string' ? { imageUrl: value.imageUrl } : {}),
   };
