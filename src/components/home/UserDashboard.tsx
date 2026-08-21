@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import SlideshowOverlay from "@/components/career-path/SlideshowOverlay";
+import WeeklyPlanCard from "@/components/home/WeeklyPlanCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -245,7 +246,11 @@ export default function UserDashboard() {
 
       {selectedCareers.length ? (
         <>
-          <section id="next-steps" className="mt-8 grid scroll-mt-24 gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
+      <section className="mt-8" aria-label={text.progress}>
+        <WeeklyPlanCard />
+      </section>
+
+      <section id="next-steps" className="mt-8 grid scroll-mt-24 gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
             <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
               <div className="flex items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold text-primary">{text.myNextSteps}</h2><p className="mt-2 text-sm text-muted-foreground">{stepsDone}</p></div><span className="text-2xl font-semibold text-primary">{completedSteps}/{totalSteps}</span></div>
               {experience?.nextBest ? (

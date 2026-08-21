@@ -49,6 +49,9 @@ vi.mock('@/lib/query/useContentQuery', () => ({
 
 vi.mock('./StorySlideshow', () => ({ default: () => null }));
 vi.mock('./DownloadAppModal', () => ({ default: () => null }));
+vi.mock('@/components/home/WeeklyPlanCard', () => ({
+  default: () => <div data-testid="weekly-plan-card">My goals this week</div>,
+}));
 
 import UserDashboard from './UserDashboard';
 
@@ -112,6 +115,7 @@ describe('pursued-area learner dashboard', () => {
     expect(container.textContent).toContain('My Career Direction');
     expect(container.textContent).toContain('My Dream Careers');
     expect(container.textContent).toContain('My Next Steps');
+    expect(container.textContent).toContain('My goals this week');
     expect(container.textContent).not.toContain('Studies how people use a product or service');
     expect(container.textContent).toContain('My Rewards');
     expect(container.textContent).not.toContain('Notice user needs');
