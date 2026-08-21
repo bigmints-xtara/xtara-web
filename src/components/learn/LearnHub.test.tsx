@@ -82,17 +82,18 @@ describe("Learn information architecture", () => {
     await act(async () => { root?.render(<LearnHub />); });
 
     const content = container.textContent || "";
-    expect(container.querySelector("#learn-page-title")?.textContent).toBe("Learn and play");
+    expect(container.querySelector("#learn-page-title")?.textContent).toBe("Learn");
     expect(content).toContain("Your learning");
     expect(content).toContain("0/3");
     expect(content).toContain("Continue");
     expect(content.indexOf("Stories")).toBeLessThan(content.indexOf("Sparks"));
-    expect(content.indexOf("Sparks")).toBeLessThan(content.indexOf("Games"));
-    expect(content.indexOf("Games")).toBeLessThan(content.indexOf("Reading challenges"));
+    expect(content.indexOf("Sparks")).toBeLessThan(content.indexOf("Reading challenges"));
     expect(content.indexOf("Reading challenges")).toBeLessThan(content.indexOf("Good reads"));
     expect(content).toContain("Design lesson 5");
     expect(content).not.toContain("Design lesson 6");
     expect(content).not.toContain("My Career Direction");
+    expect(content).not.toContain("Design detective");
+    expect(content).not.toContain("Games");
     expect(container.querySelector('a[href="/learn/sparks"]')?.textContent).toContain("View all");
   });
 

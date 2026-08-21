@@ -45,6 +45,7 @@ describe("workspace-aware header", () => {
     expect(screen.getByRole("link", { name: "Xtara Logo" })).toHaveAttribute("href", "/dashboard");
     expect(screen.getAllByRole("link", { name: "Career" })[0]).toHaveAttribute("href", "/dashboard");
     expect(screen.getAllByRole("link", { name: "Learn" })[0]).toHaveAttribute("href", "/learn");
+    expect(screen.getAllByRole("link", { name: "Play" })[0]).toHaveAttribute("href", "/play");
     expect(screen.getAllByRole("link", { name: "Achievements" })[0]).toHaveAttribute("href", "/achievements");
     expect(screen.getAllByRole("link", { name: "Profile" })[0]).toHaveAttribute("href", "/profile");
     expect(screen.getAllByRole("link", { name: "Notifications" })[0]).toHaveAttribute("href", "/notifications");

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, BookOpen, Menu, Route, Trophy, UserRound } from 'lucide-react';
+import { Bell, BookOpen, Gamepad2, Menu, Route, Trophy, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from "@/context/AuthContext";
 import { useOrganizationWorkspace } from "@/context/OrganizationContext";
@@ -45,6 +45,7 @@ const Header = () => {
         ? [
             { key: "career", url: WORKSPACE_MANIFESTS.student.homePath },
             { key: "learn", url: "/learn" },
+            { key: "play", url: "/play" },
             { key: "achievements", url: "/achievements" },
             { key: "profile", url: WORKSPACE_MANIFESTS.student.profilePath },
         ]
@@ -76,6 +77,7 @@ const Header = () => {
 
     const learnerIcon = (key: string) => {
         if (key === "learn") return BookOpen;
+        if (key === "play") return Gamepad2;
         if (key === "achievements") return Trophy;
         if (key === "profile") return UserRound;
         return Route;
@@ -227,7 +229,7 @@ const Header = () => {
                 className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/96 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl xl:hidden"
                 aria-label={t("header.nav.learnerNavigation")}
             >
-                <ul className="mx-auto grid max-w-lg grid-cols-4 px-1">
+                <ul className="mx-auto grid max-w-lg grid-cols-5 px-1">
                     {navItems.map((item) => {
                         const Icon = learnerIcon(item.key);
                         const active = isActive(item.url);

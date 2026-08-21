@@ -25,6 +25,8 @@ export const WORKSPACE_MANIFESTS = {
       "/direction",
       "/dream-careers",
       "/explore",
+      "/learn",
+      "/play",
       "/achievements",
       "/profile",
     ],

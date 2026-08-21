@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, BookOpen, Gamepad2, Puzzle, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Puzzle, Sparkles } from "lucide-react";
 
 import DownloadAppModal from "@/components/home/DownloadAppModal";
 import StorySlideshow from "@/components/home/StorySlideshow";
@@ -21,8 +21,9 @@ import {
   type LearnSectionId,
 } from "./learn-content";
 
-const sectionIds = new Set<LearnSectionId>(["stories", "sparks", "games", "challenges", "reads"]);
-const icons = { stories: BookOpen, sparks: Sparkles, games: Gamepad2, challenges: Puzzle, reads: BookOpen } satisfies Record<LearnSectionId, typeof BookOpen>;
+type LearnLibrarySection = Exclude<LearnSectionId, "games">;
+const sectionIds = new Set<LearnLibrarySection>(["stories", "sparks", "challenges", "reads"]);
+const icons = { stories: BookOpen, sparks: Sparkles, challenges: Puzzle, reads: BookOpen } satisfies Record<LearnLibrarySection, typeof BookOpen>;
 
 export default function LearnLibrary() {
   const params = useParams<{ section: string }>();
@@ -30,7 +31,7 @@ export default function LearnLibrary() {
   const { user } = useAuth();
   const { locale } = useTranslations();
   const text = learnCopy[locale];
-  const section = sectionIds.has(params.section as LearnSectionId) ? params.section as LearnSectionId : null;
+  const section = sectionIds.has(params.section as LearnLibrarySection) ? params.section as LearnLibrarySection : null;
   const [experience, setExperience] = useState<MyCareerPathExperience | null>(null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
   const [requestVersion, setRequestVersion] = useState(0);
@@ -38,6 +39,10 @@ export default function LearnLibrary() {
   const [downloadTitle, setDownloadTitle] = useState<string | null>(null);
 
   useEffect(() => {
+    if (params.section === "games") {
+      router.replace("/play");
+      return;
+    }
     if (!section) {
       router.replace("/learn");
       return;
@@ -52,7 +57,7 @@ export default function LearnLibrary() {
       })
       .catch(() => { if (active) setLoadState("error"); });
     return () => { active = false; };
-  }, [locale, requestVersion, router, section, user?.uid]);
+  }, [locale, params.section, requestVersion, router, section, user?.uid]);
 
   const shelf = useMemo(
     () => experience && section ? buildLearnShelves(experience, text).find((candidate) => candidate.id === section) : null,
@@ -62,7 +67,6 @@ export default function LearnLibrary() {
   const fallbackHeading = section ? {
     stories: [text.stories, text.storiesHelp],
     sparks: [text.sparks, text.sparksHelp],
-    games: [text.games, text.gamesHelp],
     challenges: [text.challenges, text.challengesHelp],
     reads: [text.reads, text.readsHelp],
   }[section] : ["", ""];

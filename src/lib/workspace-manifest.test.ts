@@ -11,6 +11,8 @@ describe("workspace routing manifest", () => {
 
   it("classifies owned routes without prefix collisions", () => {
     expect(isWorkspaceRoute("student", "/assessment/discovery")).toBe(true);
+    expect(isWorkspaceRoute("student", "/learn/sparks")).toBe(true);
+    expect(isWorkspaceRoute("student", "/play")).toBe(true);
     expect(isWorkspaceRoute("educator", "/organization/students/member-1")).toBe(true);
     expect(isWorkspaceRoute("admin", "/admin/settings")).toBe(true);
     expect(isWorkspaceRoute("educator", "/admin")).toBe(false);

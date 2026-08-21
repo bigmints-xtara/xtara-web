@@ -28,8 +28,8 @@ export type LearnShelf = {
 export const learnCopy = {
   en: {
     eyebrow: "My Career Path",
-    title: "Learn and play",
-    description: "Stories, quick lessons, games, and challenges for your goals.",
+    title: "Learn",
+    description: "Stories, Sparks, reading challenges, and useful reads for your goals.",
     progress: "Your learning",
     progressHelp: "Complete activities to build your learning record.",
     continue: "Continue",
@@ -53,8 +53,8 @@ export const learnCopy = {
   },
   ml: {
     eyebrow: "എന്റെ കരിയർ വഴി",
-    title: "പഠിക്കാം, കളിക്കാം",
-    description: "നിങ്ങളുടെ ലക്ഷ്യങ്ങൾക്കുള്ള കഥകൾ, ചെറിയ പാഠങ്ങൾ, ഗെയിമുകൾ, ചലഞ്ചുകൾ.",
+    title: "പഠിക്കാം",
+    description: "നിങ്ങളുടെ ലക്ഷ്യങ്ങൾക്കുള്ള കഥകൾ, സ്പാർക്കുകൾ, വായനാ ചലഞ്ചുകൾ, നല്ല ലേഖനങ്ങൾ.",
     progress: "നിങ്ങളുടെ പഠനം",
     progressHelp: "നിങ്ങളുടെ പഠന രേഖ വളർത്താൻ പ്രവർത്തനങ്ങൾ പൂർത്തിയാക്കൂ.",
     continue: "തുടരൂ",
@@ -78,8 +78,8 @@ export const learnCopy = {
   },
   hi: {
     eyebrow: "मेरा करियर पथ",
-    title: "सीखें और खेलें",
-    description: "आपके लक्ष्यों के लिए कहानियाँ, छोटे पाठ, गेम और चुनौतियाँ।",
+    title: "सीखें",
+    description: "आपके लक्ष्यों के लिए कहानियाँ, स्पार्क्स, रीडिंग चैलेंज और उपयोगी लेख।",
     progress: "आपकी सीख",
     progressHelp: "अपना लर्निंग रिकॉर्ड बनाने के लिए गतिविधियाँ पूरी करें।",
     continue: "जारी रखें",
@@ -103,8 +103,8 @@ export const learnCopy = {
   },
   ta: {
     eyebrow: "என் தொழில் பாதை",
-    title: "கற்றலும் விளையாட்டும்",
-    description: "உங்கள் இலக்குகளுக்கான கதைகள், சிறு பாடங்கள், விளையாட்டுகள், சவால்கள்.",
+    title: "கற்றுக்கொள்ளுங்கள்",
+    description: "உங்கள் இலக்குகளுக்கான கதைகள், ஸ்பார்க்ஸ், வாசிப்பு சவால்கள் மற்றும் பயனுள்ள கட்டுரைகள்.",
     progress: "உங்கள் கற்றல்",
     progressHelp: "உங்கள் கற்றல் பதிவை உருவாக்க செயல்பாடுகளை முடிக்கவும்.",
     continue: "தொடரவும்",
@@ -145,7 +145,6 @@ export function buildLearnShelves(
   const specs: Array<[LearnSectionId, string, string]> = [
     ["stories", text.stories, text.storiesHelp],
     ["sparks", text.sparks, text.sparksHelp],
-    ["games", text.games, text.gamesHelp],
     ["challenges", text.challenges, text.challengesHelp],
     ["reads", text.reads, text.readsHelp],
   ];
@@ -161,6 +160,22 @@ export function buildLearnShelves(
       items: records.map((record) => toLearnItem(id, title, record)),
     };
   });
+}
+
+export function buildGameShelf(
+  experience: MyCareerPathExperience,
+  title: string,
+  description: string,
+): LearnShelf {
+  const group = experience.contentGroups.find((candidate) => candidate.id === "games");
+  const library = experience.contentLibraries?.find((candidate) => candidate.id === "games");
+  const records = group?.items.length ? group.items : library?.items ?? [];
+  return {
+    id: "games",
+    title,
+    description,
+    items: records.map((record) => toLearnItem("games", title, record)),
+  };
 }
 
 export function findRecommendedItem(
