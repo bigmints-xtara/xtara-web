@@ -2,11 +2,23 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useParams } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { DreamCareerStudentGuideResponse } from '@/types/dream-career-student-guide';
+import { XtaraApiError } from '@/lib/api/client';
+import {
+  createAreaDirectionPlan,
+  saveDirectionPlan,
+  toggleDreamCareer,
+} from '@/lib/direction';
+import type {
+  CareerGuideQuestionId,
+  DreamCareerStudentGuideResponse,
+} from '@/types/dream-career-student-guide';
 
 const mocks = vi.hoisted(() => ({
   getGuide: vi.fn(),
   getContext: vi.fn(),
+  getDirection: vi.fn(),
+  saveDirection: vi.fn(),
+  generateSlides: vi.fn(() => []),
   user: null as null | { uid: string; isAnonymous: boolean },
 }));
 
@@ -19,10 +31,34 @@ vi.mock('@/lib/dream-career-student-guide-api', () => ({
   getDreamCareerStudentGuide: mocks.getGuide,
   getDreamCareerStudentContext: mocks.getContext,
 }));
+vi.mock('@/lib/direction-api', () => ({
+  getDirectionFromApi: mocks.getDirection,
+  saveDirectionToApi: mocks.saveDirection,
+}));
+vi.mock('@/lib/career-slides-utils', () => ({
+  generateCareerConversationSlides: mocks.generateSlides,
+}));
 
 import DreamCareerPage from './page';
 
 function guideResponse(): DreamCareerStudentGuideResponse {
+  const questionIds: CareerGuideQuestionId[] = [
+    'whatYouDo', 'dayInLife', 'whyItMatters', 'earnings', 'notablePeople',
+    'relatedCareers', 'subjects', 'educationRoutes', 'coursesAndColleges',
+    'firstJobBridge', 'careerProgression', 'employers', 'opportunities',
+    'learningResources', 'skills', 'tools', 'entranceExams', 'starterActivity',
+  ];
+  const coverageItems = questionIds.map((questionId) => ({
+    questionId,
+    chapter: (['whatYouDo', 'dayInLife', 'whyItMatters', 'earnings', 'notablePeople', 'relatedCareers'] as string[]).includes(questionId)
+      ? 'aboutCareer' as const
+      : (['subjects', 'educationRoutes', 'coursesAndColleges', 'firstJobBridge', 'careerProgression', 'employers', 'opportunities'] as string[]).includes(questionId)
+        ? 'howToGetThere' as const
+        : 'whatYouCanDoNow' as const,
+    status: 'available' as const,
+    itemCount: 1,
+    evidence: { paths: [], sourceIds: ['source-one'] },
+  }));
   return {
     career: {
       id: 'data-engineer',
@@ -36,10 +72,10 @@ function guideResponse(): DreamCareerStudentGuideResponse {
       locale: 'en',
       aboutCareer: {
         whatYouDo: 'Designs and maintains reliable data systems.',
-        activities: [],
+        activities: [{ id: 'activity-1', title: 'Design data flows', description: 'Plan dependable data movement.', sourceIds: ['source-one'] }],
         dayInLife: [],
         whyItMatters: 'Good data helps people make sound decisions.',
-        earnings: [],
+        earnings: [{ id: 'earning-1', careerStage: 'junior', geography: 'India', currency: 'INR', amountMin: 600000, amountMax: 900000, period: 'year', asOf: '2026-08-01', sourceIds: ['source-one'] }],
         notablePeople: [],
         relatedCareerIds: [],
       },
@@ -56,14 +92,22 @@ function guideResponse(): DreamCareerStudentGuideResponse {
         skills: [{ skillId: 'skill-one', importance: 'core', howUsed: 'Break data problems into testable steps.', sourceIds: ['source-one'] }],
         tools: [],
         entranceExams: [],
-        starterActivity: null,
+        starterActivity: { id: 'starter-1', title: 'Clean a table', description: 'Find duplicate rows.', estimatedMinutes: 30, sourceIds: ['source-one'] },
       },
       additionalTopics: [],
       sources: [{ id: 'source-one', label: 'Career source', organization: 'Xtara Editorial', url: 'https://example.com/source', reviewStatus: 'reviewed' }],
       provenance: { sourceVersion: 'student-guide-v1', sourceIds: ['source-one'] },
     },
-    resolved: { relatedCareers: [], courseOptions: [], employers: [], opportunities: [], learningResources: [] },
-    coverage: { items: [], byQuestion: {} as DreamCareerStudentGuideResponse['coverage']['byQuestion'] },
+    resolved: {
+      labels: { subjects: [], skills: [], occupationalTools: [] },
+      relatedCareers: [],
+      courseOptions: [{ id: 'offering-1', courseConceptId: 'course-computing', courseTitle: 'BTech Computer Science', institution: { id: 'college-1', name: 'IIT Example' }, match: 'direct', releaseId: 'release-1' }],
+      employers: [], opportunities: [], learningResources: [],
+    },
+    coverage: {
+      items: coverageItems,
+      byQuestion: Object.fromEntries(coverageItems.map((item) => [item.questionId, item])) as unknown as DreamCareerStudentGuideResponse['coverage']['byQuestion'],
+    },
     relationshipErrors: [],
   };
 }
@@ -80,12 +124,20 @@ describe('Dream Career Student Guide page', () => {
   };
 
   beforeEach(() => {
+    mocks.getGuide.mockReset();
+    mocks.getContext.mockReset();
+    mocks.getDirection.mockReset();
+    mocks.saveDirection.mockReset();
+    mocks.generateSlides.mockReset();
+    mocks.generateSlides.mockReturnValue([]);
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
     Object.defineProperty(window, 'localStorage', { configurable: true, value: storage });
     vi.mocked(useParams).mockReturnValue({ roleId: 'data-engineer' });
     mocks.user = null;
     mocks.getGuide.mockResolvedValue(guideResponse());
     mocks.getContext.mockResolvedValue({ careerId: 'data-engineer', saved: false, assessmentReasons: [], location: {} });
+    mocks.getDirection.mockResolvedValue(null);
+    mocks.saveDirection.mockRejectedValue(new Error('save not configured'));
     localStorage.clear();
   });
 
@@ -93,7 +145,7 @@ describe('Dream Career Student Guide page', () => {
     render(<DreamCareerPage />);
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer', level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'About the career' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'About career' })).toBeInTheDocument();
     expect(screen.getByText('Designs and maintains reliable data systems.')).toBeInTheDocument();
     expect(screen.queryByText('Choose this Career Direction')).not.toBeInTheDocument();
     expect(mocks.getGuide).toHaveBeenCalledWith('data-engineer', expect.objectContaining({ locale: 'en' }));
@@ -119,6 +171,81 @@ describe('Dream Career Student Guide page', () => {
     await waitFor(() => expect(mocks.getContext).toHaveBeenCalledWith('data-engineer', expect.any(Object)));
   });
 
+  it('keeps stale guide facts out of the hero and Career Conversation payload', async () => {
+    const value = guideResponse();
+    for (const questionId of ['whyItMatters', 'whatYouDo', 'earnings', 'educationRoutes', 'coursesAndColleges', 'starterActivity'] as CareerGuideQuestionId[]) {
+      value.coverage.byQuestion[questionId].status = questionId === 'educationRoutes' ? 'missing' : 'stale';
+      value.coverage.items.find((item) => item.questionId === questionId)!.status = value.coverage.byQuestion[questionId].status;
+    }
+    mocks.getGuide.mockResolvedValue(value);
+
+    render(<DreamCareerPage />);
+
+    expect(await screen.findByRole('heading', { name: 'Data Engineer' })).toBeInTheDocument();
+    expect(screen.queryByText('Good data helps people make sound decisions.')).not.toBeInTheDocument();
+    expect(mocks.generateSlides).toHaveBeenLastCalledWith(expect.objectContaining({
+      careers: [expect.objectContaining({
+        dailyWork: [],
+        preparation: '',
+        tryThis: '',
+        salaryRange: undefined,
+      })],
+      courses: [],
+    }));
+  });
+
+  it('derives signed-in mutations from the remote Direction plan and updates only after readback', async () => {
+    mocks.user = { uid: 'student-1', isAnonymous: false };
+    const remote = createAreaDirectionPlan('technology');
+    const saved = toggleDreamCareer(remote, 'data-engineer');
+    saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('technology'), 'another-career'));
+    mocks.getDirection.mockResolvedValueOnce(remote).mockResolvedValueOnce(saved);
+    mocks.getContext
+      .mockResolvedValueOnce({ careerId: 'data-engineer', saved: false, assessmentReasons: [], location: {} })
+      .mockResolvedValueOnce({ careerId: 'data-engineer', saved: true, assessmentReasons: [], location: {} });
+    let resolveSave!: (value: typeof saved) => void;
+    mocks.saveDirection.mockReturnValue(new Promise((resolve) => { resolveSave = resolve; }));
+
+    render(<DreamCareerPage />);
+
+    const add = await screen.findByRole('button', { name: 'Add to My Dream Careers' });
+    await waitFor(() => expect(mocks.getDirection).toHaveBeenCalledOnce());
+    fireEvent.click(add);
+    await waitFor(() => expect(mocks.saveDirection).toHaveBeenCalledWith(expect.objectContaining({
+      areaId: 'technology',
+      dreamCareerIds: ['data-engineer'],
+    })));
+    expect(screen.getByRole('button', { name: 'Add to My Dream Careers' })).toBeInTheDocument();
+
+    resolveSave(saved);
+    expect(await screen.findByRole('button', { name: 'Remove from My Dream Careers' })).toBeInTheDocument();
+    expect(mocks.getDirection).toHaveBeenCalledTimes(2);
+    expect(mocks.getContext).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows an honest unavailable state when no compatible signed-in Direction plan exists', async () => {
+    mocks.user = { uid: 'student-1', isAnonymous: false };
+    mocks.getDirection.mockResolvedValue(createAreaDirectionPlan('health'));
+
+    render(<DreamCareerPage />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Add to My Dream Careers' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Saving is unavailable because this career does not match a saved Career Direction in your account.');
+    expect(mocks.saveDirection).not.toHaveBeenCalled();
+  });
+
+  it('keeps signed-in save state unchanged and reports mutation failures', async () => {
+    mocks.user = { uid: 'student-1', isAnonymous: false };
+    mocks.getDirection.mockResolvedValue(createAreaDirectionPlan('technology'));
+    mocks.saveDirection.mockRejectedValue(new Error('write failed'));
+
+    render(<DreamCareerPage />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Add to My Dream Careers' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('We could not update My Dream Careers. Your saved state has not changed.');
+    expect(screen.getByRole('button', { name: 'Add to My Dream Careers' })).toBeInTheDocument();
+  });
+
   it('shows loading and an honest retryable guide error without legacy fallback content', async () => {
     mocks.getGuide.mockRejectedValueOnce(new Error('guide unavailable')).mockResolvedValueOnce(guideResponse());
 
@@ -129,6 +256,23 @@ describe('Dream Career Student Guide page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByRole('heading', { name: 'Data Engineer' })).toBeInTheDocument();
     expect(mocks.getGuide).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders reviewed career identity and an honest guide-unavailable state for a missing-guide 404', async () => {
+    mocks.getGuide.mockRejectedValue(new XtaraApiError(
+      'Published Student Guide not found',
+      404,
+      'request-guide-missing',
+      { career: { id: 'data-engineer', title: 'Data Engineer', summary: 'Reviewed career summary.', futureDirectionIds: ['technology'] } },
+    ));
+
+    render(<DreamCareerPage />);
+
+    expect(await screen.findByRole('heading', { name: 'Data Engineer', level: 1 })).toBeInTheDocument();
+    expect(screen.getByText('Reviewed career summary.')).toBeInTheDocument();
+    expect(screen.getByText('Student Guide is not available for this career yet.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'About career' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   });
 
   it('retries and replaces only the failed relationship subsection', async () => {

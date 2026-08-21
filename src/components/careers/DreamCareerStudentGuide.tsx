@@ -40,6 +40,7 @@ type GuideLabels = {
   seeAll: string;
   showLess: string;
   tryAgain: string;
+  retryAccessiblePrefix: string;
   relationshipUnavailable: string;
   loading: string;
   unavailable: string;
@@ -54,7 +55,7 @@ type GuideLabels = {
 
 const english: GuideLabels = {
   chapterNavigation: 'Career guide chapters',
-  aboutCareer: 'About the career',
+  aboutCareer: 'About career',
   aboutCareerIntro: 'Understand the work, the people it helps, and what a working day can feel like.',
   howToGetThere: 'How to get there',
   howToGetThereIntro: 'See the subjects, study routes, and first steps that can lead from school to work.',
@@ -68,8 +69,8 @@ const english: GuideLabels = {
   relatedCareers: 'Related careers',
   subjects: 'Subjects to focus on now',
   educationRoutes: 'Study routes',
-  coursesAndColleges: 'Courses, colleges and cost',
-  firstJobBridge: 'From graduation to a first job',
+  coursesAndColleges: 'Courses, colleges, cost',
+  firstJobBridge: 'From graduation first job',
   careerProgression: 'Career progression',
   employers: 'Companies that hire for this career',
   opportunities: 'Internship opportunities',
@@ -77,10 +78,11 @@ const english: GuideLabels = {
   skills: 'Skills to build',
   tools: 'Tools to learn',
   entranceExams: 'Entrance exams to consider',
-  starterActivity: 'Try this now',
+  starterActivity: 'Try it week',
   seeAll: 'See all',
   showLess: 'Show less',
   tryAgain: 'Try again',
+  retryAccessiblePrefix: 'Retry',
   relationshipUnavailable: 'This information is temporarily unavailable.',
   loading: 'Loading career guide',
   unavailable: 'This career guide is temporarily unavailable.',
@@ -121,10 +123,11 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     skills: 'വളർത്തേണ്ട കഴിവുകൾ',
     tools: 'പഠിക്കേണ്ട ഉപകരണങ്ങൾ',
     entranceExams: 'പരിഗണിക്കേണ്ട പ്രവേശന പരീക്ഷകൾ',
-    starterActivity: 'ഇപ്പോൾ ഇത് പരീക്ഷിക്കൂ',
     seeAll: 'എല്ലാം കാണൂ',
     showLess: 'കുറച്ച് കാണൂ',
     tryAgain: 'വീണ്ടും ശ്രമിക്കൂ',
+    retryAccessiblePrefix: 'വീണ്ടും ശ്രമിക്കൂ:',
+    starterActivity: 'ഈ ആഴ്ച ഇത് പരീക്ഷിക്കൂ',
     relationshipUnavailable: 'ഈ വിവരം ഇപ്പോൾ ലഭ്യമല്ല.',
     loading: 'കരിയർ ഗൈഡ് ലോഡ് ചെയ്യുന്നു',
     unavailable: 'ഈ കരിയർ ഗൈഡ് ഇപ്പോൾ ലഭ്യമല്ല.',
@@ -162,10 +165,11 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     skills: 'बनाने वाले कौशल',
     tools: 'सीखने वाले औज़ार',
     entranceExams: 'विचार करने योग्य प्रवेश परीक्षाएँ',
-    starterActivity: 'अभी यह आज़माएँ',
     seeAll: 'सभी देखें',
     showLess: 'कम दिखाएँ',
     tryAgain: 'फिर कोशिश करें',
+    retryAccessiblePrefix: 'फिर कोशिश करें:',
+    starterActivity: 'इस हफ़्ते इसे आज़माएँ',
     relationshipUnavailable: 'यह जानकारी अभी उपलब्ध नहीं है।',
     loading: 'करियर गाइड लोड हो रही है',
     unavailable: 'यह करियर गाइड अभी उपलब्ध नहीं है।',
@@ -203,10 +207,11 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     skills: 'வளர்க்க வேண்டிய திறன்கள்',
     tools: 'கற்றுக்கொள்ள வேண்டிய கருவிகள்',
     entranceExams: 'கருத்தில் கொள்ள வேண்டிய நுழைவுத் தேர்வுகள்',
-    starterActivity: 'இப்போது இதை முயற்சிக்கவும்',
     seeAll: 'அனைத்தையும் காண்க',
     showLess: 'குறைவாகக் காண்க',
     tryAgain: 'மீண்டும் முயற்சிக்கவும்',
+    retryAccessiblePrefix: 'மீண்டும் முயற்சிக்கவும்:',
+    starterActivity: 'இந்த வாரம் இதை முயற்சிக்கவும்',
     relationshipUnavailable: 'இந்தத் தகவல் இப்போது கிடைக்கவில்லை.',
     loading: 'தொழில் வழிகாட்டி ஏற்றப்படுகிறது',
     unavailable: 'இந்தத் தொழில் வழிகாட்டி இப்போது கிடைக்கவில்லை.',
@@ -237,7 +242,25 @@ export function DreamCareerStudentGuide({
   const relationshipError = (subsection: CareerGuideRelationshipSubsection) => (
     response.relationshipErrors.find((error) => error.subsection === subsection)
   );
-  const current = (questionId: CareerGuideQuestionId) => response.coverage.byQuestion[questionId]?.status !== 'stale';
+  const current = (questionId: CareerGuideQuestionId) => {
+    const status = response.coverage.byQuestion[questionId]?.status;
+    return status === 'available' || status === 'partial';
+  };
+  const subjectLabels = new Map(resolved.labels.subjects.map((item) => [item.id, item.label]));
+  const skillLabels = new Map(resolved.labels.skills.map((item) => [item.id, item.label]));
+  const toolLabels = new Map(resolved.labels.occupationalTools.map((item) => [item.id, item.label]));
+  const subjects = guide.howToGetThere.subjects.flatMap((subject) => {
+    const label = subjectLabels.get(subject.subjectId);
+    return label ? [{ ...subject, label }] : [];
+  });
+  const skills = guide.whatYouCanDoNow.skills.flatMap((skill) => {
+    const label = skillLabels.get(skill.skillId);
+    return label ? [{ ...skill, label }] : [];
+  });
+  const tools = guide.whatYouCanDoNow.tools.flatMap((tool) => {
+    const label = toolLabels.get(tool.toolId);
+    return label ? [{ ...tool, label }] : [];
+  });
 
   const relationFailure = (subsection: CareerGuideRelationshipSubsection, heading: string) => {
     const error = relationshipError(subsection);
@@ -247,6 +270,7 @@ export function DreamCareerStudentGuide({
         label={heading}
         message={text.relationshipUnavailable}
         retryLabel={text.tryAgain}
+        retryAccessiblePrefix={text.retryAccessiblePrefix}
         retrying={Boolean(retryingRelationships[subsection])}
         onRetry={onRetryRelationship ? () => onRetryRelationship(subsection) : undefined}
       />
@@ -342,13 +366,13 @@ export function DreamCareerStudentGuide({
         </GuideChapter>
 
         <GuideChapter id="how-to-get-there" title={text.howToGetThere} intro={text.howToGetThereIntro}>
-          {current('subjects') && guide.howToGetThere.subjects.length ? (
+          {current('subjects') && subjects.length ? (
             <AnswerSection title={text.subjects}>
               <ProgressiveList
-                items={guide.howToGetThere.subjects}
+                items={subjects}
                 labels={text}
                 renderItem={(subject) => (
-                  <GuideItem title={enumLabel(subject.importance, locale)} meta={subject.gradeIds.map((grade) => formatGrade(grade, locale)).join(' · ')}>{subject.guidance}</GuideItem>
+                  <GuideItem title={subject.label} meta={`${enumLabel(subject.importance, locale)} · ${subject.gradeIds.map((grade) => formatGrade(grade, locale)).join(' · ')}`}>{subject.guidance}</GuideItem>
                 )}
               />
             </AnswerSection>
@@ -457,22 +481,22 @@ export function DreamCareerStudentGuide({
             </AnswerSection>
           ) : null}
 
-          {current('skills') && guide.whatYouCanDoNow.skills.length ? (
+          {current('skills') && skills.length ? (
             <AnswerSection title={text.skills}>
               <ProgressiveList
-                items={guide.whatYouCanDoNow.skills}
+                items={skills}
                 labels={text}
-                renderItem={(skill) => <GuideItem title={enumLabel(skill.importance, locale)}>{skill.howUsed}</GuideItem>}
+                renderItem={(skill) => <GuideItem title={skill.label} meta={enumLabel(skill.importance, locale)}>{skill.howUsed}</GuideItem>}
               />
             </AnswerSection>
           ) : null}
 
-          {current('tools') && guide.whatYouCanDoNow.tools.length ? (
+          {current('tools') && tools.length ? (
             <AnswerSection title={text.tools}>
               <ProgressiveList
-                items={guide.whatYouCanDoNow.tools}
+                items={tools}
                 labels={text}
-                renderItem={(tool) => <GuideItem title={enumLabel(tool.importance, locale)}>{tool.whyLearn}</GuideItem>}
+                renderItem={(tool) => <GuideItem title={tool.label} meta={enumLabel(tool.importance, locale)}>{tool.whyLearn}</GuideItem>}
               />
             </AnswerSection>
           ) : null}
@@ -598,12 +622,12 @@ function OrderedGuideItems({ items, labels: text }: { items: Array<{ id: string;
   );
 }
 
-function RelationshipUnavailable({ label, message, retryLabel, retrying, onRetry }: { label: string; message: string; retryLabel: string; retrying: boolean; onRetry?: () => void }) {
+function RelationshipUnavailable({ label, message, retryLabel, retryAccessiblePrefix, retrying, onRetry }: { label: string; message: string; retryLabel: string; retryAccessiblePrefix: string; retrying: boolean; onRetry?: () => void }) {
   return (
     <div className="rounded-xl border border-border bg-muted/30 p-4">
       <p>{message}</p>
       {onRetry ? (
-        <button type="button" aria-label={`Retry ${label.toLowerCase()}`} disabled={retrying} className="mt-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
+        <button type="button" aria-label={`${retryAccessiblePrefix} ${label.toLocaleLowerCase()}`} disabled={retrying} className="mt-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
           {retryLabel}
         </button>
       ) : null}

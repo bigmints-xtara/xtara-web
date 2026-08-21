@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from '@/i18n/language-provider';
+import { XtaraApiError } from '@/lib/api/client';
 import { getCareerArea } from '@/lib/career-knowledge';
 import { generateCareerConversationSlides } from '@/lib/career-slides-utils';
 import {
@@ -28,10 +29,13 @@ import {
   parseDirectionPlan,
   saveDirectionPlan,
   subscribeToDirection,
+  switchCareerDirection,
   toggleDreamCareer,
+  type DirectionPlan,
 } from '@/lib/direction';
-import { saveDirectionToApi } from '@/lib/direction-api';
+import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
 import type {
+  CareerIdentityView,
   CareerGuideQuestionId,
   CareerGuideRelationshipSubsection,
   CareerStudentContextResponse,
@@ -72,16 +76,47 @@ const pageCopy = {
   },
 } as const;
 
+const selectionCopy: Record<DreamCareerGuideLocale, {
+  saveUnavailable: string;
+  saveFailed: string;
+  guideUnavailable: string;
+}> = {
+  en: {
+    saveUnavailable: 'Saving is unavailable because this career does not match a saved Career Direction in your account.',
+    saveFailed: 'We could not update My Dream Careers. Your saved state has not changed.',
+    guideUnavailable: 'Student Guide is not available for this career yet.',
+  },
+  ml: {
+    saveUnavailable: 'നിങ്ങളുടെ അക്കൗണ്ടിലെ സേവ് ചെയ്ത കരിയർ ദിശയുമായി ഈ കരിയർ യോജിക്കുന്നില്ല.',
+    saveFailed: 'എന്റെ ഡ്രീം കരിയറുകൾ മാറ്റാൻ കഴിഞ്ഞില്ല. സേവ് ചെയ്ത നില മാറിയിട്ടില്ല.',
+    guideUnavailable: 'ഈ കരിയറിന്റെ സ്റ്റുഡന്റ് ഗൈഡ് ഇതുവരെ ലഭ്യമല്ല.',
+  },
+  hi: {
+    saveUnavailable: 'यह करियर आपके खाते में सेव Career Direction से मेल नहीं खाता, इसलिए सेव करना उपलब्ध नहीं है।',
+    saveFailed: 'हम My Dream Careers को अपडेट नहीं कर सके। आपकी सेव की गई स्थिति नहीं बदली है।',
+    guideUnavailable: 'इस करियर के लिए Student Guide अभी उपलब्ध नहीं है।',
+  },
+  ta: {
+    saveUnavailable: 'உங்கள் கணக்கில் சேமிக்கப்பட்ட தொழில் திசையுடன் இந்தத் தொழில் பொருந்தவில்லை; எனவே சேமிக்க முடியாது.',
+    saveFailed: 'My Dream Careers-ஐ மாற்ற முடியவில்லை. உங்கள் சேமிப்பு நிலை மாறவில்லை.',
+    guideUnavailable: 'இந்தத் தொழிலுக்கான Student Guide இன்னும் கிடைக்கவில்லை.',
+  },
+};
+
 export default function DreamCareerPage() {
   const { roleId } = useParams<{ roleId: string }>();
   const { user } = useAuth();
   const { locale } = useTranslations();
   const guideLocale = locale as DreamCareerGuideLocale;
   const text = pageCopy[guideLocale];
+  const stateText = selectionCopy[guideLocale];
   const [response, setResponse] = useState<DreamCareerStudentGuideResponse | null>(null);
+  const [missingGuideCareer, setMissingGuideCareer] = useState<CareerIdentityView | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [studentContext, setStudentContext] = useState<CareerStudentContextResponse | null>(null);
+  const [remotePlan, setRemotePlan] = useState<DirectionPlan | null>(null);
+  const [selectionUpdating, setSelectionUpdating] = useState(false);
   const [conversationOpen, setConversationOpen] = useState(false);
   const [selectionError, setSelectionError] = useState('');
   const [retryingRelationships, setRetryingRelationships] = useState<Partial<Record<CareerGuideRelationshipSubsection, boolean>>>({});
@@ -91,13 +126,16 @@ export default function DreamCareerPage() {
   const loadGuide = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     setLoadFailed(false);
+    setMissingGuideCareer(null);
     try {
       const next = await getDreamCareerStudentGuide(roleId, { locale: guideLocale, signal });
       if (!signal?.aborted) setResponse(next);
-    } catch {
+    } catch (error) {
       if (!signal?.aborted) {
         setResponse(null);
-        setLoadFailed(true);
+        const identity = careerIdentityFromMissingGuide(error);
+        if (identity) setMissingGuideCareer(identity);
+        else setLoadFailed(true);
       }
     } finally {
       if (!signal?.aborted) setLoading(false);
@@ -112,39 +150,82 @@ export default function DreamCareerPage() {
 
   useEffect(() => {
     setStudentContext(null);
+    setRemotePlan(null);
     if (!user || user.isAnonymous) return;
     const controller = new AbortController();
-    getDreamCareerStudentContext(roleId, { signal: controller.signal })
-      .then((context) => { if (!controller.signal.aborted) setStudentContext(context); })
+    Promise.all([
+      getDreamCareerStudentContext(roleId, { signal: controller.signal }),
+      getDirectionFromApi(),
+    ])
+      .then(([context, direction]) => {
+        if (controller.signal.aborted) return;
+        setStudentContext(context);
+        setRemotePlan(direction);
+      })
       .catch(() => undefined);
     return () => controller.abort();
   }, [roleId, user]);
 
   const careerId = response?.career.id ?? roleId;
   const area = response?.career.futureDirectionIds.map((directionId) => getCareerArea(locale, directionId)).find(Boolean) ?? null;
-  const isSelected = studentContext?.saved ?? Boolean(plan?.dreamCareerIds.includes(careerId));
+  const signedIn = Boolean(user && !user.isAnonymous);
+  const isSelected = signedIn
+    ? Boolean(studentContext?.saved)
+    : Boolean(plan?.dreamCareerIds.includes(careerId));
 
   const updateSelection = async () => {
     setSelectionError('');
-    if (!plan) {
-      setSelectionError(text.needsDirection);
+    if (!signedIn) {
+      if (!plan) {
+        setSelectionError(text.needsDirection);
+        return;
+      }
+      if (!isSelected && plan.dreamCareerIds.length >= 3) {
+        setSelectionError(text.max);
+        return;
+      }
+      saveDirectionPlan(toggleDreamCareer(plan, careerId));
       return;
     }
-    if (!isSelected && plan.dreamCareerIds.length >= 3) {
+
+    if (!response || !studentContext || !remotePlan) {
+      setSelectionError(stateText.saveUnavailable);
+      return;
+    }
+    const mutation = deriveSignedInSelectionMutation(
+      remotePlan,
+      careerId,
+      response.career.futureDirectionIds,
+      isSelected,
+    );
+    if (mutation.status === 'unavailable') {
+      setSelectionError(stateText.saveUnavailable);
+      return;
+    }
+    if (mutation.status === 'max') {
       setSelectionError(text.max);
       return;
     }
-    const next = toggleDreamCareer(plan, careerId);
-    saveDirectionPlan(next);
-    setStudentContext((current) => current ? { ...current, saved: next.dreamCareerIds.includes(careerId) } : current);
-    if (user && !user.isAnonymous) {
-      try {
-        const saved = await saveDirectionToApi(next);
-        saveDirectionPlan(saved);
-        setStudentContext((current) => current ? { ...current, saved: saved.dreamCareerIds.includes(careerId) } : current);
-      } catch {
-        // Canonical reading and local continuity do not depend on the signed-in overlay.
+
+    setSelectionUpdating(true);
+    try {
+      const saved = await saveDirectionToApi(mutation.plan);
+      const [readPlan, readContext] = await Promise.all([
+        getDirectionFromApi(),
+        getDreamCareerStudentContext(careerId),
+      ]);
+      if (!readPlan
+        || !directionSelectionsMatch(readPlan, saved)
+        || readContext.saved !== mutation.expectedSaved) {
+        throw new Error('Direction readback did not match the saved selection');
       }
+      setRemotePlan(readPlan);
+      setStudentContext(readContext);
+      saveDirectionPlan(readPlan);
+    } catch {
+      setSelectionError(stateText.saveFailed);
+    } finally {
+      setSelectionUpdating(false);
     }
   };
 
@@ -161,26 +242,50 @@ export default function DreamCareerPage() {
   };
 
   if (loading && !response) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
+  if (missingGuideCareer) {
+    return (
+      <PageFrame>
+        <section className="mx-auto max-w-4xl px-5 py-16 sm:py-24">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.overview}</p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-primary sm:text-6xl">{missingGuideCareer.title}</h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
+          <p className="mt-10 rounded-2xl border border-border bg-card p-6 text-foreground">{stateText.guideUnavailable}</p>
+        </section>
+      </PageFrame>
+    );
+  }
   if (loadFailed || !response) return <PageFrame><DreamCareerStudentGuideError locale={guideLocale} onRetry={() => void loadGuide()} /></PageFrame>;
 
   const guide = response.guide;
-  const firstEarning = guide.aboutCareer.earnings[0];
+  const covered = (questionId: CareerGuideQuestionId) => {
+    const status = response.coverage.byQuestion[questionId]?.status;
+    return status === 'available' || status === 'partial';
+  };
+  const firstEarning = covered('earnings') ? guide.aboutCareer.earnings[0] : undefined;
   const conversationSlides = generateCareerConversationSlides({
     locale,
     directionTitle: area?.title ?? text.dreamCareer,
     careers: [{
       title: response.career.title,
       summary: response.career.summary,
-      dailyWork: guide.aboutCareer.activities.map((activity) => activity.title),
+      dailyWork: covered('whatYouDo')
+        ? guide.aboutCareer.activities.map((activity) => activity.title)
+        : [],
       workSetting: '',
-      preparation: guide.howToGetThere.educationRoutes.map((route) => route.description).join(' '),
-      tryThis: guide.whatYouCanDoNow.starterActivity?.description ?? '',
+      preparation: covered('educationRoutes')
+        ? guide.howToGetThere.educationRoutes.map((route) => route.description).join(' ')
+        : '',
+      tryThis: covered('starterActivity')
+        ? guide.whatYouCanDoNow.starterActivity?.description ?? ''
+        : '',
       difficultParts: [],
       salaryRange: firstEarning ? `${firstEarning.amountMin}–${firstEarning.amountMax} ${firstEarning.currency} per ${firstEarning.period}` : undefined,
       growthOutlook: undefined,
     }],
     strengths: studentContext?.assessmentReasons.map((reason) => reason.label) ?? [],
-    courses: response.resolved.courseOptions.map((option) => option.courseTitle),
+    courses: covered('coursesAndColleges')
+      ? response.resolved.courseOptions.map((option) => option.courseTitle)
+      : [],
   });
 
   return (
@@ -203,9 +308,9 @@ export default function DreamCareerPage() {
             <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.overview}</p>
             <h1 className="mt-3 max-w-4xl text-5xl font-semibold leading-[0.98] tracking-[-0.05em] text-primary sm:text-7xl">{response.career.title}</h1>
             <p className="mt-7 max-w-3xl text-xl leading-9 text-muted-foreground">{response.career.summary}</p>
-            {guide.aboutCareer.whyItMatters.trim() ? <p className="mt-7 max-w-2xl border-l-2 border-primary/35 pl-5 text-base leading-7 text-foreground">{guide.aboutCareer.whyItMatters}</p> : null}
+            {covered('whyItMatters') && guide.aboutCareer.whyItMatters.trim() ? <p className="mt-7 max-w-2xl border-l-2 border-primary/35 pl-5 text-base leading-7 text-foreground">{guide.aboutCareer.whyItMatters}</p> : null}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} onClick={() => void updateSelection()}>
+              <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
                 {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? text.remove : text.add}
               </Button>
               <Button size="lg" variant="secondary" className="rounded-full" onClick={() => setConversationOpen(true)}>
@@ -226,6 +331,82 @@ export default function DreamCareerPage() {
 
 function PageFrame({ children }: { children: React.ReactNode }) {
   return <div className="min-h-screen bg-background text-foreground"><Header /><main>{children}</main><Footer /></div>;
+}
+
+function careerIdentityFromMissingGuide(error: unknown): CareerIdentityView | null {
+  if (!(error instanceof XtaraApiError) || error.status !== 404) return null;
+  const details = error.details;
+  if (!details || typeof details !== 'object' || Array.isArray(details)) return null;
+  const career = (details as { career?: unknown }).career;
+  if (!career || typeof career !== 'object' || Array.isArray(career)) return null;
+  const value = career as Partial<CareerIdentityView>;
+  if (typeof value.id !== 'string'
+    || typeof value.title !== 'string'
+    || typeof value.summary !== 'string'
+    || !Array.isArray(value.futureDirectionIds)
+    || !value.futureDirectionIds.every((id) => typeof id === 'string')) {
+    return null;
+  }
+  return {
+    id: value.id,
+    title: value.title,
+    summary: value.summary,
+    futureDirectionIds: value.futureDirectionIds,
+    ...(typeof value.imageUrl === 'string' ? { imageUrl: value.imageUrl } : {}),
+  };
+}
+
+type SelectionMutation =
+  | { status: 'ready'; plan: DirectionPlan; expectedSaved: boolean }
+  | { status: 'max' }
+  | { status: 'unavailable' };
+
+function deriveSignedInSelectionMutation(
+  plan: DirectionPlan,
+  careerId: string,
+  careerDirectionIds: string[],
+  selected: boolean,
+): SelectionMutation {
+  const originalAreaId = plan.areaId;
+  if (selected) {
+    const containingDirections = Object.entries(plan.savedDirections)
+      .filter(([, saved]) => saved.dreamCareerIds.includes(careerId))
+      .map(([areaId]) => areaId);
+    if (!containingDirections.length) return { status: 'unavailable' };
+    let next = plan;
+    for (const areaId of containingDirections) {
+      next = switchCareerDirection(next, areaId);
+      next = toggleDreamCareer(next, careerId);
+    }
+    if (next.areaId !== originalAreaId) next = switchCareerDirection(next, originalAreaId);
+    return { status: 'ready', plan: next, expectedSaved: false };
+  }
+
+  const compatibleAreaId = [plan.areaId, ...careerDirectionIds]
+    .find((areaId, index, values) => (
+      values.indexOf(areaId) === index
+      && careerDirectionIds.includes(areaId)
+      && Boolean(plan.savedDirections[areaId])
+    ));
+  if (!compatibleAreaId) return { status: 'unavailable' };
+  if (plan.savedDirections[compatibleAreaId].dreamCareerIds.length >= 3) return { status: 'max' };
+
+  let next = switchCareerDirection(plan, compatibleAreaId);
+  next = toggleDreamCareer(next, careerId);
+  if (next.areaId !== originalAreaId) next = switchCareerDirection(next, originalAreaId);
+  return { status: 'ready', plan: next, expectedSaved: true };
+}
+
+function directionSelectionsMatch(left: DirectionPlan, right: DirectionPlan): boolean {
+  if (left.areaId !== right.areaId) return false;
+  const areaIds = Array.from(new Set([
+    ...Object.keys(left.savedDirections),
+    ...Object.keys(right.savedDirections),
+  ])).sort();
+  return areaIds.every((areaId) => (
+    left.savedDirections[areaId]?.dreamCareerIds.join('\u0000')
+      === right.savedDirections[areaId]?.dreamCareerIds.join('\u0000')
+  ));
 }
 
 const relationshipQuestion: Record<CareerGuideRelationshipSubsection, CareerGuideQuestionId> = {

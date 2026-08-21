@@ -240,6 +240,11 @@ export interface CareerLearningResourceView {
   cost: 'free' | 'paid' | 'varies';
 }
 
+export interface CareerGuideLabelView {
+  id: string;
+  label: string;
+}
+
 export type CareerGuideRelationshipSubsection =
   | 'relatedCareers'
   | 'courseOptions'
@@ -257,6 +262,11 @@ export interface DreamCareerStudentGuideResponse {
   career: CareerIdentityView;
   guide: DreamCareerStudentGuideV1;
   resolved: {
+    labels: {
+      subjects: CareerGuideLabelView[];
+      skills: CareerGuideLabelView[];
+      occupationalTools: CareerGuideLabelView[];
+    };
     relatedCareers: CareerIdentityView[];
     courseOptions: CareerCourseOptionView[];
     employers: CareerEmployerView[];

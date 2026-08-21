@@ -112,6 +112,11 @@ function response(): DreamCareerStudentGuideResponse {
       provenance: { sourceVersion: 'student-guide-v1', sourceIds: ['source-one'], authoredAt: '2026-08-01T00:00:00Z', authoredBy: 'Xtara Editorial' },
     },
     resolved: {
+      labels: {
+        subjects: [{ id: 'subject-mathematics', label: 'Mathematics' }],
+        skills: [{ id: 'skill-problem-solving', label: 'Problem solving' }],
+        occupationalTools: [{ id: 'tool-sql', label: 'SQL' }],
+      },
       relatedCareers: [{ id: 'analytics-engineer', title: 'Analytics Engineer', summary: 'Turns prepared data into useful models.', futureDirectionIds: ['technology'] }],
       courseOptions: [{ id: 'offering-1', courseConceptId: 'course-computing', courseTitle: 'BTech Computer Science', institution: { id: 'college-1', name: 'IIT Example', city: 'Kochi', state: 'Kerala', country: 'India' }, match: 'direct', releaseId: 'release-1' }],
       employers: [{ id: 'employer-1', name: 'Data Systems India', geography: 'India', verifiedAt: '2026-08-01T00:00:00Z', website: 'https://example.com/employer', evidenceSourceIds: ['source-one'] }],
@@ -131,7 +136,7 @@ describe('DreamCareerStudentGuide', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
-      'About the career',
+      'About career',
       'How to get there',
       'What I can do now',
     ]);
@@ -144,8 +149,8 @@ describe('DreamCareerStudentGuide', () => {
       'Related careers',
       'Subjects to focus on now',
       'Study routes',
-      'Courses, colleges and cost',
-      'From graduation to a first job',
+      'Courses, colleges, cost',
+      'From graduation first job',
       'Career progression',
       'Companies that hire for this career',
       'Internship opportunities',
@@ -153,8 +158,43 @@ describe('DreamCareerStudentGuide', () => {
       'Skills to build',
       'Tools to learn',
       'Entrance exams to consider',
-      'Try this now',
+      'Try it week',
     ]);
+  });
+
+  it('renders API-owned human labels and omits guidance with no reviewed label projection', () => {
+    const value = response();
+    value.guide.howToGetThere.subjects.push({
+      subjectId: 'subject-unsupported',
+      importance: 'helpful',
+      guidance: 'Unsupported subject guidance',
+      gradeIds: ['grade10'],
+      sourceIds: ['source-one'],
+    });
+    value.guide.whatYouCanDoNow.skills.push({
+      skillId: 'skill-unsupported',
+      importance: 'useful',
+      howUsed: 'Unsupported skill guidance',
+      sourceIds: ['source-one'],
+    });
+    value.guide.whatYouCanDoNow.tools.push({
+      toolId: 'tool-unsupported',
+      importance: 'useful',
+      whyLearn: 'Unsupported tool guidance',
+      sourceIds: ['source-one'],
+    });
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    expect(screen.getByText('Mathematics')).toBeInTheDocument();
+    expect(screen.getByText('Problem solving')).toBeInTheDocument();
+    expect(screen.getByText('SQL')).toBeInTheDocument();
+    expect(screen.queryByText('subject-mathematics')).not.toBeInTheDocument();
+    expect(screen.queryByText('skill-problem-solving')).not.toBeInTheDocument();
+    expect(screen.queryByText('tool-sql')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsupported subject guidance')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsupported skill guidance')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsupported tool guidance')).not.toBeInTheDocument();
   });
 
   it('omits unavailable optional answers instead of rendering empty cards or guesses', () => {
@@ -221,10 +261,21 @@ describe('DreamCareerStudentGuide', () => {
     expect(screen.queryByText('SQL for beginners')).not.toBeInTheDocument();
   });
 
+  it('renders only available or partial coverage even when missing content remains in the payload', () => {
+    const value = response();
+    value.coverage.byQuestion.whyItMatters.status = 'missing';
+    value.coverage.items.find((item) => item.questionId === 'whyItMatters')!.status = 'missing';
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    expect(screen.queryByRole('heading', { name: 'Why it matters' })).not.toBeInTheDocument();
+    expect(screen.queryByText(value.guide.aboutCareer.whyItMatters)).not.toBeInTheDocument();
+  });
+
   it('provides keyboard-focusable chapter anchors with exact destinations', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
-    const about = screen.getByRole('link', { name: 'About the career' });
+    const about = screen.getByRole('link', { name: 'About career' });
     const path = screen.getByRole('link', { name: 'How to get there' });
     const now = screen.getByRole('link', { name: 'What I can do now' });
     expect(about).toHaveAttribute('href', '#about-career');
@@ -240,6 +291,18 @@ describe('DreamCareerStudentGuide', () => {
     expect(screen.getByRole('heading', { name: 'करियर के बारे में' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी किन विषयों पर ध्यान दें' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी क्या कर सकता/सकती हूँ' })).toBeInTheDocument();
+  });
+
+  it('localizes the relationship retry accessible-label prefix', () => {
+    const value = response();
+    value.resolved.opportunities = [];
+    value.relationshipErrors = [{ subsection: 'opportunities', code: 'temporarily_unavailable', retryable: true }];
+
+    render(<DreamCareerStudentGuide response={value} locale="hi" onRetryRelationship={vi.fn()} />);
+
+    expect(screen.getByText('यह जानकारी अभी उपलब्ध नहीं है।')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'फिर कोशिश करें: इंटर्नशिप के अवसर' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Retry/ })).not.toBeInTheDocument();
   });
 
   it('uses responsive, dark-mode-safe styling without a fixed-width reader', () => {
