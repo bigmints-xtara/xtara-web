@@ -83,6 +83,8 @@ export const XTARA_API_OPERATIONS = {
   "getMeRewards": { method: "GET", path: "/api/v1/me/rewards", authenticated: true },
   "postMeSavedColleges": { method: "POST", path: "/api/v1/me/saved-colleges", authenticated: true },
   "deleteMeSavedCollegesCollegeId": { method: "DELETE", path: "/api/v1/me/saved-colleges/{collegeId}", authenticated: true },
+  "getMeWeeklyPlan": { method: "GET", path: "/api/v1/me/weekly-plan", authenticated: true },
+  "putMeWeeklyPlan": { method: "PUT", path: "/api/v1/me/weekly-plan", authenticated: true },
   "getMediaImagesSha256": { method: "GET", path: "/api/v1/media/images/{sha256}", authenticated: false },
   "getModels": { method: "GET", path: "/api/v1/models", authenticated: false },
   "getModelsModelId": { method: "GET", path: "/api/v1/models/{modelId}", authenticated: false },
