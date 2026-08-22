@@ -5,6 +5,7 @@ import { CheckCircle2, CircleDashed, Languages } from 'lucide-react';
 
 import DreamCareerProfileCards from '@/components/careers/DreamCareerProfileCards';
 import { Badge } from '@/components/ui/badge';
+import { translationLocaleCoverageState } from '@/lib/admin/configs/curatedDreamCareersConfig';
 import type { CuratedDreamCareer } from '@/types/curated-career';
 import type { DreamCareerDetailProfileV3 } from '@/types/dream-career-detail-profile';
 
@@ -25,10 +26,9 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
   const profileFor = (requested: Locale) => requested === 'en'
     ? career.detailProfile
     : career.detailProfileTranslations?.[requested];
-  const complete = LOCALES.filter(({ id }) => {
-    const standard = career.translations[id];
-    return Boolean(standard?.title?.trim() && standard?.summary?.trim() && profileFor(id));
-  }).length;
+  const coverageStates = Object.fromEntries(LOCALES.map(({ id }) => [id, translationLocaleCoverageState(career, id)])) as Record<Locale, ReturnType<typeof translationLocaleCoverageState>>;
+  const complete = LOCALES.filter(({ id }) => coverageStates[id] === 'complete').length;
+  const coverageRecorded = LOCALES.every(({ id }) => coverageStates[id] !== 'unavailable');
   const standard = career.translations[locale];
   const profile = profileFor(locale);
 
@@ -40,7 +40,7 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
           <p className="mt-1 text-sm font-medium text-amber-800">Machine translation draft — not approved</p>
           <p className="mt-1 text-sm text-slate-600">Review the standard copy and the complete rich profile in each language. Approval and publication remain separate Admin actions.</p>
         </div>
-        <Badge className="bg-white text-blue-900" variant="outline">{complete} of 4 languages complete</Badge>
+        <Badge className="bg-white text-blue-900" variant="outline">{coverageRecorded ? `${complete} of 4 languages complete` : 'Coverage not recorded'}</Badge>
       </div>
 
       {operation ? (
@@ -52,14 +52,15 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
 
       <div aria-label="Translation language" className="grid gap-2 sm:grid-cols-4" role="group">
         {LOCALES.map((item) => {
-          const itemStandard = career.translations[item.id];
-          const ready = Boolean(itemStandard?.title?.trim() && itemStandard?.summary?.trim() && profileFor(item.id));
+          const coverageState = coverageStates[item.id];
+          const ready = coverageState === 'complete';
           return (
             <button
               aria-pressed={locale === item.id}
               className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left text-sm font-medium ${locale === item.id ? 'border-blue-600 bg-blue-600 text-white' : 'bg-white text-slate-800'}`}
               key={item.id}
               onClick={() => setLocale(item.id)}
+              data-coverage-state={coverageState}
               type="button"
             >
               {item.label}{ready ? <CheckCircle2 className="size-4" /> : <CircleDashed className="size-4" />}

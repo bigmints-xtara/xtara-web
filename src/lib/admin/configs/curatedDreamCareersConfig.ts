@@ -12,7 +12,7 @@ export const curatedDreamCareersConfig: AdminConfig<CuratedDreamCareer> = {
   getId: (entity) => entity.id,
   getTitle: (entity) => entity.translations?.en?.title || entity.slug || 'Untitled Dream Career',
   getSubtitle: (entity) => entity.translationOperation
-    ? `${translationCoverage(entity)}/4 languages • ${entity.translationOperation.sourceReleaseId} • ${entity.translationOperation.runId}`
+    ? `${translationCoverage(entity) === null ? 'coverage unavailable' : `${translationCoverage(entity)}/4 languages`} • ${entity.translationOperation.sourceReleaseId} • ${entity.translationOperation.runId}`
     : `${entity.futureDirectionIds?.length || 0} directions • ${entity.skillIds?.length || 0} skills`,
   getStatus: (entity): EntityStatus => entity.status === 'retired' ? 'archived' : entity.status,
   getDomain: (entity) => entity.primaryFutureDirectionId || 'unassigned',
@@ -118,12 +118,22 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 
-function translationCoverage(entity: CuratedDreamCareer): number {
-  return (['en', 'ml', 'hi', 'ta'] as const).filter((locale) => {
-    const standard = entity.translations?.[locale];
-    const rich = locale === 'en' ? entity.detailProfile : entity.detailProfileTranslations?.[locale];
-    return Boolean(standard?.title?.trim() && standard?.summary?.trim() && rich);
-  }).length;
+export type TranslationCoverageState = 'complete' | 'partial' | 'missing' | 'unavailable';
+
+export function translationLocaleCoverageState(entity: CuratedDreamCareer, locale: 'en' | 'ml' | 'hi' | 'ta'): TranslationCoverageState {
+  const receipt = entity.translationOperation?.translationCoverage?.locales?.[locale];
+  if (!receipt || typeof receipt.complete !== 'boolean') return 'unavailable';
+  if (receipt.complete) return 'complete';
+  const translated = receipt.translatedFieldTokens?.length
+    || Object.values(receipt.fieldStatus || {}).filter((status) => status === 'translated').length;
+  return translated ? 'partial' : 'missing';
+}
+
+function translationCoverage(entity: CuratedDreamCareer): number | null {
+  const states = (['en', 'ml', 'hi', 'ta'] as const).map((locale) => translationLocaleCoverageState(entity, locale));
+  return states.some((state) => state === 'unavailable')
+    ? null
+    : states.filter((state) => state === 'complete').length;
 }
 
 function validateDreamCareer(entity: Partial<CuratedDreamCareer>): string | null {

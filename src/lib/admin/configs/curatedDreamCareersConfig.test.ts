@@ -76,6 +76,11 @@ describe('curatedDreamCareersConfig', () => {
       translationOperation: {
         sourceReleaseId: 'dream-careers-approved-52-e205d2beeb4c',
         runId: 'run-20260819-001',
+        translationCoverage: {
+          canonicalLocale: 'en',
+          releaseBlocking: false,
+          locales: Object.fromEntries(['en', 'ml', 'hi', 'ta'].map((locale) => [locale, { complete: true }])),
+        },
       },
       futureDirectionIds: ['technology'],
       skillIds: ['analysis'],
@@ -83,6 +88,51 @@ describe('curatedDreamCareersConfig', () => {
 
     expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
       '4/4 languages • dream-careers-approved-52-e205d2beeb4c • run-20260819-001',
+    );
+  });
+
+  it('reports truthful partial field coverage even when fallback-filled locale objects look complete', () => {
+    const career = curatedDreamCareersConfig.fromFirestore({
+      translations: {
+        en: { title: 'English', summary: 'English summary' },
+        hi: { title: 'हिंदी', summary: 'English fallback summary' },
+      },
+      detailProfile: { locale: 'en' },
+      detailProfileTranslations: { hi: { locale: 'hi', work: { summary: 'English fallback' } } },
+      translationOperation: {
+        sourceReleaseId: 'release-partial',
+        runId: 'run-partial',
+        translationCoverage: {
+          canonicalLocale: 'en',
+          releaseBlocking: false,
+          locales: {
+            en: { complete: true },
+            ml: { complete: false },
+            hi: { complete: false, translatedFieldTokens: ['T00000'], totalFields: 22 },
+            ta: { complete: false },
+          },
+        },
+      },
+      futureDirectionIds: ['technology'],
+      skillIds: ['analysis'],
+    }, 'partial-career');
+
+    expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
+      '1/4 languages • release-partial • run-partial',
+    );
+  });
+
+  it('does not infer translation coverage when the operation receipt has no coverage', () => {
+    const career = curatedDreamCareersConfig.fromFirestore({
+      translations: { en: { title: 'English', summary: 'English summary' } },
+      detailProfile: { locale: 'en' },
+      translationOperation: { sourceReleaseId: 'release-legacy', runId: 'run-legacy' },
+      futureDirectionIds: ['technology'],
+      skillIds: ['analysis'],
+    }, 'legacy-career');
+
+    expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
+      'coverage unavailable • release-legacy • run-legacy',
     );
   });
 });

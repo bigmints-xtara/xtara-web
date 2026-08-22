@@ -119,6 +119,17 @@ export interface CuratedDreamCareer extends AdminEntity {
     runId: string;
     idempotencyKey: string;
     priorDraftId?: string;
+    translationCoverage?: {
+      canonicalLocale: 'en';
+      releaseBlocking: false;
+      locales: Partial<Record<'en' | 'ml' | 'hi' | 'ta', {
+        canonical?: boolean;
+        complete: boolean;
+        fieldStatus?: Record<string, 'canonical' | 'translated' | 'missing'>;
+        totalFields?: number;
+        translatedFieldTokens?: string[];
+      }>>;
+    };
   };
   review: ReviewMetadata;
   provenance: ProvenanceMetadata;

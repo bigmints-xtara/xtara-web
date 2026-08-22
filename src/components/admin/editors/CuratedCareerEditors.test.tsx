@@ -134,6 +134,15 @@ describe('curated career admin editors', () => {
         translationSha256: 'b'.repeat(64),
         runId: 'run-20260819-001',
         idempotencyKey: `${sourceReleaseId}:${profile.careerId}`,
+        translationCoverage: {
+          canonicalLocale: 'en',
+          releaseBlocking: false,
+          locales: Object.fromEntries(['en', 'ml', 'hi', 'ta'].map((locale) => [locale, {
+            complete: true,
+            totalFields: 22,
+            translatedFieldTokens: locale === 'en' ? [] : Array.from({ length: 22 }, (_, index) => `T${String(index).padStart(5, '0')}`),
+          }])),
+        },
       },
     } as unknown as import('@/types/curated-career').CuratedDreamCareer;
 
@@ -147,6 +156,47 @@ describe('curated career admin editors', () => {
     expect(screen.getAllByText('Malayalam standard summary')).not.toHaveLength(0);
     expect(screen.getByText('Malayalam rich profile summary')).toBeInTheDocument();
     expect(screen.getByText('Complete rich profile')).toBeInTheDocument();
+  });
+
+  it('never marks fallback-filled partial guide coverage ready', () => {
+    const profile = exampleProfile as DreamCareerDetailProfileV3;
+    const entity = {
+      ...createEmptyDreamCareer(),
+      id: profile.careerId,
+      slug: profile.careerId,
+      detailProfile: profile,
+      translations: {
+        en: { ...createEmptyDreamCareer().translations.en, title: 'Cybersecurity Analyst', summary: 'English standard summary' },
+        hi: { ...createEmptyDreamCareer().translations.en, title: 'साइबर सुरक्षा विश्लेषक', summary: 'English fallback summary' },
+      },
+      detailProfileTranslations: { hi: { ...structuredClone(profile), locale: 'hi' } },
+      translationOperation: {
+        schemaVersion: 1,
+        operation: 'dream-career-translation',
+        sourceReleaseId: 'release-partial',
+        sourceTaskId: 'source-task',
+        sourceCareerId: profile.careerId,
+        sourceSha256: 'a'.repeat(64),
+        translationSha256: 'b'.repeat(64),
+        runId: 'run-partial',
+        idempotencyKey: `release-partial:${profile.careerId}`,
+        translationCoverage: {
+          canonicalLocale: 'en',
+          releaseBlocking: false,
+          locales: {
+            en: { complete: true, totalFields: 22, translatedFieldTokens: [] },
+            ml: { complete: false, totalFields: 22, translatedFieldTokens: [] },
+            hi: { complete: false, totalFields: 22, translatedFieldTokens: ['T00000'] },
+            ta: { complete: false, totalFields: 22, translatedFieldTokens: [] },
+          },
+        },
+      },
+    } as unknown as import('@/types/curated-career').CuratedDreamCareer;
+
+    render(<DreamCareerEditor entity={entity} onSave={async () => undefined} onCancel={() => undefined} />);
+
+    expect(screen.getByText('1 of 4 languages complete')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hindi' })).toHaveAttribute('data-coverage-state', 'partial');
   });
 
   it('shows approval blockers until every profile source is reviewed', () => {
