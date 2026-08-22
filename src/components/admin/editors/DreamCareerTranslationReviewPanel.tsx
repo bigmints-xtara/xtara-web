@@ -5,7 +5,7 @@ import { CheckCircle2, CircleDashed, Languages } from 'lucide-react';
 
 import DreamCareerProfileCards from '@/components/careers/DreamCareerProfileCards';
 import { Badge } from '@/components/ui/badge';
-import { translationLocaleCoverageState } from '@/lib/admin/configs/curatedDreamCareersConfig';
+import { translationLocaleCoverage } from '@/lib/admin/configs/curatedDreamCareersConfig';
 import type { CuratedDreamCareer } from '@/types/curated-career';
 import type { DreamCareerDetailProfileV3 } from '@/types/dream-career-detail-profile';
 
@@ -26,11 +26,15 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
   const profileFor = (requested: Locale) => requested === 'en'
     ? career.detailProfile
     : career.detailProfileTranslations?.[requested];
-  const coverageStates = Object.fromEntries(LOCALES.map(({ id }) => [id, translationLocaleCoverageState(career, id)])) as Record<Locale, ReturnType<typeof translationLocaleCoverageState>>;
-  const complete = LOCALES.filter(({ id }) => coverageStates[id] === 'complete').length;
-  const coverageRecorded = LOCALES.every(({ id }) => coverageStates[id] !== 'unavailable');
+  const localeCoverage = Object.fromEntries(LOCALES.map(({ id }) => [id, translationLocaleCoverage(career, id)])) as Record<Locale, ReturnType<typeof translationLocaleCoverage>>;
+  const complete = LOCALES.filter(({ id }) => localeCoverage[id].state === 'complete').length;
+  const coverageRecorded = LOCALES.every(({ id }) => localeCoverage[id].state !== 'unavailable');
   const standard = career.translations[locale];
   const profile = profileFor(locale);
+  const selectedCoverage = localeCoverage[locale];
+  const selectedCoverageText = selectedCoverage.totalFields === null
+    ? 'Coverage unavailable'
+    : `${selectedCoverage.translatedFields} of ${selectedCoverage.totalFields} fields ${locale === 'en' ? 'canonical' : 'translated'}`;
 
   return (
     <section className="space-y-5 rounded-xl border border-blue-200 bg-blue-50/40 p-4 sm:p-5">
@@ -52,7 +56,8 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
 
       <div aria-label="Translation language" className="grid gap-2 sm:grid-cols-4" role="group">
         {LOCALES.map((item) => {
-          const coverageState = coverageStates[item.id];
+          const coverage = localeCoverage[item.id];
+          const coverageState = coverage.state;
           const ready = coverageState === 'complete';
           return (
             <button
@@ -63,7 +68,15 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
               data-coverage-state={coverageState}
               type="button"
             >
-              {item.label}{ready ? <CheckCircle2 className="size-4" /> : <CircleDashed className="size-4" />}
+              <span>
+                <span className="block">{item.label}</span>
+                <span className="block text-xs font-normal opacity-80">
+                  {coverage.totalFields === null
+                    ? 'Coverage unavailable'
+                    : `${coverage.translatedFields} of ${coverage.totalFields} fields`}
+                </span>
+              </span>
+              {ready ? <CheckCircle2 className="size-4" /> : <CircleDashed className="size-4" />}
             </button>
           );
         })}
@@ -89,7 +102,14 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
       </div>
 
       <div className="space-y-3">
-        <div><p className="text-sm font-semibold text-slate-950">Complete rich profile</p><p className="text-xs text-slate-600">All source-backed sections shown below are part of this language draft.</p></div>
+        <div>
+          <p className="text-sm font-semibold text-slate-950">
+            {selectedCoverage.state === 'complete' ? 'Complete rich profile' : selectedCoverage.state === 'partial' ? 'Partial rich profile' : 'Rich profile'}
+          </p>
+          <p className="text-xs text-slate-600">
+            {selectedCoverageText}. English fallback may appear for fields that are not translated yet.
+          </p>
+        </div>
         {profile ? (
           <div className="grid gap-5 rounded-xl border bg-white p-4 lg:grid-cols-3">
             <DreamCareerProfileCards locale="en" profile={profile as DreamCareerDetailProfileV3} />

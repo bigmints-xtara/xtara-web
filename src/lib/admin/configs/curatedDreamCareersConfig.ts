@@ -120,17 +120,88 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export type TranslationCoverageState = 'complete' | 'partial' | 'missing' | 'unavailable';
 
+export interface TranslationLocaleCoverage {
+  state: TranslationCoverageState;
+  translatedFields: number | null;
+  totalFields: number | null;
+}
+
+const TRANSLATION_LOCALES = ['en', 'ml', 'hi', 'ta'] as const;
+const FIELD_TOKEN_PATTERN = /^T\d{5}$/;
+
+function unavailableTranslationCoverage(): TranslationLocaleCoverage {
+  return { state: 'unavailable', translatedFields: null, totalFields: null };
+}
+
+function validatedTranslationCoverage(
+  entity: CuratedDreamCareer,
+): Record<(typeof TRANSLATION_LOCALES)[number], TranslationLocaleCoverage> | null {
+  const coverage = entity.translationOperation?.translationCoverage;
+  if (!coverage || coverage.canonicalLocale !== 'en' || coverage.releaseBlocking !== false) return null;
+  if (!isRecord(coverage.locales) || Object.keys(coverage.locales).sort().join(',') !== 'en,hi,ml,ta') return null;
+
+  let expectedTotal: number | null = null;
+  let expectedTokens: string[] | null = null;
+  const result = {} as Record<(typeof TRANSLATION_LOCALES)[number], TranslationLocaleCoverage>;
+  for (const locale of TRANSLATION_LOCALES) {
+    const receipt = coverage.locales[locale];
+    if (!isRecord(receipt)) return null;
+    const canonical = receipt.canonical;
+    const complete = receipt.complete;
+    const totalFields = receipt.totalFields;
+    const translatedFieldTokens = receipt.translatedFieldTokens;
+    const fieldStatus = receipt.fieldStatus;
+    if (canonical !== (locale === 'en') || typeof complete !== 'boolean') return null;
+    if (!Number.isInteger(totalFields) || (totalFields as number) <= 0) return null;
+    if (expectedTotal === null) expectedTotal = totalFields as number;
+    if (totalFields !== expectedTotal || !Array.isArray(translatedFieldTokens) || !isRecord(fieldStatus)) return null;
+
+    const statusEntries = Object.entries(fieldStatus);
+    const statusTokens = statusEntries.map(([token]) => token).sort();
+    if (statusEntries.length !== totalFields || statusTokens.some((token) => !FIELD_TOKEN_PATTERN.test(token))) return null;
+    if (new Set(statusTokens).size !== statusTokens.length) return null;
+    if (expectedTokens === null) expectedTokens = statusTokens;
+    if (statusTokens.join(',') !== expectedTokens.join(',')) return null;
+    if (translatedFieldTokens.some((token) => typeof token !== 'string' || !FIELD_TOKEN_PATTERN.test(token))) return null;
+    const translatedTokens = translatedFieldTokens as string[];
+    if (new Set(translatedTokens).size !== translatedTokens.length) return null;
+    if (translatedTokens.some((token) => !(token in fieldStatus))) return null;
+
+    const translatedFromStatus = statusEntries
+      .filter(([, status]) => status === 'translated')
+      .map(([token]) => token)
+      .sort();
+    if (locale === 'en') {
+      if (!complete || translatedTokens.length !== 0 || statusEntries.some(([, status]) => status !== 'canonical')) return null;
+    } else {
+      if (statusEntries.some(([, status]) => status !== 'translated' && status !== 'missing')) return null;
+      if (translatedTokens.slice().sort().join(',') !== translatedFromStatus.join(',')) return null;
+      if (complete !== (translatedTokens.length === totalFields)) return null;
+    }
+
+    const translatedFields = locale === 'en' ? totalFields as number : translatedTokens.length;
+    result[locale] = {
+      state: complete ? 'complete' : translatedFields > 0 ? 'partial' : 'missing',
+      translatedFields,
+      totalFields: totalFields as number,
+    };
+  }
+  return result;
+}
+
+export function translationLocaleCoverage(
+  entity: CuratedDreamCareer,
+  locale: (typeof TRANSLATION_LOCALES)[number],
+): TranslationLocaleCoverage {
+  return validatedTranslationCoverage(entity)?.[locale] || unavailableTranslationCoverage();
+}
+
 export function translationLocaleCoverageState(entity: CuratedDreamCareer, locale: 'en' | 'ml' | 'hi' | 'ta'): TranslationCoverageState {
-  const receipt = entity.translationOperation?.translationCoverage?.locales?.[locale];
-  if (!receipt || typeof receipt.complete !== 'boolean') return 'unavailable';
-  if (receipt.complete) return 'complete';
-  const translated = receipt.translatedFieldTokens?.length
-    || Object.values(receipt.fieldStatus || {}).filter((status) => status === 'translated').length;
-  return translated ? 'partial' : 'missing';
+  return translationLocaleCoverage(entity, locale).state;
 }
 
 function translationCoverage(entity: CuratedDreamCareer): number | null {
-  const states = (['en', 'ml', 'hi', 'ta'] as const).map((locale) => translationLocaleCoverageState(entity, locale));
+  const states = TRANSLATION_LOCALES.map((locale) => translationLocaleCoverageState(entity, locale));
   return states.some((state) => state === 'unavailable')
     ? null
     : states.filter((state) => state === 'complete').length;

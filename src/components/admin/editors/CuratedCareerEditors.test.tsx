@@ -8,6 +8,25 @@ import type { DreamCareerDetailProfileReview, DreamCareerDetailProfileV3 } from 
 import DreamCareerDetailProfileEditor, { createEmptyProfile, validateAdminProfile } from './DreamCareerDetailProfileEditor';
 import { CareerSourceEditor, DreamCareerEditor, FutureDirectionEditor, withDerivedRegulation } from './CuratedCareerEditors';
 
+function translationLocaleCoverage(
+  locale: 'en' | 'ml' | 'hi' | 'ta',
+  translatedFields: number,
+  totalFields = 22,
+) {
+  const tokens = Array.from({ length: totalFields }, (_, index) => `T${String(index).padStart(5, '0')}`);
+  const translatedFieldTokens = locale === 'en' ? [] : tokens.slice(0, translatedFields);
+  return {
+    canonical: locale === 'en',
+    complete: translatedFields === totalFields,
+    totalFields,
+    translatedFieldTokens,
+    fieldStatus: Object.fromEntries(tokens.map((token) => [
+      token,
+      locale === 'en' ? 'canonical' : translatedFieldTokens.includes(token) ? 'translated' : 'missing',
+    ])),
+  };
+}
+
 describe('curated career admin editors', () => {
   it('renders every deterministic Future Direction control', () => {
     const html = renderToStaticMarkup(
@@ -137,11 +156,10 @@ describe('curated career admin editors', () => {
         translationCoverage: {
           canonicalLocale: 'en',
           releaseBlocking: false,
-          locales: Object.fromEntries(['en', 'ml', 'hi', 'ta'].map((locale) => [locale, {
-            complete: true,
-            totalFields: 22,
-            translatedFieldTokens: locale === 'en' ? [] : Array.from({ length: 22 }, (_, index) => `T${String(index).padStart(5, '0')}`),
-          }])),
+          locales: Object.fromEntries((['en', 'ml', 'hi', 'ta'] as const).map((locale) => [
+            locale,
+            translationLocaleCoverage(locale, 22),
+          ])),
         },
       },
     } as unknown as import('@/types/curated-career').CuratedDreamCareer;
@@ -152,7 +170,7 @@ describe('curated career admin editors', () => {
     expect(screen.getByText('4 of 4 languages complete')).toBeInTheDocument();
     expect(screen.getByText(sourceReleaseId)).toBeInTheDocument();
     expect(screen.getByText('run-20260819-001')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Malayalam' }));
+    fireEvent.click(screen.getByRole('button', { name: /Malayalam/ }));
     expect(screen.getAllByText('Malayalam standard summary')).not.toHaveLength(0);
     expect(screen.getByText('Malayalam rich profile summary')).toBeInTheDocument();
     expect(screen.getByText('Complete rich profile')).toBeInTheDocument();
@@ -184,10 +202,10 @@ describe('curated career admin editors', () => {
           canonicalLocale: 'en',
           releaseBlocking: false,
           locales: {
-            en: { complete: true, totalFields: 22, translatedFieldTokens: [] },
-            ml: { complete: false, totalFields: 22, translatedFieldTokens: [] },
-            hi: { complete: false, totalFields: 22, translatedFieldTokens: ['T00000'] },
-            ta: { complete: false, totalFields: 22, translatedFieldTokens: [] },
+            en: translationLocaleCoverage('en', 22),
+            ml: translationLocaleCoverage('ml', 0),
+            hi: translationLocaleCoverage('hi', 1),
+            ta: translationLocaleCoverage('ta', 0),
           },
         },
       },
@@ -196,7 +214,11 @@ describe('curated career admin editors', () => {
     render(<DreamCareerEditor entity={entity} onSave={async () => undefined} onCancel={() => undefined} />);
 
     expect(screen.getByText('1 of 4 languages complete')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Hindi' })).toHaveAttribute('data-coverage-state', 'partial');
+    expect(screen.getByRole('button', { name: /Hindi/ })).toHaveAttribute('data-coverage-state', 'partial');
+    fireEvent.click(screen.getByRole('button', { name: /Hindi/ }));
+    expect(screen.getByText('Partial rich profile')).toBeInTheDocument();
+    expect(screen.queryByText('Complete rich profile')).not.toBeInTheDocument();
+    expect(screen.getAllByText(/1 of 22 fields translated/)).not.toHaveLength(0);
   });
 
   it('shows approval blockers until every profile source is reviewed', () => {

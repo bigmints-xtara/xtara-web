@@ -122,13 +122,13 @@ export interface CuratedDreamCareer extends AdminEntity {
     translationCoverage?: {
       canonicalLocale: 'en';
       releaseBlocking: false;
-      locales: Partial<Record<'en' | 'ml' | 'hi' | 'ta', {
-        canonical?: boolean;
+      locales: Record<'en' | 'ml' | 'hi' | 'ta', {
+        canonical: boolean;
         complete: boolean;
-        fieldStatus?: Record<string, 'canonical' | 'translated' | 'missing'>;
-        totalFields?: number;
-        translatedFieldTokens?: string[];
-      }>>;
+        fieldStatus: Record<string, 'canonical' | 'translated' | 'missing'>;
+        totalFields: number;
+        translatedFieldTokens: string[];
+      }>;
     };
   };
   review: ReviewMetadata;
