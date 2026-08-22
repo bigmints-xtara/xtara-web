@@ -69,9 +69,26 @@ function sha(value: string) {
 
 function futureArtifact(): DreamCareerPhase1AuthorityArtifact {
   const reviewer = { reviewerId: 'admin_user:11111111-1111-4111-8111-111111111111', reviewedAt: '2026-08-22T12:00:00.000Z' };
-  const careerMappings = Array.from({ length: 229 }, (_, index) => ({ careerId: `career-${String(index + 1).padStart(3, '0')}`, futureDirectionIds: [ids[index % ids.length]], ...reviewer }));
+  const careerMappings = Array.from({ length: 229 }, (_, index) => ({
+    careerId: `career-${String(index + 1).padStart(3, '0')}`,
+    canonicalOrder: index,
+    sourceHashes: {
+      canonicalSourceSha256: sha(`source:${index}`),
+      guideSha256: sha(`guide:${index}`),
+      taxonomySha256: sha(`taxonomy:${index}`),
+      relationshipSha256: sha(`relationship:${index}`),
+    },
+    futureDirectionIds: [ids[index % ids.length]],
+    reviewerId: index === 1
+      ? 'admin_user:22222222-2222-4222-8222-222222222222'
+      : reviewer.reviewerId,
+    reviewedAt: index === 1 ? '2026-08-22T11:30:00.000Z' : reviewer.reviewedAt,
+  }));
   const authority = {
-    schemaVersion: 1, authorityType: 'dream-career-future-direction-mapping-authority', authorityVersion: '1.0.0', reviewer,
+    schemaVersion: 1, authorityType: 'dream-career-future-direction-mapping-authority', authorityVersion: '1.0.0',
+    reviewId: 'dream-career-phase-1', inventoryVersion: 'dream-career-phase1-review-inventory-v1',
+    inventorySha256: 'a'.repeat(64), releaseId: 'release-1', releaseContentSha256: 'b'.repeat(64),
+    registryVersion: 'career-tags-v1.0.0', registrySha256: 'c'.repeat(64), reviewer,
     canonicalDirectionIds: ids,
     careerMappings,
     directionRoles: ids.map((directionId) => ({ directionId, careerIds: careerMappings.filter((mapping) => mapping.futureDirectionIds.includes(directionId)).map((mapping) => mapping.careerId) })),
@@ -225,6 +242,14 @@ describe('dreamCareerPhase1ReviewApi', () => {
     const taxonomyResult = await dreamCareerPhase1ReviewApi.exportTaxonomyRejection();
     expect(futureResult.artifactJson).toBe(future.artifactJson);
     expect(taxonomyResult.artifactJson).toBe(taxonomy.artifactJson);
+    if (futureResult.authority.authorityType === 'dream-career-future-direction-mapping-authority') {
+      expect(futureResult.authority.reviewId).toBe('dream-career-phase-1');
+      expect(futureResult.authority.careerMappings[0].canonicalOrder).toBe(0);
+      expect(futureResult.authority.careerMappings[0].sourceHashes.guideSha256)
+        .toMatch(/^[a-f0-9]{64}$/);
+      expect(futureResult.authority.careerMappings[1].reviewerId)
+        .not.toBe(futureResult.authority.reviewer.reviewerId);
+    }
     const download = authorityArtifactDownload(taxonomyResult);
     expect(download.filename).toBe(taxonomy.filename);
     expect(download.blob.type).toBe(taxonomy.mediaType);
@@ -238,6 +263,27 @@ describe('dreamCareerPhase1ReviewApi', () => {
     const badFuture = futureArtifact();
     if (badFuture.authority.authorityType === 'dream-career-future-direction-mapping-authority') badFuture.authority.directionRoles[0].careerIds = [];
     api.post.mockResolvedValueOnce(badFuture);
-    await expect(dreamCareerPhase1ReviewApi.exportFutureDirections()).rejects.toThrow(/directionRoles|reverse|direction role|careerIds/i);
+    await expect(dreamCareerPhase1ReviewApi.exportFutureDirections()).rejects
+      .toThrow(/directionRoles|reverse|direction role|careerIds/i);
+
+    const wrongOrder = futureArtifact();
+    if (wrongOrder.authority.authorityType === 'dream-career-future-direction-mapping-authority') {
+      wrongOrder.authority.careerMappings[0].canonicalOrder = 1;
+    }
+    wrongOrder.artifactJson = `${JSON.stringify(wrongOrder.authority)}\n`;
+    wrongOrder.artifactSha256 = sha(wrongOrder.artifactJson);
+    api.post.mockResolvedValueOnce(wrongOrder);
+    await expect(dreamCareerPhase1ReviewApi.exportFutureDirections()).rejects
+      .toThrow(/canonical order/i);
+
+    const wrongSourceHash = futureArtifact();
+    if (wrongSourceHash.authority.authorityType === 'dream-career-future-direction-mapping-authority') {
+      wrongSourceHash.authority.careerMappings[0].sourceHashes.guideSha256 = 'not-a-hash';
+    }
+    wrongSourceHash.artifactJson = `${JSON.stringify(wrongSourceHash.authority)}\n`;
+    wrongSourceHash.artifactSha256 = sha(wrongSourceHash.artifactJson);
+    api.post.mockResolvedValueOnce(wrongSourceHash);
+    await expect(dreamCareerPhase1ReviewApi.exportFutureDirections()).rejects
+      .toThrow(/sha-256|hash/i);
   });
 });

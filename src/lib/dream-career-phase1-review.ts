@@ -49,8 +49,13 @@ export type DreamCareerPhase1ReviewQueue = DreamCareerPhase1ReviewSummary & { di
 
 export type FutureDirectionMappingAuthorityDocument = {
   schemaVersion: 1; authorityType: 'dream-career-future-direction-mapping-authority'; authorityVersion: '1.0.0';
+  reviewId: string; inventoryVersion: 'dream-career-phase1-review-inventory-v1'; inventorySha256: string;
+  releaseId: string; releaseContentSha256: string; registryVersion: string; registrySha256: string;
   reviewer: { reviewerId: string; reviewedAt: string }; canonicalDirectionIds: string[];
-  careerMappings: Array<{ careerId: string; futureDirectionIds: string[]; reviewerId: string; reviewedAt: string }>;
+  careerMappings: Array<{
+    careerId: string; canonicalOrder: number; sourceHashes: DreamCareerPhase1SourceHashes;
+    futureDirectionIds: string[]; reviewerId: string; reviewedAt: string;
+  }>;
   directionRoles: Array<{ directionId: string; careerIds: string[] }>;
 };
 export type TaxonomyRejectionAuthorityDocument = {
@@ -254,16 +259,47 @@ export function parseDreamCareerPhase1Detail(value: unknown): DreamCareerPhase1R
 
 function parseReviewerAuthority(value: unknown, label: string) { return reviewer(value, label); }
 function futureAuthority(value: unknown): FutureDirectionMappingAuthorityDocument {
-  const result = object(value, 'Future Direction authority'); exact(result, ['schemaVersion', 'authorityType', 'authorityVersion', 'reviewer', 'canonicalDirectionIds', 'careerMappings', 'directionRoles'], [], 'Future Direction authority');
-  if (result.schemaVersion !== 1 || result.authorityType !== 'dream-career-future-direction-mapping-authority' || result.authorityVersion !== '1.0.0' || !same(result.canonicalDirectionIds, DIRECTION_IDS)) throw new DreamCareerPhase1ContractError('Future Direction authority metadata or canonical Directions are invalid');
-  const topReviewer = parseReviewerAuthority(result.reviewer, 'Future Direction authority reviewer');
+  const result = object(value, 'Future Direction authority');
+  exact(result, [
+    'schemaVersion', 'authorityType', 'authorityVersion', 'reviewId', 'inventoryVersion',
+    'inventorySha256', 'releaseId', 'releaseContentSha256', 'registryVersion',
+    'registrySha256', 'reviewer', 'canonicalDirectionIds', 'careerMappings', 'directionRoles',
+  ], [], 'Future Direction authority');
+  if (result.schemaVersion !== 1
+      || result.authorityType !== 'dream-career-future-direction-mapping-authority'
+      || result.authorityVersion !== '1.0.0'
+      || result.reviewId !== 'dream-career-phase-1'
+      || result.inventoryVersion !== 'dream-career-phase1-review-inventory-v1'
+      || !same(result.canonicalDirectionIds, DIRECTION_IDS)) {
+    throw new DreamCareerPhase1ContractError('Future Direction authority metadata or canonical Directions are invalid');
+  }
+  text(result.releaseId, 'Future Direction authority releaseId', 200);
+  text(result.registryVersion, 'Future Direction authority registryVersion', 200);
+  for (const field of ['inventorySha256', 'releaseContentSha256', 'registrySha256'] as const) {
+    if (typeof result[field] !== 'string' || !SHA256.test(result[field])) {
+      throw new DreamCareerPhase1ContractError(`Future Direction authority ${field} must be SHA-256`);
+    }
+  }
+  const topReviewer = parseReviewerAuthority(result.reviewer, 'Future Direction authority exporter');
   if (!Array.isArray(result.careerMappings) || result.careerMappings.length !== EXPECTED_TOTAL) throw new DreamCareerPhase1ContractError('Future Direction authority must contain 229 career mappings');
   const mappings = result.careerMappings.map((value, index) => {
-    const item = object(value, `careerMappings[${index}]`); exact(item, ['careerId', 'futureDirectionIds', 'reviewerId', 'reviewedAt'], [], `careerMappings[${index}]`);
-    const careerId = text(item.careerId, `careerMappings[${index}].careerId`, 180); if (!CAREER_ID.test(careerId)) throw new DreamCareerPhase1ContractError('Future Direction authority career ID is invalid');
+    const item = object(value, `careerMappings[${index}]`);
+    exact(item, [
+      'careerId', 'canonicalOrder', 'sourceHashes', 'futureDirectionIds', 'reviewerId', 'reviewedAt',
+    ], [], `careerMappings[${index}]`);
+    const careerId = text(item.careerId, `careerMappings[${index}].careerId`, 180);
+    if (!CAREER_ID.test(careerId)) throw new DreamCareerPhase1ContractError('Future Direction authority career ID is invalid');
+    const canonicalOrder = integer(item.canonicalOrder, `careerMappings[${index}].canonicalOrder`, EXPECTED_TOTAL - 1);
+    if (canonicalOrder !== index) throw new DreamCareerPhase1ContractError('Future Direction authority canonical order is invalid');
+    const reviewedSourceHashes = sourceHashes(item.sourceHashes, `careerMappings[${index}].sourceHashes`);
     const mappingReviewer = parseReviewerAuthority({ reviewerId: item.reviewerId, reviewedAt: item.reviewedAt }, `careerMappings[${index}] reviewer`);
-    if (!same(mappingReviewer, topReviewer)) throw new DreamCareerPhase1ContractError('Future Direction authority mapping reviewer is inconsistent');
-    return { careerId, futureDirectionIds: directionIds(item.futureDirectionIds, `careerMappings[${index}].futureDirectionIds`), ...mappingReviewer };
+    return {
+      careerId,
+      canonicalOrder,
+      sourceHashes: reviewedSourceHashes,
+      futureDirectionIds: directionIds(item.futureDirectionIds, `careerMappings[${index}].futureDirectionIds`),
+      ...mappingReviewer,
+    };
   });
   if (new Set(mappings.map((mapping) => mapping.careerId)).size !== EXPECTED_TOTAL) throw new DreamCareerPhase1ContractError('Future Direction authority career mappings are not unique');
   if (!Array.isArray(result.directionRoles) || result.directionRoles.length !== 6) throw new DreamCareerPhase1ContractError('Future Direction authority direction roles must contain six entries');
@@ -275,7 +311,22 @@ function futureAuthority(value: unknown): FutureDirectionMappingAuthorityDocumen
     if (!same(careerIds, expected)) throw new DreamCareerPhase1ContractError('Future Direction authority reverse direction roles are inconsistent');
     return { directionId: DIRECTION_IDS[index], careerIds };
   });
-  return { schemaVersion: 1, authorityType: 'dream-career-future-direction-mapping-authority', authorityVersion: '1.0.0', reviewer: topReviewer, canonicalDirectionIds: [...DIRECTION_IDS], careerMappings: mappings, directionRoles: roles };
+  return {
+    schemaVersion: 1,
+    authorityType: 'dream-career-future-direction-mapping-authority',
+    authorityVersion: '1.0.0',
+    reviewId: result.reviewId,
+    inventoryVersion: result.inventoryVersion,
+    inventorySha256: result.inventorySha256 as string,
+    releaseId: result.releaseId as string,
+    releaseContentSha256: result.releaseContentSha256 as string,
+    registryVersion: result.registryVersion as string,
+    registrySha256: result.registrySha256 as string,
+    reviewer: topReviewer,
+    canonicalDirectionIds: [...DIRECTION_IDS],
+    careerMappings: mappings,
+    directionRoles: roles,
+  };
 }
 function taxonomyAuthority(value: unknown): TaxonomyRejectionAuthorityDocument {
   const result = object(value, 'taxonomy rejection authority'); exact(result, ['schemaVersion', 'authorityType', 'authorityVersion', 'reviewer', 'registryVersion', 'registrySha256', 'releaseId', 'releaseContentSha256', 'legacyFamily', 'category', 'rawValue', 'assignmentCount', 'tagId', 'disposition', 'sourcePath', 'sourceSha256'], [], 'taxonomy rejection authority');
