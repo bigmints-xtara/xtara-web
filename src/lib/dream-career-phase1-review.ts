@@ -65,7 +65,7 @@ export type DreamCareerPhase1AuthorityArtifact = {
   artifactJson: string; artifactSha256: string; authority: FutureDirectionMappingAuthorityDocument | TaxonomyRejectionAuthorityDocument;
 };
 export type DraftReviewCommand = { kind: 'draft'; careerId: string; body: { expectedVersion: number; idempotencyKey: string; sourceHashes: DreamCareerPhase1SourceHashes; primaryDirectionId: string; secondaryDirectionIds: string[] } };
-export type FinalizeReviewCommand = { kind: 'finalize'; careerId: string; body: { expectedVersion: number; idempotencyKey: string; sourceHashes: DreamCareerPhase1SourceHashes; confirmed: true } };
+export type FinalizeReviewCommand = { kind: 'finalize'; careerId: string; confirmedDirectionIds: string[]; body: { expectedVersion: number; idempotencyKey: string; sourceHashes: DreamCareerPhase1SourceHashes; confirmed: true } };
 
 function object(value: unknown, label: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new DreamCareerPhase1ContractError(`${label} must be an object`);
@@ -215,7 +215,18 @@ function blockers(value: unknown): DreamCareerPhase1ReviewSummary['blockers'] {
 export function parseDreamCareerPhase1Summary(value: unknown): DreamCareerPhase1ReviewSummary {
   const result = object(value, 'complete summary'); exact(result, ['reviewId', 'expectedTotal', 'counts', 'blockers'], [], 'complete summary');
   if (result.expectedTotal !== EXPECTED_TOTAL) throw new DreamCareerPhase1ContractError('complete summary expectedTotal is invalid');
-  return { reviewId: text(result.reviewId, 'complete summary reviewId', 180), expectedTotal: EXPECTED_TOTAL, counts: counts(result.counts), blockers: blockers(result.blockers) };
+  const parsed: DreamCareerPhase1ReviewSummary = { reviewId: text(result.reviewId, 'complete summary reviewId', 180), expectedTotal: EXPECTED_TOTAL, counts: counts(result.counts), blockers: blockers(result.blockers) };
+  if (parsed.counts.total !== EXPECTED_TOTAL) throw new DreamCareerPhase1ContractError('complete summary total must be exactly 229');
+  if (parsed.blockers.length === 0 && !isDreamCareerPhase1ReviewComplete(parsed)) throw new DreamCareerPhase1ContractError('blocker-free complete summary must have exactly 229 finalized reviews');
+  return parsed;
+}
+export function isDreamCareerPhase1ReviewComplete(summary: DreamCareerPhase1ReviewSummary): boolean {
+  return summary.expectedTotal === EXPECTED_TOTAL
+    && summary.counts.total === EXPECTED_TOTAL
+    && summary.counts.pending === 0
+    && summary.counts.draft === 0
+    && summary.counts.finalized === EXPECTED_TOTAL
+    && summary.blockers.length === 0;
 }
 export function parseDreamCareerPhase1Queue(value: unknown): DreamCareerPhase1ReviewQueue {
   const result = object(value, 'queue'); exact(result, ['reviewId', 'expectedTotal', 'counts', 'blockers', 'directionOptions', 'records'], [], 'queue');
@@ -300,13 +311,18 @@ export function createDraftReviewCommand(record: DreamCareerPhase1ReviewDetail, 
 }
 export function createFinalizeReviewCommand(record: DreamCareerPhase1ReviewDetail, idempotencyKey: string): FinalizeReviewCommand {
   parseDreamCareerPhase1Detail(record); text(idempotencyKey, 'idempotencyKey', 120);
-  return { kind: 'finalize', careerId: record.careerId, body: { expectedVersion: record.version, idempotencyKey, sourceHashes: record.sourceHashes, confirmed: true } };
+  if (!record.draft) throw new DreamCareerPhase1ContractError('finalize command requires a persisted draft selection');
+  return {
+    kind: 'finalize', careerId: record.careerId,
+    confirmedDirectionIds: [record.draft.primaryDirectionId, ...record.draft.secondaryDirectionIds],
+    body: { expectedVersion: record.version, idempotencyKey, sourceHashes: record.sourceHashes, confirmed: true },
+  };
 }
 
 function verifyMutation(record: DreamCareerPhase1ReviewRecord, command: DraftReviewCommand | FinalizeReviewCommand): void {
   if (record.careerId !== command.careerId || record.version !== command.body.expectedVersion + 1 || record.lastMutation?.idempotencyKey !== command.body.idempotencyKey) throw new DreamCareerPhase1ContractError('mutation readback identity/version/idempotency is inconsistent');
   if (command.kind === 'draft' && (record.status !== 'draft' || !record.draft || record.draft.primaryDirectionId !== command.body.primaryDirectionId || !same(record.draft.secondaryDirectionIds, command.body.secondaryDirectionIds))) throw new DreamCareerPhase1ContractError('draft mutation readback does not match the command');
-  if (command.kind === 'finalize' && (record.status !== 'finalized' || !record.finalDecision)) throw new DreamCareerPhase1ContractError('finalize mutation readback does not match the command');
+  if (command.kind === 'finalize' && (record.status !== 'finalized' || !record.finalDecision || !same(record.finalDecision.futureDirectionIds, command.confirmedDirectionIds))) throw new DreamCareerPhase1ContractError('finalize mutation directions do not match the confirmed command');
 }
 function verifyDetailReadback(detail: DreamCareerPhase1ReviewDetail, mutation: DreamCareerPhase1ReviewRecord): void {
   const record = { ...detail } as Record<string, unknown>;
@@ -316,7 +332,11 @@ function verifyDetailReadback(detail: DreamCareerPhase1ReviewDetail, mutation: D
 
 export const dreamCareerPhase1ReviewApi = {
   async listQueue() { return parseDreamCareerPhase1Queue(await xtaraApi.get<unknown>('/admin/dream-career-phase1-review')); },
-  async getDetail(careerId: string) { return parseDreamCareerPhase1Detail(await xtaraApi.get<unknown>(recordPath(careerId))); },
+  async getDetail(careerId: string) {
+    const detail = parseDreamCareerPhase1Detail(await xtaraApi.get<unknown>(recordPath(careerId)));
+    if (detail.careerId !== careerId) throw new DreamCareerPhase1ContractError('detail career identity does not match the requested career');
+    return detail;
+  },
   async getComplete() { return parseDreamCareerPhase1Summary(await xtaraApi.get<unknown>('/admin/dream-career-phase1-review/complete')); },
   async saveDraft(command: DraftReviewCommand) {
     const mutation = reviewRecord(await xtaraApi.put<unknown>(`${recordPath(command.careerId)}/draft`, command.body), false) as DreamCareerPhase1ReviewRecord;

@@ -5,11 +5,24 @@ const reviewApi = vi.hoisted(() => ({
   listQueue: vi.fn(), getDetail: vi.fn(), getComplete: vi.fn(), saveDraft: vi.fn(), finalize: vi.fn(),
   exportFutureDirections: vi.fn(), exportTaxonomyRejection: vi.fn(),
 }));
+const testContext = vi.hoisted(() => ({ locale: 'en', userProfile: { adminRole: 'admin' } as { adminRole: string } }));
 vi.mock('@/lib/dream-career-phase1-review', async (importOriginal) => ({
   ...await importOriginal<typeof import('@/lib/dream-career-phase1-review')>(),
   dreamCareerPhase1ReviewApi: reviewApi,
 }));
-vi.mock('@/i18n/language-provider', () => ({ useTranslations: () => ({ locale: 'en' }) }));
+vi.mock('@/context/AuthContext', () => ({ useAuth: () => ({ userProfile: testContext.userProfile }) }));
+vi.mock('@/i18n/language-provider', async () => {
+  const { defaultMessages, getMessages } = await import('@/i18n/messages');
+  const { translate } = await import('@/i18n/translate');
+  return {
+    useTranslations: () => ({
+      locale: testContext.locale,
+      t: (key: string, vars?: Record<string, string | number>) => translate(
+        getMessages(testContext.locale as Parameters<typeof getMessages>[0]), key, vars, defaultMessages,
+      ),
+    }),
+  };
+});
 
 import DreamCareerPhase1ReviewPage from './DreamCareerPhase1ReviewPage';
 import type { DreamCareerPhase1ReviewDetail, DreamCareerPhase1ReviewQueue } from '@/lib/dream-career-phase1-review';
@@ -54,6 +67,8 @@ function detail(item = record(0, 'draft')): DreamCareerPhase1ReviewDetail {
 describe('DreamCareerPhase1ReviewPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    testContext.locale = 'en';
+    testContext.userProfile = { adminRole: 'admin' };
     reviewApi.listQueue.mockResolvedValue(queue());
     reviewApi.getDetail.mockResolvedValue(detail());
     reviewApi.getComplete.mockResolvedValue({ reviewId: 'dream-career-phase-1', expectedTotal: 229, counts: { total: 229, pending: 227, draft: 1, finalized: 1 }, blockers: ['incomplete_human_review'] });
@@ -246,6 +261,17 @@ describe('DreamCareerPhase1ReviewPage', () => {
     expect(screen.queryByRole('button', { name: 'Export Future Direction mapping' })).not.toBeInTheDocument();
   });
 
+  it('fails closed when /complete has no blockers but is not exactly complete', async () => {
+    reviewApi.getComplete.mockResolvedValue({
+      reviewId: 'dream-career-phase-1', expectedTotal: 229,
+      counts: { total: 229, pending: 229, draft: 0, finalized: 0 }, blockers: [],
+    });
+    render(<DreamCareerPhase1ReviewPage />);
+    await screen.findByRole('region', { name: 'Review counts' });
+    expect(screen.queryByRole('button', { name: 'Export Future Direction mapping' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Export taxonomy rejection' })).not.toBeInTheDocument();
+  });
+
   it('shows exact taxonomy identity and artifact export controls only when /complete is eligible', async () => {
     reviewApi.getComplete.mockResolvedValue({ reviewId: 'dream-career-phase-1', expectedTotal: 229, counts: { total: 229, pending: 0, draft: 0, finalized: 229 }, blockers: [] });
     const authority = { schemaVersion: 1, authorityType: 'dream-career-taxonomy-rejection-authority', authorityVersion: '1.0.0', reviewer: { reviewerId: 'admin_user:11111111-1111-4111-8111-111111111111', reviewedAt: '2026-08-22T12:00:00.000Z' }, registryVersion: 'v1', registrySha256: 'a'.repeat(64), releaseId: 'release-1', releaseContentSha256: 'b'.repeat(64), legacyFamily: 'traits', category: 'traitIds', rawValue: 'ytical', assignmentCount: 1, tagId: null, disposition: 'rejected', sourcePath: 'language-policy-officer', sourceSha256: 'c'.repeat(64) };
@@ -278,5 +304,80 @@ describe('DreamCareerPhase1ReviewPage', () => {
     const action = within(first).getByRole('button', { name: 'Review Canonical Career 1 compact' });
     fireEvent.click(action);
     expect(await screen.findByRole('region', { name: 'Decision editor' })).toBeInTheDocument();
+  });
+
+  it('shows compact blocker mismatch fields and does not duplicate the record version', async () => {
+    const blockedQueue = queue();
+    blockedQueue.records[0].sourceBinding = {
+      ...blockedQueue.records[0].sourceBinding,
+      status: 'mismatch', isCurrent: false, isMismatch: true,
+      blockers: ['source_hash_mismatch'], mismatchFields: ['guideSha256'],
+    };
+    reviewApi.listQueue.mockResolvedValue(blockedQueue);
+    render(<DreamCareerPhase1ReviewPage />);
+    const first = within(await screen.findByTestId('compact-career-list')).getByTestId('compact-career-career-001');
+    expect(first).toHaveTextContent('source_hash_mismatch');
+    expect(first).toHaveTextContent('guideSha256');
+    expect(within(first).getAllByText('Version 1')).toHaveLength(1);
+  });
+
+  it('keeps Tab focus inside the busy dialog when every action is disabled', async () => {
+    reviewApi.finalize.mockReturnValue(new Promise(() => undefined));
+    render(<DreamCareerPhase1ReviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Review final decision' }));
+    const dialog = screen.getByRole('dialog', { name: 'Finalize this decision?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Finalize permanently' }));
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeDisabled());
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(dialog).toHaveFocus();
+  });
+
+  it('restores focus to the page heading after successful finalization disables the trigger', async () => {
+    reviewApi.finalize.mockResolvedValue({
+      ...detail(), status: 'finalized', version: 2, draft: null,
+      finalDecision: {
+        futureDirectionIds: ['business', 'society'],
+        reviewerId: 'admin_user:22222222-2222-4222-8222-222222222222',
+        reviewedAt: '2026-08-22T13:00:00.000Z',
+      },
+    });
+    render(<DreamCareerPhase1ReviewPage />);
+    const heading = screen.getByRole('heading', { name: 'Dream Career Phase 1 review' });
+    fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Review final decision' }));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Finalize permanently' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(heading).toHaveFocus();
+  });
+
+  it('lets editors save drafts but hides finalization and authority exports', async () => {
+    testContext.userProfile = { adminRole: 'editor' };
+    reviewApi.getComplete.mockResolvedValue({
+      reviewId: 'dream-career-phase-1', expectedTotal: 229,
+      counts: { total: 229, pending: 0, draft: 0, finalized: 229 }, blockers: [],
+    });
+    render(<DreamCareerPhase1ReviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
+    const editor = await screen.findByRole('region', { name: 'Decision editor' });
+    expect(within(editor).getByRole('button', { name: 'Save draft' })).toBeEnabled();
+    expect(within(editor).queryByRole('button', { name: 'Review final decision' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Export Future Direction mapping' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Export taxonomy rejection' })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['ml', 'ഡ്രീം കരിയർ ഘട്ടം 1 അവലോകനം', 'കരിയറുകൾ തിരയുക'],
+    ['ta', 'கனவு தொழில் கட்டம் 1 மதிப்பாய்வு', 'தொழில்களைத் தேடுக'],
+  ])('renders the complete workflow in %s without hard-coded English fallback', async (locale, title, searchLabel) => {
+    testContext.locale = locale;
+    render(<DreamCareerPhase1ReviewPage />);
+    expect(await screen.findByRole('heading', { name: title })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: searchLabel })).toBeInTheDocument();
+    expect(screen.queryByText('Dream Career Phase 1 review')).not.toBeInTheDocument();
+    expect(screen.queryByText('Human review required')).not.toBeInTheDocument();
+    expect(screen.queryByText('All statuses')).not.toBeInTheDocument();
+    expect(screen.queryByText('Taxonomy rejection acknowledgement')).not.toBeInTheDocument();
+    expect(screen.queryByText('Final release remains blocked')).not.toBeInTheDocument();
   });
 });

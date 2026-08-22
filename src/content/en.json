@@ -1010,6 +1010,30 @@
     "medals": "Medals",
     "currentTier": "Current Tier"
   },
+  "admin": {
+    "dreamCareerPhase1Review": {
+      "title": "Dream Career Phase 1 review",
+      "badge": "Human review required",
+      "intro": "Review the server-bound Future Direction decisions for all 229 canonical careers. Drafts are resumable; finalization requires a different authenticated reviewer.",
+      "loading": "Loading authenticated review queue…",
+      "unavailable": "Review queue unavailable",
+      "retry": "Retry queue",
+      "common": { "displayUnavailable": "Canonical display unavailable", "sourcePathUnavailable": "Source path unavailable", "unavailable": "Unavailable", "none": "None", "version": "Version {version}" },
+      "status": { "pending": "Not started", "draft": "Draft", "finalized": "Finalized" },
+      "source": { "badge": "Source {status}", "current": "current", "stale": "stale", "mismatch": "mismatch" },
+      "review": { "draftReview": "Draft review", "finalReview": "Final review", "draftRecorded": "Draft author recorded", "noDraftAuthor": "No draft author", "finalRecorded": "Final reviewer recorded", "notFinalized": "Not finalized", "timeUnavailable": "Time unavailable" },
+      "decision": { "primary": "Primary:", "secondaries": "Secondaries:" },
+      "errors": { "loadQueue": "Unable to load the authenticated review queue.", "loadDetail": "Unable to load the persisted review detail.", "summaryReadback": "Decision persisted, but the server completion summary could not be verified. Exports remain unavailable.", "export": "Authority export failed." },
+      "counts": { "region": "Review counts", "total": "Total", "exportBlocked": "Export blocked by server completion summary:" },
+      "filters": { "searchLabel": "Search careers", "searchPlaceholder": "Search title, career ID, or source path", "statusLabel": "Filter by review status", "allStatuses": "All statuses", "sourceLabel": "Filter by source state", "allSources": "All source states", "blockedLabel": "Filter by blocked state", "allBlockers": "All blocker states", "blocked": "Blocked", "unblocked": "Unblocked", "resultCount": "{visible} of {total}" },
+      "queue": { "region": "Career review queue", "order": "Order", "career": "Career and source", "decision": "Decision", "status": "Status", "binding": "Source binding and blockers", "recorded": "Recorded review", "action": "Action", "noBlockers": "No blockers", "reviewAria": "Review {title}", "reviewCompactAria": "Review {title} compact", "review": "Review", "reviewCareer": "Review career", "empty": "No careers match these filters." },
+      "editor": { "region": "Decision editor", "close": "Close decision editor", "canonicalSource": "Canonical source", "release": "Release", "currentRecord": "Current record", "versionSource": "Version {version} · Source {status}", "locked": "This record cannot be changed.", "invalidDirections": "The server did not provide exactly six canonical Direction choices.", "sourceBinding": "Source binding is {status}.", "primary": "Primary Direction", "required": "Required", "primaryHelp": "Choose the single best fit.", "primaryOption": "Primary {label}", "secondary": "Secondary Directions", "secondaryLimit": "Optional, up to two", "secondaryHelp": "Secondary choices remain ordered in the order selected.", "secondaryOption": "Secondary {label}", "choosePrimaryError": "Choose one primary Direction before saving.", "draftConfirmed": "Persisted readback confirmed.", "saveError": "Unable to save and verify the draft.", "finalizeConfirmed": "Finalized decision readback confirmed.", "finalizeError": "Unable to finalize and verify the decision.", "retrySave": "Retry save", "saveDraft": "Save draft", "reviewFinal": "Review final decision" },
+      "dialog": { "close": "Close confirmation", "title": "Finalize this decision?", "description": "Finalization is permanent in this interface; another authenticated reviewer must finalize work authored by someone else.", "career": "Career", "reviewIdentity": "Review identity", "currentSource": "Current source identity", "cancel": "Cancel", "confirm": "Finalize permanently" },
+      "taxonomy": { "title": "Taxonomy rejection acknowledgement", "description": "The frozen source contains one malformed legacy assignment.", "career": "Career", "family": "Family", "category": "Category", "rawValue": "Raw value", "assignmentCount": "Assignment count", "tagId": "Tag ID", "disposition": "Disposition", "note": "The malformed raw value is omitted, not corrected to analytical. This acknowledgement does not invent a replacement tag." },
+      "release": { "title": "Final release remains blocked", "description": "Accepted-college release authority and final release acceptance are outside this Phase 1 review.", "note": "This interface cannot create, edit, or imply either authority. They remain blocked until separate server-authoritative workflows and persisted readback exist." },
+      "exports": { "title": "Authority exports", "description": "The server completion summary reports this review eligible for export.", "mappingAria": "Export Future Direction mapping", "mapping": "Export mapping", "taxonomyAria": "Export taxonomy rejection", "taxonomy": "Export taxonomy rejection", "downloadAria": "Download {bytes} authoritative bytes", "download": "Download authoritative file" }
+    }
+  },
   "downloadModal": {
     "defaultTitle": "Download the App",
     "heading": "Experience the Full App",

@@ -122,6 +122,8 @@ describe('Dream Career Phase 1 runtime validation', () => {
     const summary = { reviewId: 'dream-career-phase-1', expectedTotal: 229, counts: { total: 229, pending: 0, draft: 0, finalized: 229 }, blockers: [] };
     expect(parseDreamCareerPhase1Summary(summary).counts.finalized).toBe(229);
     expect(() => parseDreamCareerPhase1Summary({ ...summary, counts: { total: 229, pending: 1, draft: 0, finalized: 229 } })).toThrow(/count/i);
+    expect(() => parseDreamCareerPhase1Summary({ ...summary, counts: { total: 229, pending: 229, draft: 0, finalized: 0 }, blockers: [] })).toThrow(/complete|blocker|finalized/i);
+    expect(() => parseDreamCareerPhase1Summary({ ...summary, counts: { total: 228, pending: 228, draft: 0, finalized: 0 }, blockers: ['incomplete_human_review'] })).toThrow(/229|total/i);
   });
 });
 
@@ -134,6 +136,20 @@ describe('dreamCareerPhase1ReviewApi', () => {
     await expect(dreamCareerPhase1ReviewApi.getDetail('career-001')).resolves.toMatchObject({ careerId: 'career-001' });
     await expect(dreamCareerPhase1ReviewApi.getComplete()).resolves.toMatchObject({ counts: { finalized: 1 } });
     expect(api.get).toHaveBeenNthCalledWith(3, '/admin/dream-career-phase1-review/complete');
+  });
+
+  it('rejects a structurally valid detail response for a different requested career', async () => {
+    api.get.mockResolvedValue(detailValue());
+    await expect(dreamCareerPhase1ReviewApi.getDetail('career-002')).rejects.toThrow(/requested|career/i);
+    expect(api.get).toHaveBeenCalledWith('/admin/dream-career-phase1-review/career-002');
+  });
+
+  it('rejects an inconsistent blocker-free /complete response at the adapter boundary', async () => {
+    api.get.mockResolvedValue({
+      reviewId: 'dream-career-phase-1', expectedTotal: 229,
+      counts: { total: 229, pending: 229, draft: 0, finalized: 0 }, blockers: [],
+    });
+    await expect(dreamCareerPhase1ReviewApi.getComplete()).rejects.toThrow(/complete|blocker|finalized/i);
   });
 
   it('sends an exact stable draft command, validates mutation response, then performs persisted readback', async () => {
@@ -165,6 +181,26 @@ describe('dreamCareerPhase1ReviewApi', () => {
     await dreamCareerPhase1ReviewApi.finalize(command);
     expect(api.post).toHaveBeenNthCalledWith(1, '/admin/dream-career-phase1-review/career-001/finalize', command.body);
     expect(api.post).toHaveBeenNthCalledWith(2, '/admin/dream-career-phase1-review/career-001/finalize', command.body);
+    expect(command.confirmedDirectionIds).toEqual(['business', 'society']);
+  });
+
+  it('binds finalization to the persisted draft directions in the command and mutation response', async () => {
+    const command = createFinalizeReviewCommand(detailValue(), 'finalize-key');
+    const changed = mutationValue(command);
+    if (changed.finalDecision) changed.finalDecision.futureDirectionIds = ['design'];
+    api.post.mockResolvedValue(changed);
+    await expect(dreamCareerPhase1ReviewApi.finalize(command)).rejects.toThrow(/direction|command/i);
+    expect(api.get).not.toHaveBeenCalled();
+  });
+
+  it('rejects a persisted finalize readback whose directions changed after the response', async () => {
+    const command = createFinalizeReviewCommand(detailValue(), 'finalize-key');
+    const mutation = mutationValue(command);
+    const readback = persistedDetail(command);
+    if (readback.finalDecision) readback.finalDecision.futureDirectionIds = ['design'];
+    api.post.mockResolvedValue(mutation);
+    api.get.mockResolvedValue(readback);
+    await expect(dreamCareerPhase1ReviewApi.finalize(command)).rejects.toThrow(/persisted|readback/i);
   });
 
   it('rejects malformed mutation readback before requesting detail', async () => {
