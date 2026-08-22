@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -135,6 +135,58 @@ function response(): DreamCareerStudentGuideResponse {
   };
 }
 
+function sparseResponse(): DreamCareerStudentGuideResponse {
+  const value = response();
+  value.guide.aboutCareer = {
+    whatYouDo: '',
+    activities: [],
+    dayInLife: [],
+    whyItMatters: '',
+    earnings: [],
+    notablePeople: [],
+    relatedCareerIds: [],
+  };
+  value.guide.howToGetThere = {
+    subjects: [],
+    educationRoutes: [],
+    firstJobBridge: [],
+    careerProgression: [],
+    employerLinkIds: [],
+    opportunityQuery: { careerId: value.career.id },
+  };
+  value.guide.whatYouCanDoNow = {
+    learningResourceIds: [],
+    skills: [],
+    tools: [],
+    entranceExams: [],
+    starterActivity: null,
+  };
+  value.guide.additionalTopics = [];
+  value.resolved.labels = { subjects: [], skills: [], occupationalTools: [] };
+  value.resolved.relatedCareers = [];
+  value.resolved.courseOptions = { status: 'available', items: [] };
+  value.resolved.employers = [];
+  value.resolved.opportunities = [];
+  value.resolved.learningResources = [];
+  value.relationshipErrors = [];
+  value.coverage.items = value.coverage.items.map((item) => ({ ...item, status: 'missing' as const, itemCount: 0 }));
+  value.coverage.byQuestion = Object.fromEntries(value.coverage.items.map((item) => [item.questionId, item])) as unknown as DreamCareerStudentGuideResponse['coverage']['byQuestion'];
+  return value;
+}
+
+function stubCompactLayout() {
+  vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query: string) => ({
+    matches: query === '(max-width: 1023px)',
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })));
+}
+
 describe('DreamCareerStudentGuide', () => {
   beforeEach(() => window.history.replaceState(null, '', '/'));
   afterEach(() => vi.unstubAllGlobals());
@@ -171,6 +223,97 @@ describe('DreamCareerStudentGuide', () => {
       expect(within(navigation).getByRole('link', { name: question })).toBeInTheDocument();
     }
     expect(within(screen.getByTestId('active-question-pane')).getByRole('heading', { name: 'What will I do?' })).toBeInTheDocument();
+  });
+
+  it('shows one concise status and no navigation when the entire guide has no renderable questions', () => {
+    render(<DreamCareerStudentGuide response={sparseResponse()} locale="en" />);
+
+    const statuses = screen.getAllByRole('status');
+    expect(statuses).toHaveLength(1);
+    expect(statuses[0]).toHaveTextContent('More reviewed guidance for this career is being prepared.');
+    expect(screen.queryByRole('navigation', { name: 'Career guide chapters' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
+
+  it('places additive paragraph, bullet, and resource topics in their declared chapters with stable links', () => {
+    const value = response();
+    value.guide.additionalTopics = [
+      {
+        id: 'wider-impact',
+        chapter: 'aboutCareer',
+        title: 'What wider impact can I have?',
+        summary: 'Data work can improve public services.',
+        blocks: [{ type: 'paragraph', text: 'Reliable information can help communities plan.' }],
+        sourceIds: ['source-one'],
+      },
+      {
+        id: 'route-choices',
+        chapter: 'howToGetThere',
+        title: 'How can I compare study routes?',
+        summary: '',
+        blocks: [{ type: 'bullets', items: ['Compare course content', 'Ask about practical projects'] }],
+        sourceIds: ['source-one'],
+      },
+      {
+        id: 'practice-library',
+        chapter: 'whatYouCanDoNow',
+        title: 'Where can I practise?',
+        summary: '',
+        blocks: [{ type: 'resourceLinks', resourceIds: ['resource-1', 'resource-not-reviewed'] }],
+        sourceIds: ['source-one'],
+      },
+      {
+        id: 'unavailable-library',
+        chapter: 'whatYouCanDoNow',
+        title: 'Unavailable resource topic',
+        summary: '',
+        blocks: [{ type: 'resourceLinks', resourceIds: ['resource-not-reviewed'] }],
+        sourceIds: ['source-one'],
+      },
+    ];
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    const navigation = screen.getByRole('navigation', { name: 'Career guide chapters' });
+    const aboutChapter = within(navigation).getByRole('link', { name: 'About this career' }).closest('section');
+    const pathChapter = within(navigation).getByRole('link', { name: 'How to get there' }).closest('section');
+    const nowChapter = within(navigation).getByRole('link', { name: 'What I can do now' }).closest('section');
+    expect(within(aboutChapter!).getByRole('link', { name: 'What wider impact can I have?' })).toHaveAttribute('href', '#guide-question-additional-about-wider-impact');
+    expect(within(pathChapter!).getByRole('link', { name: 'How can I compare study routes?' })).toHaveAttribute('href', '#guide-question-additional-path-route-choices');
+    expect(within(nowChapter!).getByRole('link', { name: 'Where can I practise?' })).toHaveAttribute('href', '#guide-question-additional-now-practice-library');
+    expect(within(navigation).queryByRole('link', { name: 'Unavailable resource topic' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('link', { name: 'What wider impact can I have?' }));
+    expect(screen.getByText('Reliable information can help communities plan.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: 'How can I compare study routes?' }));
+    expect(screen.getByText('Compare course content')).toBeInTheDocument();
+    expect(screen.getByText('Ask about practical projects')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: 'Where can I practise?' }));
+    expect(screen.getByRole('link', { name: 'SQL for beginners' })).toHaveAttribute('href', 'https://example.com/sql');
+  });
+
+  it('selects exact question fragments from the initial hash, clicks, and later hash changes with focus', async () => {
+    window.history.replaceState(null, '', '/#guide-question-career-progression');
+    render(<DreamCareerStudentGuide response={response()} locale="en" />);
+
+    const progression = await screen.findByRole('region', { name: 'How can my career grow?' });
+    await waitFor(() => expect(progression).toHaveFocus());
+    expect(progression).toHaveAttribute('id', 'guide-question-career-progression');
+    expect(document.getElementById(window.location.hash.slice(1))).toBe(progression);
+    expect(screen.getByRole('link', { name: 'How can my career grow?' })).toHaveAttribute('aria-current', 'location');
+    expect(screen.getByTestId('active-question-pane')).toHaveAttribute('aria-live', 'polite');
+
+    fireEvent.click(screen.getByRole('link', { name: 'What tools should I learn?' }));
+    const tools = screen.getByRole('region', { name: 'What tools should I learn?' });
+    await waitFor(() => expect(tools).toHaveFocus());
+    expect(window.location.hash).toBe('#guide-question-tools');
+    expect(document.getElementById('guide-question-tools')).toBe(tools);
+
+    window.history.replaceState(null, '', '/#guide-question-earnings');
+    window.dispatchEvent(new Event('hashchange'));
+    const earnings = await screen.findByRole('region', { name: 'How much can I earn?' });
+    await waitFor(() => expect(earnings).toHaveFocus());
+    expect(document.getElementById('guide-question-earnings')).toBe(earnings);
   });
 
   it('renders API-owned human labels and omits guidance with no reviewed label projection', () => {
@@ -333,9 +476,9 @@ describe('DreamCareerStudentGuide', () => {
     const about = screen.getByRole('link', { name: 'About this career' });
     const path = screen.getByRole('link', { name: 'How to get there' });
     const now = screen.getByRole('link', { name: 'What I can do now' });
-    expect(about).toHaveAttribute('href', '#about-career');
-    expect(path).toHaveAttribute('href', '#how-to-get-there');
-    expect(now).toHaveAttribute('href', '#what-you-can-do-now');
+    expect(about).toHaveAttribute('href', '#guide-question-what-you-do');
+    expect(path).toHaveAttribute('href', '#guide-question-subjects');
+    expect(now).toHaveAttribute('href', '#guide-question-learning-resources');
     about.focus();
     expect(about).toHaveFocus();
   });
@@ -348,20 +491,53 @@ describe('DreamCareerStudentGuide', () => {
     expect(within(navigation).getByRole('link', { name: 'What will I do?' })).toHaveAttribute('href', '#guide-question-what-you-do');
     desktop.unmount();
 
-    vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query: string) => ({
-      matches: query === '(max-width: 1023px)',
-      media: query,
-      onchange: null,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })));
+    stubCompactLayout();
     const compact = render(<DreamCareerStudentGuide response={response()} locale="en" />);
     expect(screen.getByTestId('compact-question-reader')).toBeInTheDocument();
+    expect(screen.queryByTestId('desktop-question-navigation')).not.toBeInTheDocument();
     expect(screen.getAllByRole('heading', { name: 'What will I do?' })).toHaveLength(1);
     compact.unmount();
+  });
+
+  it('keeps every surviving chapter, question, and additive topic in order in the compact reader', () => {
+    const value = response();
+    value.guide.aboutCareer.dayInLife = [];
+    value.guide.additionalTopics = [
+      { id: 'about-extra', chapter: 'aboutCareer', title: 'About extra', summary: 'About detail', blocks: [], sourceIds: ['source-one'] },
+      { id: 'path-extra', chapter: 'howToGetThere', title: 'Path extra', summary: 'Path detail', blocks: [], sourceIds: ['source-one'] },
+      { id: 'now-extra', chapter: 'whatYouCanDoNow', title: 'Now extra', summary: 'Now detail', blocks: [], sourceIds: ['source-one'] },
+    ];
+    stubCompactLayout();
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    expect(screen.queryByTestId('desktop-question-navigation')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('heading').map((heading) => heading.textContent)).toEqual([
+      'About this career',
+      'What will I do?',
+      'Why does it matter?',
+      'How much can I earn?',
+      'Who can I learn from?',
+      'What related careers can I pursue?',
+      'About extra',
+      'How to get there',
+      'What subjects should I learn now?',
+      'What can I study?',
+      'Which courses and colleges are available?',
+      'How do I move from graduation to employment?',
+      'How can my career grow?',
+      'Which companies hire for this career?',
+      'Where can I find an internship?',
+      'Path extra',
+      'What I can do now',
+      'What other courses and online resources can I take?',
+      'What skills should I develop?',
+      'What tools should I learn?',
+      'What entrance exams should I consider?',
+      'What can I try this week?',
+      'Now extra',
+    ]);
+    expect(screen.queryByRole('heading', { name: 'What is a day like?' })).not.toBeInTheDocument();
   });
 
   it('uses localized chapter and learner-question labels', () => {
@@ -408,7 +584,12 @@ describe('DreamCareerStudentGuide', () => {
   it('renders distinct loading and honest retryable error states', () => {
     const retry = vi.fn();
     const { rerender } = render(<DreamCareerStudentGuideLoading locale="en" />);
-    expect(screen.getByRole('status')).toHaveTextContent('Loading career guide');
+    const loading = screen.getByRole('status');
+    expect(loading).toHaveTextContent('Loading career guide');
+    expect(loading.querySelector('.animate-spin')).toHaveClass('motion-reduce:animate-none');
+    for (const skeleton of loading.querySelectorAll('.animate-pulse')) {
+      expect(skeleton).toHaveClass('motion-reduce:animate-none');
+    }
 
     rerender(<DreamCareerStudentGuideError locale="en" onRetry={retry} />);
     expect(screen.getByRole('alert')).toHaveTextContent('This career guide is temporarily unavailable.');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useSyncExternalStore, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type MouseEvent, type ReactNode, type RefObject } from 'react';
 import Link from 'next/link';
 
 import type {
@@ -594,23 +594,43 @@ export function DreamCareerStudentGuide({
   const reviewedSources = guide.sources.filter((source) => source.reviewStatus === 'reviewed');
   const questionEntries = chapters.flatMap((chapter) => chapter.questions.map((question) => ({ chapter, question })));
   const questionSignature = questionEntries.map(({ question }) => question.id).join('|');
-  const [selectedQuestionId, setSelectedQuestionId] = useState(readQuestionHash);
+  const [selectedQuestionId, setSelectedQuestionId] = useState('');
+  const [focusRequest, setFocusRequest] = useState(0);
+  const pendingFocusQuestionId = useRef('');
+  const activeQuestionRef = useRef<HTMLElement>(null);
   const compactLayout = useSyncExternalStore(subscribeCompactLayout, getCompactLayout, getServerCompactLayout);
 
   useEffect(() => {
     const syncHash = () => {
       const next = readQuestionHash();
-      if (next && questionSignature.split('|').includes(next)) setSelectedQuestionId(next);
+      if (next && questionSignature.split('|').includes(next)) {
+        pendingFocusQuestionId.current = next;
+        setSelectedQuestionId(next);
+        setFocusRequest((request) => request + 1);
+      }
     };
+    syncHash();
     window.addEventListener('hashchange', syncHash);
     return () => window.removeEventListener('hashchange', syncHash);
   }, [questionSignature]);
 
   const selectedEntry = questionEntries.find(({ question }) => question.id === selectedQuestionId) ?? questionEntries[0];
   const activeQuestionId = selectedEntry?.question.id ?? '';
+
+  useEffect(() => {
+    if (compactLayout || !activeQuestionId || pendingFocusQuestionId.current !== activeQuestionId) return;
+    const activeQuestion = activeQuestionRef.current;
+    if (!activeQuestion) return;
+    activeQuestion.focus({ preventScroll: true });
+    activeQuestion.scrollIntoView?.({ block: 'start' });
+    pendingFocusQuestionId.current = '';
+  }, [activeQuestionId, compactLayout, focusRequest]);
+
   const selectQuestion = (event: MouseEvent<HTMLAnchorElement>, questionId: string) => {
     event.preventDefault();
+    pendingFocusQuestionId.current = questionId;
     setSelectedQuestionId(questionId);
+    setFocusRequest((request) => request + 1);
     window.history.replaceState(null, '', `#guide-question-${questionId}`);
   };
 
@@ -655,7 +675,7 @@ export function DreamCareerStudentGuide({
               {chapters.map((chapter) => (
                 <section id={chapter.id} key={chapter.id} className="scroll-mt-24">
                   <h2 className="text-base font-semibold text-foreground">
-                    <a href={`#${chapter.id}`} onClick={(event) => selectQuestion(event, chapter.questions[0].id)} className="group flex items-center gap-3 focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <a href={`#guide-question-${chapter.questions[0].id}`} onClick={(event) => selectQuestion(event, chapter.questions[0].id)} className="group flex items-center gap-3 focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                       <span aria-hidden className="text-xs font-bold tracking-[0.14em] text-primary/70">{chapter.number}</span>
                       <span>{chapter.title}</span>
                     </a>
@@ -680,9 +700,9 @@ export function DreamCareerStudentGuide({
 
           <main className="min-w-0" data-testid="desktop-question-reader">
             {selectedEntry ? (
-              <div data-testid="active-question-pane">
+              <div data-testid="active-question-pane" aria-live="polite">
                 <p className="text-xs font-bold tracking-[0.16em] text-primary/70">{selectedEntry.chapter.number} · {selectedEntry.chapter.title}</p>
-                <QuestionSection question={selectedEntry.question} idSuffix="pane" />
+                <QuestionSection question={selectedEntry.question} sectionRef={activeQuestionRef} />
               </div>
             ) : null}
             {sourcesPanel ? <div className="mt-14">{sourcesPanel}</div> : null}
@@ -697,11 +717,11 @@ export function DreamCareerStudentGuideLoading({ locale }: { locale: DreamCareer
   return (
     <div role="status" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10">
-        <span className="mb-6 block h-7 w-7 animate-spin rounded-full border-2 border-primary/25 border-t-primary" aria-hidden />
+        <span className="mb-6 block h-7 w-7 animate-spin rounded-full border-2 border-primary/25 border-t-primary motion-reduce:animate-none" aria-hidden />
         <p className="text-sm font-semibold text-foreground">{labels[locale].loading}</p>
         <div aria-hidden className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)]">
-          <div className="h-28 animate-pulse rounded-2xl bg-muted" />
-          <div className="h-44 animate-pulse rounded-2xl bg-muted" />
+          <div className="h-28 animate-pulse rounded-2xl bg-muted motion-reduce:animate-none" />
+          <div className="h-44 animate-pulse rounded-2xl bg-muted motion-reduce:animate-none" />
         </div>
       </div>
     </div>
@@ -737,10 +757,10 @@ function GuideChapter({ chapter }: { chapter: GuideChapterModel }) {
   );
 }
 
-function QuestionSection({ question, idSuffix = '' }: { question: GuideQuestion; idSuffix?: string }) {
-  const id = `guide-question-${question.id}${idSuffix ? `-${idSuffix}` : ''}`;
+function QuestionSection({ question, sectionRef }: { question: GuideQuestion; sectionRef?: RefObject<HTMLElement | null> }) {
+  const id = `guide-question-${question.id}`;
   return (
-    <section id={id} tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-7 sm:py-9">
+    <section ref={sectionRef} id={id} role="region" tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-7 sm:py-9">
       <h3 id={`${id}-title`} className="text-xl font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-2xl">{question.title}</h3>
       <div className="mt-4 min-w-0 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">{question.content}</div>
     </section>
