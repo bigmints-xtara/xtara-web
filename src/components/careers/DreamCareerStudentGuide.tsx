@@ -42,7 +42,6 @@ type GuideLabels = {
   tryAgain: string;
   retryAccessiblePrefix: string;
   relationshipUnavailable: string;
-  courseMappingUnavailable: string;
   loading: string;
   unavailable: string;
   sources: string;
@@ -70,7 +69,7 @@ const english: GuideLabels = {
   relatedCareers: 'Related careers',
   subjects: 'Subjects to focus on now',
   educationRoutes: 'Study routes',
-  coursesAndColleges: 'Courses, colleges, and cost',
+  coursesAndColleges: 'Courses and colleges',
   firstJobBridge: 'From graduation to first job',
   careerProgression: 'Career progression',
   employers: 'Companies that hire for this career',
@@ -85,7 +84,6 @@ const english: GuideLabels = {
   tryAgain: 'Try again',
   retryAccessiblePrefix: 'Retry',
   relationshipUnavailable: 'This information is temporarily unavailable.',
-  courseMappingUnavailable: 'Course and college matches are not available yet.',
   loading: 'Loading career guide',
   unavailable: 'This career guide is temporarily unavailable.',
   sources: 'Sources and evidence',
@@ -116,7 +114,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     relatedCareers: 'ബന്ധപ്പെട്ട കരിയറുകൾ',
     subjects: 'ഇപ്പോൾ ശ്രദ്ധിക്കേണ്ട വിഷയങ്ങൾ',
     educationRoutes: 'പഠന പാതകൾ',
-    coursesAndColleges: 'കോഴ്സുകൾ, കോളേജുകൾ, ചെലവ് എന്നിവ',
+    coursesAndColleges: 'കോഴ്സുകളും കോളേജുകളും',
     firstJobBridge: 'ബിരുദത്തിൽ നിന്ന് ആദ്യ ജോലിയിലേക്ക്',
     careerProgression: 'കരിയർ വളർച്ച',
     employers: 'ഈ കരിയറിലേക്ക് നിയമിക്കുന്ന കമ്പനികൾ',
@@ -131,7 +129,6 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     retryAccessiblePrefix: 'വീണ്ടും ശ്രമിക്കൂ:',
     starterActivity: 'ഈ ആഴ്ച ഇത് പരീക്ഷിക്കൂ',
     relationshipUnavailable: 'ഈ വിവരം ഇപ്പോൾ ലഭ്യമല്ല.',
-    courseMappingUnavailable: 'കോഴ്‌സ്, കോളേജ് പൊരുത്തങ്ങൾ ഇപ്പോൾ ലഭ്യമല്ല.',
     loading: 'കരിയർ ഗൈഡ് ലോഡ് ചെയ്യുന്നു',
     unavailable: 'ഈ കരിയർ ഗൈഡ് ഇപ്പോൾ ലഭ്യമല്ല.',
     sources: 'ഉറവിടങ്ങളും തെളിവുകളും',
@@ -159,7 +156,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     relatedCareers: 'संबंधित करियर',
     subjects: 'अभी किन विषयों पर ध्यान दें',
     educationRoutes: 'पढ़ाई के रास्ते',
-    coursesAndColleges: 'कोर्स, कॉलेज और लागत',
+    coursesAndColleges: 'कोर्स और कॉलेज',
     firstJobBridge: 'ग्रेजुएशन से पहली नौकरी तक',
     careerProgression: 'करियर में आगे बढ़ना',
     employers: 'इस करियर के लिए भर्ती करने वाली कंपनियाँ',
@@ -174,7 +171,6 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     retryAccessiblePrefix: 'फिर कोशिश करें:',
     starterActivity: 'इस हफ़्ते इसे आज़माएँ',
     relationshipUnavailable: 'यह जानकारी अभी उपलब्ध नहीं है।',
-    courseMappingUnavailable: 'कोर्स और कॉलेज के मेल अभी उपलब्ध नहीं हैं।',
     loading: 'करियर गाइड लोड हो रही है',
     unavailable: 'यह करियर गाइड अभी उपलब्ध नहीं है।',
     sources: 'स्रोत और प्रमाण',
@@ -202,7 +198,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     relatedCareers: 'தொடர்புடைய தொழில்கள்',
     subjects: 'இப்போது கவனம் செலுத்த வேண்டிய பாடங்கள்',
     educationRoutes: 'படிப்புப் பாதைகள்',
-    coursesAndColleges: 'படிப்புகள், கல்லூரிகள் மற்றும் செலவு',
+    coursesAndColleges: 'படிப்புகள் மற்றும் கல்லூரிகள்',
     firstJobBridge: 'பட்டப்படிப்பிலிருந்து முதல் வேலை வரை',
     careerProgression: 'தொழில் முன்னேற்றம்',
     employers: 'இந்தத் தொழிலுக்கு ஆட்களை எடுக்கும் நிறுவனங்கள்',
@@ -217,7 +213,6 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     retryAccessiblePrefix: 'மீண்டும் முயற்சிக்கவும்:',
     starterActivity: 'இந்த வாரம் இதை முயற்சிக்கவும்',
     relationshipUnavailable: 'இந்தத் தகவல் இப்போது கிடைக்கவில்லை.',
-    courseMappingUnavailable: 'பாடநெறி மற்றும் கல்லூரிப் பொருத்தங்கள் இன்னும் கிடைக்கவில்லை.',
     loading: 'தொழில் வழிகாட்டி ஏற்றப்படுகிறது',
     unavailable: 'இந்தத் தொழில் வழிகாட்டி இப்போது கிடைக்கவில்லை.',
     sources: 'ஆதாரங்களும் சான்றுகளும்',
@@ -286,9 +281,9 @@ export function DreamCareerStudentGuide({
     <div data-testid="dream-career-student-guide" className="min-w-0 bg-muted/20 text-foreground dark:bg-background">
       <nav
         aria-label={text.chapterNavigation}
-        className="sticky top-0 z-20 overflow-x-auto border-b border-border/70 bg-background/95 px-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:px-6"
+        className="sticky top-0 z-20 border-b border-border/70 bg-background/95 px-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:px-6"
       >
-        <div className="mx-auto flex w-max min-w-full max-w-6xl gap-2 py-3 lg:justify-center">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-3 gap-1 py-2 sm:gap-2 sm:py-3">
           <ChapterAnchor href="#about-career" number="01">{text.aboutCareer}</ChapterAnchor>
           <ChapterAnchor href="#how-to-get-there" number="02">{text.howToGetThere}</ChapterAnchor>
           <ChapterAnchor href="#what-you-can-do-now" number="03">{text.whatYouCanDoNow}</ChapterAnchor>
@@ -393,7 +388,7 @@ export function DreamCareerStudentGuide({
             </AnswerSection>
           ) : null}
 
-          {current('coursesAndColleges') && (resolved.courseOptions.items.length || resolved.courseOptions.status === 'mapping_unavailable' || relationshipError('courseOptions')) ? (
+          {current('coursesAndColleges') && (resolved.courseOptions.items.length || relationshipError('courseOptions')) ? (
             <AnswerSection title={text.coursesAndColleges}>
               {resolved.courseOptions.items.length ? (
                 <ProgressiveList
@@ -409,15 +404,6 @@ export function DreamCareerStudentGuide({
                       </GuideItem>
                     );
                   }}
-                />
-              ) : null}
-              {resolved.courseOptions.status === 'mapping_unavailable' ? (
-                <RelationshipUnavailable
-                  label={text.coursesAndColleges}
-                  message={text.courseMappingUnavailable}
-                  retryLabel={text.tryAgain}
-                  retryAccessiblePrefix={text.retryAccessiblePrefix}
-                  retrying={false}
                 />
               ) : null}
               {relationFailure('courseOptions', text.coursesAndColleges)}
@@ -586,9 +572,9 @@ export function DreamCareerStudentGuideError({ locale, onRetry }: { locale: Drea
 
 function ChapterAnchor({ href, number, children }: { href: string; number: string; children: ReactNode }) {
   return (
-    <a href={href} className="group inline-flex whitespace-nowrap rounded-full border border-transparent px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-border hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-4">
-      <span aria-hidden className="mr-2 text-xs font-bold text-primary/70 group-hover:text-primary">{number}</span>
-      {children}
+    <a href={href} className="group flex min-w-0 flex-col items-center justify-center rounded-xl border border-transparent px-1.5 py-2 text-center text-[0.7rem] font-semibold leading-tight whitespace-normal break-words text-muted-foreground transition hover:border-border hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:px-4 sm:text-sm">
+      <span aria-hidden className="mb-0.5 text-[0.65rem] font-bold text-primary/70 group-hover:text-primary sm:mr-2 sm:mb-0 sm:text-xs">{number}</span>
+      <span className="min-w-0">{children}</span>
     </a>
   );
 }

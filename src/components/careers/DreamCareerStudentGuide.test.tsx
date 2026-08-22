@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -153,7 +153,7 @@ describe('DreamCareerStudentGuide', () => {
       'Related careers',
       'Subjects to focus on now',
       'Study routes',
-      'Courses, colleges, and cost',
+      'Courses and colleges',
       'From graduation to first job',
       'Career progression',
       'Companies that hire for this career',
@@ -225,9 +225,10 @@ describe('DreamCareerStudentGuide', () => {
     expect(screen.queryByText(/not available yet/i)).not.toBeInTheDocument();
   });
 
-  it('uses accepted relationship IDs for canonical career and college links', () => {
+  it('renders accepted course options under an honest courses and colleges heading', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
+    expect(screen.getByRole('heading', { name: 'Courses and colleges' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Analytics Engineer' })).toHaveAttribute('href', '/explore/roles/analytics-engineer');
     expect(screen.getByRole('link', { name: /IIT Example/i })).toHaveAttribute('href', '/colleges/college-1');
   });
@@ -238,19 +239,32 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.queryByRole('heading', { name: 'Courses, colleges, and cost' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Courses and colleges' })).not.toBeInTheDocument();
     expect(screen.queryByText(/matches are not available yet/i)).not.toBeInTheDocument();
   });
 
-  it('distinguishes an unavailable course mapping from an honest empty result', () => {
+  it('omits a non-retryable unavailable course mapping from the learner page', () => {
     const value = response();
     value.resolved.courseOptions = { status: 'mapping_unavailable', items: [] };
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.getByRole('heading', { name: 'Courses, colleges, and cost' })).toBeInTheDocument();
-    expect(screen.getByText('Course and college matches are not available yet.')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Courses and colleges' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Course and college matches are not available yet.')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Retry courses/i })).not.toBeInTheDocument();
+  });
+
+  it('shows retry UI only for an actual retryable course relationship error', () => {
+    const value = response();
+    value.resolved.courseOptions = { status: 'available', items: [] };
+    value.relationshipErrors = [{ subsection: 'courseOptions', code: 'temporarily_unavailable', retryable: true }];
+    const retry = vi.fn();
+
+    render(<DreamCareerStudentGuide response={value} locale="en" onRetryRelationship={retry} />);
+
+    expect(screen.getByRole('heading', { name: 'Courses and colleges' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry courses and colleges' }));
+    expect(retry).toHaveBeenCalledWith('courseOptions');
   });
 
   it('discloses long lists progressively with an explicit See all control', () => {
@@ -310,23 +324,36 @@ describe('DreamCareerStudentGuide', () => {
     expect(about).toHaveFocus();
   });
 
+  it('keeps all three chapter destinations visible in an equal-width compact rail', () => {
+    render(<DreamCareerStudentGuide response={response()} locale="en" />);
+
+    const navigation = screen.getByRole('navigation', { name: 'Career guide chapters' });
+    const rail = navigation.firstElementChild;
+    expect(navigation).not.toHaveClass('overflow-x-auto');
+    expect(rail).toHaveClass('grid', 'w-full', 'grid-cols-3');
+    for (const link of within(navigation).getAllByRole('link')) {
+      expect(link).toHaveClass('min-w-0', 'whitespace-normal');
+    }
+  });
+
   it('uses localized chapter and learner-question labels', () => {
     const value = response();
     const { rerender } = render(<DreamCareerStudentGuide response={value} locale="hi" />);
 
     expect(screen.getByRole('heading', { name: 'इस करियर के बारे में' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी किन विषयों पर ध्यान दें' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'कोर्स और कॉलेज' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'विकसित करने योग्य कौशल' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी क्या कर सकता/सकती हूँ' })).toBeInTheDocument();
 
     rerender(<DreamCareerStudentGuide response={value} locale="ml" />);
     expect(screen.getByRole('heading', { name: 'ഈ കരിയറിനെക്കുറിച്ച്' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'കോഴ്സുകൾ, കോളേജുകൾ, ചെലവ് എന്നിവ' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'കോഴ്സുകളും കോളേജുകളും' })).toBeInTheDocument();
 
     rerender(<DreamCareerStudentGuide response={value} locale="ta" />);
     expect(screen.getByRole('heading', { name: 'இந்தத் தொழிலைப் பற்றி' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'வேலையில் ஒரு நாள்' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'படிப்புகள், கல்லூரிகள் மற்றும் செலவு' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'படிப்புகள் மற்றும் கல்லூரிகள்' })).toBeInTheDocument();
   });
 
   it('localizes the relationship retry accessible-label prefix', () => {
@@ -345,7 +372,7 @@ describe('DreamCareerStudentGuide', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
     expect(screen.getByTestId('dream-career-student-guide')).toHaveClass('min-w-0', 'bg-muted/20', 'text-foreground', 'dark:bg-background');
-    expect(screen.getByRole('navigation', { name: 'Career guide chapters' })).toHaveClass('sticky', 'overflow-x-auto', 'bg-background/95');
+    expect(screen.getByRole('navigation', { name: 'Career guide chapters' })).toHaveClass('sticky', 'bg-background/95');
     expect(screen.getByRole('heading', { name: 'About this career', level: 2 }).closest('section')).toHaveClass('scroll-mt-24');
   });
 
