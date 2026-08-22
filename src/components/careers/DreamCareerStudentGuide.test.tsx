@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -309,8 +309,10 @@ describe('DreamCareerStudentGuide', () => {
     expect(window.location.hash).toBe('#guide-question-tools');
     expect(document.getElementById('guide-question-tools')).toBe(tools);
 
-    window.history.replaceState(null, '', '/#guide-question-earnings');
-    window.dispatchEvent(new Event('hashchange'));
+    act(() => {
+      window.history.replaceState(null, '', '/#guide-question-earnings');
+      window.dispatchEvent(new Event('hashchange'));
+    });
     const earnings = await screen.findByRole('region', { name: 'How much can I earn?' });
     await waitFor(() => expect(earnings).toHaveFocus());
     expect(document.getElementById('guide-question-earnings')).toBe(earnings);
