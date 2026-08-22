@@ -114,6 +114,14 @@ function normalizeTranslation(value: unknown, fallbackTitle = '', fallbackSummar
   } as CareerRoleTranslation;
 }
 
+function hasStandardTranslationPayload(value: CareerRoleTranslation | undefined): boolean {
+  return Boolean(value && Object.values(value).some((field: string | string[]) => (
+    typeof field === 'string'
+      ? Boolean(field.trim())
+      : field.some((item: string) => Boolean(item.trim()))
+  )));
+}
+
 function stringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
@@ -295,7 +303,7 @@ function validatedTranslationCoverage(
       if (complete !== (translatedTokens.length === totalFields)) return null;
       const profile = entity.detailProfileTranslations?.[locale];
       if (translatedTokens.length === 0) {
-        if (profile) return null;
+        if (hasStandardTranslationPayload(entity.translations[locale]) || profile) return null;
       } else {
         if (!isRecord(profile)) return null;
         const target = { standard: entity.translations[locale], detailProfile: profile };

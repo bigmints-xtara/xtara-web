@@ -224,4 +224,31 @@ describe('curatedDreamCareersConfig', () => {
       'coverage unavailable • release-false-complete • run-false-complete',
     );
   });
+
+  it('fails closed when zero translated tokens contradict persisted standard locale content', () => {
+    const career = curatedDreamCareersConfig.fromFirestore({
+      translations: {
+        en: { title: 'English', summary: 'English summary' },
+        ml: { title: 'മലയാളം', summary: 'മലയാളം സംഗ്രഹം' },
+      },
+      detailProfile: { locale: 'en' },
+      detailProfileTranslations: {},
+      translationOperation: translationOperation('false-missing-career', {
+        canonicalLocale: 'en',
+        releaseBlocking: false,
+        locales: {
+          en: localeCoverage('en'),
+          ml: localeCoverage('ml'),
+          hi: localeCoverage('hi'),
+          ta: localeCoverage('ta'),
+        },
+      }, { sourceReleaseId: 'release-false-missing', runId: 'run-false-missing' }),
+    }, 'false-missing-career');
+
+    expect(translationLocaleCoverageState(career, 'en')).toBe('unavailable');
+    expect(translationLocaleCoverageState(career, 'ml')).toBe('unavailable');
+    expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
+      'coverage unavailable • release-false-missing • run-false-missing',
+    );
+  });
 });
