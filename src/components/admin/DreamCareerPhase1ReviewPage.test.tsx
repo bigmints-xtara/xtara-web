@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const reviewApi = vi.hoisted(() => ({
-  listQueue: vi.fn(), getDetail: vi.fn(), saveDraft: vi.fn(), finalize: vi.fn(),
+  listQueue: vi.fn(), getDetail: vi.fn(), getComplete: vi.fn(), saveDraft: vi.fn(), finalize: vi.fn(),
   exportFutureDirections: vi.fn(), exportTaxonomyRejection: vi.fn(),
 }));
 vi.mock('@/lib/dream-career-phase1-review', async (importOriginal) => ({
@@ -56,6 +56,7 @@ describe('DreamCareerPhase1ReviewPage', () => {
     vi.clearAllMocks();
     reviewApi.listQueue.mockResolvedValue(queue());
     reviewApi.getDetail.mockResolvedValue(detail());
+    reviewApi.getComplete.mockResolvedValue({ reviewId: 'dream-career-phase-1', expectedTotal: 229, counts: { total: 229, pending: 227, draft: 1, finalized: 1 }, blockers: ['incomplete_human_review'] });
   });
 
   it('keeps review controls unavailable while loading and shows forbidden state without leaking them', async () => {
@@ -75,19 +76,32 @@ describe('DreamCareerPhase1ReviewPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('expected 229');
     fireEvent.click(screen.getByRole('button', { name: 'Retry queue' }));
     await waitFor(() => expect(reviewApi.listQueue).toHaveBeenCalledTimes(2));
-    expect(await screen.findByText('Canonical Career 1')).toBeInTheDocument();
+    expect(await screen.findAllByText('Canonical Career 1')).not.toHaveLength(0);
   });
 
   it('renders all 229 canonically ordered rows and filters by status, source state, title, and ID', async () => {
+    const filteredQueue = queue();
+    filteredQueue.records[2].sourceBinding = { ...filteredQueue.records[2].sourceBinding, status: 'stale', isCurrent: false, isStale: true, blockers: ['source_hash_mismatch'], mismatchFields: ['guideSha256'] };
+    reviewApi.listQueue.mockResolvedValue(filteredQueue);
     render(<DreamCareerPhase1ReviewPage />);
-    expect(await screen.findByText('Canonical Career 229')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: /review canonical career/i })).toHaveLength(229);
+    expect(await screen.findAllByText('Canonical Career 229')).not.toHaveLength(0);
+    expect(screen.getAllByRole('button', { name: /^Review Canonical Career \d+$/i })).toHaveLength(229);
+    const firstDesktopRow = screen.getByTestId('desktop-career-career-001');
+    expect(firstDesktopRow).toHaveTextContent('Primary: Server business');
+    expect(firstDesktopRow).toHaveTextContent('Secondaries: Server society');
+    expect(firstDesktopRow).toHaveTextContent('Version 1');
     fireEvent.change(screen.getByRole('combobox', { name: 'Filter by review status' }), { target: { value: 'finalized' } });
-    expect(screen.getByText('Canonical Career 2')).toBeInTheDocument();
+    expect(screen.getAllByText('Canonical Career 2')).not.toHaveLength(0);
     expect(screen.queryByText('Canonical Career 1')).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole('combobox', { name: 'Filter by review status' }), { target: { value: 'all' } });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter by source state' }), { target: { value: 'stale' } });
+    expect(screen.getByTestId('desktop-career-career-003')).toHaveTextContent('Canonical Career 3');
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter by source state' }), { target: { value: 'all' } });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter by blocked state' }), { target: { value: 'blocked' } });
+    expect(screen.getByTestId('desktop-career-career-003')).toHaveTextContent('source_hash_mismatch');
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filter by blocked state' }), { target: { value: 'all' } });
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search careers' }), { target: { value: 'career-229' } });
-    expect(screen.getByText('Canonical Career 229')).toBeInTheDocument();
+    expect(screen.getAllByText('Canonical Career 229')).not.toHaveLength(0);
     expect(screen.queryByText('Canonical Career 228')).not.toBeInTheDocument();
   });
 
@@ -115,6 +129,27 @@ describe('DreamCareerPhase1ReviewPage', () => {
     expect(within(editor).getByLabelText('Primary Server science')).toBeChecked();
     fireEvent.click(within(editor).getByRole('button', { name: 'Retry save' }));
     expect(await within(editor).findByRole('status')).toHaveTextContent('Persisted readback confirmed');
+    const firstCommand = reviewApi.saveDraft.mock.calls[0][0];
+    const retriedCommand = reviewApi.saveDraft.mock.calls[1][0];
+    expect(retriedCommand).toEqual(firstCommand);
+    expect(retriedCommand.body.idempotencyKey).toBe(firstCommand.body.idempotencyKey);
+  });
+
+  it('resets the pending draft command when the reviewer changes the action', async () => {
+    reviewApi.saveDraft.mockRejectedValueOnce(new Error('Readback unavailable')).mockRejectedValueOnce(new Error('Readback unavailable'));
+    render(<DreamCareerPhase1ReviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
+    const editor = await screen.findByRole('region', { name: 'Decision editor' });
+    fireEvent.click(within(editor).getByLabelText('Primary Server science'));
+    fireEvent.click(within(editor).getByRole('button', { name: 'Save draft' }));
+    await within(editor).findByRole('alert');
+    const firstCommand = reviewApi.saveDraft.mock.calls[0][0];
+    fireEvent.click(within(editor).getByLabelText('Primary Server health'));
+    fireEvent.click(within(editor).getByRole('button', { name: 'Save draft' }));
+    await waitFor(() => expect(reviewApi.saveDraft).toHaveBeenCalledTimes(2));
+    const changedCommand = reviewApi.saveDraft.mock.calls[1][0];
+    expect(changedCommand.body.idempotencyKey).not.toBe(firstCommand.body.idempotencyKey);
+    expect(changedCommand.body.primaryDirectionId).toBe('health');
   });
 
   it('keeps the draft visible when the server rejects a stale expected version', async () => {
@@ -142,7 +177,7 @@ describe('DreamCareerPhase1ReviewPage', () => {
 
   it('requires exact irreversible confirmation and exposes self-finalization failure without discarding draft', async () => {
     reviewApi.finalize.mockRejectedValue(new Error('A different authenticated reviewer must finalize this draft'));
-    render(<DreamCareerPhase1ReviewPage />);
+    const rendered = render(<DreamCareerPhase1ReviewPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Review final decision' }));
     const dialog = screen.getByRole('dialog', { name: 'Finalize this decision?' });
@@ -154,9 +189,40 @@ describe('DreamCareerPhase1ReviewPage', () => {
     expect(dialog).toHaveTextContent('catalogue/career-001.json');
     expect(dialog).toHaveTextContent('another authenticated reviewer');
     expect(within(dialog).getByRole('button', { name: 'Cancel' })).toHaveFocus();
+    expect(rendered.container).toHaveAttribute('aria-hidden', 'true');
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(within(dialog).getByRole('button', { name: 'Finalize permanently' })).toHaveFocus();
+    fireEvent.keyDown(dialog, { key: 'Tab' });
+    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toHaveFocus();
+    fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true });
+    expect(within(dialog).getByRole('button', { name: 'Finalize permanently' })).toHaveFocus();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Finalize permanently' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('different authenticated reviewer');
     expect(screen.getAllByText('Draft author recorded').length).toBeGreaterThan(0);
+  });
+
+  it('closes confirmation with Escape and restores focus to its trigger', async () => {
+    render(<DreamCareerPhase1ReviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
+    const trigger = await screen.findByRole('button', { name: 'Review final decision' });
+    fireEvent.click(trigger);
+    const dialog = screen.getByRole('dialog', { name: 'Finalize this decision?' });
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+
+  it('retries finalize with the identical command after commit-success/readback failure', async () => {
+    reviewApi.finalize.mockRejectedValueOnce(new Error('Readback unavailable')).mockResolvedValueOnce({ ...detail(), status: 'finalized', version: 2, finalDecision: { futureDirectionIds: ['business', 'society'], reviewerId: 'admin_user:22222222-2222-4222-8222-222222222222', reviewedAt: '2026-08-22T13:00:00.000Z' } });
+    render(<DreamCareerPhase1ReviewPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Review Canonical Career 1' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Review final decision' }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Finalize permanently' }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Readback unavailable');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Finalize permanently' }));
+    await waitFor(() => expect(reviewApi.finalize).toHaveBeenCalledTimes(2));
+    expect(reviewApi.finalize.mock.calls[1][0]).toEqual(reviewApi.finalize.mock.calls[0][0]);
   });
 
   it('never renders reviewer IDs, hashes as editable fields, status controls, or reverse-role fields', async () => {
@@ -170,15 +236,47 @@ describe('DreamCareerPhase1ReviewPage', () => {
     expect(screen.queryByText(/directionRoles/)).not.toBeInTheDocument();
   });
 
-  it('shows the exact taxonomy rejection and export controls only when the server summary is eligible', async () => {
+  it('uses /complete as the sole count and export gate, regardless of queue summary', async () => {
     const eligible = queue({ blockers: [], counts: { total: 229, pending: 0, draft: 0, finalized: 229 }, records: Array.from({ length: 229 }, (_, index) => record(index, 'finalized')) });
     reviewApi.listQueue.mockResolvedValue(eligible);
-    reviewApi.exportTaxonomyRejection.mockResolvedValue({ legacyFamily: 'traits', category: 'traitIds', rawValue: 'ytical', disposition: 'rejected' });
+    reviewApi.getComplete.mockResolvedValue({ reviewId: 'dream-career-phase-1', expectedTotal: 229, counts: { total: 229, pending: 1, draft: 0, finalized: 228 }, blockers: ['incomplete_human_review'] });
     render(<DreamCareerPhase1ReviewPage />);
-    expect(await screen.findByText('Raw value: ytical')).toBeInTheDocument();
+    const counts = await screen.findByRole('region', { name: 'Review counts' });
+    expect(within(counts).getByText('228')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Export Future Direction mapping' })).not.toBeInTheDocument();
+  });
+
+  it('shows exact taxonomy identity and artifact export controls only when /complete is eligible', async () => {
+    reviewApi.getComplete.mockResolvedValue({ reviewId: 'dream-career-phase-1', expectedTotal: 229, counts: { total: 229, pending: 0, draft: 0, finalized: 229 }, blockers: [] });
+    const authority = { schemaVersion: 1, authorityType: 'dream-career-taxonomy-rejection-authority', authorityVersion: '1.0.0', reviewer: { reviewerId: 'admin_user:11111111-1111-4111-8111-111111111111', reviewedAt: '2026-08-22T12:00:00.000Z' }, registryVersion: 'v1', registrySha256: 'a'.repeat(64), releaseId: 'release-1', releaseContentSha256: 'b'.repeat(64), legacyFamily: 'traits', category: 'traitIds', rawValue: 'ytical', assignmentCount: 1, tagId: null, disposition: 'rejected', sourcePath: 'language-policy-officer', sourceSha256: 'c'.repeat(64) };
+    const artifactJson = `${JSON.stringify(authority)}\n`;
+    reviewApi.exportTaxonomyRejection.mockResolvedValue({ artifactSchemaVersion: 1, authorityType: authority.authorityType, authoritySchemaVersion: 1, authorityVersion: '1.0.0', filename: 'dream-career-phase1-taxonomy-rejection-authority-v1.json', mediaType: 'application/json', artifactJson, artifactSha256: 'd'.repeat(64), authority });
+    render(<DreamCareerPhase1ReviewPage />);
+    const taxonomy = await screen.findByRole('region', { name: 'Taxonomy rejection acknowledgement' });
+    expect(within(taxonomy).getByText('language-policy-officer')).toBeInTheDocument();
+    expect(within(taxonomy).getByText('traits')).toBeInTheDocument();
+    expect(within(taxonomy).getByText('traitIds')).toBeInTheDocument();
+    expect(within(taxonomy).getByText('ytical')).toBeInTheDocument();
+    expect(within(taxonomy).getByText('1')).toBeInTheDocument();
+    expect(within(taxonomy).getByText('null')).toBeInTheDocument();
+    expect(within(taxonomy).getByText('rejected')).toBeInTheDocument();
     expect(screen.getByText(/omitted, not corrected to analytical/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Export Future Direction mapping' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Export taxonomy rejection' }));
-    expect(await screen.findByText(/"rawValue": "ytical"/)).toBeInTheDocument();
+    expect(await screen.findByText(new RegExp('"rawValue":"ytical"'))).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: `Download ${artifactJson.length} authoritative bytes` })).toBeInTheDocument();
+  });
+
+  it('renders usable compact career cards with a reachable review action', async () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 });
+    window.dispatchEvent(new Event('resize'));
+    render(<DreamCareerPhase1ReviewPage />);
+    const compact = await screen.findByTestId('compact-career-list');
+    const first = within(compact).getByTestId('compact-career-career-001');
+    expect(first).toHaveTextContent('Canonical Career 1');
+    expect(first).toHaveTextContent('Primary: Server business');
+    const action = within(first).getByRole('button', { name: 'Review Canonical Career 1 compact' });
+    fireEvent.click(action);
+    expect(await screen.findByRole('region', { name: 'Decision editor' })).toBeInTheDocument();
   });
 });
