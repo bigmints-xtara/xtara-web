@@ -6,6 +6,8 @@ export const XTARA_API_OPERATIONS = {
   "postAdminAiReviewContent": { method: "POST", path: "/api/v1/admin/ai/review-content", authenticated: true },
   "postAdminAiReviewContentBatch": { method: "POST", path: "/api/v1/admin/ai/review-content/batch", authenticated: true },
   "getAdminCatalogColleges": { method: "GET", path: "/api/v1/admin/catalog/colleges", authenticated: true },
+  "getAdminCatalogCollegesActiveRelease": { method: "GET", path: "/api/v1/admin/catalog/colleges/active-release", authenticated: true },
+  "postAdminCatalogCollegesActiveReleaseExport": { method: "POST", path: "/api/v1/admin/catalog/colleges/active-release/export", authenticated: true },
   "getAdminCatalogCollegesExport": { method: "GET", path: "/api/v1/admin/catalog/colleges/export", authenticated: true },
   "getAdminConfigs": { method: "GET", path: "/api/v1/admin/configs", authenticated: true },
   "postAdminConfigs": { method: "POST", path: "/api/v1/admin/configs", authenticated: true },
