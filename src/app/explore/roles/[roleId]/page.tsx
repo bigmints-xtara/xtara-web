@@ -247,11 +247,13 @@ export default function DreamCareerPage() {
   if (missingGuideCareer) {
     return (
       <PageFrame>
-        <section className="mx-auto max-w-4xl px-5 py-16 sm:py-24">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.overview}</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-[-0.04em] text-primary sm:text-6xl">{missingGuideCareer.title}</h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
-          <p className="mt-10 rounded-2xl border border-border bg-card p-6 text-foreground">{stateText.guideUnavailable}</p>
+        <section className="bg-muted/20 px-4 py-10 sm:px-6 sm:py-16">
+          <div className="mx-auto max-w-5xl rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10 lg:p-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
+            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-primary sm:text-6xl">{missingGuideCareer.title}</h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
+            <p className="mt-8 max-w-2xl rounded-2xl bg-muted/55 px-5 py-4 text-foreground sm:px-6">{stateText.guideUnavailable}</p>
+          </div>
         </section>
       </PageFrame>
     );
@@ -294,7 +296,7 @@ export default function DreamCareerPage() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main>
-        <section className="relative overflow-hidden border-b border-primary/10 bg-gradient-to-br from-secondary/25 via-card to-background px-5 py-14 sm:py-20">
+        <section className="relative overflow-hidden border-b border-primary/10 bg-gradient-to-br from-secondary/30 via-background to-accent/10 px-4 py-10 sm:px-6 sm:py-16">
           {response.career.imageUrl ? <>
             <div aria-hidden className="absolute inset-y-0 right-0 w-full bg-cover bg-center opacity-20 lg:w-1/2 lg:opacity-90" style={{ backgroundImage: `url(${response.career.imageUrl})` }} />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/20" />
@@ -303,15 +305,19 @@ export default function DreamCareerPage() {
             <Link href={area ? `/explore/areas/${area.id}` : '/explore'} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ArrowLeft className="h-4 w-4" />{text.back}
             </Link>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               {area ? <Badge variant="secondary">{area.title}</Badge> : null}
               {isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{text.selected}</Badge> : null}
             </div>
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.overview}</p>
-            <h1 className="mt-3 max-w-4xl text-5xl font-semibold leading-[0.98] tracking-[-0.05em] text-primary sm:text-7xl">{response.career.title}</h1>
-            <p className="mt-7 max-w-3xl text-xl leading-9 text-muted-foreground">{response.career.summary}</p>
-            {covered('whyItMatters') && guide.aboutCareer.whyItMatters.trim() ? <p className="mt-7 max-w-2xl border-l-2 border-primary/35 pl-5 text-base leading-7 text-foreground">{guide.aboutCareer.whyItMatters}</p> : null}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
+            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-6xl lg:text-7xl">{response.career.title}</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">{response.career.summary}</p>
+            {covered('whyItMatters') && guide.aboutCareer.whyItMatters.trim() ? (
+              <div className="mt-7 max-w-3xl rounded-2xl border border-primary/10 bg-card/85 px-5 py-4 text-sm leading-6 text-foreground shadow-sm backdrop-blur sm:px-6 sm:py-5 sm:text-base sm:leading-7">
+                {guide.aboutCareer.whyItMatters}
+              </div>
+            ) : null}
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
                 {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? text.remove : text.add}
               </Button>
@@ -319,7 +325,7 @@ export default function DreamCareerPage() {
                 <MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}
               </Button>
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">{text.conversationHelp}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{text.conversationHelp}</p>
             {selectionError ? <p role="alert" className="mt-3 text-sm font-medium text-destructive">{selectionError}</p> : null}
           </div>
         </section>

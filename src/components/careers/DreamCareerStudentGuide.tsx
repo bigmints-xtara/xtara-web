@@ -283,20 +283,20 @@ export function DreamCareerStudentGuide({
   };
 
   return (
-    <div data-testid="dream-career-student-guide" className="min-w-0 bg-background text-foreground dark:bg-background">
+    <div data-testid="dream-career-student-guide" className="min-w-0 bg-muted/20 text-foreground dark:bg-background">
       <nav
         aria-label={text.chapterNavigation}
-        className="sticky top-0 z-20 overflow-x-auto border-y border-border/70 bg-background/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+        className="sticky top-0 z-20 overflow-x-auto border-b border-border/70 bg-background/95 px-4 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:px-6"
       >
-        <div className="mx-auto flex w-max min-w-full max-w-5xl gap-2 py-3 sm:justify-center">
-          <ChapterAnchor href="#about-career">{text.aboutCareer}</ChapterAnchor>
-          <ChapterAnchor href="#how-to-get-there">{text.howToGetThere}</ChapterAnchor>
-          <ChapterAnchor href="#what-you-can-do-now">{text.whatYouCanDoNow}</ChapterAnchor>
+        <div className="mx-auto flex w-max min-w-full max-w-6xl gap-2 py-3 lg:justify-center">
+          <ChapterAnchor href="#about-career" number="01">{text.aboutCareer}</ChapterAnchor>
+          <ChapterAnchor href="#how-to-get-there" number="02">{text.howToGetThere}</ChapterAnchor>
+          <ChapterAnchor href="#what-you-can-do-now" number="03">{text.whatYouCanDoNow}</ChapterAnchor>
         </div>
       </nav>
 
-      <div className="mx-auto max-w-5xl px-5 pb-20">
-        <GuideChapter id="about-career" title={text.aboutCareer} intro={text.aboutCareerIntro}>
+      <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:pb-28">
+        <GuideChapter id="about-career" number="01" title={text.aboutCareer} intro={text.aboutCareerIntro}>
           {current('whatYouDo') && (guide.aboutCareer.whatYouDo.trim() || guide.aboutCareer.activities.length) ? (
             <AnswerSection title={text.whatYouDo}>
               {guide.aboutCareer.whatYouDo.trim() ? <p>{guide.aboutCareer.whatYouDo}</p> : null}
@@ -370,7 +370,7 @@ export function DreamCareerStudentGuide({
           <AdditionalTopics topics={guide.additionalTopics.filter((topic) => topic.chapter === 'aboutCareer')} response={response} labels={text} />
         </GuideChapter>
 
-        <GuideChapter id="how-to-get-there" title={text.howToGetThere} intro={text.howToGetThereIntro}>
+        <GuideChapter id="how-to-get-there" number="02" title={text.howToGetThere} intro={text.howToGetThereIntro}>
           {current('subjects') && subjects.length ? (
             <AnswerSection title={text.subjects}>
               <ProgressiveList
@@ -479,7 +479,7 @@ export function DreamCareerStudentGuide({
           <AdditionalTopics topics={guide.additionalTopics.filter((topic) => topic.chapter === 'howToGetThere')} response={response} labels={text} />
         </GuideChapter>
 
-        <GuideChapter id="what-you-can-do-now" title={text.whatYouCanDoNow} intro={text.whatYouCanDoNowIntro}>
+        <GuideChapter id="what-you-can-do-now" number="03" title={text.whatYouCanDoNow} intro={text.whatYouCanDoNowIntro}>
           {current('learningResources') && (resolved.learningResources.length || relationshipError('learningResources')) ? (
             <AnswerSection title={text.learningResources}>
               {resolved.learningResources.length ? (
@@ -537,7 +537,7 @@ export function DreamCareerStudentGuide({
         </GuideChapter>
 
         {guide.sources.some((source) => source.reviewStatus === 'reviewed') ? (
-          <details className="mt-12 rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground open:shadow-sm sm:p-7">
+          <details className="mt-4 rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground shadow-sm open:shadow-md sm:mt-6 sm:p-7">
             <summary className="cursor-pointer font-semibold text-foreground">{text.sources}</summary>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {guide.sources.filter((source) => source.reviewStatus === 'reviewed').map((source) => (
@@ -557,9 +557,15 @@ export function DreamCareerStudentGuide({
 
 export function DreamCareerStudentGuideLoading({ locale }: { locale: DreamCareerGuideLocale }) {
   return (
-    <div role="status" className="mx-auto max-w-5xl px-5 py-16 text-center text-sm text-muted-foreground">
-      <span className="mx-auto mb-4 block h-7 w-7 animate-spin rounded-full border-2 border-primary/25 border-t-primary" aria-hidden />
-      {labels[locale].loading}
+    <div role="status" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
+      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10">
+        <span className="mb-6 block h-7 w-7 animate-spin rounded-full border-2 border-primary/25 border-t-primary" aria-hidden />
+        <p className="text-sm font-semibold text-foreground">{labels[locale].loading}</p>
+        <div aria-hidden className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)]">
+          <div className="h-28 animate-pulse rounded-2xl bg-muted" />
+          <div className="h-44 animate-pulse rounded-2xl bg-muted" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -567,43 +573,55 @@ export function DreamCareerStudentGuideLoading({ locale }: { locale: DreamCareer
 export function DreamCareerStudentGuideError({ locale, onRetry }: { locale: DreamCareerGuideLocale; onRetry: () => void }) {
   const text = labels[locale];
   return (
-    <div role="alert" className="mx-auto my-16 max-w-xl rounded-2xl border border-border bg-card px-6 py-8 text-center">
-      <p className="text-base text-foreground">{text.unavailable}</p>
+    <div role="alert" className="mx-auto my-12 max-w-xl px-4 sm:my-20">
+      <div className="rounded-3xl border border-border bg-card px-6 py-10 text-center shadow-sm sm:px-10">
+      <p className="text-lg font-semibold text-foreground">{text.unavailable}</p>
       <button type="button" className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
         {text.tryAgain}
       </button>
+      </div>
     </div>
   );
 }
 
-function ChapterAnchor({ href, children }: { href: string; children: ReactNode }) {
-  return <a href={href} className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">{children}</a>;
+function ChapterAnchor({ href, number, children }: { href: string; number: string; children: ReactNode }) {
+  return (
+    <a href={href} className="group inline-flex whitespace-nowrap rounded-full border border-transparent px-3 py-2 text-sm font-semibold text-muted-foreground transition hover:border-border hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-4">
+      <span aria-hidden className="mr-2 text-xs font-bold text-primary/70 group-hover:text-primary">{number}</span>
+      {children}
+    </a>
+  );
 }
 
-function GuideChapter({ id, title, intro, children }: { id: string; title: string; intro: string; children: ReactNode }) {
+function GuideChapter({ id, number, title, intro, children }: { id: string; number: string; title: string; intro: string; children: ReactNode }) {
   return (
-    <section id={id} tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 border-b border-border py-14 last:border-b-0 sm:py-20">
-      <header className="max-w-3xl">
-        <h2 id={`${id}-title`} className="text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-5xl">{title}</h2>
-        <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">{intro}</p>
-      </header>
-      <div className="mt-10 divide-y divide-border/80">{children}</div>
+    <section id={id} tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-6 first:pt-10 sm:py-10 sm:first:pt-14">
+      <div className="rounded-[1.75rem] border border-border/80 bg-background p-4 shadow-sm sm:p-6 lg:p-8">
+        <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] lg:gap-12">
+          <header className="self-start lg:sticky lg:top-24">
+            <span aria-hidden className="inline-flex h-10 min-w-10 items-center justify-center rounded-full bg-secondary px-3 text-sm font-bold text-secondary-foreground">{number}</span>
+            <h2 id={`${id}-title`} className="mt-5 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl">{title}</h2>
+            <p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">{intro}</p>
+          </header>
+          <div className="min-w-0 divide-y divide-border/80 overflow-hidden rounded-2xl border border-border bg-card shadow-sm empty:hidden">{children}</div>
+        </div>
+      </div>
     </section>
   );
 }
 
 function AnswerSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="grid min-w-0 gap-4 py-8 first:pt-0 sm:grid-cols-[minmax(0,0.75fr)_minmax(0,1.6fr)] sm:gap-10 sm:py-10">
-      <h3 className="text-xl font-semibold tracking-[-0.02em] text-foreground sm:text-2xl">{title}</h3>
-      <div className="min-w-0 text-sm leading-7 text-muted-foreground sm:text-base">{children}</div>
+    <section className="grid min-w-0 gap-4 px-5 py-6 sm:px-7 sm:py-8 xl:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] xl:gap-8">
+      <h3 className="text-lg font-semibold leading-6 tracking-[-0.015em] text-foreground sm:text-xl">{title}</h3>
+      <div className="min-w-0 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">{children}</div>
     </section>
   );
 }
 
 function GuideItem({ title, meta, children }: { title: ReactNode; meta?: string; children?: ReactNode }) {
   return (
-    <div className="border-l-2 border-primary/20 pl-4 sm:pl-5">
+    <div className="rounded-xl bg-muted/45 px-4 py-3.5">
       <div className="font-semibold text-foreground">{title}</div>
       {meta ? <div className="mt-1 text-xs font-medium text-muted-foreground">{meta}</div> : null}
       {children ? <div className="mt-2">{children}</div> : null}
@@ -616,7 +634,7 @@ function ProgressiveList<Item>({ items, renderItem, labels: text, initialCount =
   const visible = expanded ? items : items.slice(0, initialCount);
   return (
     <div>
-      <div className="space-y-5">{visible.map((item, index) => <div key={itemKey(item, index)}>{renderItem(item, index)}</div>)}</div>
+      <div className="space-y-3">{visible.map((item, index) => <div key={itemKey(item, index)}>{renderItem(item, index)}</div>)}</div>
       {items.length > initialCount ? (
         <button type="button" className="mt-5 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setExpanded((value) => !value)}>
           {expanded ? text.showLess : text.seeAll}

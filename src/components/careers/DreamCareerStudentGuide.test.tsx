@@ -344,8 +344,9 @@ describe('DreamCareerStudentGuide', () => {
   it('uses responsive, dark-mode-safe styling without a fixed-width reader', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
-    expect(screen.getByTestId('dream-career-student-guide')).toHaveClass('min-w-0', 'bg-background', 'text-foreground');
-    expect(screen.getByRole('navigation', { name: 'Career guide chapters' })).toHaveClass('sticky', 'overflow-x-auto');
+    expect(screen.getByTestId('dream-career-student-guide')).toHaveClass('min-w-0', 'bg-muted/20', 'text-foreground', 'dark:bg-background');
+    expect(screen.getByRole('navigation', { name: 'Career guide chapters' })).toHaveClass('sticky', 'overflow-x-auto', 'bg-background/95');
+    expect(screen.getByRole('heading', { name: 'About this career', level: 2 }).closest('section')).toHaveClass('scroll-mt-24');
   });
 
   it('renders distinct loading and honest retryable error states', () => {
