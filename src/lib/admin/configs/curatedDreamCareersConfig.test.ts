@@ -18,6 +18,26 @@ function localeCoverage(locale: 'en' | 'ml' | 'hi' | 'ta', translated = locale =
   };
 }
 
+function translationOperation(
+  careerId: string,
+  coverage?: unknown,
+  overrides: Record<string, unknown> = {},
+) {
+  return {
+    schemaVersion: 1,
+    operation: 'dream-career-translation',
+    sourceReleaseId: 'release-one',
+    sourceTaskId: 'source-task-one',
+    sourceCareerId: careerId,
+    sourceSha256: 'a'.repeat(64),
+    translationSha256: 'b'.repeat(64),
+    runId: 'run-one',
+    idempotencyKey: `release-one:${careerId}`,
+    ...(coverage === undefined ? {} : { translationCoverage: coverage }),
+    ...overrides,
+  };
+}
+
 describe('curatedDreamCareersConfig', () => {
   it('normalizes partial locale objects returned by older canonical records', () => {
     const career = curatedDreamCareersConfig.fromFirestore({
@@ -89,18 +109,17 @@ describe('curatedDreamCareersConfig', () => {
         hi: { locale: 'hi' },
         ta: { locale: 'ta' },
       },
-      translationOperation: {
-        sourceReleaseId: 'dream-careers-approved-52-e205d2beeb4c',
-        runId: 'run-20260819-001',
-        translationCoverage: {
+      translationOperation: translationOperation('translated-career', {
           canonicalLocale: 'en',
           releaseBlocking: false,
           locales: Object.fromEntries((['en', 'ml', 'hi', 'ta'] as const).map((locale) => [
             locale,
             localeCoverage(locale, 2),
           ])),
-        },
-      },
+        }, {
+          sourceReleaseId: 'dream-careers-approved-52-e205d2beeb4c',
+          runId: 'run-20260819-001',
+        }),
       futureDirectionIds: ['technology'],
       skillIds: ['analysis'],
     }, 'translated-career');
@@ -114,14 +133,11 @@ describe('curatedDreamCareersConfig', () => {
     const career = curatedDreamCareersConfig.fromFirestore({
       translations: {
         en: { title: 'English', summary: 'English summary' },
-        hi: { title: 'हिंदी', summary: 'English fallback summary' },
+        hi: { title: 'हिंदी', summary: 'English summary' },
       },
       detailProfile: { locale: 'en' },
       detailProfileTranslations: { hi: { locale: 'hi', work: { summary: 'English fallback' } } },
-      translationOperation: {
-        sourceReleaseId: 'release-partial',
-        runId: 'run-partial',
-        translationCoverage: {
+      translationOperation: translationOperation('partial-career', {
           canonicalLocale: 'en',
           releaseBlocking: false,
           locales: {
@@ -130,8 +146,7 @@ describe('curatedDreamCareersConfig', () => {
             hi: localeCoverage('hi', 1),
             ta: localeCoverage('ta'),
           },
-        },
-      },
+        }, { sourceReleaseId: 'release-partial', runId: 'run-partial' }),
       futureDirectionIds: ['technology'],
       skillIds: ['analysis'],
     }, 'partial-career');
@@ -145,7 +160,10 @@ describe('curatedDreamCareersConfig', () => {
     const career = curatedDreamCareersConfig.fromFirestore({
       translations: { en: { title: 'English', summary: 'English summary' } },
       detailProfile: { locale: 'en' },
-      translationOperation: { sourceReleaseId: 'release-legacy', runId: 'run-legacy' },
+      translationOperation: translationOperation('legacy-career', undefined, {
+        sourceReleaseId: 'release-legacy',
+        runId: 'run-legacy',
+      }),
       futureDirectionIds: ['technology'],
       skillIds: ['analysis'],
     }, 'legacy-career');
@@ -165,10 +183,7 @@ describe('curatedDreamCareersConfig', () => {
     for (const receipt of malformedReceipts) {
       const career = curatedDreamCareersConfig.fromFirestore({
         translations: { en: { title: 'English', summary: 'English summary' } },
-        translationOperation: {
-          sourceReleaseId: 'release-malformed',
-          runId: 'run-malformed',
-          translationCoverage: {
+        translationOperation: translationOperation('malformed-career', {
             canonicalLocale: 'en',
             releaseBlocking: false,
             locales: {
@@ -177,8 +192,7 @@ describe('curatedDreamCareersConfig', () => {
               hi: receipt,
               ta: localeCoverage('ta'),
             },
-          },
-        },
+          }, { sourceReleaseId: 'release-malformed', runId: 'run-malformed' }),
       }, 'malformed-career');
 
       expect(translationLocaleCoverageState(career, 'en')).toBe('unavailable');
@@ -187,5 +201,27 @@ describe('curatedDreamCareersConfig', () => {
         'coverage unavailable • release-malformed • run-malformed',
       );
     }
+  });
+
+  it('fails closed when a complete receipt is not backed by persisted locale payloads', () => {
+    const career = curatedDreamCareersConfig.fromFirestore({
+      translations: { en: { title: 'English', summary: 'English summary' } },
+      detailProfile: { locale: 'en' },
+      detailProfileTranslations: {},
+      translationOperation: translationOperation('false-complete-career', {
+          canonicalLocale: 'en',
+          releaseBlocking: false,
+          locales: Object.fromEntries((['en', 'ml', 'hi', 'ta'] as const).map((locale) => [
+            locale,
+            localeCoverage(locale, 2),
+          ])),
+        }, { sourceReleaseId: 'release-false-complete', runId: 'run-false-complete' }),
+    }, 'false-complete-career');
+
+    expect(translationLocaleCoverageState(career, 'en')).toBe('unavailable');
+    expect(translationLocaleCoverageState(career, 'ml')).toBe('unavailable');
+    expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
+      'coverage unavailable • release-false-complete • run-false-complete',
+    );
   });
 });

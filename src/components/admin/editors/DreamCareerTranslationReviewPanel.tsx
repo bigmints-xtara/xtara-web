@@ -42,7 +42,7 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
         <div>
           <div className="flex items-center gap-2"><Languages className="size-5 text-blue-700" /><h2 className="font-semibold text-slate-950">Translation coverage</h2></div>
           <p className="mt-1 text-sm font-medium text-amber-800">Machine translation draft — not approved</p>
-          <p className="mt-1 text-sm text-slate-600">Review the standard copy and the complete rich profile in each language. Approval and publication remain separate Admin actions.</p>
+          <p className="mt-1 text-sm text-slate-600">Review the standard copy and rich-profile preview for each language. Approval and publication remain separate Admin actions.</p>
         </div>
         <Badge className="bg-white text-blue-900" variant="outline">{coverageRecorded ? `${complete} of 4 languages complete` : 'Coverage not recorded'}</Badge>
       </div>

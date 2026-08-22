@@ -8,10 +8,71 @@ import type { DreamCareerDetailProfileReview, DreamCareerDetailProfileV3 } from 
 import DreamCareerDetailProfileEditor, { createEmptyProfile, validateAdminProfile } from './DreamCareerDetailProfileEditor';
 import { CareerSourceEditor, DreamCareerEditor, FutureDirectionEditor, withDerivedRegulation } from './CuratedCareerEditors';
 
+const COVERAGE_PROTECTED_KEYS = new Set([
+  'actions', 'admissionRoute', 'asOf', 'authoredAt', 'authorType', 'basis',
+  'careerStage', 'category', 'contentHash', 'cost', 'country', 'currency',
+  'durationEvidence', 'employmentType', 'feeCategory', 'feePeriod', 'frequency',
+  'geography', 'importance', 'institutionType', 'level', 'locale', 'method',
+  'model', 'officialUrl', 'period', 'profileUrl', 'publishedAt', 'relationship',
+  'relevance', 'requirement', 'routeType', 'schedule', 'schemaVersion', 'scoreType',
+  'scoreEffects', 'scoreUse', 'sourceType', 'stageType', 'status', 'stream', 'tool',
+  'toolVersion', 'track', 'travel', 'trend', 'url', 'verifiedAt', 'workModes',
+]);
+
+function coverageProtectedPath(path: Array<string | number>): boolean {
+  const labels = path.map(String);
+  const key = labels.at(-1) || '';
+  const parent = labels.at(-2) || '';
+  return COVERAGE_PROTECTED_KEYS.has(key)
+    || COVERAGE_PROTECTED_KEYS.has(parent)
+    || key === 'id'
+    || key.endsWith('Id')
+    || key.endsWith('Ids')
+    || parent.endsWith('Id')
+    || parent.endsWith('Ids')
+    || labels.includes('provenance')
+    || (labels.includes('notablePeople') && key === 'name')
+    || (labels.includes('sources') && key === 'organization')
+    || (labels.includes('entranceExams') && ['name', 'authority'].includes(key))
+    || ['programName', 'jurisdiction'].includes(key)
+    || parent === 'courseQueries';
+}
+
+function coverageFieldCount(value: unknown): number {
+  let count = 0;
+  const visit = (current: unknown, path: Array<string | number>) => {
+    if (Array.isArray(current)) {
+      current.forEach((child, index) => visit(child, [...path, index]));
+    } else if (current && typeof current === 'object') {
+      Object.entries(current).forEach(([key, child]) => visit(child, [...path, key]));
+    } else if (typeof current === 'string' && current.trim() && !coverageProtectedPath(path)) {
+      count += 1;
+    }
+  };
+  visit(value, []);
+  return count;
+}
+
+function translateCoverageFields<T>(value: T, locale: string): T {
+  const visit = (current: unknown, path: Array<string | number>): unknown => {
+    if (Array.isArray(current)) return current.map((child, index) => visit(child, [...path, index]));
+    if (current && typeof current === 'object') {
+      return Object.fromEntries(Object.entries(current).map(([key, child]) => [
+        key,
+        visit(child, [...path, key]),
+      ]));
+    }
+    return typeof current === 'string' && current.trim() && !coverageProtectedPath(path)
+      ? `${locale}: ${current}`
+      : current;
+  };
+  return visit(value, []) as T;
+}
+
 function translationLocaleCoverage(
   locale: 'en' | 'ml' | 'hi' | 'ta',
   translatedFields: number,
-  totalFields = 22,
+  totalFields: number,
 ) {
   const tokens = Array.from({ length: totalFields }, (_, index) => `T${String(index).padStart(5, '0')}`);
   const translatedFieldTokens = locale === 'en' ? [] : tokens.slice(0, translatedFields);
@@ -121,10 +182,17 @@ describe('curated career admin editors', () => {
 
   it('lets Admin reviewers inspect standard and rich translation coverage by locale', () => {
     const profile = exampleProfile as DreamCareerDetailProfileV3;
+    const englishStandard = { ...createEmptyDreamCareer().translations.en, title: 'Cybersecurity Analyst', summary: 'English standard summary' };
+    const totalFields = coverageFieldCount({ standard: englishStandard, detailProfile: profile });
     const translated = (locale: 'ml' | 'hi' | 'ta', summary: string) => ({
-      ...structuredClone(profile),
+      ...translateCoverageFields(profile, locale),
       locale,
-      work: { ...structuredClone(profile.work), summary },
+      work: { ...translateCoverageFields(profile.work, locale), summary },
+    });
+    const translatedStandard = (locale: 'ml' | 'hi' | 'ta', title: string, summary: string) => ({
+      ...translateCoverageFields(englishStandard, locale),
+      title,
+      summary,
     });
     const sourceReleaseId = 'dream-careers-approved-52-e205d2beeb4c';
     const entity = {
@@ -133,10 +201,10 @@ describe('curated career admin editors', () => {
       slug: profile.careerId,
       detailProfile: profile,
       translations: {
-        en: { ...createEmptyDreamCareer().translations.en, title: 'Cybersecurity Analyst', summary: 'English standard summary' },
-        ml: { ...createEmptyDreamCareer().translations.en, title: 'സൈബർ സുരക്ഷാ അനലിസ്റ്റ്', summary: 'Malayalam standard summary' },
-        hi: { ...createEmptyDreamCareer().translations.en, title: 'साइबर सुरक्षा विश्लेषक', summary: 'Hindi standard summary' },
-        ta: { ...createEmptyDreamCareer().translations.en, title: 'இணையப் பாதுகாப்புப் பகுப்பாய்வாளர்', summary: 'Tamil standard summary' },
+        en: englishStandard,
+        ml: translatedStandard('ml', 'സൈബർ സുരക്ഷാ അനലിസ്റ്റ്', 'Malayalam standard summary'),
+        hi: translatedStandard('hi', 'साइबर सुरक्षा विश्लेषक', 'Hindi standard summary'),
+        ta: translatedStandard('ta', 'இணையப் பாதுகாப்புப் பகுப்பாய்வாளர்', 'Tamil standard summary'),
       },
       detailProfileTranslations: {
         ml: translated('ml', 'Malayalam rich profile summary'),
@@ -158,7 +226,7 @@ describe('curated career admin editors', () => {
           releaseBlocking: false,
           locales: Object.fromEntries((['en', 'ml', 'hi', 'ta'] as const).map((locale) => [
             locale,
-            translationLocaleCoverage(locale, 22),
+            translationLocaleCoverage(locale, totalFields, totalFields),
           ])),
         },
       },
@@ -178,14 +246,16 @@ describe('curated career admin editors', () => {
 
   it('never marks fallback-filled partial guide coverage ready', () => {
     const profile = exampleProfile as DreamCareerDetailProfileV3;
+    const englishStandard = { ...createEmptyDreamCareer().translations.en, title: 'Cybersecurity Analyst', summary: 'English standard summary' };
+    const totalFields = coverageFieldCount({ standard: englishStandard, detailProfile: profile });
     const entity = {
       ...createEmptyDreamCareer(),
       id: profile.careerId,
       slug: profile.careerId,
       detailProfile: profile,
       translations: {
-        en: { ...createEmptyDreamCareer().translations.en, title: 'Cybersecurity Analyst', summary: 'English standard summary' },
-        hi: { ...createEmptyDreamCareer().translations.en, title: 'साइबर सुरक्षा विश्लेषक', summary: 'English fallback summary' },
+        en: englishStandard,
+        hi: { ...englishStandard, title: 'साइबर सुरक्षा विश्लेषक' },
       },
       detailProfileTranslations: { hi: { ...structuredClone(profile), locale: 'hi' } },
       translationOperation: {
@@ -202,10 +272,10 @@ describe('curated career admin editors', () => {
           canonicalLocale: 'en',
           releaseBlocking: false,
           locales: {
-            en: translationLocaleCoverage('en', 22),
-            ml: translationLocaleCoverage('ml', 0),
-            hi: translationLocaleCoverage('hi', 1),
-            ta: translationLocaleCoverage('ta', 0),
+            en: translationLocaleCoverage('en', totalFields, totalFields),
+            ml: translationLocaleCoverage('ml', 0, totalFields),
+            hi: translationLocaleCoverage('hi', 1, totalFields),
+            ta: translationLocaleCoverage('ta', 0, totalFields),
           },
         },
       },
@@ -218,7 +288,7 @@ describe('curated career admin editors', () => {
     fireEvent.click(screen.getByRole('button', { name: /Hindi/ }));
     expect(screen.getByText('Partial rich profile')).toBeInTheDocument();
     expect(screen.queryByText('Complete rich profile')).not.toBeInTheDocument();
-    expect(screen.getAllByText(/1 of 22 fields translated/)).not.toHaveLength(0);
+    expect(screen.getAllByText(new RegExp(`1 of ${totalFields} fields translated`))).not.toHaveLength(0);
   });
 
   it('shows approval blockers until every profile source is reviewed', () => {
