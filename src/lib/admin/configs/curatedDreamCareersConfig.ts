@@ -114,12 +114,11 @@ function normalizeTranslation(value: unknown, fallbackTitle = '', fallbackSummar
   } as CareerRoleTranslation;
 }
 
-function hasStandardTranslationPayload(value: CareerRoleTranslation | undefined): boolean {
-  return Boolean(value && Object.values(value).some((field: string | string[]) => (
-    typeof field === 'string'
-      ? Boolean(field.trim())
-      : field.some((item: string) => Boolean(item.trim()))
-  )));
+function hasStandardTranslationPayload(value: unknown): boolean {
+  if (typeof value === 'string') return Boolean(value.trim());
+  if (Array.isArray(value)) return value.some(hasStandardTranslationPayload);
+  if (isRecord(value)) return Object.values(value).some(hasStandardTranslationPayload);
+  return false;
 }
 
 function stringArray(value: unknown): string[] {

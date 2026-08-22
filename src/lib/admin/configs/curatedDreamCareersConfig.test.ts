@@ -251,4 +251,39 @@ describe('curatedDreamCareersConfig', () => {
       'coverage unavailable • release-false-missing • run-false-missing',
     );
   });
+
+  it('fails closed without throwing when localized standard content contains object lists', () => {
+    const career = curatedDreamCareersConfig.fromFirestore({
+      translations: {
+        en: { title: 'English', summary: 'English summary' },
+        ml: {
+          careerPath: [{
+            stage: 'school',
+            title: 'സ്കൂളിൽ തയ്യാറെടുക്കുക',
+            description: 'പ്രധാന വിഷയങ്ങളിൽ ശക്തമായ അടിത്തറ ഉണ്ടാക്കുക.',
+          }],
+        },
+      },
+      detailProfile: { locale: 'en' },
+      detailProfileTranslations: {},
+      translationOperation: translationOperation('object-list-career', {
+        canonicalLocale: 'en',
+        releaseBlocking: false,
+        locales: {
+          en: localeCoverage('en'),
+          ml: localeCoverage('ml'),
+          hi: localeCoverage('hi'),
+          ta: localeCoverage('ta'),
+        },
+      }, { sourceReleaseId: 'release-object-list', runId: 'run-object-list' }),
+    }, 'object-list-career');
+
+    expect(() => translationLocaleCoverageState(career, 'ml')).not.toThrow();
+    for (const locale of ['en', 'ml', 'hi', 'ta'] as const) {
+      expect(translationLocaleCoverageState(career, locale)).toBe('unavailable');
+    }
+    expect(curatedDreamCareersConfig.getSubtitle(career)).toBe(
+      'coverage unavailable • release-object-list • run-object-list',
+    );
+  });
 });
