@@ -24,6 +24,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/colleges': 'College catalogue',
   '/admin/dream-careers': 'Dream careers',
   '/admin/future-directions': 'Future directions',
+  '/admin/dream-career-phase1-review': 'Dream Career Phase 1 review',
   '/admin/career-sources': 'Career sources',
   '/admin/users': 'Users',
   '/admin/settings': 'Settings',

@@ -10,6 +10,7 @@ import {
   FileText,
   Gamepad2,
   Route,
+  ShieldCheck,
   Sparkles,
   Star,
   Trophy,
@@ -35,6 +36,7 @@ const modules = [
   { title: 'Colleges', description: 'Accepted institutions, courses, and career mappings', href: '/admin/colleges', key: '', icon: Building2 },
   { title: 'Dream careers', description: 'Curated career role profiles', href: '/admin/dream-careers', key: 'dream_careers', icon: Star },
   { title: 'Future directions', description: 'Assessment pathways and evidence rules', href: '/admin/future-directions', key: 'future_directions', icon: Route },
+  { title: 'Phase 1 review', description: 'Review 229 canonical Future Direction decisions', href: '/admin/dream-career-phase1-review', key: '', icon: ShieldCheck },
 ];
 
 export default function AdminDashboard() {

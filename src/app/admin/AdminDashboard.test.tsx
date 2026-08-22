@@ -30,12 +30,13 @@ describe('admin dashboard', () => {
     await act(async () => { root.render(<AdminDashboard />); });
 
     const links = Array.from(container.querySelectorAll('a'));
-    expect(links.length).toBe(10);
+    expect(links.length).toBe(11);
     expect(links.every((link) => Boolean(link.getAttribute('href')))).toBe(true);
     expect(container.textContent).not.toMatch(/coming soon|open workspace|not implemented/i);
     expect(container.textContent).not.toContain('Total content');
     expect(container.textContent).toContain('Open admin assistant');
     expect(container.textContent).toContain('Future directions');
+    expect(container.textContent).toContain('Phase 1 review');
     expect(container.textContent).toContain('Colleges');
   });
 
