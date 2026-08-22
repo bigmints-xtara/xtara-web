@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type MouseEvent, type ReactNode } from 'react';
 import Link from 'next/link';
 
 import type {
@@ -51,6 +51,21 @@ type GuideLabels = {
   perYear: string;
   closes: string;
   minutes: string;
+  sparseGuide: string;
+};
+
+type GuideQuestion = {
+  id: string;
+  title: string;
+  content: ReactNode;
+};
+
+type GuideChapterModel = {
+  id: string;
+  number: string;
+  title: string;
+  intro: string;
+  questions: GuideQuestion[];
 };
 
 const english: GuideLabels = {
@@ -61,24 +76,24 @@ const english: GuideLabels = {
   howToGetThereIntro: 'See the subjects, study routes, and first steps that can lead from school to work.',
   whatYouCanDoNow: 'What I can do now',
   whatYouCanDoNowIntro: 'Start with practical learning, skills, tools, and experiences you can act on today.',
-  whatYouDo: "What you'll do",
-  dayInLife: 'A day in the life',
-  whyItMatters: 'Why it matters',
-  earnings: 'What you could earn',
-  notablePeople: 'People to learn from',
-  relatedCareers: 'Related careers',
-  subjects: 'Subjects to focus on now',
-  educationRoutes: 'Study routes',
-  coursesAndColleges: 'Courses and colleges',
-  firstJobBridge: 'From graduation to first job',
-  careerProgression: 'Career progression',
-  employers: 'Companies that hire for this career',
-  opportunities: 'Internship opportunities',
-  learningResources: 'Starter courses and online resources',
-  skills: 'Skills to build',
-  tools: 'Tools to learn',
-  entranceExams: 'Entrance exams to consider',
-  starterActivity: 'Try it this week',
+  whatYouDo: 'What will I do?',
+  dayInLife: 'What is a day like?',
+  whyItMatters: 'Why does it matter?',
+  earnings: 'How much can I earn?',
+  notablePeople: 'Who can I learn from?',
+  relatedCareers: 'What related careers can I pursue?',
+  subjects: 'What subjects should I learn now?',
+  educationRoutes: 'What can I study?',
+  coursesAndColleges: 'Which courses and colleges are available?',
+  firstJobBridge: 'How do I move from graduation to employment?',
+  careerProgression: 'How can my career grow?',
+  employers: 'Which companies hire for this career?',
+  opportunities: 'Where can I find an internship?',
+  learningResources: 'What other courses and online resources can I take?',
+  skills: 'What skills should I develop?',
+  tools: 'What tools should I learn?',
+  entranceExams: 'What entrance exams should I consider?',
+  starterActivity: 'What can I try this week?',
   seeAll: 'See all',
   showLess: 'Show less',
   tryAgain: 'Try again',
@@ -93,6 +108,7 @@ const english: GuideLabels = {
   perYear: 'per year',
   closes: 'Closes',
   minutes: 'minutes',
+  sparseGuide: 'More reviewed guidance for this career is being prepared.',
 };
 
 const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
@@ -138,6 +154,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     perYear: 'പ്രതി വർഷം',
     closes: 'അവസാന തീയതി',
     minutes: 'മിനിറ്റ്',
+    sparseGuide: 'ഈ കരിയറിനായുള്ള കൂടുതല് പരിശോധിച്ച മാർഗ്ഗനിർദ്ദേശം തയ്യാറാക്കുന്നു.',
   },
   hi: {
     ...english,
@@ -180,6 +197,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     perYear: 'प्रति वर्ष',
     closes: 'अंतिम तारीख',
     minutes: 'मिनट',
+    sparseGuide: 'इस करियर के लिए और सत्यापित मार्गदर्शन तैयार किया जा रहा है।',
   },
   ta: {
     ...english,
@@ -222,6 +240,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
     perYear: 'ஆண்டிற்கு',
     closes: 'கடைசி நாள்',
     minutes: 'நிமிடங்கள்',
+    sparseGuide: 'இந்தத் தொழிலுக்கான மேலும் சரிபார்க்கப்பட்ட வழிகாட்டுதல் தயாராக்கப்படுகிறது.',
   },
 };
 
@@ -277,266 +296,399 @@ export function DreamCareerStudentGuide({
     );
   };
 
-  return (
-    <div data-testid="dream-career-student-guide" className="min-w-0 bg-muted/20 text-foreground dark:bg-background">
-      <nav
-        aria-label={text.chapterNavigation}
-        className="sticky top-0 z-20 border-b border-border/70 bg-background/95 px-2 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:px-6"
-      >
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-3 gap-1 py-2 sm:gap-2 sm:py-3">
-          <ChapterAnchor href="#about-career" number="01">{text.aboutCareer}</ChapterAnchor>
-          <ChapterAnchor href="#how-to-get-there" number="02">{text.howToGetThere}</ChapterAnchor>
-          <ChapterAnchor href="#what-you-can-do-now" number="03">{text.whatYouCanDoNow}</ChapterAnchor>
-        </div>
-      </nav>
+  const aboutQuestions: GuideQuestion[] = [];
+  const pathQuestions: GuideQuestion[] = [];
+  const nowQuestions: GuideQuestion[] = [];
 
-      <div className="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:pb-28">
-        <GuideChapter id="about-career" number="01" title={text.aboutCareer} intro={text.aboutCareerIntro}>
-          {current('whatYouDo') && (guide.aboutCareer.whatYouDo.trim() || guide.aboutCareer.activities.length) ? (
-            <AnswerSection title={text.whatYouDo}>
-              {guide.aboutCareer.whatYouDo.trim() ? <p>{guide.aboutCareer.whatYouDo}</p> : null}
-              {guide.aboutCareer.activities.length ? (
-                <ProgressiveList
-                  items={guide.aboutCareer.activities}
-                  labels={text}
-                  renderItem={(activity) => <GuideItem title={activity.title}>{activity.description}</GuideItem>}
-                />
-              ) : null}
-            </AnswerSection>
+  if (current('whatYouDo') && (guide.aboutCareer.whatYouDo.trim() || guide.aboutCareer.activities.length)) {
+    aboutQuestions.push({
+      id: 'what-you-do',
+      title: text.whatYouDo,
+      content: (
+        <>
+          {guide.aboutCareer.whatYouDo.trim() ? <p>{guide.aboutCareer.whatYouDo}</p> : null}
+          {guide.aboutCareer.activities.length ? (
+            <ProgressiveList
+              items={guide.aboutCareer.activities}
+              labels={text}
+              renderItem={(activity) => <GuideItem title={activity.title}>{activity.description}</GuideItem>}
+            />
           ) : null}
+        </>
+      ),
+    });
+  }
 
-          {current('dayInLife') && guide.aboutCareer.dayInLife.length ? (
-            <AnswerSection title={text.dayInLife}>
-              <ProgressiveList
-                items={[...guide.aboutCareer.dayInLife].sort((left, right) => left.order - right.order)}
-                labels={text}
-                renderItem={(moment) => (
-                  <GuideItem title={`${moment.timeLabel} · ${moment.title}`}>{moment.description}</GuideItem>
-                )}
-              />
-            </AnswerSection>
+  if (current('dayInLife') && guide.aboutCareer.dayInLife.length) {
+    aboutQuestions.push({
+      id: 'day-in-life',
+      title: text.dayInLife,
+      content: (
+        <ProgressiveList
+          items={[...guide.aboutCareer.dayInLife].sort((left, right) => left.order - right.order)}
+          labels={text}
+          renderItem={(moment) => (
+            <GuideItem title={`${moment.timeLabel} · ${moment.title}`}>{moment.description}</GuideItem>
+          )}
+        />
+      ),
+    });
+  }
+
+  if (current('whyItMatters') && guide.aboutCareer.whyItMatters.trim()) {
+    aboutQuestions.push({ id: 'why-it-matters', title: text.whyItMatters, content: <p>{guide.aboutCareer.whyItMatters}</p> });
+  }
+
+  if (current('earnings') && guide.aboutCareer.earnings.length) {
+    aboutQuestions.push({
+      id: 'earnings',
+      title: text.earnings,
+      content: (
+        <ProgressiveList
+          items={guide.aboutCareer.earnings}
+          labels={text}
+          renderItem={(earning) => (
+            <GuideItem title={`${formatMoney(earning.amountMin, locale)}–${formatMoney(earning.amountMax, locale)} ${earning.period === 'month' ? text.perMonth : text.perYear}`}>
+              {enumLabel(earning.careerStage, locale)} · {earning.geography} · {text.asOf} {formatDate(earning.asOf, locale)}
+            </GuideItem>
+          )}
+        />
+      ),
+    });
+  }
+
+  if (current('notablePeople') && guide.aboutCareer.notablePeople.length) {
+    aboutQuestions.push({
+      id: 'notable-people',
+      title: text.notablePeople,
+      content: (
+        <ProgressiveList
+          items={guide.aboutCareer.notablePeople}
+          labels={text}
+          renderItem={(person) => <GuideItem title={person.name}>{person.whyRelevant}</GuideItem>}
+        />
+      ),
+    });
+  }
+
+  if ((current('relatedCareers') && resolved.relatedCareers.length) || relationshipError('relatedCareers')) {
+    aboutQuestions.push({
+      id: 'related-careers',
+      title: text.relatedCareers,
+      content: (
+        <>
+          {resolved.relatedCareers.length ? (
+            <ProgressiveList
+              items={resolved.relatedCareers}
+              labels={text}
+              renderItem={(career) => (
+                <GuideItem title={<Link className="text-primary underline-offset-4 hover:underline" href={`/explore/roles/${encodeURIComponent(career.id)}`}>{career.title}</Link>}>
+                  {career.summary}
+                </GuideItem>
+              )}
+            />
           ) : null}
+          {relationFailure('relatedCareers', text.relatedCareers)}
+        </>
+      ),
+    });
+  }
 
-          {current('whyItMatters') && guide.aboutCareer.whyItMatters.trim() ? (
-            <AnswerSection title={text.whyItMatters}><p>{guide.aboutCareer.whyItMatters}</p></AnswerSection>
-          ) : null}
+  if (current('subjects') && subjects.length) {
+    pathQuestions.push({
+      id: 'subjects',
+      title: text.subjects,
+      content: (
+        <ProgressiveList
+          items={subjects}
+          labels={text}
+          renderItem={(subject) => (
+            <GuideItem title={subject.label} meta={`${enumLabel(subject.importance, locale)} · ${subject.gradeIds.map((grade) => formatGrade(grade, locale)).join(' · ')}`}>{subject.guidance}</GuideItem>
+          )}
+        />
+      ),
+    });
+  }
 
-          {current('earnings') && guide.aboutCareer.earnings.length ? (
-            <AnswerSection title={text.earnings}>
-              <ProgressiveList
-                items={guide.aboutCareer.earnings}
-                labels={text}
-                renderItem={(earning) => (
-                  <GuideItem title={`${formatMoney(earning.amountMin, locale)}–${formatMoney(earning.amountMax, locale)} ${earning.period === 'month' ? text.perMonth : text.perYear}`}>
-                    {enumLabel(earning.careerStage, locale)} · {earning.geography} · {text.asOf} {formatDate(earning.asOf, locale)}
+  if (current('educationRoutes') && guide.howToGetThere.educationRoutes.length) {
+    pathQuestions.push({
+      id: 'education-routes',
+      title: text.educationRoutes,
+      content: (
+        <ProgressiveList
+          items={guide.howToGetThere.educationRoutes}
+          labels={text}
+          renderItem={(route) => <GuideItem title={route.title} meta={enumLabel(route.routeType, locale)}>{route.description}</GuideItem>}
+        />
+      ),
+    });
+  }
+
+  if ((current('coursesAndColleges') && resolved.courseOptions.items.length) || relationshipError('courseOptions')) {
+    pathQuestions.push({
+      id: 'courses-and-colleges',
+      title: text.coursesAndColleges,
+      content: (
+        <>
+          {resolved.courseOptions.items.length ? (
+            <ProgressiveList
+              items={resolved.courseOptions.items}
+              labels={text}
+              renderItem={(option) => {
+                const location = [option.institution.city, option.institution.state, option.institution.country].filter(Boolean).join(', ');
+                return (
+                  <GuideItem title={option.courseTitle} meta={location || undefined}>
+                    <Link className="font-medium text-primary underline-offset-4 hover:underline" href={`/colleges/${encodeURIComponent(option.institution.id)}`}>
+                      {option.institution.name}
+                    </Link>
                   </GuideItem>
-                )}
-              />
-            </AnswerSection>
+                );
+              }}
+            />
           ) : null}
+          {relationFailure('courseOptions', text.coursesAndColleges)}
+        </>
+      ),
+    });
+  }
 
-          {current('notablePeople') && guide.aboutCareer.notablePeople.length ? (
-            <AnswerSection title={text.notablePeople}>
-              <ProgressiveList
-                items={guide.aboutCareer.notablePeople}
-                labels={text}
-                renderItem={(person) => <GuideItem title={person.name}>{person.whyRelevant}</GuideItem>}
-              />
-            </AnswerSection>
-          ) : null}
+  if (current('firstJobBridge') && guide.howToGetThere.firstJobBridge.length) {
+    pathQuestions.push({ id: 'first-job-bridge', title: text.firstJobBridge, content: <OrderedGuideItems items={guide.howToGetThere.firstJobBridge} labels={text} /> });
+  }
 
-          {current('relatedCareers') && (resolved.relatedCareers.length || relationshipError('relatedCareers')) ? (
-            <AnswerSection title={text.relatedCareers}>
-              {resolved.relatedCareers.length ? (
-                <ProgressiveList
-                  items={resolved.relatedCareers}
-                  labels={text}
-                  renderItem={(career) => (
-                    <GuideItem title={<Link className="text-primary underline-offset-4 hover:underline" href={`/explore/roles/${encodeURIComponent(career.id)}`}>{career.title}</Link>}>
-                      {career.summary}
-                    </GuideItem>
-                  )}
+  if (current('careerProgression') && guide.howToGetThere.careerProgression.length) {
+    pathQuestions.push({
+      id: 'career-progression',
+      title: text.careerProgression,
+      content: (
+        <ProgressiveList
+          items={[...guide.howToGetThere.careerProgression].sort((left, right) => left.order - right.order)}
+          labels={text}
+          renderItem={(stage) => <GuideItem title={stage.title} meta={enumLabel(stage.level, locale)}>{stage.description}</GuideItem>}
+        />
+      ),
+    });
+  }
+
+  if ((current('employers') && resolved.employers.length) || relationshipError('employers')) {
+    pathQuestions.push({
+      id: 'employers',
+      title: text.employers,
+      content: (
+        <>
+          {resolved.employers.length ? (
+            <ProgressiveList
+              items={resolved.employers}
+              labels={text}
+              renderItem={(employer) => (
+                <GuideItem
+                  title={employer.website ? <a className="text-primary underline-offset-4 hover:underline" href={employer.website} target="_blank" rel="noreferrer">{employer.name}</a> : employer.name}
+                  meta={`${employer.geography} · ${text.verified} ${formatDate(employer.verifiedAt, locale)}`}
                 />
-              ) : null}
-              {relationFailure('relatedCareers', text.relatedCareers)}
-            </AnswerSection>
+              )}
+            />
           ) : null}
+          {relationFailure('employers', text.employers)}
+        </>
+      ),
+    });
+  }
 
-          <AdditionalTopics topics={guide.additionalTopics.filter((topic) => topic.chapter === 'aboutCareer')} response={response} labels={text} />
-        </GuideChapter>
-
-        <GuideChapter id="how-to-get-there" number="02" title={text.howToGetThere} intro={text.howToGetThereIntro}>
-          {current('subjects') && subjects.length ? (
-            <AnswerSection title={text.subjects}>
-              <ProgressiveList
-                items={subjects}
-                labels={text}
-                renderItem={(subject) => (
-                  <GuideItem title={subject.label} meta={`${enumLabel(subject.importance, locale)} · ${subject.gradeIds.map((grade) => formatGrade(grade, locale)).join(' · ')}`}>{subject.guidance}</GuideItem>
-                )}
-              />
-            </AnswerSection>
-          ) : null}
-
-          {current('educationRoutes') && guide.howToGetThere.educationRoutes.length ? (
-            <AnswerSection title={text.educationRoutes}>
-              <ProgressiveList
-                items={guide.howToGetThere.educationRoutes}
-                labels={text}
-                renderItem={(route) => <GuideItem title={route.title} meta={enumLabel(route.routeType, locale)}>{route.description}</GuideItem>}
-              />
-            </AnswerSection>
-          ) : null}
-
-          {current('coursesAndColleges') && (resolved.courseOptions.items.length || relationshipError('courseOptions')) ? (
-            <AnswerSection title={text.coursesAndColleges}>
-              {resolved.courseOptions.items.length ? (
-                <ProgressiveList
-                  items={resolved.courseOptions.items}
-                  labels={text}
-                  renderItem={(option) => {
-                    const location = [option.institution.city, option.institution.state, option.institution.country].filter(Boolean).join(', ');
-                    return (
-                      <GuideItem title={option.courseTitle} meta={location || undefined}>
-                        <Link className="font-medium text-primary underline-offset-4 hover:underline" href={`/colleges/${encodeURIComponent(option.institution.id)}`}>
-                          {option.institution.name}
-                        </Link>
-                      </GuideItem>
-                    );
-                  }}
+  if ((current('opportunities') && resolved.opportunities.length) || relationshipError('opportunities')) {
+    pathQuestions.push({
+      id: 'opportunities',
+      title: text.opportunities,
+      content: (
+        <>
+          {resolved.opportunities.length ? (
+            <ProgressiveList
+              items={resolved.opportunities}
+              labels={text}
+              renderItem={(opportunity) => (
+                <GuideItem
+                  title={opportunity.title}
+                  meta={[opportunity.providerName, enumLabel(opportunity.kind, locale), opportunity.closesAt ? `${text.closes} ${formatDate(opportunity.closesAt, locale)}` : ''].filter(Boolean).join(' · ')}
                 />
-              ) : null}
-              {relationFailure('courseOptions', text.coursesAndColleges)}
-            </AnswerSection>
+              )}
+            />
           ) : null}
+          {relationFailure('opportunities', text.opportunities)}
+        </>
+      ),
+    });
+  }
 
-          {current('firstJobBridge') && guide.howToGetThere.firstJobBridge.length ? (
-            <AnswerSection title={text.firstJobBridge}>
-              <OrderedGuideItems items={guide.howToGetThere.firstJobBridge} labels={text} />
-            </AnswerSection>
+  if ((current('learningResources') && resolved.learningResources.length) || relationshipError('learningResources')) {
+    nowQuestions.push({
+      id: 'learning-resources',
+      title: text.learningResources,
+      content: (
+        <>
+          {resolved.learningResources.length ? (
+            <ProgressiveList
+              items={resolved.learningResources}
+              labels={text}
+              renderItem={(resource) => (
+                <GuideItem title={<a className="text-primary underline-offset-4 hover:underline" href={resource.url} target="_blank" rel="noreferrer">{resource.title}</a>} meta={`${resource.providerName} · ${enumLabel(resource.level, locale)} · ${enumLabel(resource.cost, locale)}`} />
+              )}
+            />
           ) : null}
+          {relationFailure('learningResources', text.learningResources)}
+        </>
+      ),
+    });
+  }
 
-          {current('careerProgression') && guide.howToGetThere.careerProgression.length ? (
-            <AnswerSection title={text.careerProgression}>
-              <ProgressiveList
-                items={[...guide.howToGetThere.careerProgression].sort((left, right) => left.order - right.order)}
-                labels={text}
-                renderItem={(stage) => <GuideItem title={stage.title} meta={enumLabel(stage.level, locale)}>{stage.description}</GuideItem>}
-              />
-            </AnswerSection>
-          ) : null}
+  if (current('skills') && skills.length) {
+    nowQuestions.push({
+      id: 'skills',
+      title: text.skills,
+      content: <ProgressiveList items={skills} labels={text} renderItem={(skill) => <GuideItem title={skill.label} meta={enumLabel(skill.importance, locale)}>{skill.howUsed}</GuideItem>} />,
+    });
+  }
 
-          {current('employers') && (resolved.employers.length || relationshipError('employers')) ? (
-            <AnswerSection title={text.employers}>
-              {resolved.employers.length ? (
-                <ProgressiveList
-                  items={resolved.employers}
-                  labels={text}
-                  renderItem={(employer) => (
-                    <GuideItem
-                      title={employer.website ? <a className="text-primary underline-offset-4 hover:underline" href={employer.website} target="_blank" rel="noreferrer">{employer.name}</a> : employer.name}
-                      meta={`${employer.geography} · ${text.verified} ${formatDate(employer.verifiedAt, locale)}`}
-                    />
-                  )}
-                />
-              ) : null}
-              {relationFailure('employers', text.employers)}
-            </AnswerSection>
-          ) : null}
+  if (current('tools') && tools.length) {
+    nowQuestions.push({
+      id: 'tools',
+      title: text.tools,
+      content: <ProgressiveList items={tools} labels={text} renderItem={(tool) => <GuideItem title={tool.label} meta={enumLabel(tool.importance, locale)}>{tool.whyLearn}</GuideItem>} />,
+    });
+  }
 
-          {current('opportunities') && (resolved.opportunities.length || relationshipError('opportunities')) ? (
-            <AnswerSection title={text.opportunities}>
-              {resolved.opportunities.length ? (
-                <ProgressiveList
-                  items={resolved.opportunities}
-                  labels={text}
-                  renderItem={(opportunity) => (
-                    <GuideItem
-                      title={opportunity.title}
-                      meta={[opportunity.providerName, enumLabel(opportunity.kind, locale), opportunity.closesAt ? `${text.closes} ${formatDate(opportunity.closesAt, locale)}` : ''].filter(Boolean).join(' · ')}
-                    />
-                  )}
-                />
-              ) : null}
-              {relationFailure('opportunities', text.opportunities)}
-            </AnswerSection>
-          ) : null}
+  if (current('entranceExams') && applicableExams.length) {
+    nowQuestions.push({
+      id: 'entrance-exams',
+      title: text.entranceExams,
+      content: (
+        <ProgressiveList
+          items={applicableExams}
+          labels={text}
+          renderItem={(exam) => <GuideItem title={<a className="text-primary underline-offset-4 hover:underline" href={exam.officialUrl} target="_blank" rel="noreferrer">{exam.name}</a>} meta={enumLabel(exam.requirement, locale)} />}
+        />
+      ),
+    });
+  }
 
-          <AdditionalTopics topics={guide.additionalTopics.filter((topic) => topic.chapter === 'howToGetThere')} response={response} labels={text} />
-        </GuideChapter>
+  if (current('starterActivity') && guide.whatYouCanDoNow.starterActivity) {
+    nowQuestions.push({
+      id: 'starter-activity',
+      title: text.starterActivity,
+      content: (
+        <GuideItem title={guide.whatYouCanDoNow.starterActivity.title} meta={`${guide.whatYouCanDoNow.starterActivity.estimatedMinutes} ${text.minutes}`}>
+          {guide.whatYouCanDoNow.starterActivity.description}
+        </GuideItem>
+      ),
+    });
+  }
 
-        <GuideChapter id="what-you-can-do-now" number="03" title={text.whatYouCanDoNow} intro={text.whatYouCanDoNowIntro}>
-          {current('learningResources') && (resolved.learningResources.length || relationshipError('learningResources')) ? (
-            <AnswerSection title={text.learningResources}>
-              {resolved.learningResources.length ? (
-                <ProgressiveList
-                  items={resolved.learningResources}
-                  labels={text}
-                  renderItem={(resource) => (
-                    <GuideItem title={<a className="text-primary underline-offset-4 hover:underline" href={resource.url} target="_blank" rel="noreferrer">{resource.title}</a>} meta={`${resource.providerName} · ${enumLabel(resource.level, locale)} · ${enumLabel(resource.cost, locale)}`} />
-                  )}
-                />
-              ) : null}
-              {relationFailure('learningResources', text.learningResources)}
-            </AnswerSection>
-          ) : null}
+  appendAdditionalTopics(aboutQuestions, 'aboutCareer', guide.additionalTopics, response, text);
+  appendAdditionalTopics(pathQuestions, 'howToGetThere', guide.additionalTopics, response, text);
+  appendAdditionalTopics(nowQuestions, 'whatYouCanDoNow', guide.additionalTopics, response, text);
 
-          {current('skills') && skills.length ? (
-            <AnswerSection title={text.skills}>
-              <ProgressiveList
-                items={skills}
-                labels={text}
-                renderItem={(skill) => <GuideItem title={skill.label} meta={enumLabel(skill.importance, locale)}>{skill.howUsed}</GuideItem>}
-              />
-            </AnswerSection>
-          ) : null}
+  const chapters: GuideChapterModel[] = [
+    { id: 'about-career', number: '01', title: text.aboutCareer, intro: text.aboutCareerIntro, questions: aboutQuestions },
+    { id: 'how-to-get-there', number: '02', title: text.howToGetThere, intro: text.howToGetThereIntro, questions: pathQuestions },
+    { id: 'what-you-can-do-now', number: '03', title: text.whatYouCanDoNow, intro: text.whatYouCanDoNowIntro, questions: nowQuestions },
+  ].filter((chapter) => chapter.questions.length > 0);
 
-          {current('tools') && tools.length ? (
-            <AnswerSection title={text.tools}>
-              <ProgressiveList
-                items={tools}
-                labels={text}
-                renderItem={(tool) => <GuideItem title={tool.label} meta={enumLabel(tool.importance, locale)}>{tool.whyLearn}</GuideItem>}
-              />
-            </AnswerSection>
-          ) : null}
+  const reviewedSources = guide.sources.filter((source) => source.reviewStatus === 'reviewed');
+  const questionEntries = chapters.flatMap((chapter) => chapter.questions.map((question) => ({ chapter, question })));
+  const questionSignature = questionEntries.map(({ question }) => question.id).join('|');
+  const [selectedQuestionId, setSelectedQuestionId] = useState(readQuestionHash);
+  const compactLayout = useSyncExternalStore(subscribeCompactLayout, getCompactLayout, getServerCompactLayout);
 
-          {current('entranceExams') && applicableExams.length ? (
-            <AnswerSection title={text.entranceExams}>
-              <ProgressiveList
-                items={applicableExams}
-                labels={text}
-                renderItem={(exam) => <GuideItem title={<a className="text-primary underline-offset-4 hover:underline" href={exam.officialUrl} target="_blank" rel="noreferrer">{exam.name}</a>} meta={enumLabel(exam.requirement, locale)} />}
-              />
-            </AnswerSection>
-          ) : null}
+  useEffect(() => {
+    const syncHash = () => {
+      const next = readQuestionHash();
+      if (next && questionSignature.split('|').includes(next)) setSelectedQuestionId(next);
+    };
+    window.addEventListener('hashchange', syncHash);
+    return () => window.removeEventListener('hashchange', syncHash);
+  }, [questionSignature]);
 
-          {current('starterActivity') && guide.whatYouCanDoNow.starterActivity ? (
-            <AnswerSection title={text.starterActivity}>
-              <GuideItem title={guide.whatYouCanDoNow.starterActivity.title} meta={`${guide.whatYouCanDoNow.starterActivity.estimatedMinutes} ${text.minutes}`}>
-                {guide.whatYouCanDoNow.starterActivity.description}
-              </GuideItem>
-            </AnswerSection>
-          ) : null}
+  const selectedEntry = questionEntries.find(({ question }) => question.id === selectedQuestionId) ?? questionEntries[0];
+  const activeQuestionId = selectedEntry?.question.id ?? '';
+  const selectQuestion = (event: MouseEvent<HTMLAnchorElement>, questionId: string) => {
+    event.preventDefault();
+    setSelectedQuestionId(questionId);
+    window.history.replaceState(null, '', `#guide-question-${questionId}`);
+  };
 
-          <AdditionalTopics topics={guide.additionalTopics.filter((topic) => topic.chapter === 'whatYouCanDoNow')} response={response} labels={text} />
-        </GuideChapter>
+  const sourcesPanel = reviewedSources.length ? (
+    <details className="border-t border-border pt-6 text-sm text-muted-foreground">
+      <summary className="cursor-pointer font-semibold text-foreground">{text.sources}</summary>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        {reviewedSources.map((source) => (
+          <a key={source.id} href={source.url} target="_blank" rel="noreferrer" className="border-l-2 border-border py-1 pl-4 hover:border-primary">
+            <span className="font-medium text-foreground">{source.label}</span>
+            <span className="mt-1 block">{source.organization}</span>
+            {source.lastVerifiedAt ? <span className="mt-2 block text-xs">{text.verified} {formatDate(source.lastVerifiedAt, locale)}</span> : null}
+          </a>
+        ))}
+      </div>
+    </details>
+  ) : null;
 
-        {guide.sources.some((source) => source.reviewStatus === 'reviewed') ? (
-          <details className="mt-4 rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground shadow-sm open:shadow-md sm:mt-6 sm:p-7">
-            <summary className="cursor-pointer font-semibold text-foreground">{text.sources}</summary>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {guide.sources.filter((source) => source.reviewStatus === 'reviewed').map((source) => (
-                <a key={source.id} href={source.url} target="_blank" rel="noreferrer" className="rounded-xl border border-border p-4 hover:border-primary/40">
-                  <span className="font-medium text-foreground">{source.label}</span>
-                  <span className="mt-1 block">{source.organization}</span>
-                  {source.lastVerifiedAt ? <span className="mt-2 block text-xs">{text.verified} {formatDate(source.lastVerifiedAt, locale)}</span> : null}
-                </a>
+  if (!chapters.length) {
+    return (
+      <div data-testid="dream-career-student-guide" className="min-w-0 bg-background px-4 py-12 text-foreground dark:bg-background sm:px-6 sm:py-16">
+        <p role="status" className="mx-auto max-w-3xl border-l-2 border-accent px-5 text-base leading-7 text-muted-foreground">
+          {text.sparseGuide}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div data-testid="dream-career-student-guide" className="min-w-0 scroll-smooth bg-background text-foreground motion-reduce:scroll-auto dark:bg-background">
+      {compactLayout ? (
+        <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14" data-testid="compact-question-reader">
+          <main className="min-w-0 space-y-14 sm:space-y-18">
+            {chapters.map((chapter) => <GuideChapter key={chapter.id} chapter={chapter} />)}
+            {sourcesPanel}
+          </main>
+        </div>
+      ) : (
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-14 lg:py-16">
+          <nav aria-label={text.chapterNavigation} className="min-w-0" data-testid="desktop-question-navigation">
+            <div className="sticky top-24 space-y-8 border-r border-border/80 pr-7">
+              {chapters.map((chapter) => (
+                <section id={chapter.id} key={chapter.id} className="scroll-mt-24">
+                  <h2 className="text-base font-semibold text-foreground">
+                    <a href={`#${chapter.id}`} onClick={(event) => selectQuestion(event, chapter.questions[0].id)} className="group flex items-center gap-3 focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                      <span aria-hidden className="text-xs font-bold tracking-[0.14em] text-primary/70">{chapter.number}</span>
+                      <span>{chapter.title}</span>
+                    </a>
+                  </h2>
+                  <div className="mt-3 space-y-1 border-l border-border pl-4">
+                    {chapter.questions.map((question) => (
+                      <a
+                        key={question.id}
+                        href={`#guide-question-${question.id}`}
+                        aria-current={question.id === activeQuestionId ? 'location' : undefined}
+                        onClick={(event) => selectQuestion(event, question.id)}
+                        className={`block rounded-lg border-l-2 px-3 py-2 text-sm leading-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${question.id === activeQuestionId ? 'border-primary bg-primary/5 font-semibold text-foreground' : 'border-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                      >
+                        {question.title}
+                      </a>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
-          </details>
-        ) : null}
-      </div>
+          </nav>
+
+          <main className="min-w-0" data-testid="desktop-question-reader">
+            {selectedEntry ? (
+              <div data-testid="active-question-pane">
+                <p className="text-xs font-bold tracking-[0.16em] text-primary/70">{selectedEntry.chapter.number} · {selectedEntry.chapter.title}</p>
+                <QuestionSection question={selectedEntry.question} idSuffix="pane" />
+              </div>
+            ) : null}
+            {sourcesPanel ? <div className="mt-14">{sourcesPanel}</div> : null}
+          </main>
+        </div>
+      )}
     </div>
   );
 }
@@ -570,44 +722,34 @@ export function DreamCareerStudentGuideError({ locale, onRetry }: { locale: Drea
   );
 }
 
-function ChapterAnchor({ href, number, children }: { href: string; number: string; children: ReactNode }) {
+function GuideChapter({ chapter }: { chapter: GuideChapterModel }) {
   return (
-    <a href={href} className="group flex min-w-0 flex-col items-center justify-center rounded-xl border border-transparent px-1.5 py-2 text-center text-[0.7rem] font-semibold leading-tight whitespace-normal break-words text-muted-foreground transition hover:border-border hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:px-4 sm:text-sm">
-      <span aria-hidden className="mb-0.5 text-[0.65rem] font-bold text-primary/70 group-hover:text-primary sm:mr-2 sm:mb-0 sm:text-xs">{number}</span>
-      <span className="min-w-0">{children}</span>
-    </a>
-  );
-}
-
-function GuideChapter({ id, number, title, intro, children }: { id: string; number: string; title: string; intro: string; children: ReactNode }) {
-  return (
-    <section id={id} tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-6 first:pt-10 sm:py-10 sm:first:pt-14">
-      <div className="rounded-[1.75rem] border border-border/80 bg-background p-4 shadow-sm sm:p-6 lg:p-8">
-        <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)] lg:gap-12">
-          <header className="self-start lg:sticky lg:top-24">
-            <span aria-hidden className="inline-flex h-10 min-w-10 items-center justify-center rounded-full bg-secondary px-3 text-sm font-bold text-secondary-foreground">{number}</span>
-            <h2 id={`${id}-title`} className="mt-5 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl">{title}</h2>
-            <p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">{intro}</p>
-          </header>
-          <div className="min-w-0 divide-y divide-border/80 overflow-hidden rounded-2xl border border-border bg-card shadow-sm empty:hidden">{children}</div>
-        </div>
+    <section id={chapter.id} tabIndex={-1} aria-labelledby={`${chapter.id}-title`} className="scroll-mt-24 first:pt-0">
+      <header className="border-b border-border pb-7">
+        <p aria-hidden className="text-xs font-bold tracking-[0.16em] text-primary/70">{chapter.number}</p>
+        <h2 id={`${chapter.id}-title`} className="mt-3 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl">{chapter.title}</h2>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">{chapter.intro}</p>
+      </header>
+      <div className="divide-y divide-border/80">
+        {chapter.questions.map((question) => <QuestionSection key={question.id} question={question} />)}
       </div>
     </section>
   );
 }
 
-function AnswerSection({ title, children }: { title: string; children: ReactNode }) {
+function QuestionSection({ question, idSuffix = '' }: { question: GuideQuestion; idSuffix?: string }) {
+  const id = `guide-question-${question.id}${idSuffix ? `-${idSuffix}` : ''}`;
   return (
-    <section className="grid min-w-0 gap-4 px-5 py-6 sm:px-7 sm:py-8 xl:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] xl:gap-8">
-      <h3 className="text-lg font-semibold leading-6 tracking-[-0.015em] text-foreground sm:text-xl">{title}</h3>
-      <div className="min-w-0 text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">{children}</div>
+    <section id={id} tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-7 sm:py-9">
+      <h3 id={`${id}-title`} className="text-xl font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-2xl">{question.title}</h3>
+      <div className="mt-4 min-w-0 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">{question.content}</div>
     </section>
   );
 }
 
 function GuideItem({ title, meta, children }: { title: ReactNode; meta?: string; children?: ReactNode }) {
   return (
-    <div className="rounded-xl bg-muted/45 px-4 py-3.5">
+    <div className="border-l-2 border-border py-1 pl-4 transition-colors hover:border-primary/50">
       <div className="font-semibold text-foreground">{title}</div>
       {meta ? <div className="mt-1 text-xs font-medium text-muted-foreground">{meta}</div> : null}
       {children ? <div className="mt-2">{children}</div> : null}
@@ -642,10 +784,10 @@ function OrderedGuideItems({ items, labels: text }: { items: Array<{ id: string;
 
 function RelationshipUnavailable({ label, message, retryLabel, retryAccessiblePrefix, retrying, onRetry }: { label: string; message: string; retryLabel: string; retryAccessiblePrefix: string; retrying: boolean; onRetry?: () => void }) {
   return (
-    <div className="rounded-xl border border-border bg-muted/30 p-4">
+    <div className="border-l-2 border-muted-foreground/40 py-1 pl-4">
       <p>{message}</p>
       {onRetry ? (
-        <button type="button" aria-label={`${retryAccessiblePrefix} ${label.toLocaleLowerCase()}`} disabled={retrying} className="mt-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
+        <button type="button" aria-label={`${retryAccessiblePrefix} ${label.charAt(0).toLocaleLowerCase()}${label.slice(1)}`} disabled={retrying} className="mt-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
           {retryLabel}
         </button>
       ) : null}
@@ -653,27 +795,77 @@ function RelationshipUnavailable({ label, message, retryLabel, retryAccessiblePr
   );
 }
 
-function AdditionalTopics({ topics, response, labels: text }: { topics: CareerAdditionalTopic[]; response: DreamCareerStudentGuideResponse; labels: GuideLabels }) {
-  if (!topics.length) return null;
+function appendAdditionalTopics(
+  questions: GuideQuestion[],
+  chapter: CareerAdditionalTopic['chapter'],
+  topics: CareerAdditionalTopic[],
+  response: DreamCareerStudentGuideResponse,
+  text: GuideLabels,
+) {
   const resources = new Map(
     response.coverage.byQuestion.learningResources?.status === 'stale'
       ? []
       : response.resolved.learningResources.map((resource) => [resource.id, resource]),
   );
-  return <>{topics.map((topic) => (
-    <AnswerSection key={topic.id} title={topic.title}>
-      {topic.summary.trim() ? <p>{topic.summary}</p> : null}
-      <div className="mt-4 space-y-4">
-        {topic.blocks.map((block, index) => {
-          if (block.type === 'paragraph') return <p key={`${topic.id}-${index}`}>{block.text}</p>;
-          if (block.type === 'bullets') return <ul key={`${topic.id}-${index}`} className="list-disc space-y-2 pl-5">{block.items.map((item) => <li key={item}>{item}</li>)}</ul>;
-          const linked = block.resourceIds.flatMap((id) => resources.get(id) ?? []);
-          if (!linked.length) return null;
-          return <ProgressiveList key={`${topic.id}-${index}`} items={linked} labels={text} renderItem={(resource) => <GuideItem title={<a className="text-primary underline-offset-4 hover:underline" href={resource.url} target="_blank" rel="noreferrer">{resource.title}</a>} meta={resource.providerName} />} />;
-        })}
-      </div>
-    </AnswerSection>
-  ))}</>;
+
+  for (const topic of topics.filter((item) => item.chapter === chapter)) {
+    const blocks = topic.blocks.flatMap((block, index) => {
+      if (block.type === 'paragraph') return block.text.trim() ? [<p key={`${topic.id}-${index}`}>{block.text}</p>] : [];
+      if (block.type === 'bullets') {
+        const items = block.items.filter((item) => item.trim());
+        return items.length ? [<ul key={`${topic.id}-${index}`} className="list-disc space-y-2 pl-5">{items.map((item) => <li key={item}>{item}</li>)}</ul>] : [];
+      }
+      const linked = block.resourceIds.flatMap((id) => resources.get(id) ?? []);
+      if (!linked.length) return [];
+      return [<ProgressiveList key={`${topic.id}-${index}`} items={linked} labels={text} renderItem={(resource) => <GuideItem title={<a className="text-primary underline-offset-4 hover:underline" href={resource.url} target="_blank" rel="noreferrer">{resource.title}</a>} meta={resource.providerName} />} />];
+    });
+    if (!topic.summary.trim() && !blocks.length) continue;
+    questions.push({
+      id: `additional-${chapterSlug(chapter)}-${slug(topic.id)}`,
+      title: topic.title,
+      content: (
+        <>
+          {topic.summary.trim() ? <p>{topic.summary}</p> : null}
+          {blocks.length ? <div className="mt-4 space-y-4">{blocks}</div> : null}
+        </>
+      ),
+    });
+  }
+}
+
+function chapterSlug(chapter: CareerAdditionalTopic['chapter']) {
+  if (chapter === 'aboutCareer') return 'about';
+  if (chapter === 'howToGetThere') return 'path';
+  return 'now';
+}
+
+function slug(value: string) {
+  return value.toLocaleLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'topic';
+}
+
+const compactLayoutQuery = '(max-width: 1023px)';
+
+function subscribeCompactLayout(callback: () => void) {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => undefined;
+  const media = window.matchMedia(compactLayoutQuery);
+  media.addEventListener('change', callback);
+  return () => media.removeEventListener('change', callback);
+}
+
+function getCompactLayout() {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+    ? window.matchMedia(compactLayoutQuery).matches
+    : false;
+}
+
+function getServerCompactLayout() {
+  return false;
+}
+
+function readQuestionHash() {
+  if (typeof window === 'undefined') return '';
+  const match = window.location.hash.match(/^#guide-question-(.+)$/);
+  return match?.[1] ?? '';
 }
 
 function itemKey(item: unknown, index: number) {
