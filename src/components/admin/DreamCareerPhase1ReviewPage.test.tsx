@@ -94,6 +94,40 @@ describe('DreamCareerPhase1ReviewPage', () => {
     expect(await screen.findAllByText('Canonical Career 1')).not.toHaveLength(0);
   });
 
+  it('localizes a fail-closed canonical-count mismatch in Malayalam', async () => {
+    testContext.locale = 'ml';
+    reviewApi.listQueue.mockResolvedValue(queue({ records: [], counts: { total: 0, pending: 0, draft: 0, finalized: 0 } }));
+    render(<DreamCareerPhase1ReviewPage />);
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('229 അംഗീകൃത കരിയറുകൾ പ്രതീക്ഷിച്ചു, പക്ഷേ 0 ലഭിച്ചു');
+    expect(alert).not.toHaveTextContent('Review queue unavailable');
+  });
+
+  it('localizes a fail-closed queue identity mismatch in Tamil', async () => {
+    testContext.locale = 'ta';
+    reviewApi.getComplete.mockResolvedValue({
+      reviewId: 'different-review', expectedTotal: 229,
+      counts: { total: 229, pending: 227, draft: 1, finalized: 1 },
+      blockers: ['incomplete_human_review'],
+    });
+    render(<DreamCareerPhase1ReviewPage />);
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('வரிசை மற்றும் நிறைவு அடையாளங்கள் பொருந்தவில்லை');
+    expect(alert).not.toHaveTextContent('Review queue unavailable');
+  });
+
+  it('keeps all queue-integrity translation keys present in every locale catalog', async () => {
+    const { getMessages } = await import('@/i18n/messages');
+    const { translate } = await import('@/i18n/translate');
+    const keys = ['integrityCount', 'integrityIdentity', 'integrityDirections', 'integrityOrder'];
+    for (const locale of ['en', 'hi', 'ml', 'ta'] as const) {
+      for (const key of keys) {
+        const path = `admin.dreamCareerPhase1Review.errors.${key}`;
+        expect(translate(getMessages(locale), path)).not.toBe(path);
+      }
+    }
+  });
+
   it('renders all 229 canonically ordered rows and filters by status, source state, title, and ID', async () => {
     const filteredQueue = queue();
     filteredQueue.records[2].sourceBinding = { ...filteredQueue.records[2].sourceBinding, status: 'stale', isCurrent: false, isStale: true, blockers: ['source_hash_mismatch'], mismatchFields: ['guideSha256'] };

@@ -40,11 +40,11 @@ function idempotencyKey(action: 'draft' | 'finalize', careerId: string): string 
   return `phase1-${action}-${careerId}-${random}`;
 }
 
-function queueIntegrityError(queue: DreamCareerPhase1ReviewQueue, summary: DreamCareerPhase1ReviewSummary): string | null {
-  if (queue.expectedTotal !== EXPECTED_TOTAL || queue.records.length !== EXPECTED_TOTAL) return `Review queue unavailable: expected ${EXPECTED_TOTAL} canonical careers but received ${queue.records.length}.`;
-  if (queue.reviewId !== summary.reviewId || queue.expectedTotal !== summary.expectedTotal) return 'Review queue unavailable: queue and completion identities do not match.';
-  if (queue.directionOptions.length !== 6 || new Set(queue.directionOptions.map((item) => item.directionId)).size !== 6 || queue.directionOptions.some((item, index) => item.canonicalOrder !== index)) return 'Review queue unavailable: the server did not return exactly six canonical Direction choices.';
-  if (queue.records.some((record, index) => record.canonicalOrder !== index)) return 'Review queue unavailable: canonical career order does not match the server contract.';
+function queueIntegrityError(queue: DreamCareerPhase1ReviewQueue, summary: DreamCareerPhase1ReviewSummary, text: ReviewTranslate): string | null {
+  if (queue.expectedTotal !== EXPECTED_TOTAL || queue.records.length !== EXPECTED_TOTAL) return text('errors.integrityCount', { expected: EXPECTED_TOTAL, received: queue.records.length });
+  if (queue.reviewId !== summary.reviewId || queue.expectedTotal !== summary.expectedTotal) return text('errors.integrityIdentity');
+  if (queue.directionOptions.length !== 6 || new Set(queue.directionOptions.map((item) => item.directionId)).size !== 6 || queue.directionOptions.some((item, index) => item.canonicalOrder !== index)) return text('errors.integrityDirections');
+  if (queue.records.some((record, index) => record.canonicalOrder !== index)) return text('errors.integrityOrder');
   return null;
 }
 
@@ -223,7 +223,7 @@ export default function DreamCareerPhase1ReviewPage() {
   useEffect(() => {
     let active = true; setLoading(true); setError(null); setQueue(null); setSummary(null); setDetail(null);
     Promise.all([dreamCareerPhase1ReviewApi.listQueue(), dreamCareerPhase1ReviewApi.getComplete()])
-      .then(([queueValue, summaryValue]) => { if (active) { const integrity = queueIntegrityError(queueValue, summaryValue); if (integrity) throw new Error(integrity); setQueue(queueValue); setSummary(summaryValue); } })
+      .then(([queueValue, summaryValue]) => { if (active) { const integrity = queueIntegrityError(queueValue, summaryValue, textRef.current); if (integrity) throw new Error(integrity); setQueue(queueValue); setSummary(summaryValue); } })
       .catch((caught) => { if (active) setError(errorMessage(caught, textRef.current('errors.loadQueue'))); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
