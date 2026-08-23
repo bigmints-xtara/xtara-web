@@ -142,7 +142,12 @@ describe('AdminContentEditorPage', () => {
     const inReview = { ...draft, lockVersion: 2, status: 'inReview' as const };
     const approved = { ...inReview, lockVersion: 3, status: 'approved' as const };
     const promotedVersion = { ...approved, lockVersion: 4, status: 'live' as const };
-    const promotedRecord = { ...live, version: 2, translations: { ...live.translations, en: { ...live.translations.en, summary: 'Promoted summary.' } } };
+    const promotedRecord = {
+      ...live,
+      version: 2,
+      versionControl: { liveVersionId: promotedVersion.id, revision: promotedVersion.revision },
+      translations: { ...live.translations, en: { ...live.translations.en, summary: 'Promoted summary.' } },
+    };
     service.getById.mockResolvedValueOnce(live).mockResolvedValueOnce(promotedRecord);
     versions.createDraft.mockResolvedValue(draft);
     versions.action
@@ -169,5 +174,77 @@ describe('AdminContentEditorPage', () => {
     expect(await screen.findByText('Version 2 is live and verified.')).toBeInTheDocument();
     expect(versions.action).toHaveBeenNthCalledWith(3, 'dream_careers', live.id, approved, 'promote');
     expect(service.update).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['a stale live version ID', { liveVersionId: 'dream_careers__versioned-role__v000001', revision: 2 }],
+    ['a stale live revision', { liveVersionId: 'dream_careers__versioned-role__v000002', revision: 1 }],
+    ['missing version metadata', undefined],
+    ['malformed version metadata', []],
+  ])('does not verify promotion when canonical readback has %s', async (_caseName, versionControl) => {
+    const live = {
+      ...createEmptyDreamCareer(), id: 'versioned-role', slug: 'versioned-role',
+      status: 'published' as const, published: true, draft: false,
+      translations: {
+        ...createEmptyDreamCareer().translations,
+        en: { ...createEmptyDreamCareer().translations.en, title: 'Versioned Career', summary: 'Current live summary.' },
+      },
+    };
+    const approved = {
+      id: 'dream_careers__versioned-role__v000002', schemaVersion: 1 as const,
+      collectionName: 'dream_careers' as const, recordId: live.id, revision: 2, lockVersion: 3,
+      status: 'approved' as const, content: { ...live, status: 'draft', published: false, draft: true },
+      basedOnVersionId: 'dream_careers__versioned-role__v000001',
+      createdAt: '2026-08-23T08:00:00.000Z', createdBy: 'editor-1',
+      updatedAt: '2026-08-23T08:00:00.000Z', updatedBy: 'editor-1',
+    };
+    const promotedVersion = { ...approved, lockVersion: 4, status: 'live' as const };
+    const canonical = {
+      ...live,
+      version: 2,
+      ...(versionControl ? { versionControl } : {}),
+    };
+    service.getById.mockResolvedValueOnce(live).mockResolvedValueOnce(canonical);
+    versions.action.mockResolvedValueOnce(promotedVersion);
+    versions.history
+      .mockResolvedValueOnce({ live: null, active: approved, versions: [approved] })
+      .mockResolvedValueOnce({ live: promotedVersion, active: null, versions: [promotedVersion] });
+
+    render(<AdminContentEditorPage contentType="dream-careers" recordId={live.id} />);
+    await screen.findByRole('heading', { name: 'Versioned Career', level: 1 });
+    fireEvent.click(await screen.findByRole('button', { name: 'Promote to live' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Promotion completed, but canonical live readback could not verify the promoted version.');
+    expect(screen.queryByText('Version 2 is live and verified.')).not.toBeInTheDocument();
+  });
+
+  it('does not verify promotion when canonical readback fails', async () => {
+    const live = {
+      ...createEmptyDreamCareer(), id: 'versioned-role', slug: 'versioned-role',
+      status: 'published' as const, published: true, draft: false,
+      translations: {
+        ...createEmptyDreamCareer().translations,
+        en: { ...createEmptyDreamCareer().translations.en, title: 'Versioned Career', summary: 'Current live summary.' },
+      },
+    };
+    const approved = {
+      id: 'dream_careers__versioned-role__v000002', schemaVersion: 1 as const,
+      collectionName: 'dream_careers' as const, recordId: live.id, revision: 2, lockVersion: 3,
+      status: 'approved' as const, content: { ...live, status: 'draft', published: false, draft: true },
+      basedOnVersionId: 'dream_careers__versioned-role__v000001',
+      createdAt: '2026-08-23T08:00:00.000Z', createdBy: 'editor-1',
+      updatedAt: '2026-08-23T08:00:00.000Z', updatedBy: 'editor-1',
+    };
+    const promotedVersion = { ...approved, lockVersion: 4, status: 'live' as const };
+    service.getById.mockResolvedValueOnce(live).mockRejectedValueOnce(new Error('Readback request failed'));
+    versions.action.mockResolvedValueOnce(promotedVersion);
+    versions.history.mockResolvedValueOnce({ live: null, active: approved, versions: [approved] });
+
+    render(<AdminContentEditorPage contentType="dream-careers" recordId={live.id} />);
+    await screen.findByRole('heading', { name: 'Versioned Career', level: 1 });
+    fireEvent.click(await screen.findByRole('button', { name: 'Promote to live' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Promotion completed, but canonical live readback could not verify the promoted version.');
+    expect(screen.queryByText('Version 2 is live and verified.')).not.toBeInTheDocument();
   });
 });

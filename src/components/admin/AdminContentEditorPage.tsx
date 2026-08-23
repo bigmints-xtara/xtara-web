@@ -172,10 +172,15 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
         : await careerContentVersionsApi.action(versionedCollection, persistedId, activeVersion!, action);
       setVersionHistory((history) => replaceVersion(history, result));
       if (action === 'promote') {
-        const readback = await service.getById(persistedId);
-        if (!readback) throw new Error(`Version ${result.revision} was promoted but the live item could not be read back.`);
-        setLiveEntity(readback);
-        setEntity(readback);
+        let canonical: AdminEntity | null;
+        try {
+          canonical = await service.getById(persistedId);
+        } catch {
+          throw new Error(PROMOTION_VERIFICATION_ERROR);
+        }
+        if (!hasPromotedVersionIdentity(canonical, result)) throw new Error(PROMOTION_VERIFICATION_ERROR);
+        setLiveEntity(canonical);
+        setEntity(canonical);
         setPreviewVersion(null);
         setActionMessage(`Version ${result.revision} is live and verified.`);
       } else {
@@ -282,6 +287,20 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
         </div>
       )}
     </div>
+  );
+}
+
+const PROMOTION_VERIFICATION_ERROR = 'Promotion completed, but canonical live readback could not verify the promoted version.';
+
+function hasPromotedVersionIdentity(canonical: AdminEntity | null, promoted: CareerContentVersion): boolean {
+  if (!canonical || typeof canonical !== 'object') return false;
+  const versionControl = (canonical as AdminEntity & { versionControl?: unknown }).versionControl;
+  return Boolean(
+    versionControl
+    && typeof versionControl === 'object'
+    && !Array.isArray(versionControl)
+    && (versionControl as { liveVersionId?: unknown }).liveVersionId === promoted.id
+    && (versionControl as { revision?: unknown }).revision === promoted.revision,
   );
 }
 
