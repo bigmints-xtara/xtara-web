@@ -33,6 +33,7 @@ export const XTARA_API_OPERATIONS = {
   "getAdminDreamCareerPhase1ReviewComplete": { method: "GET", path: "/api/v1/admin/dream-career-phase1-review/complete", authenticated: true },
   "postAdminDreamCareerPhase1ReviewExportFutureDirections": { method: "POST", path: "/api/v1/admin/dream-career-phase1-review/export/future-directions", authenticated: true },
   "postAdminDreamCareerPhase1ReviewExportTaxonomyRejection": { method: "POST", path: "/api/v1/admin/dream-career-phase1-review/export/taxonomy-rejection", authenticated: true },
+  "postAdminDreamCareerPhase1ReviewInitialize": { method: "POST", path: "/api/v1/admin/dream-career-phase1-review/initialize", authenticated: true },
   "getAdminDreamCareerPhase1ReviewCareerId": { method: "GET", path: "/api/v1/admin/dream-career-phase1-review/{careerId}", authenticated: true },
   "putAdminDreamCareerPhase1ReviewCareerIdDraft": { method: "PUT", path: "/api/v1/admin/dream-career-phase1-review/{careerId}/draft", authenticated: true },
   "postAdminDreamCareerPhase1ReviewCareerIdFinalize": { method: "POST", path: "/api/v1/admin/dream-career-phase1-review/{careerId}/finalize", authenticated: true },
