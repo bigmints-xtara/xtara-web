@@ -1,6 +1,6 @@
 "use client";
 
-import { StorySlide as StorySlideType } from "@/lib/firebase/firestore-service";
+import { StorySlide as StorySlideType } from "@/lib/api/content";
 import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 

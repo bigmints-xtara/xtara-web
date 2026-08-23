@@ -1,9 +1,9 @@
-import { useFirestoreQuery } from './useFirestoreQuery';
+import { useApiQuery } from './useApiQuery';
 import { getCareerPathById, getCareerTools } from '@/lib/firebase/career-helpers';
 import { CareerPath } from '@/types/career';
 
 export function useCareerPathQuery(pathId: string | undefined) {
-  return useFirestoreQuery<CareerPath | null>(
+  return useApiQuery<CareerPath | null>(
     ['career-path', pathId || ''],
     async () => {
       if (!pathId) return null;
@@ -17,7 +17,7 @@ export function useCareerPathQuery(pathId: string | undefined) {
 }
 
 export function useCareerToolsQuery(careerCluster?: string) {
-  return useFirestoreQuery<any[]>(
+  return useApiQuery<any[]>(
     ['career-tools', careerCluster || 'all'],
     async () => {
       return getCareerTools(careerCluster);

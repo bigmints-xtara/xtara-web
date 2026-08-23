@@ -1,9 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
-export function useFirestoreQuery<T>(
-  key: string | any[],
+export function useApiQuery<T>(
+  key: string | unknown[],
   queryFactory: () => Promise<T>,
-  options?: Partial<UseQueryOptions<T>>
+  options?: Partial<UseQueryOptions<T>>,
 ) {
   return useQuery<T>({
     queryKey: Array.isArray(key) ? key : [key],

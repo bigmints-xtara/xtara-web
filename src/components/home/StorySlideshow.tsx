@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { Story } from "@/lib/firebase/firestore-service";
+import { Story } from "@/lib/api/content";
 import StorySlide from "./StorySlide";
 
 interface StorySlideshowProps {
@@ -94,8 +94,8 @@ export default function StorySlideshow({ story, isOpen, onClose, onComplete, use
         setSaveError(null);
         try {
             if (userId) {
-                const { FirestoreService } = await import("@/lib/firebase/firestore-service");
-                await FirestoreService.markStoryWatched(userId, story.id);
+                const { ContentService } = await import("@/lib/api/content");
+                await ContentService.markStoryWatched(userId, story.id);
             }
             onComplete?.();
             handleClose();

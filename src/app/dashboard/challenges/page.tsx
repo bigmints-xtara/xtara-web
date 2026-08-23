@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useChallengesQuery } from "@/lib/query/useContentQuery";
-import { FirestoreService, Challenge } from "@/lib/firebase/firestore-service";
+import { ContentService, Challenge } from "@/lib/api/content";
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Trophy, BookOpen, ChevronRight } from "lucide-react";
@@ -51,11 +51,11 @@ export default function ChallengesPage() {
             setSaveError(null);
             setRewardError(null);
             try {
-                const data = await FirestoreService.getChallengeById(selectedChallengeId);
+                const data = await ContentService.getChallengeById(selectedChallengeId);
                 let completedBefore = false;
                 if (userId && !userIsAnonymous) {
                     try {
-                        completedBefore = await FirestoreService.hasChallengeSubmission(selectedChallengeId);
+                        completedBefore = await ContentService.hasChallengeSubmission(selectedChallengeId);
                     } catch (error) {
                         console.error("Failed to load challenge progress", error);
                         setSaveError("Previous progress could not be loaded.");
@@ -116,7 +116,7 @@ export default function ChallengesPage() {
         setSubmitting(true);
         setSaveError(null);
         try {
-            await FirestoreService.submitChallenge(activeChallenge.id, {
+            await ContentService.submitChallenge(activeChallenge.id, {
                 answers: questions.map((_, index) => selectedAnswers[index]),
                 score: correctCount,
                 isPractice,

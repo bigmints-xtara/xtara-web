@@ -114,7 +114,7 @@ function itemsFrom<T>(response: ListResponse<T>): T[] {
   return Array.isArray(response) ? response : response.items || [];
 }
 
-const FirestoreService = {
+export const ContentService = {
   async getStoriesForHome(limitCount = 5): Promise<Story[]> {
     const response = await xtaraApi.get<ListResponse<Story>>(`/stories?limit=${limitCount}`);
     return itemsFrom(response);
@@ -181,5 +181,4 @@ const FirestoreService = {
   },
 };
 
-export { FirestoreService };
-export default FirestoreService;
+export default ContentService;

@@ -15,8 +15,8 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/context/AuthContext", () => ({
   useAuth: () => ({ user: { uid: "student-1", isAnonymous: false } }),
 }));
-vi.mock("@/lib/firebase/firestore-service", () => ({
-  FirestoreService: {
+vi.mock("@/lib/api/content", () => ({
+  ContentService: {
     getSparkById: mocks.getSpark,
     markSparkCompleted: mocks.complete,
   },

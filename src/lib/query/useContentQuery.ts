@@ -1,53 +1,53 @@
-import { useFirestoreQuery } from './useFirestoreQuery';
-import { FirestoreService, Story, GoodRead, Challenge, Spark, GameInstance } from '@/lib/firebase/firestore-service';
+import { useApiQuery } from './useApiQuery';
+import { ContentService, Story, GoodRead, Challenge, Spark, GameInstance } from '@/lib/api/content';
 
 const TWELVE_HOURS = 43200000;
 
 export function useStoriesQuery(limitCount = 5) {
-  return useFirestoreQuery<Story[]>(
+  return useApiQuery<Story[]>(
     ['stories', limitCount],
     async () => {
-      return FirestoreService.getStoriesForHome(limitCount);
+      return ContentService.getStoriesForHome(limitCount);
     },
     { staleTime: TWELVE_HOURS }
   );
 }
 
 export function useGoodReadsQuery(limitCount = 5) {
-  return useFirestoreQuery<GoodRead[]>(
+  return useApiQuery<GoodRead[]>(
     ['good-reads', limitCount],
     async () => {
-      return FirestoreService.getGoodReadsForHome(limitCount);
+      return ContentService.getGoodReadsForHome(limitCount);
     },
     { staleTime: TWELVE_HOURS }
   );
 }
 
 export function useChallengesQuery(limitCount = 5) {
-  return useFirestoreQuery<Challenge[]>(
+  return useApiQuery<Challenge[]>(
     ['challenges', limitCount],
     async () => {
-      return FirestoreService.getChallengesForHome(limitCount);
+      return ContentService.getChallengesForHome(limitCount);
     },
     { staleTime: TWELVE_HOURS }
   );
 }
 
 export function useSparksQuery(limitCount = 5) {
-  return useFirestoreQuery<Spark[]>(
+  return useApiQuery<Spark[]>(
     ['sparks', limitCount],
     async () => {
-      return FirestoreService.getSparksForHome(limitCount);
+      return ContentService.getSparksForHome(limitCount);
     },
     { staleTime: TWELVE_HOURS }
   );
 }
 
 export function useGamesQuery(limitCount = 5) {
-  return useFirestoreQuery<GameInstance[]>(
+  return useApiQuery<GameInstance[]>(
     ['games', limitCount],
     async () => {
-      return FirestoreService.getPlayableGames(limitCount);
+      return ContentService.getPlayableGames(limitCount);
     },
     { staleTime: TWELVE_HOURS }
   );

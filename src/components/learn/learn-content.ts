@@ -1,4 +1,4 @@
-import type { Story, StorySlide } from "@/lib/firebase/firestore-service";
+import type { Story, StorySlide } from "@/lib/api/content";
 import type { MyCareerPathExperience } from "@/lib/experience-api";
 
 export const ROOT_SHELF_LIMIT = 5;

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { FirestoreService, GoodRead } from "@/lib/firebase/firestore-service";
+import { ContentService, GoodRead } from "@/lib/api/content";
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,7 +30,7 @@ export default function GoodReadPage() {
 
         const fetchGoodRead = async () => {
             setLoading(true);
-            const data = await FirestoreService.getGoodReadById(id);
+            const data = await ContentService.getGoodReadById(id);
             setGoodRead(data);
             setLoading(false);
         };
@@ -57,7 +57,7 @@ export default function GoodReadPage() {
         setSavingCompletion(true);
         setSaveError(null);
         try {
-            await FirestoreService.markGoodReadCompleted(goodRead.id);
+            await ContentService.markGoodReadCompleted(goodRead.id);
             setCompletionSaved(true);
             await awardPoints();
         } catch (error) {
@@ -79,7 +79,7 @@ export default function GoodReadPage() {
         if (!goodRead?.hyperlink) return;
         window.open(goodRead.hyperlink, "_blank", "noopener,noreferrer");
         if (user && !user.isAnonymous) {
-            void FirestoreService.markGoodReadLinkOpened(goodRead.id).catch((error) => {
+            void ContentService.markGoodReadLinkOpened(goodRead.id).catch((error) => {
                 console.error("Failed to save Good Read link progress", error);
             });
         }

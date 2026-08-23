@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { getMyCareerPathExperience, type MyCareerPathExperience } from "@/lib/experience-api";
-import type { Story } from "@/lib/firebase/firestore-service";
+import type { Story } from "@/lib/api/content";
 import {
   buildLearnShelves,
   findRecommendedItem,

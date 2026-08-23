@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { FirestoreService, Spark, SparkKnowledgeCheck } from "@/lib/firebase/firestore-service";
+import { ContentService, Spark, SparkKnowledgeCheck } from "@/lib/api/content";
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +38,7 @@ export default function SparkQuizPage() {
         if (!id) return;
         const fetchSpark = async () => {
             setLoading(true);
-            const data = await FirestoreService.getSparkById(id);
+            const data = await ContentService.getSparkById(id);
             setSpark(data);
             setLoading(false);
         };
@@ -99,7 +99,7 @@ export default function SparkQuizPage() {
         setSubmitting(true);
         setSaveError(null);
         try {
-            await FirestoreService.markSparkCompleted(spark.id);
+            await ContentService.markSparkCompleted(spark.id);
             let awarded = false;
             try {
                 const achievements = new AchievementsService();

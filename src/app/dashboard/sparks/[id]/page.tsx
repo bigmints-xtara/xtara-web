@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { FirestoreService, Spark, SparkSlide } from "@/lib/firebase/firestore-service";
+import { ContentService, Spark, SparkSlide } from "@/lib/api/content";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import Skeleton from "@/components/ui/Skeleton";
@@ -24,7 +24,7 @@ export default function SparkLearningPage() {
 
         const fetchSpark = async () => {
             setLoading(true);
-            const data = await FirestoreService.getSparkById(id);
+            const data = await ContentService.getSparkById(id);
             if (data) {
                 setSpark(data);
                 

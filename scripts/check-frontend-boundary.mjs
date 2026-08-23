@@ -11,8 +11,11 @@ const allowed = new Set([
 const forbidden = [
   /from\s+['"]firebase\/firestore['"]/,
   /from\s+['"]firebase\/functions['"]/,
+  /from\s+['"]firebase\/storage['"]/,
+  /from\s+['"]firebase-admin(?:\/[^'"]+)?['"]/,
   /\bgetFirestore\s*\(/,
   /\bgetFunctions\s*\(/,
+  /\bgetStorage\s*\(/,
   /\bcollection\s*\(\s*db\b/,
   /\bdoc\s*\(\s*db\b/,
   /\bgetDocs\s*\(/,

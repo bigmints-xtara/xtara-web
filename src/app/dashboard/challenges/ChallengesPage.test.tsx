@@ -16,8 +16,8 @@ vi.mock("@/context/AuthContext", () => ({
 vi.mock("@/lib/query/useContentQuery", () => ({
   useChallengesQuery: () => ({ data: [{ id: "challenge-1", title: "Improve a form" }], isLoading: false }),
 }));
-vi.mock("@/lib/firebase/firestore-service", () => ({
-  FirestoreService: {
+vi.mock("@/lib/api/content", () => ({
+  ContentService: {
     getChallengeById: mocks.getChallenge,
     hasChallengeSubmission: mocks.hasSubmission,
     submitChallenge: mocks.submit,
