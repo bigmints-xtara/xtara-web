@@ -155,6 +155,7 @@ export interface AdminConfig<T extends AdminEntity> {
   entityNamePlural: string;
   collectionName: string;
   supportsApproval?: boolean;
+  versionControlled?: boolean;
   hideNewButton?: boolean;
   orderByField?: string | null;
   orderByDirection?: 'asc' | 'desc';

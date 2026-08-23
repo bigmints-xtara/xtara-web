@@ -6,6 +6,7 @@ export const curatedDreamCareersConfig: AdminConfig<CuratedDreamCareer> = {
   entityNamePlural: 'Dream Careers',
   collectionName: 'dream_careers',
   supportsApproval: true,
+  versionControlled: true,
   orderByField: 'slug',
   orderByDirection: 'asc',
   createEmpty: () => createEmptyDreamCareer(),

@@ -11,6 +11,7 @@ const service = vi.hoisted(() => ({
   update: vi.fn(),
 }));
 const approval = vi.hoisted(() => ({ approve: vi.fn() }));
+const versions = vi.hoisted(() => ({ history: vi.fn(), createDraft: vi.fn(), saveDraft: vi.fn(), action: vi.fn() }));
 const auth = vi.hoisted(() => ({ useAuth: vi.fn() }));
 
 vi.mock('@/lib/services/adminService', () => ({
@@ -22,6 +23,7 @@ vi.mock('@/lib/services/adminService', () => ({
   },
 }));
 vi.mock('@/lib/admin-content-approval', () => ({ adminContentApprovalApi: approval }));
+vi.mock('@/lib/career-content-versions', () => ({ careerContentVersionsApi: versions }));
 vi.mock('@/context/AuthContext', () => ({ useAuth: auth.useAuth }));
 
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
@@ -59,6 +61,8 @@ describe('AdminContentEditorPage', () => {
     service.getPage.mockResolvedValue({ items: [], total: 0, page: 1, limit: 50, totalPages: 0, availableDomains: ['all'] });
     service.update.mockReset();
     approval.approve.mockReset();
+    Object.values(versions).forEach((mock) => mock.mockReset());
+    versions.history.mockResolvedValue({ live: null, active: null, versions: [] });
     auth.useAuth.mockReturnValue({ userProfile: { adminRole: 'super_admin' } });
     vi.stubGlobal('confirm', vi.fn(() => true));
     push.mockReset();
@@ -115,5 +119,55 @@ describe('AdminContentEditorPage', () => {
     await waitFor(() => expect(approval.approve).toHaveBeenCalledWith('dream_careers', [draft.id]));
     expect(await screen.findByText('Approved and verified. This record is ready to publish.')).toBeInTheDocument();
     expect(screen.getAllByText('In review').length).toBeGreaterThan(0);
+  });
+
+  it('shows the separate draft, review, approval, and live-promotion flow for a published career', async () => {
+    const live = {
+      ...createEmptyDreamCareer(), id: 'versioned-role', slug: 'versioned-role',
+      status: 'published' as const, published: true, draft: false,
+      translations: {
+        ...createEmptyDreamCareer().translations,
+        en: { ...createEmptyDreamCareer().translations.en, title: 'Versioned Career', summary: 'Current live summary.' },
+      },
+    };
+    const base = {
+      id: 'dream_careers__versioned-role__v000002', schemaVersion: 1 as const,
+      collectionName: 'dream_careers' as const, recordId: live.id, revision: 2,
+      content: { ...live, status: 'draft', published: false, draft: true },
+      basedOnVersionId: 'dream_careers__versioned-role__v000001',
+      createdAt: '2026-08-23T08:00:00.000Z', createdBy: 'editor-1',
+      updatedAt: '2026-08-23T08:00:00.000Z', updatedBy: 'editor-1',
+    };
+    const draft = { ...base, lockVersion: 1, status: 'draft' as const };
+    const inReview = { ...draft, lockVersion: 2, status: 'inReview' as const };
+    const approved = { ...inReview, lockVersion: 3, status: 'approved' as const };
+    const promotedVersion = { ...approved, lockVersion: 4, status: 'live' as const };
+    const promotedRecord = { ...live, version: 2, translations: { ...live.translations, en: { ...live.translations.en, summary: 'Promoted summary.' } } };
+    service.getById.mockResolvedValueOnce(live).mockResolvedValueOnce(promotedRecord);
+    versions.createDraft.mockResolvedValue(draft);
+    versions.action
+      .mockResolvedValueOnce(inReview)
+      .mockResolvedValueOnce(approved)
+      .mockResolvedValueOnce(promotedVersion);
+    versions.history
+      .mockResolvedValueOnce({ live: null, active: null, versions: [] })
+      .mockResolvedValueOnce({ live: null, active: draft, versions: [draft] })
+      .mockResolvedValueOnce({ live: null, active: inReview, versions: [inReview] })
+      .mockResolvedValueOnce({ live: null, active: approved, versions: [approved] })
+      .mockResolvedValueOnce({ live: promotedVersion, active: null, versions: [promotedVersion] });
+
+    render(<AdminContentEditorPage contentType="dream-careers" recordId={live.id} />);
+    await screen.findByRole('heading', { name: 'Versioned Career', level: 1 });
+    fireEvent.click(await screen.findByRole('button', { name: 'Create draft' }));
+    expect(await screen.findByRole('button', { name: 'Submit for review' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Submit for review' }));
+    expect(await screen.findByRole('button', { name: 'Approve version' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Approve version' }));
+    expect(await screen.findByRole('button', { name: 'Promote to live' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Promote to live' }));
+
+    expect(await screen.findByText('Version 2 is live and verified.')).toBeInTheDocument();
+    expect(versions.action).toHaveBeenNthCalledWith(3, 'dream_careers', live.id, approved, 'promote');
+    expect(service.update).not.toHaveBeenCalled();
   });
 });

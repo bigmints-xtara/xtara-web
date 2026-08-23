@@ -5,6 +5,8 @@ export const futureDirectionsConfig: AdminConfig<FutureDirection> = {
   entityName: 'Future Direction',
   entityNamePlural: 'Future Directions',
   collectionName: 'future_directions',
+  supportsApproval: true,
+  versionControlled: true,
   orderByField: 'displayOrder',
   orderByDirection: 'asc',
   createEmpty: () => createEmptyFutureDirection(),
