@@ -170,7 +170,6 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
       const result = action === 'create'
         ? await careerContentVersionsApi.createDraft(versionedCollection, persistedId)
         : await careerContentVersionsApi.action(versionedCollection, persistedId, activeVersion!, action);
-      setVersionHistory((history) => replaceVersion(history, result));
       if (action === 'promote') {
         let canonical: AdminEntity | null;
         try {
@@ -179,11 +178,13 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
           throw new Error(PROMOTION_VERIFICATION_ERROR);
         }
         if (!hasPromotedVersionIdentity(canonical, result)) throw new Error(PROMOTION_VERIFICATION_ERROR);
+        setVersionHistory((history) => replaceVersion(history, result));
         setLiveEntity(canonical);
         setEntity(canonical);
         setPreviewVersion(null);
         setActionMessage(`Version ${result.revision} is live and verified.`);
       } else {
+        setVersionHistory((history) => replaceVersion(history, result));
         setEntity(definition.config.fromFirestore(result.content, persistedId));
         setActionMessage(action === 'create'
           ? `Version ${result.revision} is ready to edit. The live item is unchanged.`

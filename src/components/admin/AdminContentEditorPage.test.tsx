@@ -216,6 +216,8 @@ describe('AdminContentEditorPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Promotion completed, but canonical live readback could not verify the promoted version.');
     expect(screen.queryByText('Version 2 is live and verified.')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Versions' }));
+    expect(screen.queryByText('Live')).not.toBeInTheDocument();
   });
 
   it('does not verify promotion when canonical readback fails', async () => {
@@ -246,5 +248,7 @@ describe('AdminContentEditorPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Promotion completed, but canonical live readback could not verify the promoted version.');
     expect(screen.queryByText('Version 2 is live and verified.')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Versions' }));
+    expect(screen.queryByText('Live')).not.toBeInTheDocument();
   });
 });
