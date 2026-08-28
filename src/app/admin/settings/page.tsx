@@ -192,7 +192,8 @@ export default function AdminSettingsPage() {
     return <div className="flex h-full items-center justify-center text-sm text-muted-foreground"><Loader2 className="mr-2 size-4 animate-spin" />Loading settings…</div>;
   }
 
-  const ready = Boolean(config.enabled && activeProvider?.baseUrl && activeProvider.model);
+  const providerConfigured = Boolean(activeProvider?.baseUrl && activeProvider.model);
+  const ready = Boolean(config.enabled && providerConfigured);
   const hasIncompleteProvider = config.providers.some((provider) => (
     !provider.providerName.trim() || !provider.baseUrl.trim() || !provider.model
   ));
@@ -218,8 +219,8 @@ export default function AdminSettingsPage() {
             <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Add OpenAI-compatible endpoints, load their available models, and choose which provider and model powers the admin assistant.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className={ready ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : ''} variant="outline">
-              <span className={`size-1.5 rounded-full ${ready ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />{ready ? 'Assistant enabled' : 'Not configured'}
+            <Badge className={ready ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : providerConfigured ? 'border-amber-200 bg-amber-50 text-amber-700' : ''} variant="outline">
+              <span className={`size-1.5 rounded-full ${ready ? 'bg-emerald-500' : providerConfigured ? 'bg-amber-500' : 'bg-muted-foreground'}`} />{ready ? 'Assistant enabled' : providerConfigured ? 'Assistant disabled' : 'Not configured'}
             </Badge>
             <Button onClick={addProvider} type="button" variant="outline"><Plus />Add provider</Button>
             <Button disabled={saveDisabled} type="submit">{saving ? <Loader2 className="animate-spin" /> : <Save />}Save changes</Button>

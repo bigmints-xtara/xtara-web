@@ -91,4 +91,30 @@ describe('admin provider settings', () => {
     expect(container.textContent).toContain('A credential is stored (••••1234).');
     expect(container.querySelectorAll('button[aria-label^="Remove "]')).toHaveLength(2);
   });
+
+  it('labels a configured provider as disabled when the assistant switch is off', async () => {
+    api.getConfig.mockResolvedValueOnce({
+      enabled: false,
+      activeProviderId: 'or',
+      providerName: 'OR',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      model: 'deepseek/deepseek-v4-flash',
+      apiMode: 'chat_completions',
+      hasApiKey: true,
+      providers: [{
+        id: 'or',
+        providerName: 'OR',
+        baseUrl: 'https://openrouter.ai/api/v1',
+        model: 'deepseek/deepseek-v4-flash',
+        apiMode: 'chat_completions',
+        models: [],
+        hasApiKey: true,
+      }],
+    });
+
+    await act(async () => { root.render(<AdminSettingsPage />); });
+    await vi.waitFor(() => expect(container.textContent).toContain('Assistant disabled'));
+
+    expect(container.textContent).not.toContain('Not configured');
+  });
 });

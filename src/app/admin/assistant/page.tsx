@@ -271,7 +271,13 @@ export default function AdminAssistantPage() {
     }
   }, [messages, messagesLoading, sending]);
 
-  const configured = Boolean(config?.enabled && config.baseUrl && config.model);
+  const activeProvider = config?.providers.find((provider) => provider.id === config.activeProviderId);
+  const providerConfigured = Boolean(
+    config?.activeProviderId
+    && (activeProvider?.baseUrl || config.baseUrl)
+    && (activeProvider?.model || config.model),
+  );
+  const configured = Boolean(config?.enabled && providerConfigured);
   const selectedConversation = conversations.find((conversation) => conversation.id === selectedId) || null;
 
   const selectConversation = async (conversation: AdminAgentConversation) => {
@@ -373,11 +379,14 @@ export default function AdminAssistantPage() {
   }
 
   if (!configured || !config) {
+    const disabled = Boolean(config && providerConfigured && !config.enabled);
+    const providerLabel = activeProvider?.providerName || config?.providerName || 'The active provider';
+    const modelLabel = activeProvider?.model || config?.model || 'its selected model';
     return (
       <div className="flex h-full items-center justify-center overflow-y-auto p-6">
         <Card className="max-w-lg shadow-sm">
-          <CardHeader><div className="mb-3 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground"><Bot className="size-5" /></div><CardTitle>Connect a compatible model</CardTitle><CardDescription>The admin assistant has no hosted fallback. Add a compatible endpoint and select a model in Settings.</CardDescription></CardHeader>
-          <CardContent><Button asChild><Link href="/admin/settings"><Settings2 />Configure model</Link></Button>{error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}</CardContent>
+          <CardHeader><div className="mb-3 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground"><Bot className="size-5" /></div><CardTitle>{disabled ? 'Admin assistant is disabled' : 'Connect a compatible model'}</CardTitle><CardDescription>{disabled ? `${providerLabel} and ${modelLabel} are configured. Enable the admin assistant in Settings to start a chat.` : 'The admin assistant has no hosted fallback. Add a compatible endpoint and select a model in Settings.'}</CardDescription></CardHeader>
+          <CardContent><Button asChild><Link href="/admin/settings"><Settings2 />{disabled ? 'Enable assistant' : 'Configure model'}</Link></Button>{error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}</CardContent>
         </Card>
       </div>
     );

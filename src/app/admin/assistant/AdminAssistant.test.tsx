@@ -83,4 +83,32 @@ describe('admin assistant conversation history', () => {
     await waitFor(() => expect(api.updateConversation).toHaveBeenCalledWith('conversation-1', { status: 'archived' }));
     expect(screen.queryByText('Renamed thread')).not.toBeInTheDocument();
   });
+
+  it('distinguishes a configured but disabled provider from a missing provider', async () => {
+    api.getConfig.mockResolvedValueOnce({
+      enabled: false,
+      activeProviderId: 'or',
+      providerName: 'OR',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      model: 'deepseek/deepseek-v4-flash',
+      apiMode: 'chat_completions',
+      hasApiKey: true,
+      providers: [{
+        id: 'or',
+        providerName: 'OR',
+        baseUrl: 'https://openrouter.ai/api/v1',
+        model: 'deepseek/deepseek-v4-flash',
+        apiMode: 'chat_completions',
+        models: [],
+        hasApiKey: true,
+      }],
+    });
+
+    render(<AdminAssistantPage />);
+
+    expect(await screen.findByText('Admin assistant is disabled')).toBeInTheDocument();
+    expect(screen.getByText(/OR and deepseek\/deepseek-v4-flash are configured/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Enable assistant' })).toHaveAttribute('href', '/admin/settings');
+    expect(screen.queryByText('Connect a compatible model')).not.toBeInTheDocument();
+  });
 });
