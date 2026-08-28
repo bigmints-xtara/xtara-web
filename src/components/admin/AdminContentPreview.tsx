@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DreamCareerProfileCards from '@/components/careers/DreamCareerProfileCards';
+import DreamCareerStudentGuideReviewPanel from '@/components/admin/editors/DreamCareerStudentGuideReviewPanel';
 import type { Challenge, GameInstance, GameTemplate, GoodRead, Spark, Story } from '@/types/admin';
 import type { CuratedCareerSource, CuratedDreamCareer, FutureDirection } from '@/types/curated-career';
 
@@ -113,21 +114,34 @@ export function GameTemplatePreview({ entity }: { entity: GameTemplate }) {
 
 export function DreamCareerPreview({ entity }: { entity: CuratedDreamCareer }) {
   const copy = entity.translations?.en;
+  const hasStudentGuide = Boolean(entity.studentGuide);
   return (
     <div className="pb-10">
     <PreviewArticle image={entity.imageUrl} kicker="Dream Career" title={copy?.title || entity.slug}>
       <RichText value={copy?.summary || ''} />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <PreviewFact label="Work setting" value={copy?.workSetting || 'Not specified'} />
-        <PreviewFact label="Pathway" value={copy?.pathway || 'Not specified'} />
-        <PreviewFact label="Salary range" value={entity.salaryRange || 'Not specified'} />
-        <PreviewFact label="Growth outlook" value={entity.growthOutlook || 'Not specified'} />
-      </div>
-      {copy?.dailyWork?.length ? <TagList label="Daily work" values={copy.dailyWork} /> : null}
-      {copy?.specializations?.length ? <TagList label="Specializations" values={copy.specializations} /> : null}
-      {copy?.tryThis ? <section><h2 className="text-lg font-semibold">Try this</h2><p className="mt-2 text-muted-foreground">{copy.tryThis}</p></section> : null}
+      {!hasStudentGuide ? (
+        <>
+          {[copy?.workSetting, copy?.pathway, entity.salaryRange, entity.growthOutlook].some(Boolean) ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {copy?.workSetting ? <PreviewFact label="Work setting" value={copy.workSetting} /> : null}
+              {copy?.pathway ? <PreviewFact label="Pathway" value={copy.pathway} /> : null}
+              {entity.salaryRange ? <PreviewFact label="Salary range" value={entity.salaryRange} /> : null}
+              {entity.growthOutlook ? <PreviewFact label="Growth outlook" value={entity.growthOutlook} /> : null}
+            </div>
+          ) : null}
+          {copy?.dailyWork?.length ? <TagList label="Daily work" values={copy.dailyWork} /> : null}
+          {copy?.specializations?.length ? <TagList label="Specializations" values={copy.specializations} /> : null}
+          {copy?.tryThis ? <section><h2 className="text-lg font-semibold">Try this</h2><p className="mt-2 text-muted-foreground">{copy.tryThis}</p></section> : null}
+        </>
+      ) : null}
     </PreviewArticle>
-    {entity.detailProfile ? <div className="mx-auto max-w-6xl px-6 sm:px-10"><DreamCareerProfileCards locale="en" profile={entity.detailProfile} /></div> : null}
+    {hasStudentGuide ? (
+      <div className="mx-auto max-w-6xl px-6 sm:px-10">
+        <DreamCareerStudentGuideReviewPanel career={entity} />
+      </div>
+    ) : entity.detailProfile ? (
+      <div className="mx-auto max-w-6xl px-6 sm:px-10"><DreamCareerProfileCards locale="en" profile={entity.detailProfile} /></div>
+    ) : null}
     </div>
   );
 }

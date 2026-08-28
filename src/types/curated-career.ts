@@ -4,6 +4,10 @@ import type {
   DreamCareerDetailProfileTranslations,
   DreamCareerDetailProfileV3,
 } from '@/types/dream-career-detail-profile';
+import type {
+  DreamCareerStudentGuideTranslationPatchV1,
+  DreamCareerStudentGuideV1,
+} from '@/types/dream-career-student-guide';
 
 export type CurationStatus = 'draft' | 'inReview' | 'published' | 'retired';
 export type AssessmentGrade = 'grade8' | 'grade9' | 'grade10';
@@ -105,6 +109,18 @@ export interface CuratedDreamCareer extends AdminEntity {
   imageUrl?: string;
   salaryRange?: string;
   growthOutlook?: string;
+  contentCompleteness?: {
+    schemaVersion: 1;
+    studentGuide: 'pending' | 'partial' | 'complete';
+    translations: 'pending' | 'partial' | 'complete';
+    evidence: 'pending' | 'partial' | 'complete';
+    tagging: 'pending' | 'partial' | 'complete';
+    directionMapping: 'pending' | 'partial' | 'complete';
+    qa: 'pending' | 'partial' | 'complete';
+    pendingFields: string[];
+  };
+  studentGuide?: DreamCareerStudentGuideV1;
+  studentGuideTranslations?: Partial<Record<'ml' | 'hi' | 'ta', DreamCareerStudentGuideTranslationPatchV1>>;
   detailProfile?: DreamCareerDetailProfileV3;
   detailProfileReview?: DreamCareerDetailProfileReview;
   detailProfileTranslations?: DreamCareerDetailProfileTranslations;

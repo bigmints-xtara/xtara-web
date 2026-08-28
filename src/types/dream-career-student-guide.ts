@@ -158,6 +158,78 @@ export interface DreamCareerStudentGuideV1 {
   };
 }
 
+type DeepPartial<T> = T extends Array<infer Item>
+  ? Array<DeepPartial<Item>>
+  : T extends object
+    ? { [Key in keyof T]?: DeepPartial<T[Key]> }
+    : T;
+
+export type DreamCareerStudentGuideTranslationPatchV1 = DeepPartial<Omit<DreamCareerStudentGuideV1, 'locale'>> & {
+  locale: Exclude<DreamCareerGuideLocale, 'en'>;
+};
+
+const TRANSLATABLE_STUDENT_GUIDE_PATHS = new Set([
+  '$.aboutCareer.whatYouDo',
+  '$.aboutCareer.activities[*].title',
+  '$.aboutCareer.activities[*].description',
+  '$.aboutCareer.dayInLife[*].timeLabel',
+  '$.aboutCareer.dayInLife[*].title',
+  '$.aboutCareer.dayInLife[*].description',
+  '$.aboutCareer.whyItMatters',
+  '$.aboutCareer.earnings[*].geography',
+  '$.aboutCareer.notablePeople[*].whyRelevant',
+  '$.howToGetThere.subjects[*].guidance',
+  '$.howToGetThere.educationRoutes[*].title',
+  '$.howToGetThere.educationRoutes[*].description',
+  '$.howToGetThere.firstJobBridge[*].title',
+  '$.howToGetThere.firstJobBridge[*].description',
+  '$.howToGetThere.careerProgression[*].title',
+  '$.howToGetThere.careerProgression[*].description',
+  '$.whatYouCanDoNow.skills[*].howUsed',
+  '$.whatYouCanDoNow.tools[*].whyLearn',
+  '$.whatYouCanDoNow.starterActivity.title',
+  '$.whatYouCanDoNow.starterActivity.description',
+  '$.additionalTopics[*].title',
+  '$.additionalTopics[*].summary',
+  '$.additionalTopics[*].blocks[*].text',
+  '$.additionalTopics[*].blocks[*].items[*]',
+  '$.sources[*].label',
+]);
+
+export function resolveDreamCareerStudentGuideTranslation(
+  canonical: DreamCareerStudentGuideV1,
+  translation: DreamCareerStudentGuideTranslationPatchV1,
+): DreamCareerStudentGuideV1 {
+  return {
+    ...mergeTranslationPatch(canonical, translation, '$') as DreamCareerStudentGuideV1,
+    locale: translation.locale,
+  };
+}
+
+function mergeTranslationPatch(canonical: unknown, translation: unknown, path: string): unknown {
+  if (translation === undefined) return canonical;
+  const normalizedPath = path.replace(/\[\d+\]/g, '[*]');
+  if (TRANSLATABLE_STUDENT_GUIDE_PATHS.has(normalizedPath)
+    && typeof canonical === 'string'
+    && typeof translation === 'string') {
+    return translation.trim() === '' ? canonical : translation;
+  }
+  if (Array.isArray(canonical) && Array.isArray(translation)) {
+    return canonical.map((value, index) => mergeTranslationPatch(value, translation[index], `${path}[${index}]`));
+  }
+  if (isObject(canonical) && isObject(translation)) {
+    return Object.fromEntries(Object.entries(canonical).map(([key, value]) => [
+      key,
+      mergeTranslationPatch(value, translation[key], `${path}.${key}`),
+    ]));
+  }
+  return translation;
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 export type CareerGuideQuestionId =
   | 'whatYouDo'
   | 'dayInLife'

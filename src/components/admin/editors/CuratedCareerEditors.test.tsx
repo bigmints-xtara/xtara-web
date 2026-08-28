@@ -1,10 +1,12 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import exampleProfile from '../../../../../xtara-api/scripts/fixtures/cybersecurity-analyst.detail-profile-v3.json';
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
 import type { DreamCareerDetailProfileReview, DreamCareerDetailProfileV3 } from '@/types/dream-career-detail-profile';
+import type { DreamCareerStudentGuideV1 } from '@/types/dream-career-student-guide';
+import { DreamCareerPreview } from '../AdminContentPreview';
 import DreamCareerDetailProfileEditor, { createEmptyProfile, validateAdminProfile } from './DreamCareerDetailProfileEditor';
 import { CareerSourceEditor, DreamCareerEditor, FutureDirectionEditor, withDerivedRegulation } from './CuratedCareerEditors';
 
@@ -88,6 +90,42 @@ function translationLocaleCoverage(
   };
 }
 
+function studentGuide(locale: 'en' | 'ml' = 'en'): DreamCareerStudentGuideV1 {
+  const localized = locale === 'ml';
+  return {
+    schemaVersion: 1,
+    careerId: 'administrative-officer',
+    locale,
+    aboutCareer: {
+      whatYouDo: localized ? 'പൊതു സേവനങ്ങൾ ക്രമീകരിക്കുന്നു.' : 'Keeps public services organized.',
+      activities: [{ id: 'process-applications', title: 'Process applications', description: 'Checks records and coordinates decisions.', sourceIds: ['government-careers'] }],
+      dayInLife: [{ id: 'morning-checks', order: 1, timeLabel: '9:00', title: 'Morning checks', description: 'Reviews the day’s priorities.', sourceIds: ['government-careers'] }],
+      whyItMatters: 'Reliable administration helps services reach people.',
+      earnings: [{ id: 'associate-india', careerStage: 'associate', geography: 'India', currency: 'INR', amountMin: 300000, amountMax: 600000, period: 'year', asOf: '2026', sourceIds: ['government-careers'] }],
+      notablePeople: [],
+      relatedCareerIds: ['office-manager'],
+    },
+    howToGetThere: {
+      subjects: [{ subjectId: 'social-science', importance: 'helpful', guidance: 'Learn how institutions work.', gradeIds: ['grade9'], sourceIds: ['government-careers'] }],
+      educationRoutes: [{ id: 'public-administration-degree', routeType: 'degree', title: 'Public administration degree', description: 'Builds policy and administration foundations.', courseConceptIds: ['public-administration'], sourceIds: ['government-careers'] }],
+      firstJobBridge: [{ id: 'entry-role', order: 1, title: 'Start in an entry role', description: 'Build practical office experience.', sourceIds: ['government-careers'] }],
+      careerProgression: [{ id: 'senior-administrator', order: 1, level: 'senior', title: 'Senior Administrator', description: 'Leads larger operations.', sourceIds: ['government-careers'] }],
+      employerLinkIds: ['government-departments'],
+      opportunityQuery: { careerId: 'administrative-officer' },
+    },
+    whatYouCanDoNow: {
+      learningResourceIds: ['intro-public-administration'],
+      skills: [{ skillId: 'record-keeping', importance: 'core', howUsed: 'Maintains accurate decisions and records.', sourceIds: ['government-careers'] }],
+      tools: [{ toolId: 'office-suite', importance: 'important', whyLearn: 'Supports documents, schedules, and reporting.', sourceIds: ['government-careers'] }],
+      entranceExams: [{ id: 'civil-services', name: 'Civil Services', requirement: 'onePossibleRoute', appliesToRouteIds: ['public-administration-degree'], officialUrl: 'https://example.com/exam', sourceIds: ['government-careers'] }],
+      starterActivity: { id: 'organize-a-process', title: 'Organize a simple process', description: 'Map the steps in a school office request.', estimatedMinutes: 30, sourceIds: ['government-careers'] },
+    },
+    additionalTopics: [],
+    sources: [{ id: 'government-careers', label: 'Government careers portal', organization: 'Public Service', url: 'https://example.com/careers', reviewStatus: 'pending' }],
+    provenance: { sourceVersion: 'gx10-english-careers', sourceIds: ['government-careers'] },
+  };
+}
+
 describe('curated career admin editors', () => {
   it('renders every deterministic Future Direction control', () => {
     const html = renderToStaticMarkup(
@@ -128,6 +166,58 @@ describe('curated career admin editors', () => {
     expect(html).toContain('Not approved');
     expect(html).toContain('Structured career profile');
     expect(html).toContain('Add structured profile');
+  });
+
+  it('reviews the first-class Student Guide and its available translations without flattening it into legacy fields', () => {
+    const entity = {
+      ...createEmptyDreamCareer(),
+      id: 'administrative-officer',
+      slug: 'administrative-officer',
+      studentGuide: studentGuide(),
+      studentGuideTranslations: {
+        ml: { locale: 'ml', aboutCareer: { whatYouDo: studentGuide('ml').aboutCareer.whatYouDo } },
+      },
+      contentCompleteness: {
+        schemaVersion: 1,
+        studentGuide: 'partial',
+        translations: 'partial',
+        evidence: 'partial',
+        tagging: 'complete',
+        directionMapping: 'complete',
+        qa: 'partial',
+        pendingFields: ['studentGuide.sources.government-careers.reviewStatus'],
+      },
+    } as import('@/types/curated-career').CuratedDreamCareer;
+
+    render(<DreamCareerEditor entity={entity} onSave={async () => undefined} onCancel={() => undefined} />);
+
+    const guide = screen.getByTestId('student-guide-admin-review');
+    expect(within(guide).getByText('Keeps public services organized.')).toBeInTheDocument();
+    expect(within(guide).getByText('Public administration degree')).toBeInTheDocument();
+    expect(within(guide).getByText('record-keeping')).toBeInTheDocument();
+    expect(within(guide).getByText('office-suite')).toBeInTheDocument();
+    expect(within(guide).getByText('Government careers portal')).toBeInTheDocument();
+    expect(within(guide).getByText('1 source pending review')).toBeInTheDocument();
+
+    fireEvent.click(within(guide).getByRole('button', { name: 'Malayalam' }));
+    expect(within(guide).getByText('പൊതു സേവനങ്ങൾ ക്രമീകരിക്കുന്നു.')).toBeInTheDocument();
+  });
+
+  it('uses the Student Guide in Admin preview and suppresses legacy placeholders and profile fallback', () => {
+    const entity = {
+      ...createEmptyDreamCareer(),
+      id: 'administrative-officer',
+      slug: 'administrative-officer',
+      studentGuide: studentGuide(),
+      detailProfile: exampleProfile,
+    } as unknown as import('@/types/curated-career').CuratedDreamCareer;
+
+    render(<DreamCareerPreview entity={entity} />);
+
+    expect(screen.getByTestId('student-guide-admin-review')).toBeInTheDocument();
+    expect(screen.getByText('Keeps public services organized.')).toBeInTheDocument();
+    expect(screen.queryByText('Not specified')).not.toBeInTheDocument();
+    expect(screen.queryByText('Information Security Analysts, O*NET 15-1212.00')).not.toBeInTheDocument();
   });
 
   it('serializes the regulated boolean from the selected regulation status', async () => {

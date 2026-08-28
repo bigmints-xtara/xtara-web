@@ -10,6 +10,7 @@ import { createEmptyFutureDirection } from '@/lib/admin/configs/futureDirections
 import { AdminService } from '@/lib/services/adminService';
 import type { CuratedCareerSource, CuratedDreamCareer, CurationStatus, FutureDirection } from '@/types/curated-career';
 import DreamCareerDetailProfileEditor from './DreamCareerDetailProfileEditor';
+import DreamCareerStudentGuideReviewPanel from './DreamCareerStudentGuideReviewPanel';
 import DreamCareerTranslationReviewPanel from './DreamCareerTranslationReviewPanel';
 
 type EditorProps<T> = {
@@ -144,6 +145,10 @@ export function DreamCareerEditor({ entity, onSave, onCancel }: EditorProps<Cura
           </Section>
         );
       })}
+
+      <DreamCareerStudentGuideReviewPanel
+        career={{ ...form, id: entity?.id || form.slug } as CuratedDreamCareer}
+      />
 
       <Section title="Career facts" description="Use reviewed, role-specific sources for time-sensitive claims.">
         <div className="grid gap-4 md:grid-cols-2">

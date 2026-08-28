@@ -188,6 +188,17 @@ function stubCompactLayout() {
 }
 
 describe('DreamCareerStudentGuide', () => {
+  it('keeps evolving guide content visible while omitting pending source links', () => {
+    const value = response();
+    value.guide.sources[0].reviewStatus = 'pending';
+
+    render(<DreamCareerStudentGuide response={value} locale="en" />);
+
+    expect(screen.getByText('Designs, builds, and maintains reliable data systems.')).toBeInTheDocument();
+    expect(screen.queryByText('Reviewed career source')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sources and evidence')).not.toBeInTheDocument();
+  });
+
   beforeEach(() => window.history.replaceState(null, '', '/'));
   afterEach(() => vi.unstubAllGlobals());
 
