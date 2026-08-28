@@ -211,6 +211,7 @@ describe('DreamCareerStudentGuide', () => {
     expect(chapterHeadings[1]).toHaveAccessibleName('How to get there');
     expect(chapterHeadings[2]).toHaveAccessibleName('What I can do now');
     const navigation = screen.getByRole('navigation', { name: 'Career guide chapters' });
+    const reader = screen.getByTestId('desktop-editorial-reader');
     for (const question of [
       'What will I do?',
       'What is a day like?',
@@ -231,9 +232,14 @@ describe('DreamCareerStudentGuide', () => {
       'What entrance exams should I consider?',
       'What can I try this week?',
     ]) {
-      expect(within(navigation).getByRole('link', { name: question })).toBeInTheDocument();
+      expect(within(reader).getByRole('heading', { name: question })).toBeInTheDocument();
     }
-    expect(within(screen.getByTestId('active-question-pane')).getByRole('heading', { name: 'What will I do?' })).toBeInTheDocument();
+    expect(within(navigation).getAllByRole('link')).toHaveLength(3);
+    for (const chapterId of ['about-career', 'how-to-get-there', 'what-you-can-do-now']) {
+      expect(document.querySelectorAll(`#${chapterId}`)).toHaveLength(1);
+    }
+    expect(within(screen.getByTestId('desktop-editorial-reader')).getByRole('heading', { name: 'What will I do?' })).toBeInTheDocument();
+    expect(screen.getByTestId('career-guide-widgets')).toBeInTheDocument();
   });
 
   it('shows one concise status and no navigation when the entire guide has no renderable questions', () => {
@@ -285,22 +291,15 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    const navigation = screen.getByRole('navigation', { name: 'Career guide chapters' });
-    const aboutChapter = within(navigation).getByRole('link', { name: 'About this career' }).closest('section');
-    const pathChapter = within(navigation).getByRole('link', { name: 'How to get there' }).closest('section');
-    const nowChapter = within(navigation).getByRole('link', { name: 'What I can do now' }).closest('section');
-    expect(within(aboutChapter!).getByRole('link', { name: 'What wider impact can I have?' })).toHaveAttribute('href', '#guide-question-additional-about-wider-impact');
-    expect(within(pathChapter!).getByRole('link', { name: 'How can I compare study routes?' })).toHaveAttribute('href', '#guide-question-additional-path-route-choices');
-    expect(within(nowChapter!).getByRole('link', { name: 'Where can I practise?' })).toHaveAttribute('href', '#guide-question-additional-now-practice-library');
-    expect(within(navigation).queryByRole('link', { name: 'Unavailable resource topic' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'What wider impact can I have?' })).toHaveAttribute('id', 'guide-question-additional-about-wider-impact');
+    expect(screen.getByRole('region', { name: 'How can I compare study routes?' })).toHaveAttribute('id', 'guide-question-additional-path-route-choices');
+    expect(screen.getByRole('region', { name: 'Where can I practise?' })).toHaveAttribute('id', 'guide-question-additional-now-practice-library');
+    expect(screen.queryByRole('heading', { name: 'Unavailable resource topic' })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('link', { name: 'What wider impact can I have?' }));
     expect(screen.getByText('Reliable information can help communities plan.')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', { name: 'How can I compare study routes?' }));
     expect(screen.getByText('Compare course content')).toBeInTheDocument();
     expect(screen.getByText('Ask about practical projects')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', { name: 'Where can I practise?' }));
-    expect(screen.getByRole('link', { name: 'SQL for beginners' })).toHaveAttribute('href', 'https://example.com/sql');
+    expect(screen.getAllByRole('link', { name: 'SQL for beginners' }).some((link) => link.getAttribute('href') === 'https://example.com/sql')).toBe(true);
   });
 
   it('selects exact question fragments from the initial hash, clicks, and later hash changes with focus', async () => {
@@ -311,10 +310,15 @@ describe('DreamCareerStudentGuide', () => {
     await waitFor(() => expect(progression).toHaveFocus());
     expect(progression).toHaveAttribute('id', 'guide-question-career-progression');
     expect(document.getElementById(window.location.hash.slice(1))).toBe(progression);
-    expect(screen.getByRole('link', { name: 'How can my career grow?' })).toHaveAttribute('aria-current', 'location');
-    expect(screen.getByTestId('active-question-pane')).toHaveAttribute('aria-live', 'polite');
+    const chapterLinks = within(screen.getByRole('navigation', { name: 'Career guide chapters' })).getAllByRole('link');
+    expect(chapterLinks[1]).toHaveAttribute('href', '#how-to-get-there');
+    expect(chapterLinks[1]).toHaveAttribute('aria-current', 'location');
+    expect(screen.getByTestId('desktop-editorial-reader')).toContainElement(progression);
 
-    fireEvent.click(screen.getByRole('link', { name: 'What tools should I learn?' }));
+    act(() => {
+      window.history.replaceState(null, '', '/#guide-question-tools');
+      window.dispatchEvent(new Event('hashchange'));
+    });
     const tools = screen.getByRole('region', { name: 'What tools should I learn?' });
     await waitFor(() => expect(tools).toHaveFocus());
     expect(window.location.hash).toBe('#guide-question-tools');
@@ -353,17 +357,17 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    fireEvent.click(screen.getByRole('link', { name: 'What subjects should I learn now?' }));
+    expect(screen.getByRole('heading', { name: 'What subjects should I learn now?' })).toBeInTheDocument();
     expect(screen.getByText('Mathematics')).toBeInTheDocument();
     expect(screen.queryByText('subject-mathematics')).not.toBeInTheDocument();
     expect(screen.queryByText('Unsupported subject guidance')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('link', { name: 'What skills should I develop?' }));
-    expect(screen.getByText('Problem solving')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'What skills should I develop?' })).toBeInTheDocument();
+    expect(screen.getAllByText('Problem solving')).not.toHaveLength(0);
     expect(screen.queryByText('skill-problem-solving')).not.toBeInTheDocument();
     expect(screen.queryByText('Unsupported skill guidance')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('link', { name: 'What tools should I learn?' }));
+    expect(screen.getByRole('heading', { name: 'What tools should I learn?' })).toBeInTheDocument();
     expect(screen.getByText('SQL')).toBeInTheDocument();
     expect(screen.queryByText('tool-sql')).not.toBeInTheDocument();
     expect(screen.queryByText('Unsupported tool guidance')).not.toBeInTheDocument();
@@ -383,22 +387,21 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.queryByRole('link', { name: 'What is a day like?' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'How much can I earn?' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Who can I learn from?' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'What related careers can I pursue?' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Which companies hire for this career?' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Where can I find an internship?' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'What tools should I learn?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'What is a day like?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'How much can I earn?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Who can I learn from?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'What related careers can I pursue?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Which companies hire for this career?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Where can I find an internship?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'What tools should I learn?' })).not.toBeInTheDocument();
     expect(screen.queryByText(/not available yet/i)).not.toBeInTheDocument();
   });
 
   it('renders accepted course options under an honest courses and colleges heading', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
-    fireEvent.click(screen.getByRole('link', { name: 'What related careers can I pursue?' }));
+    expect(screen.getByRole('heading', { name: 'What related careers can I pursue?' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Analytics Engineer' })).toHaveAttribute('href', '/explore/roles/analytics-engineer');
-    fireEvent.click(screen.getByRole('link', { name: 'Which courses and colleges are available?' }));
     expect(screen.getByRole('heading', { name: 'Which courses and colleges are available?' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /IIT Example/i })).toHaveAttribute('href', '/colleges/college-1');
   });
@@ -409,7 +412,7 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.queryByRole('link', { name: 'Which courses and colleges are available?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Which courses and colleges are available?' })).not.toBeInTheDocument();
     expect(screen.queryByText(/matches are not available yet/i)).not.toBeInTheDocument();
   });
 
@@ -419,7 +422,7 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.queryByRole('link', { name: 'Which courses and colleges are available?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Which courses and colleges are available?' })).not.toBeInTheDocument();
     expect(screen.queryByText('Course and college matches are not available yet.')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Retry courses/i })).not.toBeInTheDocument();
   });
@@ -432,7 +435,6 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" onRetryRelationship={retry} />);
 
-    fireEvent.click(screen.getByRole('link', { name: 'Which courses and colleges are available?' }));
     expect(screen.getByRole('heading', { name: 'Which courses and colleges are available?' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Retry which courses and colleges are available?' }));
     expect(retry).toHaveBeenCalledWith('courseOptions');
@@ -442,7 +444,8 @@ describe('DreamCareerStudentGuide', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
     expect(screen.queryByText('Improve reliability')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'See all' }));
+    const whatYouDo = screen.getByRole('region', { name: 'What will I do?' });
+    fireEvent.click(within(whatYouDo).getByRole('button', { name: 'See all' }));
     expect(screen.getByText('Improve reliability')).toBeInTheDocument();
   });
 
@@ -455,7 +458,6 @@ describe('DreamCareerStudentGuide', () => {
     render(<DreamCareerStudentGuide response={value} locale="en" onRetryRelationship={retry} />);
 
     expect(screen.getByText('Designs, builds, and maintains reliable data systems.')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', { name: 'Where can I find an internship?' }));
     expect(screen.getByRole('heading', { name: 'Where can I find an internship?' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Retry where can I find an internship?' }));
     expect(retry).toHaveBeenCalledWith('opportunities');
@@ -468,7 +470,7 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.queryByRole('link', { name: 'What other courses and online resources can I take?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'What other courses and online resources can I take?' })).not.toBeInTheDocument();
     expect(screen.queryByText('SQL for beginners')).not.toBeInTheDocument();
   });
 
@@ -479,19 +481,18 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="en" />);
 
-    expect(screen.queryByRole('link', { name: 'Why does it matter?' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Why does it matter?' })).not.toBeInTheDocument();
     expect(screen.queryByText(value.guide.aboutCareer.whyItMatters)).not.toBeInTheDocument();
   });
 
   it('provides keyboard-focusable chapter anchors with exact destinations', () => {
     render(<DreamCareerStudentGuide response={response()} locale="en" />);
 
-    const about = screen.getByRole('link', { name: 'About this career' });
-    const path = screen.getByRole('link', { name: 'How to get there' });
-    const now = screen.getByRole('link', { name: 'What I can do now' });
-    expect(about).toHaveAttribute('href', '#guide-question-what-you-do');
-    expect(path).toHaveAttribute('href', '#guide-question-subjects');
-    expect(now).toHaveAttribute('href', '#guide-question-learning-resources');
+    const navigation = screen.getByRole('navigation', { name: 'Career guide chapters' });
+    const [about, path, now] = within(navigation).getAllByRole('link');
+    expect(about).toHaveAttribute('href', '#about-career');
+    expect(path).toHaveAttribute('href', '#how-to-get-there');
+    expect(now).toHaveAttribute('href', '#what-you-can-do-now');
     about.focus();
     expect(about).toHaveFocus();
   });
@@ -501,7 +502,11 @@ describe('DreamCareerStudentGuide', () => {
 
     const navigation = screen.getByRole('navigation', { name: 'Career guide chapters' });
     expect(navigation).toHaveAttribute('data-testid', 'desktop-question-navigation');
-    expect(within(navigation).getByRole('link', { name: 'What will I do?' })).toHaveAttribute('href', '#guide-question-what-you-do');
+    expect(within(navigation).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+      '#about-career',
+      '#how-to-get-there',
+      '#what-you-can-do-now',
+    ]);
     desktop.unmount();
 
     stubCompactLayout();
@@ -559,18 +564,18 @@ describe('DreamCareerStudentGuide', () => {
 
     expect(screen.getByRole('heading', { name: 'इस करियर के बारे में' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'अभी क्या कर सकता/सकती हूँ' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'अभी किन विषयों पर ध्यान दें' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'कोर्स और कॉलेज' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'विकसित करने योग्य कौशल' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'अभी किन विषयों पर ध्यान दें' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'कोर्स और कॉलेज' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'विकसित करने योग्य कौशल' })).toBeInTheDocument();
 
     rerender(<DreamCareerStudentGuide response={value} locale="ml" />);
     expect(screen.getByRole('heading', { name: 'ഈ കരിയറിനെക്കുറിച്ച്' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'കോഴ്സുകളും കോളേജുകളും' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'കോഴ്സുകളും കോളേജുകളും' })).toBeInTheDocument();
 
     rerender(<DreamCareerStudentGuide response={value} locale="ta" />);
     expect(screen.getByRole('heading', { name: 'இந்தத் தொழிலைப் பற்றி' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'வேலையில் ஒரு நாள்' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'படிப்புகள் மற்றும் கல்லூரிகள்' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'வேலையில் ஒரு நாள்' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'படிப்புகள் மற்றும் கல்லூரிகள்' })).toBeInTheDocument();
   });
 
   it('localizes the relationship retry accessible-label prefix', () => {
@@ -580,7 +585,7 @@ describe('DreamCareerStudentGuide', () => {
 
     render(<DreamCareerStudentGuide response={value} locale="hi" onRetryRelationship={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole('link', { name: 'इंटर्नशिप के अवसर' }));
+    expect(screen.getByRole('heading', { name: 'इंटर्नशिप के अवसर' })).toBeInTheDocument();
     expect(screen.getByText('यह जानकारी अभी उपलब्ध नहीं है।')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'फिर कोशिश करें: इंटर्नशिप के अवसर' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Retry/ })).not.toBeInTheDocument();

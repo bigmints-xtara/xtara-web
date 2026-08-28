@@ -300,10 +300,10 @@ describe('Dream Career Student Guide page', () => {
 
     render(<DreamCareerPage />);
 
-    fireEvent.click(await screen.findByRole('link', { name: 'Where can I find an internship?' }));
+    expect(await screen.findByRole('heading', { name: 'Where can I find an internship?' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Retry where can I find an internship?' }));
     expect(await screen.findByText('Data engineering internship')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('link', { name: 'What will I do?' }));
+    expect(screen.getByRole('heading', { name: 'What will I do?' })).toBeInTheDocument();
     expect(screen.getByText('Designs and maintains reliable data systems.')).toBeInTheDocument();
     expect(screen.queryByText('This unrelated replacement must not overwrite the reader.')).not.toBeInTheDocument();
   });

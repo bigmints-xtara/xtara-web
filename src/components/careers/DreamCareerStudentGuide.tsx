@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore, type MouseEvent, type ReactNode, type RefObject } from 'react';
+import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import Link from 'next/link';
+import { Banknote, GraduationCap, Lightbulb, Sparkles } from 'lucide-react';
 
 import type {
   CareerAdditionalTopic,
@@ -597,7 +598,6 @@ export function DreamCareerStudentGuide({
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
   const [focusRequest, setFocusRequest] = useState(0);
   const pendingFocusQuestionId = useRef('');
-  const activeQuestionRef = useRef<HTMLElement>(null);
   const compactLayout = useSyncExternalStore(subscribeCompactLayout, getCompactLayout, getServerCompactLayout);
 
   useEffect(() => {
@@ -614,25 +614,16 @@ export function DreamCareerStudentGuide({
     return () => window.removeEventListener('hashchange', syncHash);
   }, [questionSignature]);
 
-  const selectedEntry = questionEntries.find(({ question }) => question.id === selectedQuestionId) ?? questionEntries[0];
-  const activeQuestionId = selectedEntry?.question.id ?? '';
+  const activeQuestionId = selectedQuestionId || questionEntries[0]?.question.id || '';
 
   useEffect(() => {
-    if (compactLayout || !activeQuestionId || pendingFocusQuestionId.current !== activeQuestionId) return;
-    const activeQuestion = activeQuestionRef.current;
+    if (!activeQuestionId || pendingFocusQuestionId.current !== activeQuestionId) return;
+    const activeQuestion = document.getElementById(`guide-question-${activeQuestionId}`);
     if (!activeQuestion) return;
     activeQuestion.focus({ preventScroll: true });
     activeQuestion.scrollIntoView?.({ block: 'start' });
     pendingFocusQuestionId.current = '';
-  }, [activeQuestionId, compactLayout, focusRequest]);
-
-  const selectQuestion = (event: MouseEvent<HTMLAnchorElement>, questionId: string) => {
-    event.preventDefault();
-    pendingFocusQuestionId.current = questionId;
-    setSelectedQuestionId(questionId);
-    setFocusRequest((request) => request + 1);
-    window.history.replaceState(null, '', `#guide-question-${questionId}`);
-  };
+  }, [activeQuestionId, focusRequest]);
 
   const sourcesPanel = reviewedSources.length ? (
     <details className="border-t border-border pt-6 text-sm text-muted-foreground">
@@ -664,51 +655,140 @@ export function DreamCareerStudentGuide({
       {compactLayout ? (
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14" data-testid="compact-question-reader">
           <main className="min-w-0 space-y-14 sm:space-y-18">
-            {chapters.map((chapter) => <GuideChapter key={chapter.id} chapter={chapter} />)}
+            {chapters.map((chapter, index) => (
+              <Fragment key={chapter.id}>
+                <GuideChapter chapter={chapter} />
+                {index === 0 ? (
+                  <div className="border-y border-border bg-muted/20 px-5 py-6 sm:px-6" data-testid="compact-guide-widgets">
+                    <GuideUtilityRail response={response} locale={locale} text={text} />
+                  </div>
+                ) : null}
+              </Fragment>
+            ))}
             {sourcesPanel}
           </main>
         </div>
       ) : (
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-14 lg:py-16">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_minmax(0,18rem)] lg:gap-12 lg:py-20">
           <nav aria-label={text.chapterNavigation} className="min-w-0" data-testid="desktop-question-navigation">
-            <div className="sticky top-24 space-y-8 border-r border-border/80 pr-7">
+            <div className="sticky top-24 space-y-8 border-r border-border/80 pr-6">
               {chapters.map((chapter) => (
-                <section id={chapter.id} key={chapter.id} className="scroll-mt-24">
-                  <h2 className="text-base font-semibold text-foreground">
-                    <a href={`#guide-question-${chapter.questions[0].id}`} onClick={(event) => selectQuestion(event, chapter.questions[0].id)} className="group flex items-center gap-3 focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                      <span aria-hidden className="text-xs font-bold tracking-[0.14em] text-primary/70">{chapter.number}</span>
-                      <span>{chapter.title}</span>
-                    </a>
-                  </h2>
-                  <div className="mt-3 space-y-1 border-l border-border pl-4">
-                    {chapter.questions.map((question) => (
-                      <a
-                        key={question.id}
-                        href={`#guide-question-${question.id}`}
-                        aria-current={question.id === activeQuestionId ? 'location' : undefined}
-                        onClick={(event) => selectQuestion(event, question.id)}
-                        className={`block rounded-lg border-l-2 px-3 py-2 text-sm leading-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${question.id === activeQuestionId ? 'border-primary bg-primary/5 font-semibold text-foreground' : 'border-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
-                      >
-                        {question.title}
-                      </a>
-                    ))}
-                  </div>
+              <section key={chapter.id}>
+                <a
+                  href={`#${chapter.id}`}
+                  aria-current={chapter.questions.some((question) => question.id === activeQuestionId) ? 'location' : undefined}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    const target = document.getElementById(chapter.id);
+                    window.history.pushState(null, '', `#${chapter.id}`);
+                    setSelectedQuestionId(chapter.questions[0].id);
+                    target?.focus({ preventScroll: true });
+                    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="group grid grid-cols-[2rem_minmax(0,1fr)] gap-2 border-l-2 border-transparent py-1 text-muted-foreground transition-colors hover:text-foreground aria-[current=location]:border-primary aria-[current=location]:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                    <span aria-hidden className="text-xs font-bold tracking-[0.14em] text-primary/70">{chapter.number}</span>
+                    <span>
+                      <span className="block text-sm font-semibold leading-5">{chapter.title}</span>
+                      <span className="mt-1.5 block text-xs leading-5 text-muted-foreground">{chapter.intro}</span>
+                    </span>
+                  </a>
                 </section>
               ))}
             </div>
           </nav>
 
-          <main className="min-w-0" data-testid="desktop-question-reader">
-            {selectedEntry ? (
-              <div data-testid="active-question-pane" aria-live="polite">
-                <p className="text-xs font-bold tracking-[0.16em] text-primary/70">{selectedEntry.chapter.number} · {selectedEntry.chapter.title}</p>
-                <QuestionSection question={selectedEntry.question} sectionRef={activeQuestionRef} />
-              </div>
-            ) : null}
+          <main className="min-w-0 space-y-20" data-testid="desktop-editorial-reader">
+            {chapters.map((chapter) => <GuideChapter key={chapter.id} chapter={chapter} />)}
             {sourcesPanel ? <div className="mt-14">{sourcesPanel}</div> : null}
           </main>
+
+          <aside className="min-w-0" aria-label={text.whatYouCanDoNow} data-testid="career-guide-widgets">
+            <div className="sticky top-24 border-l border-border bg-muted/20 px-6 py-1">
+              <GuideUtilityRail response={response} locale={locale} text={text} />
+            </div>
+          </aside>
         </div>
       )}
+    </div>
+  );
+}
+
+function GuideUtilityRail({
+  response,
+  locale,
+  text,
+}: {
+  response: DreamCareerStudentGuideResponse;
+  locale: DreamCareerGuideLocale;
+  text: GuideLabels;
+}) {
+  const available = (questionId: CareerGuideQuestionId) => {
+    const status = response.coverage.byQuestion[questionId]?.status;
+    return status === 'available' || status === 'partial';
+  };
+  const earning = available('earnings') ? response.guide.aboutCareer.earnings[0] : undefined;
+  const route = available('educationRoutes') ? response.guide.howToGetThere.educationRoutes[0] : undefined;
+  const starter = available('starterActivity') ? response.guide.whatYouCanDoNow.starterActivity : undefined;
+  const skillLabels = new Map(response.resolved.labels.skills.map((item) => [item.id, item.label]));
+  const skills = available('skills')
+    ? response.guide.whatYouCanDoNow.skills.flatMap((skill) => skillLabels.get(skill.skillId) ?? []).slice(0, 3)
+    : [];
+
+  if (!earning && !route && !starter && !skills.length) return null;
+
+  return (
+    <div className="divide-y divide-border text-sm">
+      {earning ? (
+        <section className="py-6 first:pt-5">
+          <div className="flex items-center gap-3 text-primary">
+            <Banknote aria-hidden className="h-5 w-5 text-accent" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em]">{text.earnings}</p>
+          </div>
+          <p className="mt-4 text-lg font-semibold leading-7 text-foreground">
+            {formatMoney(earning.amountMin, locale)}–{formatMoney(earning.amountMax, locale)}
+          </p>
+          <p className="mt-1 leading-6 text-muted-foreground">
+            {earning.period === 'month' ? text.perMonth : text.perYear} · {earning.geography}
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">{text.asOf} {formatDate(earning.asOf, locale)}</p>
+        </section>
+      ) : null}
+
+      {route ? (
+        <section className="py-6">
+          <div className="flex items-center gap-3 text-primary">
+            <GraduationCap aria-hidden className="h-5 w-5 text-accent" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em]">{text.educationRoutes}</p>
+          </div>
+          <p className="mt-4 font-semibold leading-6 text-foreground">{route.title}</p>
+          <p className="mt-1 leading-6 text-muted-foreground">{route.description}</p>
+        </section>
+      ) : null}
+
+      {skills.length ? (
+        <section className="py-6">
+          <div className="flex items-center gap-3 text-primary">
+            <Sparkles aria-hidden className="h-5 w-5 text-accent" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em]">{text.skills}</p>
+          </div>
+          <ul className="mt-4 space-y-2 text-foreground">
+            {skills.map((skill) => <li key={skill} className="border-l-2 border-border pl-3">{skill}</li>)}
+          </ul>
+        </section>
+      ) : null}
+
+      {starter ? (
+        <section className="py-6">
+          <div className="flex items-center gap-3 text-primary">
+            <Lightbulb aria-hidden className="h-5 w-5 text-accent" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em]">{text.starterActivity}</p>
+          </div>
+          <p className="mt-4 font-semibold leading-6 text-foreground">{starter.title}</p>
+          <p className="mt-1 leading-6 text-muted-foreground">{starter.description}</p>
+          <p className="mt-2 text-xs text-muted-foreground">{starter.estimatedMinutes} {text.minutes}</p>
+        </section>
+      ) : null}
     </div>
   );
 }
@@ -757,10 +837,10 @@ function GuideChapter({ chapter }: { chapter: GuideChapterModel }) {
   );
 }
 
-function QuestionSection({ question, sectionRef }: { question: GuideQuestion; sectionRef?: RefObject<HTMLElement | null> }) {
+function QuestionSection({ question }: { question: GuideQuestion }) {
   const id = `guide-question-${question.id}`;
   return (
-    <section ref={sectionRef} id={id} role="region" tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-7 sm:py-9">
+    <section id={id} role="region" tabIndex={-1} aria-labelledby={`${id}-title`} className="scroll-mt-24 py-7 focus:outline-none sm:py-9">
       <h3 id={`${id}-title`} className="text-xl font-semibold leading-tight tracking-[-0.02em] text-foreground sm:text-2xl">{question.title}</h3>
       <div className="mt-4 min-w-0 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-base sm:leading-7">{question.content}</div>
     </section>
@@ -842,7 +922,7 @@ function appendAdditionalTopics(
     if (!topic.summary.trim() && !blocks.length) continue;
     questions.push({
       id: `additional-${chapterSlug(chapter)}-${slug(topic.id)}`,
-      title: topic.title,
+      title: displayTopicTitle(topic.title),
       content: (
         <>
           {topic.summary.trim() ? <p>{topic.summary}</p> : null}
@@ -851,6 +931,12 @@ function appendAdditionalTopics(
       ),
     });
   }
+}
+
+function displayTopicTitle(value: string) {
+  if (!value.includes('_')) return value;
+  const spaced = value.replace(/_+/g, ' ').trim();
+  return spaced ? `${spaced.charAt(0).toLocaleUpperCase()}${spaced.slice(1)}` : value;
 }
 
 function chapterSlug(chapter: CareerAdditionalTopic['chapter']) {

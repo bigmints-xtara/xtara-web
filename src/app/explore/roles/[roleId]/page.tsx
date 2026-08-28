@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, MessageCircleMore, Plus, X } from 'lucide-react';
@@ -19,6 +20,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from '@/i18n/language-provider';
 import { XtaraApiError } from '@/lib/api/client';
 import { getCareerArea } from '@/lib/career-knowledge';
+import { getCareerDirectionImage } from '@/lib/career-direction-imagery';
 import { generateCareerConversationSlides } from '@/lib/career-slides-utils';
 import {
   getDreamCareerStudentContext,
@@ -291,44 +293,54 @@ export default function DreamCareerPage() {
       ? response.resolved.courseOptions.items.map((option) => option.courseTitle)
       : [],
   });
+  const directionImage = getCareerDirectionImage(response.career.primaryFutureDirectionId);
+  const editorialImage = directionImage ?? response.career.imageUrl ?? null;
+  const editorialCaption = covered('whatYouDo') ? guide.aboutCareer.activities[0]?.title : undefined;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main>
-        <section className="relative overflow-hidden border-b border-primary/10 bg-gradient-to-br from-secondary/30 via-background to-accent/10 px-4 py-10 sm:px-6 sm:py-16">
-          {response.career.imageUrl ? <>
-            <div aria-hidden className="absolute inset-y-0 right-0 w-full bg-cover bg-center opacity-20 lg:w-1/2 lg:opacity-90" style={{ backgroundImage: `url(${response.career.imageUrl})` }} />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/20" />
-          </> : null}
-          <div className="relative mx-auto max-w-6xl">
+        <section className="border-b border-border bg-background px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
+          <div className="mx-auto max-w-7xl">
             <Link href={area ? `/explore/areas/${area.id}` : '/explore'} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ArrowLeft className="h-4 w-4" />{text.back}
             </Link>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              {area ? <Badge variant="secondary">{area.title}</Badge> : null}
-              {isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{text.selected}</Badge> : null}
-            </div>
-            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
-            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-6xl lg:text-7xl">{response.career.title}</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">{response.career.summary}</p>
-            {covered('whyItMatters') && guide.aboutCareer.whyItMatters.trim() ? (
-              <div className="mt-7 max-w-3xl rounded-2xl border border-primary/10 bg-card/85 px-5 py-4 text-sm leading-6 text-foreground shadow-sm backdrop-blur sm:px-6 sm:py-5 sm:text-base sm:leading-7">
-                {guide.aboutCareer.whyItMatters}
+            <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end lg:gap-16">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  {area ? <Badge variant="secondary">{area.title}</Badge> : null}
+                  {isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{text.selected}</Badge> : null}
+                </div>
+                <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
+                <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-6xl lg:text-7xl">{response.career.title}</h1>
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">{response.career.summary}</p>
               </div>
-            ) : null}
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
-                {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? text.remove : text.add}
-              </Button>
-              <Button size="lg" variant="secondary" className="rounded-full" onClick={() => setConversationOpen(true)}>
-                <MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}
-              </Button>
+              <div className="flex flex-col gap-3 lg:pb-1">
+                <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
+                  {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? text.remove : text.add}
+                </Button>
+                <Button size="lg" variant="secondary" className="rounded-full" onClick={() => setConversationOpen(true)}>
+                  <MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}
+                </Button>
+                <p className="text-sm leading-6 text-muted-foreground">{text.conversationHelp}</p>
+                {selectionError ? <p role="alert" className="text-sm font-medium text-destructive">{selectionError}</p> : null}
+              </div>
             </div>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{text.conversationHelp}</p>
-            {selectionError ? <p role="alert" className="mt-3 text-sm font-medium text-destructive">{selectionError}</p> : null}
           </div>
         </section>
+        {editorialImage ? (
+          <figure className="border-b border-border bg-muted/20">
+            <div className="relative h-64 overflow-hidden sm:h-80 lg:h-[22rem]">
+              <Image unoptimized fill priority alt="" src={editorialImage} sizes="100vw" className="object-cover object-center" />
+            </div>
+            {editorialCaption ? (
+              <figcaption className="mx-auto max-w-7xl px-4 py-3 text-sm leading-6 text-muted-foreground sm:px-6">
+                {editorialCaption}
+              </figcaption>
+            ) : null}
+          </figure>
+        ) : null}
         <DreamCareerStudentGuide response={response} locale={guideLocale} onRetryRelationship={(subsection) => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
       </main>
       <Footer />
