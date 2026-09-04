@@ -37,4 +37,15 @@ describe('AdminMasterDetail', () => {
     await waitFor(() => expect(service.bulk).toHaveBeenCalledWith('publish', { mode: 'ids', ids: ['1'] }));
     expect(await screen.findByRole('status')).toHaveTextContent('1 succeeded');
   });
+
+  it('does not offer legacy publish actions for version-controlled content', async () => {
+    render(<AdminMasterDetail config={{ ...gamesConfig, supportsApproval: true, versionControlled: true }} renderEditor={() => null} />);
+    await screen.findByText('Game 1');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Select 1' }));
+    expect(screen.queryByRole('button', { name: 'Publish selected' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Approve selected' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Actions for Game 1' }));
+    expect(screen.queryByRole('menuitem', { name: 'Publish' })).not.toBeInTheDocument();
+  });
 });
