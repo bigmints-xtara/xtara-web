@@ -130,7 +130,7 @@ export default function DreamCareerPage() {
     setLoadFailed(false);
     setMissingGuideCareer(null);
     try {
-      const next = await getDreamCareerStudentGuide(roleId, { locale: guideLocale, signal });
+      const next = await getDreamCareerStudentGuide(roleId, { locale: guideLocale, location: studentContext?.location, signal });
       if (!signal?.aborted) setResponse(next);
     } catch (error) {
       if (!signal?.aborted) {
@@ -142,7 +142,7 @@ export default function DreamCareerPage() {
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, [guideLocale, roleId]);
+  }, [guideLocale, roleId, studentContext?.location]);
 
   useEffect(() => {
     const controller = new AbortController();

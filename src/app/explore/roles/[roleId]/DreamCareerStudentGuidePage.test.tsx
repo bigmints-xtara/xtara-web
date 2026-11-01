@@ -145,6 +145,13 @@ describe('Dream Career Student Guide page', () => {
     localStorage.clear();
   });
 
+  it('refreshes guide relationships with signed-in state and country context', async () => {
+    mocks.user = { uid: 'student-1', isAnonymous: false };
+    mocks.getContext.mockResolvedValue({ careerId: 'data-engineer', saved: false, assessmentReasons: [], location: { state: 'Kerala', country: 'India' } });
+    render(<DreamCareerPage />);
+    await waitFor(() => expect(mocks.getGuide).toHaveBeenCalledWith('data-engineer', expect.objectContaining({ location: { state: 'Kerala', country: 'India' } })));
+  });
+
   it('renders a public canonical guide without assessment or Future Direction state', async () => {
     render(<DreamCareerPage />);
 

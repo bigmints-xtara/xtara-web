@@ -22,6 +22,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/admin/games': 'Games',
   '/admin/game-templates': 'Game templates',
   '/admin/colleges': 'College catalogue',
+  '/admin/mvp-readiness': 'MVP catalogue readiness',
   '/admin/dream-careers': 'Dream careers',
   '/admin/future-directions': 'Future directions',
   '/admin/dream-career-phase1-review': 'Dream Career Phase 1 review',

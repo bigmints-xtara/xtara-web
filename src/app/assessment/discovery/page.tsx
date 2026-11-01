@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -46,6 +46,7 @@ export default function DiscoveryResultPage() {
     () => storedResult ? localizeDiscoveryResult(storedResult, locale) : null,
     [locale, storedResult],
   );
+  const [saveError, setSaveError] = useState(false);
   const reasonsByArea = useMemo(
     () => getDistinctAreaReasons(result?.areas ?? []),
     [result?.areas],
@@ -65,15 +66,13 @@ export default function DiscoveryResultPage() {
 
   const pursueArea = async (areaId: string) => {
     const plan = switchCareerDirection(loadDirectionPlan(), areaId);
-    saveDirectionPlan(plan);
-    if (user && !user.isAnonymous) {
-      try {
-        saveDirectionPlan(await saveDirectionToApi(plan));
-      } catch {
-        // Keep the selected area locally until account sync is available again.
-      }
+    setSaveError(false);
+    try {
+      saveDirectionPlan(user && !user.isAnonymous ? await saveDirectionToApi(plan) : plan);
+      router.push(`/explore/areas/${areaId}`);
+    } catch {
+      setSaveError(true);
     }
-    router.push(`/explore/areas/${areaId}`);
   };
 
   return (
@@ -85,6 +84,7 @@ export default function DiscoveryResultPage() {
             <p className="mt-4 text-base leading-7 text-slate-600 sm:text-lg">{catalog.result.description}</p>
           </div>
 
+          {saveError ? <p role="alert">{catalog.ui.errorTitle} {catalog.ui.retry}</p> : null}
           <section className="mt-8 sm:mt-10" aria-label={catalog.result.areasLabel}>
             <h2 className="sr-only">{catalog.result.areasLabel}</h2>
             <div className="mt-5 grid gap-5 lg:grid-cols-3">

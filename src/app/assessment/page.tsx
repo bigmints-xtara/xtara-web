@@ -14,11 +14,8 @@ import { useTranslations } from "@/i18n/language-provider";
 import {
   assessmentV2StorageKey,
   assessmentStageStorageKey,
-  assessmentV2Version,
-  buildDiscoveryResult,
   readAssessmentDraft,
   getAssessmentV2Catalog,
-  getAssessmentV2Questions,
   getAssessmentStageQuestion,
   parseAssessmentDraft,
   parseDiscoveryResult,
@@ -27,12 +24,10 @@ import {
   saveAssessmentDraft,
   saveDiscoveryResult,
 } from "@/lib/assessment-v2";
-import { saveAssessment } from "@/lib/firebase/assessment";
 import { getPendingOrganizationJoin } from "@/lib/pending-organization-join";
 import { normalizeAssessmentAnswers } from "@/lib/assessment-selection";
-import { getPublishedCareerCatalog } from "@/lib/curated-career-api";
 import { evaluateAssessmentOnServer, getActiveAssessmentDefinition, type ActiveAssessmentDefinition } from "@/lib/assessment-api";
-import { XtaraApiError } from "@/lib/api/client";
+import { savePendingAssessmentToAccount } from "@/lib/discovery-save";
 import type { AssessmentAnswers } from "@/types/assessment";
 
 const subscribeToAssessmentDraft = () => () => undefined;
@@ -57,6 +52,8 @@ function AssessmentJourney() {
   const stage = parseOptionalAssessmentStage(rawStage);
   const [introDismissed, setIntroDismissed] = useState(false);
   const [activeDefinition, setActiveDefinition] = useState<ActiveAssessmentDefinition | null>(null);
+  const [definitionFailed, setDefinitionFailed] = useState(false);
+  const [definitionAttempt, setDefinitionAttempt] = useState(0);
   const catalog = getAssessmentV2Catalog(locale);
   const rawResult = useSyncExternalStore(
     subscribeToAssessmentDraft,
@@ -71,19 +68,22 @@ function AssessmentJourney() {
       setActiveDefinition(null);
       return () => { cancelled = true; };
     }
+    setActiveDefinition(null);
+    setDefinitionFailed(false);
     getActiveAssessmentDefinition(effectiveStage, locale)
       .then((definition) => {
-        if (!cancelled && definition.stage === effectiveStage && definition.locale === locale) setActiveDefinition(definition);
+        if (definition.stage !== effectiveStage || definition.locale !== locale) throw new Error("Assessment definition did not match your grade and language");
+        if (!cancelled) setActiveDefinition(definition);
       })
       .catch(() => {
-        if (!cancelled) setActiveDefinition(null);
+        if (!cancelled) setDefinitionFailed(true);
       });
     return () => { cancelled = true; };
-  }, [effectiveStage, locale]);
+  }, [effectiveStage, locale, definitionAttempt]);
   const questions = useMemo(() => {
     const contextualQuestions = activeDefinition?.stage === effectiveStage && activeDefinition.locale === locale
       ? activeDefinition.questions
-      : effectiveStage ? getAssessmentV2Questions(effectiveStage, locale) : [];
+      : [];
     return [
       getAssessmentStageQuestion(locale),
       ...contextualQuestions.filter((question) => question.id !== "currentGrade"),
@@ -116,51 +116,20 @@ function AssessmentJourney() {
     setProcessingError("");
     try {
       const completedStage = parseAssessmentStage(typeof answers.currentGrade === "string" ? answers.currentGrade : effectiveStage);
-      let result;
-      try {
-        const serverResult = await evaluateAssessmentOnServer({
-          definitionId: "career-discovery",
-          version: activeDefinition?.version || assessmentV2Version,
-          stage: completedStage,
-          locale,
-          answers,
-        });
-        if (!serverResult.areas.length) throw new Error("Published catalog is not ready");
-        result = serverResult;
-      } catch (error) {
-        if (error instanceof XtaraApiError && (error.status === 400 || error.status === 409)) throw error;
-        const curatedCatalog = await getPublishedCareerCatalog().catch(() => undefined);
-        result = buildDiscoveryResult(completedStage, locale, answers, curatedCatalog);
-      }
-
-      if (user && !user.isAnonymous) {
-        try {
-          await saveAssessment(user.uid, {
-            schemaVersion: result.version,
-            stage: completedStage,
-            locale,
-            answers,
-            result: {
-              signals: result.signals,
-              traits: result.traits,
-              areas: result.areas,
-              context: result.context,
-              catalogSnapshot: result.catalogSnapshot,
-              definitionDocumentId: result.definitionDocumentId,
-              evaluationSource: result.evaluationSource,
-              catalogSource: result.catalogSource,
-            },
-            resultType: "exploration_map",
-            completedAt: result.createdAt,
-          });
-          result.syncStatus = "synced";
-        } catch {
-          // Local completion remains available when persistence is offline.
-        }
-      }
-
-      saveDiscoveryResult(result);
       saveAssessmentDraft(completedStage, answers);
+      if (!activeDefinition || activeDefinition.stage !== completedStage || activeDefinition.locale !== locale) {
+        throw new Error(catalog.ui.errorTitle);
+      }
+      const result = await evaluateAssessmentOnServer({
+        definitionId: activeDefinition.id,
+        version: activeDefinition.version,
+        stage: completedStage, locale, answers,
+      });
+      if (!result.areas.length) throw new Error(catalog.ui.errorTitle);
+      saveDiscoveryResult(result);
+      if (user && !user.isAnonymous) {
+        if (!await savePendingAssessmentToAccount(user.uid)) throw new Error(catalog.ui.errorTitle);
+      }
       const pendingJoinCode = getPendingOrganizationJoin();
       router.push(pendingJoinCode
         ? `/join/${encodeURIComponent(pendingJoinCode)}`
@@ -177,17 +146,19 @@ function AssessmentJourney() {
     return <AssessmentIntro catalog={catalog} onStart={() => setIntroDismissed(true)} />;
   }
 
-  if (processingError) {
+  if (processingError || definitionFailed) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7fafc] px-6 text-center">
         <h1 className="text-2xl font-semibold text-primary">{catalog.ui.errorTitle}</h1>
-        <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-slate-600">{processingError}</p>
-        <button type="button" onClick={() => setProcessingError("")} className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white">
+        <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-slate-600">{processingError || catalog.ui.errorTitle}</p>
+        <button type="button" onClick={() => { setProcessingError(""); if (definitionFailed) setDefinitionAttempt((attempt) => attempt + 1); }} className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white">
           {catalog.ui.retry}
         </button>
       </div>
     );
   }
+
+  if (effectiveStage && (!activeDefinition || activeDefinition.stage !== effectiveStage || activeDefinition.locale !== locale)) return <AssessmentLoading />;
 
   if (processing) {
     return (
