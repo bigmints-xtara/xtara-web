@@ -76,6 +76,8 @@ export const XTARA_API_OPERATIONS = {
   "postGoodReadsGoodReadIdRead": { method: "POST", path: "/api/v1/good-reads/{goodReadId}/read", authenticated: true },
   "getHealth": { method: "GET", path: "/api/v1/health", authenticated: false },
   "getJobsJobId": { method: "GET", path: "/api/v1/jobs/{jobId}", authenticated: true },
+  "getLocationsStates": { method: "GET", path: "/api/v1/locations/states", authenticated: false },
+  "getLocationsStatesState": { method: "GET", path: "/api/v1/locations/states/{state}", authenticated: false },
   "deleteMe": { method: "DELETE", path: "/api/v1/me", authenticated: true },
   "getMe": { method: "GET", path: "/api/v1/me", authenticated: true },
   "patchMe": { method: "PATCH", path: "/api/v1/me", authenticated: true },

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, LockKeyhole, MapPin } from "lucide-react";
 
+import LocationInput from "@/components/assessment/LocationInput";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,7 +56,7 @@ const copy = {
     "prerequisiteAction": "See my assessment results",
     "careerArea": "Career Direction",
     "studyDetails": "Study details",
-    "locationError": "We could not load districts and cities. Check your connection and try again.",
+    "locationError": "Some district or city suggestions are unavailable. You can enter your details.",
     "retry": "Try again"
   },
   "ml": {
@@ -88,7 +89,7 @@ const copy = {
     "prerequisiteAction": "എന്റെ അസസ്‌മെന്റ് ഫലം കാണാം",
     "careerArea": "കരിയർ മേഖല",
     "studyDetails": "പഠന വിവരങ്ങൾ",
-    "locationError": "ജില്ലകളും നഗരങ്ങളും ലോഡ് ചെയ്യാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കൂ.",
+    "locationError": "ചില ജില്ലയുടെയോ നഗരത്തിന്റെയോ നിർദ്ദേശങ്ങൾ ലഭ്യമല്ല. നിങ്ങളുടെ വിവരങ്ങൾ ടൈപ്പ് ചെയ്യാം.",
     "retry": "വീണ്ടും ശ്രമിക്കുക"
   },
   "hi": {
@@ -121,7 +122,7 @@ const copy = {
     "prerequisiteAction": "Career Directions खोलें",
     "careerArea": "Career Direction",
     "studyDetails": "Study details",
-    "locationError": "Location options load नहीं हो पाए।",
+    "locationError": "कुछ ज़िले या शहर के सुझाव उपलब्ध नहीं हैं। आप अपनी जानकारी टाइप कर सकते हैं।",
     "retry": "फिर try करें"
   },
   "ta": {
@@ -154,7 +155,7 @@ const copy = {
     "prerequisiteAction": "என்னோட மதிப்பீட்டு முடிவுகளை பாருங்க",
     "careerArea": "தொழில் திசை",
     "studyDetails": "படிப்பு விவரங்கள்",
-    "locationError": "எங்களால் மாவட்டங்களையும் நகரங்களையும் ஏற்ற முடியவில்லை. உங்கள் இணைப்பை சரிபார்த்து மீண்டும் முயற்சிக்கவும்.",
+    "locationError": "சில மாவட்டம் அல்லது நகரப் பரிந்துரைகள் கிடைக்கவில்லை. உங்கள் விவரங்களைத் தட்டச்சு செய்யலாம்.",
     "retry": "மீண்டும் முயற்சி செய்"
   }
 } as const;
@@ -334,8 +335,8 @@ export default function PathwayPersonalizationPage() {
             <Choice value={profile.state} options={withCurrentValue(states, profile.state)} placeholder={text.select} onChange={changeState} />
           </Field>
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label={text.district}><Choice value={profile.district} options={withCurrentValue(districts, profile.district)} placeholder={text.select} onChange={changeDistrict} disabled={!profile.state || loadingLocations} /></Field>
-            <Field label={text.city}><Choice value={profile.city} options={withCurrentValue(cities, profile.city)} placeholder={text.select} onChange={(city) => setProfile({ ...profile, city })} disabled={!profile.district || loadingLocations} /></Field>
+            <Field label={text.district}><LocationInput value={profile.district} options={withCurrentValue(districts, profile.district)} placeholder={text.select} onChange={changeDistrict} disabled={!profile.state || loadingLocations} /></Field>
+            <Field label={text.city}><LocationInput value={profile.city} options={withCurrentValue(cities, profile.city)} placeholder={text.select} onChange={(city) => setProfile({ ...profile, city })} disabled={!profile.district || loadingLocations} /></Field>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label={text.board}><Choice value={profile.educationBoard} options={boards} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(educationBoard) => setProfile({ ...profile, educationBoard })} /></Field>

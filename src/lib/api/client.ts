@@ -20,9 +20,18 @@ type ApiEnvelope<T> =
   | { success: true; data?: T; user?: T; authenticated?: boolean; requestId?: string }
   | T;
 
-type XtaraRequestInit = Omit<RequestInit, "body"> & { body?: unknown };
+export type XtaraRequestOptions = RequestInit & { expectedUserId?: string };
+type XtaraRequestInit = Omit<XtaraRequestOptions, "body"> & { body?: unknown };
 
-async function authHeader(): Promise<Record<string, string>> {
+async function authHeader(expectedUserId?: string): Promise<Record<string, string>> {
+  if (expectedUserId !== undefined) {
+    const user = getFirebaseAuth().currentUser;
+    if (!user || user.uid !== expectedUserId) throw new Error('The signed-in account changed before the request.');
+    const token = await user.getIdToken();
+    if (getFirebaseAuth().currentUser?.uid !== expectedUserId) throw new Error('The signed-in account changed while authorizing the request.');
+    if (!token) throw new Error('An account token is required for this request.');
+    return { Authorization: `Bearer ${token}` };
+  }
   try {
     const user = getFirebaseAuth().currentUser;
     if (!user) return {};
@@ -46,21 +55,22 @@ function unwrap<T>(payload: ApiEnvelope<T>): T {
 }
 
 export async function apiRequest<T>(path: string, init: XtaraRequestInit = {}): Promise<T> {
-  const { body, ...requestInit } = init;
+  const { body, expectedUserId, ...requestInit } = init;
   const headers = new Headers(requestInit.headers);
   if (!headers.has("Content-Type") && body !== undefined) {
     headers.set("Content-Type", "application/json");
   }
 
-  const tokenHeaders = await authHeader();
+  const tokenHeaders = await authHeader(expectedUserId);
   Object.entries(tokenHeaders).forEach(([key, value]) => {
-    if (!headers.has(key)) headers.set(key, value);
+    if (expectedUserId !== undefined || !headers.has(key)) headers.set(key, value);
   });
 
+  if (expectedUserId !== undefined && getFirebaseAuth().currentUser?.uid !== expectedUserId) throw new Error('The signed-in account changed before the request.');
   const response = await fetch(getXtaraApiUrl(path), {
     ...requestInit,
     headers,
-    credentials: requestInit.credentials ?? "include",
+    credentials: expectedUserId !== undefined ? "omit" : requestInit.credentials ?? "include",
     body:
       body !== undefined && typeof body !== "string"
         ? JSON.stringify(body)
@@ -109,14 +119,14 @@ export async function apiDownload(path: string): Promise<Blob> {
 }
 
 export const xtaraApi = {
-  get: <T>(path: string, init?: RequestInit) => apiRequest<T>(path, { ...init, method: "GET" }),
-  post: <T>(path: string, body?: unknown, init?: RequestInit) =>
+  get: <T>(path: string, init?: XtaraRequestOptions) => apiRequest<T>(path, { ...init, method: "GET" }),
+  post: <T>(path: string, body?: unknown, init?: XtaraRequestOptions) =>
     apiRequest<T>(path, { ...init, method: "POST", body }),
-  put: <T>(path: string, body?: unknown, init?: RequestInit) =>
+  put: <T>(path: string, body?: unknown, init?: XtaraRequestOptions) =>
     apiRequest<T>(path, { ...init, method: "PUT", body }),
-  patch: <T>(path: string, body?: unknown, init?: RequestInit) =>
+  patch: <T>(path: string, body?: unknown, init?: XtaraRequestOptions) =>
     apiRequest<T>(path, { ...init, method: "PATCH", body }),
-  delete: <T>(path: string, init?: RequestInit) => apiRequest<T>(path, { ...init, method: "DELETE" }),
+  delete: <T>(path: string, init?: XtaraRequestOptions) => apiRequest<T>(path, { ...init, method: "DELETE" }),
 };
 
 export default xtaraApi;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { deleteUser, sendEmailVerification, signOut } from "firebase/auth";
@@ -12,6 +12,8 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import Header from "@/components/Header";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LocationInput from "@/components/assessment/LocationInput";
+import { pathwayFromAccount, saveAccountStudy } from "@/lib/profile-study";
 import AcademicProgressSection from "@/components/profile/AcademicProgressSection";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -24,14 +26,14 @@ import Skeleton from "@/components/ui/Skeleton";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import type { AcademicGrade } from "@/lib/academic-progress-api";
-import { defaultAcademicYear, saveAcademicPeriod } from "@/lib/academic-progress-api";
+import { defaultAcademicYear } from "@/lib/academic-progress-api";
 import { xtaraApi } from "@/lib/api/client";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import { getStateDetails, getStates } from "@/lib/firebase/location";
-import { updateLearnerProfile, updatePersonalInfo } from "@/lib/firebase/profile-service";
+import { updatePersonalInfo } from "@/lib/firebase/profile-service";
 import type { UserProfile } from "@/lib/firebase/auth-helpers";
 import {
-  emptyPathwayProfile, loadPathwayProfile, localizePathwayValue, savePathwayProfile, type PathwayProfileDraft,
+  emptyPathwayProfile, localizePathwayValue, type PathwayProfileDraft,
 } from "@/lib/pathway-profile";
 import { listOrganizationWorkspaces, type OrganizationWorkspace } from "@/lib/organization";
 
@@ -95,7 +97,7 @@ const copy = {
     "scholarship": "Would you like scholarship options?",
     "select": "Select an option",
     "locationLoading": "Loading location choices…",
-    "locationError": "We could not load districts and cities. Try again.",
+    "locationError": "Some district or city suggestions are unavailable. You can enter your details.",
     "required": "Complete class, board, location, and at least one subject.",
     "assessment": "My assessment",
     "assessmentHelp": "A summary of what you told Xtara—not a permanent label or a perfect-match score.",
@@ -161,7 +163,7 @@ const copy = {
     "scholarship": "സ്കോളർഷിപ്പ് ഓപ്ഷനുകൾ കാണണോ?",
     "select": "ഒരു ഓപ്ഷൻ തിരഞ്ഞെടുക്കൂ",
     "locationLoading": "സ്ഥല വിവരങ്ങൾ ലോഡ് ചെയ്യുന്നു…",
-    "locationError": "ജില്ലകളും നഗരങ്ങളും ലോഡ് ചെയ്യാനായില്ല. വീണ്ടും ശ്രമിക്കൂ.",
+    "locationError": "ചില ജില്ലയുടെയോ നഗരത്തിന്റെയോ നിർദ്ദേശങ്ങൾ ലഭ്യമല്ല. നിങ്ങളുടെ വിവരങ്ങൾ ടൈപ്പ് ചെയ്യാം.",
     "required": "ക്ലാസ്, ബോർഡ്, സ്ഥലം, കുറഞ്ഞത് ഒരു വിഷയം എന്നിവ പൂർത്തിയാക്കൂ.",
     "assessment": "എന്റെ അസസ്‌മെന്റ്",
     "assessmentHelp": "നിങ്ങൾ നൽകിയ മറുപടികളുടെ സംഗ്രഹമാണിത്. നിങ്ങളെ പൂട്ടുന്ന ലേബലോ മാച്ച് സ്കോറോ അല്ല.",
@@ -227,7 +229,7 @@ const copy = {
     "scholarship": "Would you like scholarship options?",
     "select": "Select an option",
     "locationLoading": "Loading location choices…",
-    "locationError": "We could not load districts and cities. Try again.",
+    "locationError": "कुछ ज़िले या शहर के सुझाव उपलब्ध नहीं हैं। आप अपनी जानकारी टाइप कर सकते हैं।",
     "required": "Required",
     "assessment": "My assessment",
     "assessmentHelp": "A summary of what you told Xtara—not a permanent label or a perfect-match score.",
@@ -293,7 +295,7 @@ const copy = {
     "scholarship": "உங்களுக்கு உதவித்தொகை விருப்பங்கள் வேண்டுமா?",
     "select": "ஒரு விருப்பத்தைத் தேர்ந்தெடுக்கவும்",
     "locationLoading": "இடத் தேர்வுகள் ஏற்றப்படுகின்றன...",
-    "locationError": "எங்களால் மாவட்டங்களையும் நகரங்களையும் ஏற்ற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
+    "locationError": "சில மாவட்டம் அல்லது நகரப் பரிந்துரைகள் கிடைக்கவில்லை. உங்கள் விவரங்களைத் தட்டச்சு செய்யலாம்.",
     "required": "வகுப்பு, வாரியம், இடம் மற்றும் குறைந்தது ஒரு பாடத்தையாவது முழுமையாகப் படியுங்கள்.",
     "assessment": "என் மதிப்பீடு",
     "assessmentHelp": "நீங்கள் Xtara-விடம் பகிர்ந்தவற்றின் சுருக்கம் மட்டுமே; நிரந்தர அடையாளமோ முழுமையான பொருத்த மதிப்பெண்ணோ அல்ல.",
@@ -330,6 +332,10 @@ export default function ProfilePage() {
   const router = useRouter();
   const section = useSearchParams().get("section");
   const queryClient = useQueryClient();
+  const currentOwner = useRef(user?.uid);
+  const hydratedOwner = useRef(user?.uid);
+  currentOwner.current = user?.uid;
+  const ownsPage = (ownerId: string) => currentOwner.current === ownerId && getFirebaseAuth().currentUser?.uid === ownerId;
   const [profile, setProfile] = useState<UserProfile | null>(userProfile);
   const [pathway, setPathway] = useState<PathwayProfileDraft>(emptyPathwayProfile);
   const [academicYear, setAcademicYear] = useState(defaultAcademicYear());
@@ -356,22 +362,20 @@ export default function ProfilePage() {
   useEffect(() => { if (!loading && !user) router.replace("/login?next=%2Fprofile"); }, [loading, router, user]);
 
   useEffect(() => {
-    if (!userProfile) return;
+    if (hydratedOwner.current !== user?.uid) {
+      hydratedOwner.current = user?.uid;
+      setGrade("grade8"); setAcademicYear(defaultAcademicYear()); setCustomSubject("");
+      setSaving(false); setStatus(""); setPersonalOpen(false); setStudyOpen(false);
+    }
+    if (!user || !userProfile || userProfile.uid !== user.uid) {
+      setSaving(false); setStatus(""); setGrade("grade8"); setAcademicYear(defaultAcademicYear()); setCustomSubject(""); setProfile(null); setPathway(emptyPathwayProfile); setFullName(''); setDisplayName(''); setSubjects([]); setStudyOpen(false); setPersonalOpen(false);
+      return;
+    }
+    setSaving(false); setStatus(""); setCustomSubject("");
     setProfile(userProfile);
     setFullName(userProfile.fullName || userProfile.displayName || user?.displayName || "");
     setDisplayName(userProfile.displayName || user?.displayName || "");
-    const local = loadPathwayProfile();
-    const saved = userProfile.pathwayProfile;
-    setPathway({
-      state: saved?.state || local?.state || userProfile.state || "",
-      district: saved?.district || local?.district || "",
-      city: saved?.city || local?.city || userProfile.city || "",
-      educationBoard: saved?.educationBoard || local?.educationBoard || userProfile.educationBoard || "",
-      studyLanguage: saved?.studyLanguage || local?.studyLanguage || "",
-      locationPreference: saved?.locationPreference || local?.locationPreference || "",
-      affordability: saved?.affordability || local?.affordability || "",
-      scholarshipInterest: saved?.scholarshipInterest || local?.scholarshipInterest || "",
-    });
+    setPathway(pathwayFromAccount(userProfile));
     setGrade(normalizeGrade(userProfile.gradeStage || userProfile.currentGrade));
     setSubjects(Array.isArray(userProfile.subjectsLearning) ? userProfile.subjectsLearning : []);
   }, [user, userProfile]);
@@ -398,21 +402,30 @@ export default function ProfilePage() {
   const name = profile?.fullName || profile?.displayName || user?.displayName || text.title;
   const email = user?.email || profile?.email || "";
 
-  const refreshProfile = async (patch: Partial<UserProfile>) => {
+  const refreshProfile = async (patch: Partial<UserProfile>, ownerId: string) => {
+    if (!ownsPage(ownerId)) return;
     setProfile((current) => current ? { ...current, ...patch } : ({ uid: user?.uid || "", email, displayName: null, ...patch } as UserProfile));
-    await queryClient.invalidateQueries({ queryKey: ["auth", "userProfile", user?.uid] });
+    await queryClient.invalidateQueries({ queryKey: ["auth", "userProfile", ownerId] });
   };
 
   const savePersonal = async () => {
     if (!user || !fullName.trim()) return;
+    const ownerId = user.uid;
     setSaving(true); setStatus("");
     try {
       await updatePersonalInfo(user.uid, { fullName, displayName });
-      await refreshProfile({ fullName: fullName.trim(), displayName: displayName.trim() });
+      if (!ownsPage(ownerId)) return;
+      await refreshProfile({ fullName: fullName.trim(), displayName: displayName.trim() }, ownerId);
+      if (!ownsPage(ownerId)) return;
       setPersonalOpen(false); setStatus(text.saved);
-    } catch { setStatus(text.saveError); } finally { setSaving(false); }
+    } catch { if (ownsPage(ownerId)) setStatus(text.saveError); } finally { if (ownsPage(ownerId)) setSaving(false); }
   };
 
+  const resetStudyDraft = () => {
+    setPathway(pathwayFromAccount(profile));
+    setGrade(normalizeGrade(profile?.gradeStage || profile?.currentGrade));
+    setSubjects(profile?.subjectsLearning ?? []);
+  };
   const changeState = (state: string) => {
     setPathway((current) => ({ ...current, state, district: "", city: "" }));
     setDistricts([]); setCities([]); setLocationError(false);
@@ -420,16 +433,16 @@ export default function ProfilePage() {
 
   const saveStudy = async () => {
     if (!user || !pathway.state || !pathway.district || !pathway.city || !pathway.educationBoard || !subjects.length) { setStatus(text.required); return; }
+    const ownerId = user.uid;
     setSaving(true); setStatus("");
     try {
-      const savedPathway = savePathwayProfile(pathway);
-      await Promise.all([
-        updateLearnerProfile(user.uid, { currentGrade: grade, gradeStage: grade, educationBoard: pathway.educationBoard, city: pathway.city, state: pathway.state, country: "India", subjectsLearning: subjects, pathwayProfile: savedPathway }),
-        saveAcademicPeriod({ academicYear, gradeStage: grade, boardId: pathway.educationBoard, subjects }),
-      ]);
-      await refreshProfile({ currentGrade: grade, gradeStage: grade, educationBoard: pathway.educationBoard, city: pathway.city, state: pathway.state, country: "India", subjectsLearning: subjects, pathwayProfile: savedPathway });
+      const saved = await saveAccountStudy(user.uid, { pathway, grade, academicYear, subjects });
+      if (!ownsPage(ownerId)) return;
+      await refreshProfile(saved, ownerId);
+      if (!ownsPage(ownerId)) return;
+      setPathway(pathwayFromAccount(saved));
       setStudyOpen(false); setStatus(text.saved);
-    } catch { setStatus(text.saveError); } finally { setSaving(false); }
+    } catch { if (ownsPage(ownerId)) setStatus(text.saveError); } finally { if (ownsPage(ownerId)) setSaving(false); }
   };
 
   const toggleSubject = (subject: string) => setSubjects((current) => current.includes(subject) ? current.filter((item) => item !== subject) : [...current, subject]);
@@ -475,22 +488,22 @@ export default function ProfilePage() {
           </> : null}
 
           {section === "academic" ? <>
-          <ProfileCard id="study" icon={GraduationCap} title={text.study} description={text.studyHelp} action={<Button variant="outline" className="min-h-11 rounded-xl" onClick={() => setStudyOpen((value) => !value)}><Pencil className="mr-2 h-4 w-4" />{text.edit}</Button>}>
+          <ProfileCard id="study" icon={GraduationCap} title={text.study} description={text.studyHelp} action={<Button variant="outline" className="min-h-11 rounded-xl" onClick={() => { resetStudyDraft(); setStudyOpen((value) => !value); }}><Pencil className="mr-2 h-4 w-4" />{text.edit}</Button>}>
             {studyOpen ? <div className="rounded-2xl bg-slate-50 p-4 sm:p-6"><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <Field label={text.grade}><Choice value={grade} options={["grade8", "grade9", "grade10", "grade11", "grade12"]} placeholder={text.select} getLabel={(value) => gradeLabel(value as AcademicGrade, text)} onChange={(value) => setGrade(value as AcademicGrade)} /></Field>
               <Field label={text.board}><Choice value={pathway.educationBoard} options={boards} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(educationBoard) => setPathway((current) => ({ ...current, educationBoard }))} /></Field>
               <Field label={text.year}><Input value={academicYear} onChange={(event) => setAcademicYear(event.target.value)} /></Field>
               <Field label={text.state}><Choice value={pathway.state} options={withCurrent(states, pathway.state)} placeholder={text.select} onChange={changeState} /></Field>
-              <Field label={text.district}><Choice value={pathway.district} options={withCurrent(districts, pathway.district)} placeholder={text.select} onChange={(district) => setPathway((current) => ({ ...current, district, city: "" }))} disabled={!pathway.state || locationLoading} /></Field>
-              <Field label={text.city}><Choice value={pathway.city} options={withCurrent(cities, pathway.city)} placeholder={text.select} onChange={(city) => setPathway((current) => ({ ...current, city }))} disabled={!pathway.district || locationLoading} /></Field>
+              <Field label={text.district}><LocationInput value={pathway.district} options={withCurrent(districts, pathway.district)} placeholder={text.select} onChange={(district) => setPathway((current) => ({ ...current, district, city: "" }))} disabled={!pathway.state || locationLoading} /></Field>
+              <Field label={text.city}><LocationInput value={pathway.city} options={withCurrent(cities, pathway.city)} placeholder={text.select} onChange={(city) => setPathway((current) => ({ ...current, city }))} disabled={!pathway.district || locationLoading} /></Field>
               <Field label={text.language}><Choice value={pathway.studyLanguage} options={studyLanguages} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(studyLanguage) => setPathway((current) => ({ ...current, studyLanguage }))} /></Field>
               <Field label={text.studyLocation}><Choice value={pathway.locationPreference} options={locationPreferences} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(locationPreference) => setPathway((current) => ({ ...current, locationPreference }))} /></Field>
               <Field label={text.fees}><Choice value={pathway.affordability} options={affordabilityOptions} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(affordability) => setPathway((current) => ({ ...current, affordability }))} /></Field>
               <Field label={text.scholarship}><Choice value={pathway.scholarshipInterest} options={scholarshipOptions} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(scholarshipInterest) => setPathway((current) => ({ ...current, scholarshipInterest }))} /></Field>
             </div>{locationLoading ? <p className="mt-3 flex items-center gap-2 text-sm text-slate-500"><Loader2 className="h-4 w-4 animate-spin" />{text.locationLoading}</p> : null}{locationError ? <p role="alert" className="mt-3 text-sm text-amber-800">{text.locationError}</p> : null}
               <div className="mt-6"><p className="text-sm font-medium text-slate-700">{text.subjects}</p><div className="mt-3 flex flex-wrap gap-2">{[...new Set([...standardSubjects, ...subjects])].map((subject) => <button type="button" key={subject} aria-pressed={subjects.includes(subject)} onClick={() => toggleSubject(subject)} className={`min-h-10 rounded-full border px-3 py-2 text-sm transition ${subjects.includes(subject) ? "border-primary bg-primary text-white" : "border-slate-200 bg-white text-slate-700 hover:border-primary/40"}`}>{subjects.includes(subject) ? <Check className="mr-1.5 inline h-3.5 w-3.5" /> : null}{subject}</button>)}</div><div className="mt-3 flex gap-2"><Input value={customSubject} onChange={(event) => setCustomSubject(event.target.value)} placeholder={text.customSubject} /><Button type="button" variant="outline" onClick={addCustomSubject} disabled={!customSubject.trim()}><Plus className="mr-2 h-4 w-4" />{text.addSubject}</Button></div></div>
-              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="outline" onClick={() => setStudyOpen(false)}>{text.cancel}</Button><Button onClick={saveStudy} disabled={saving}>{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}{saving ? text.saving : text.save}</Button></div>
-            </div> : <><DescriptionGrid items={[[text.grade, text[grade]], [text.board, pathway.educationBoard || "—"], [text.state, pathway.state || "—"], [text.district, pathway.district || "—"], [text.city, pathway.city || "—"], [text.language, localizePathwayValue(pathway.studyLanguage, locale) || "—"]]} /><div className="mt-4 flex flex-wrap gap-2">{subjects.length ? subjects.map((subject) => <Badge key={subject} variant="secondary">{subject}</Badge>) : <span className="text-sm text-slate-500">{text.subjects}: —</span>}</div></>}
+              <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="outline" onClick={() => { resetStudyDraft(); setStudyOpen(false); }}>{text.cancel}</Button><Button onClick={saveStudy} disabled={saving}>{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}{saving ? text.saving : text.save}</Button></div>
+            </div> : <><DescriptionGrid items={[[text.grade, profile?.gradeStage || profile?.currentGrade ? text[normalizeGrade(profile.gradeStage || profile.currentGrade)] : "—"], [text.board, pathwayFromAccount(profile).educationBoard || "—"], [text.state, pathwayFromAccount(profile).state || "—"], [text.district, pathwayFromAccount(profile).district || "—"], [text.city, pathwayFromAccount(profile).city || "—"], [text.language, localizePathwayValue(pathwayFromAccount(profile).studyLanguage, locale) || "—"]]} /><div className="mt-4 flex flex-wrap gap-2">{subjects.length ? subjects.map((subject) => <Badge key={subject} variant="secondary">{subject}</Badge>) : <span className="text-sm text-slate-500">{text.subjects}: —</span>}</div></>}
           </ProfileCard>
           <AcademicProgressSection locale={locale} grade={grade} board={pathway.educationBoard} subjects={subjects} />
           </> : null}

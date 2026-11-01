@@ -46,18 +46,24 @@ const indiaStatesAndTerritories = [
 ];
 
 export async function getStates(): Promise<string[]> {
-  const response = await xtaraApi.get<{ items?: string[] }>('/locations/states').catch(() => ({ items: [] }));
-  return response.items?.length ? response.items : indiaStatesAndTerritories;
+  try {
+    const response = await xtaraApi.get<{ items?: string[] }>('/locations/states');
+    return response.items ?? [];
+  } catch {
+    // Offline geography choices only; never infer district/city availability.
+    return indiaStatesAndTerritories;
+  }
 }
 
 export interface StateDetails {
   districts: string[];
   cities: string[];
   unavailable?: boolean;
+  availability?: { districts: 'available' | 'unavailable'; cities: 'available' | 'unavailable' };
 }
 
 export async function getStateDetails(stateName: string): Promise<StateDetails> {
   return xtaraApi
-    .get<{ districts: string[]; cities: string[] }>(`/locations/states?state=${encodeURIComponent(stateName)}`)
+    .get<StateDetails>(`/locations/states?state=${encodeURIComponent(stateName)}`)
     .catch(() => ({ districts: [], cities: [], unavailable: true }));
 }

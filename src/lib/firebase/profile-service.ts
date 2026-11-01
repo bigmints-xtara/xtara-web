@@ -1,14 +1,23 @@
+import { getFirebaseAuth } from '@/lib/firebase-client';
 import { xtaraApi } from '@/lib/api/client';
 
-export async function updatePersonalInfo(_userId: string, values: { fullName: string; displayName: string }) {
+export async function updatePersonalInfo(userId: string, values: { fullName: string; displayName: string }) {
+  const assertOwner = () => { if (getFirebaseAuth().currentUser?.uid !== userId) throw new Error('The signed-in account changed. Reopen your profile before saving.'); };
+  assertOwner();
   await xtaraApi.patch('/me', {
     displayName: values.displayName.trim(),
     fullName: values.fullName.trim(),
-  });
+  }, { expectedUserId: userId });
+  assertOwner();
+  const saved = await xtaraApi.get<{ uid?: string; fullName?: string; displayName?: string }>('/me', { expectedUserId: userId });
+  assertOwner();
+  if (saved.uid !== userId || saved.fullName !== values.fullName.trim() || saved.displayName !== values.displayName.trim()) {
+    throw new Error('Your personal details were not returned by account readback.');
+  }
 }
 
-export async function updateLearnerProfile(_userId: string, values: Record<string, unknown>) {
-  return xtaraApi.patch('/me', values);
+export async function updateLearnerProfile(userId: string, values: Record<string, unknown>) {
+  return xtaraApi.patch('/me', values, { expectedUserId: userId });
 }
 
 export async function updateAcademicProfile(

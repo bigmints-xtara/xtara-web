@@ -48,8 +48,8 @@ export async function getAcademicProgress(): Promise<{ period: AcademicPeriod | 
   return { period: periodResponse.period ?? null, exams: examsResponse.items ?? [] };
 }
 
-export async function saveAcademicPeriod(period: Omit<AcademicPeriod, 'id' | 'userId' | 'status' | 'updatedAt'>): Promise<AcademicPeriod> {
-  const response = await xtaraApi.put<{ period: AcademicPeriod }>('/me/academic-period', period);
+export async function saveAcademicPeriod(period: Omit<AcademicPeriod, 'id' | 'userId' | 'status' | 'updatedAt'>, expectedUserId?: string): Promise<AcademicPeriod> {
+  const response = await xtaraApi.put<{ period: AcademicPeriod }>('/me/academic-period', period, { expectedUserId });
   return response.period;
 }
 
