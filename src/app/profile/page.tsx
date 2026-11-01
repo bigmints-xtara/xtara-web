@@ -79,6 +79,8 @@ const copy = {
     "grade8": "Class 8",
     "grade9": "Class 9",
     "grade10": "Class 10",
+    "grade11": "Class 11",
+    "grade12": "Class 12",
     "board": "School board",
     "year": "Academic year",
     "subjects": "Current subjects",
@@ -143,6 +145,8 @@ const copy = {
     "grade8": "ക്ലാസ് 8",
     "grade9": "ക്ലാസ് 9",
     "grade10": "ക്ലാസ് 10",
+    "grade11": "ക്ലാസ് 11",
+    "grade12": "ക്ലാസ് 12",
     "board": "വിദ്യാഭ്യാസ ബോർഡ്",
     "year": "അക്കാദമിക് വർഷം",
     "subjects": "ഇപ്പോഴത്തെ വിഷയങ്ങൾ",
@@ -207,6 +211,8 @@ const copy = {
     "grade8": "Class 8",
     "grade9": "Class 9",
     "grade10": "Class 10",
+    "grade11": "Class 11",
+    "grade12": "Class 12",
     "board": "Board exam",
     "year": "Academic year",
     "subjects": "Current subjects",
@@ -271,6 +277,8 @@ const copy = {
     "grade8": "8-ஆம் வகுப்பு",
     "grade9": "9-ஆம் வகுப்பு",
     "grade10": "பத்தாம் வகுப்பு",
+    "grade11": "பதினொன்றாம் வகுப்பு",
+    "grade12": "பன்னிரண்டாம் வகுப்பு",
     "board": "பள்ளிக் குழு",
     "year": "கல்வியாண்டு",
     "subjects": "தற்போதைய பாடங்கள்",
@@ -469,7 +477,7 @@ export default function ProfilePage() {
           {section === "academic" ? <>
           <ProfileCard id="study" icon={GraduationCap} title={text.study} description={text.studyHelp} action={<Button variant="outline" className="min-h-11 rounded-xl" onClick={() => setStudyOpen((value) => !value)}><Pencil className="mr-2 h-4 w-4" />{text.edit}</Button>}>
             {studyOpen ? <div className="rounded-2xl bg-slate-50 p-4 sm:p-6"><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Field label={text.grade}><Choice value={grade} options={["grade8", "grade9", "grade10"]} placeholder={text.select} getLabel={(value) => gradeLabel(value as AcademicGrade, text)} onChange={(value) => setGrade(value as AcademicGrade)} /></Field>
+              <Field label={text.grade}><Choice value={grade} options={["grade8", "grade9", "grade10", "grade11", "grade12"]} placeholder={text.select} getLabel={(value) => gradeLabel(value as AcademicGrade, text)} onChange={(value) => setGrade(value as AcademicGrade)} /></Field>
               <Field label={text.board}><Choice value={pathway.educationBoard} options={boards} placeholder={text.select} getLabel={(value) => localizePathwayValue(value, locale)} onChange={(educationBoard) => setPathway((current) => ({ ...current, educationBoard }))} /></Field>
               <Field label={text.year}><Input value={academicYear} onChange={(event) => setAcademicYear(event.target.value)} /></Field>
               <Field label={text.state}><Choice value={pathway.state} options={withCurrent(states, pathway.state)} placeholder={text.select} onChange={changeState} /></Field>
@@ -610,7 +618,7 @@ function Field({ label, children, className = "" }: { label: string; children: R
 function Choice({ value, options, placeholder, onChange, getLabel = (option) => option, disabled = false }: { value: string; options: string[]; placeholder: string; onChange: (value: string) => void; getLabel?: (value: string) => string; disabled?: boolean }) { return <Select value={value} onValueChange={onChange} disabled={disabled}><SelectTrigger className="min-h-11"><SelectValue placeholder={placeholder} /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option} value={option}>{getLabel(option)}</SelectItem>)}</SelectContent></Select>; }
 function initials(name: string) { return name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "X"; }
 function humanize(value: string) { return value.split("_").filter(Boolean).map((part) => `${part[0]?.toUpperCase()}${part.slice(1)}`).join(" "); }
-function normalizeGrade(value?: string): AcademicGrade { return value === "grade9" || value === "grade10" ? value : "grade8"; }
-function gradeLabel(grade: AcademicGrade, text: { grade8: string; grade9: string; grade10: string }) { return grade === "grade8" ? text.grade8 : grade === "grade9" ? text.grade9 : text.grade10; }
+function normalizeGrade(value?: string): AcademicGrade { return value === "grade9" || value === "grade10" || value === "grade11" || value === "grade12" ? value : "grade8"; }
+function gradeLabel(grade: AcademicGrade, text: Record<AcademicGrade, string>) { return text[grade]; }
 function withCurrent(options: string[], current: string) { return [...new Set([...(current ? [current] : []), ...options])]; }
 function ProfileSkeleton() { return <div className="min-h-screen bg-[#f7fafc]"><Header /><main className="mx-auto max-w-5xl space-y-5 px-4 py-8"><Skeleton className="h-10 w-48" /><Skeleton className="h-28 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></main></div>; }

@@ -1,8 +1,8 @@
 # xtara-web agent instructions
 
 Read `../AGENTS.md`, `../workspace.yaml`, and the active feature manifest before
-product work. Use `../bin/xtara status` for repository state. There is no
-`.factory` development workflow for this repository.
+product work. Use `../bin/xtara status` for repository state and Spacecrew for
+current work and context. Workspace tools provide validation and evidence.
 
 This Next.js application owns web learner and administrative presentation. For
 learner features, inspect and implement the Flutter equivalent. Shared rules and

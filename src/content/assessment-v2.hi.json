@@ -24,7 +24,9 @@
       "options": {
         "grade8": "Grade 8",
         "grade9": "Grade 9",
-        "grade10": "Grade 10"
+        "grade10": "Grade 10",
+        "grade11": "कक्षा 11",
+        "grade12": "कक्षा 12"
       }
     },
     "processingTitle": "आपकी Career Directions बन रही हैं",
@@ -1073,6 +1075,64 @@
           }
         ]
       }
+    ],
+    "grade11": [
+      {
+        "id": "grade11Focus",
+        "fieldType": "singleSelect",
+        "label": "कक्षा 11 में अपने अगले कदम तलाशने में आपको किससे मदद मिलेगी?",
+        "description": "अपने वर्तमान विषयों को संदर्भ मानें, अपनी रुचियों की सीमा नहीं।",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "subjects",
+            "label": "वर्तमान विषयों को करियर से जोड़ना"
+          },
+          {
+            "id": "experience",
+            "label": "छोटा प्रोजेक्ट करना या किसी से उनके काम के बारे में बात करना"
+          },
+          {
+            "id": "routes",
+            "label": "वैकल्पिक पढ़ाई के रास्ते समझना"
+          },
+          {
+            "id": "discussion",
+            "label": "शिक्षक या परिवार के सदस्य से विकल्पों पर चर्चा करना"
+          }
+        ]
+      }
+    ],
+    "grade12": [
+      {
+        "id": "grade12NextStep",
+        "fieldType": "singleSelect",
+        "label": "कक्षा 12 के बाद की तैयारी में आपको किससे मदद मिलेगी?",
+        "description": "संभावित रास्तों की तुलना करें; यह आकलन आपकी प्रवेश पात्रता तय नहीं करता।",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "routes",
+            "label": "डिग्री, डिप्लोमा, प्रशिक्षण या अप्रेंटिसशिप की तुलना करना"
+          },
+          {
+            "id": "requirements",
+            "label": "वर्तमान प्रवेश शर्तें और आवेदन की तारीखें जाँचना"
+          },
+          {
+            "id": "practical",
+            "label": "खर्च, स्थान और उपलब्ध सहायता समझना"
+          },
+          {
+            "id": "discussion",
+            "label": "रास्ता चुनने से पहले अपने विकल्पों पर चर्चा करना"
+          }
+        ]
+      }
     ]
   },
   "signals": {
@@ -1246,6 +1306,16 @@
       "Compare how school subjects and courses keep different Career Directions open.",
       "Review the suggestions with your family, teacher, or counselor.",
       "Add your location and fee preference before comparing colleges."
+    ],
+    "grade11": [
+      "अपने वर्तमान विषयों से जुड़े कई करियर तलाशें।",
+      "छोटा प्रोजेक्ट करें या उस काम को जानने वाले व्यक्ति से बात करें।",
+      "किसी पढ़ाई के रास्ते को उपलब्ध मानने से पहले उसकी शर्तें जाँचें।"
+    ],
+    "grade12": [
+      "डिग्री, डिप्लोमा, प्रशिक्षण और अप्रेंटिसशिप के रास्तों की तुलना करें।",
+      "आधिकारिक स्रोतों से वर्तमान प्रवेश शर्तें, खर्च और अंतिम तारीखें जाँचें।",
+      "अपनी सूची और अगले व्यावहारिक कदम पर किसी विश्वसनीय वयस्क से चर्चा करें।"
     ]
   }
 }

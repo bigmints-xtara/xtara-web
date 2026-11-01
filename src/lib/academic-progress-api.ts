@@ -1,6 +1,6 @@
 import { xtaraApi } from '@/lib/api/client';
 
-export type AcademicGrade = 'grade8' | 'grade9' | 'grade10';
+export type AcademicGrade = 'grade8' | 'grade9' | 'grade10' | 'grade11' | 'grade12';
 export type AcademicExamType = 'unit_test' | 'term' | 'annual' | 'board' | 'other';
 
 export interface AcademicPeriod {

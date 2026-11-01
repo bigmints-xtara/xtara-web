@@ -36,7 +36,7 @@ export default function EditAcademicProfileModal({
         setError(null);
 
         try {
-            await onSave(educationBoard, grade, grade === "grade12" ? stream : undefined);
+            await onSave(educationBoard, grade, (grade === "grade11" || grade === "grade12") ? stream : undefined);
             onClose();
         } catch (err: any) {
             setError(err.message || "Failed to save changes");
@@ -93,12 +93,15 @@ export default function EditAcademicProfileModal({
                             disabled={isSaving}
                         >
                             <option value="">Select Grade</option>
-                            <option value="grade10">Class 10</option>
+                            <option value="grade8">Class 8</option>
+                        <option value="grade9">Class 9</option>
+                        <option value="grade10">Class 10</option>
+                        <option value="grade11">Class 11</option>
                             <option value="grade12">Class 12</option>
                         </select>
                     </div>
 
-                    {grade === "grade12" && (
+                    {(grade === "grade11" || grade === "grade12") && (
                         <div>
                             <label className="text-sm text-gray-400 mb-2 block">
                                 Stream

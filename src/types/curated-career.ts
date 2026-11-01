@@ -10,7 +10,7 @@ import type {
 } from '@/types/dream-career-student-guide';
 
 export type CurationStatus = 'draft' | 'inReview' | 'published' | 'retired';
-export type AssessmentGrade = 'grade8' | 'grade9' | 'grade10';
+export type AssessmentGrade = 'grade8' | 'grade9' | 'grade10' | 'grade11' | 'grade12';
 
 export interface ReviewMetadata {
   reviewedBy?: string;
@@ -69,10 +69,10 @@ export interface FutureDirection extends AdminEntity {
   toolIds: string[];
   courseQueries?: string[];
   gradeGuidance: {
-    en: Record<AssessmentGrade, string[]>;
-    ml?: Record<AssessmentGrade, string[]>;
-    hi?: Record<AssessmentGrade, string[]>;
-    ta?: Record<AssessmentGrade, string[]>;
+    en: Record<'grade8' | 'grade9' | 'grade10', string[]> & Partial<Record<'grade11' | 'grade12', string[]>>;
+    ml?: Record<'grade8' | 'grade9' | 'grade10', string[]> & Partial<Record<'grade11' | 'grade12', string[]>>;
+    hi?: Record<'grade8' | 'grade9' | 'grade10', string[]> & Partial<Record<'grade11' | 'grade12', string[]>>;
+    ta?: Record<'grade8' | 'grade9' | 'grade10', string[]> & Partial<Record<'grade11' | 'grade12', string[]>>;
   };
   displayOrder: number;
   review: ReviewMetadata;

@@ -11,6 +11,10 @@ import {
   localizeDiscoveryResult,
   parseAssessmentStage,
   parseOptionalAssessmentStage,
+  parseDiscoveryResult,
+  loadAssessmentDraft,
+  saveAssessmentDraft,
+  clearAssessmentDraft,
 } from "./assessment-v2";
 import { createEmptyDreamCareer } from "./admin/configs/curatedDreamCareersConfig";
 import { createEmptyFutureDirection } from "./admin/configs/futureDirectionsConfig";
@@ -37,7 +41,7 @@ describe("career discovery definition", () => {
   it("uses one reusable definition with grade-adaptive question modules", () => {
     const definition = getCareerAssessmentDefinition("en");
     expect(definition.id).toBe("career-discovery");
-    expect(definition.contexts).toEqual(["grade8", "grade9", "grade10"]);
+    expect(definition.contexts).toEqual(["grade8", "grade9", "grade10", "grade11", "grade12"]);
     expect(getAssessmentV2Questions("grade8", "en").some((question) => question.id === "grade8Exposure")).toBe(true);
     expect(getAssessmentV2Questions("grade9", "en").some((question) => question.id === "grade9Evidence")).toBe(true);
     expect(getAssessmentV2Questions("grade10", "en").some((question) => question.id === "grade10Decision")).toBe(true);
@@ -49,7 +53,38 @@ describe("career discovery definition", () => {
     expect(parseAssessmentStage("college")).toBe("grade8");
     expect(parseAssessmentStage(null)).toBe("grade8");
     expect(parseOptionalAssessmentStage(null)).toBeNull();
-    expect(getAssessmentStageQuestion("en").options?.map((option) => option.id)).toEqual(["grade8", "grade9", "grade10"]);
+    expect(getAssessmentStageQuestion("en").options?.map((option) => option.id)).toEqual(["grade8", "grade9", "grade10", "grade11", "grade12"]);
+  });
+
+  it.each(["grade11", "grade12"] as const)("preserves %s across result and stage parsing in every locale", (stage) => {
+    expect(parseAssessmentStage(stage)).toBe(stage);
+    for (const locale of ["en", "ml", "hi", "ta"] as const) {
+      const questions = getAssessmentV2Questions(stage, locale);
+      const contextual = questions.find((question) => question.id.startsWith(stage));
+      expect(contextual?.label).toBeTruthy();
+      expect(contextual?.options?.length).toBeGreaterThan(0);
+      const result = buildDiscoveryResult(stage, locale, { ...technologyAnswers, currentGrade: stage });
+      expect(parseDiscoveryResult(JSON.stringify(result))?.stage).toBe(stage);
+      expect(localizeDiscoveryResult(result, locale).nextActions.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("rejects unsupported stored stages and retains existing 3.0 results", () => {
+    const result = buildDiscoveryResult("grade10", "en", technologyAnswers);
+    expect(parseDiscoveryResult(JSON.stringify({ ...result, version: "3.0.0" }))?.stage).toBe("grade10");
+    expect(parseDiscoveryResult(JSON.stringify({ ...result, stage: "grade13" }))).toBeNull();
+  });
+
+  it("recovers unchanged 3.0 drafts, prefers current drafts, and clears both after completion", () => {
+    localStorage.clear();
+    const legacyKey = "xtara_assessment_v2:draft:3.0.0:grade10";
+    localStorage.setItem(legacyKey, JSON.stringify({ currentGrade: "grade10", experienceLevel: "some" }));
+    expect(loadAssessmentDraft("grade10").experienceLevel).toBe("some");
+    saveAssessmentDraft("grade10", { currentGrade: "grade10", experienceLevel: "new" });
+    expect(loadAssessmentDraft("grade10").experienceLevel).toBe("new");
+    clearAssessmentDraft("grade10");
+    expect(loadAssessmentDraft("grade10")).toEqual({});
+    expect(localStorage.getItem(legacyKey)).toBeNull();
   });
 
   it("keeps Tamil assessment identities aligned with English", () => {

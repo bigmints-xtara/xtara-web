@@ -43,7 +43,7 @@ export interface UserProfile {
     marks?: Record<string, number>;
     timestamp?: string;
   };
-  gradeStage?: 'grade8' | 'grade9' | 'grade10';
+  gradeStage?: 'grade8' | 'grade9' | 'grade10' | 'grade11' | 'grade12';
   pathwayProfile?: {
     state?: string;
     district?: string;

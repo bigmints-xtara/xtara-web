@@ -16,7 +16,7 @@ import {
   assessmentStageStorageKey,
   assessmentV2Version,
   buildDiscoveryResult,
-  getAssessmentDraftStorageKey,
+  readAssessmentDraft,
   getAssessmentV2Catalog,
   getAssessmentV2Questions,
   getAssessmentStageQuestion,
@@ -89,10 +89,9 @@ function AssessmentJourney() {
       ...contextualQuestions.filter((question) => question.id !== "currentGrade"),
     ];
   }, [activeDefinition, effectiveStage, locale]);
-  const draftStorageKey = getAssessmentDraftStorageKey(effectiveStage ?? "grade8");
   const rawDraft = useSyncExternalStore(
     subscribeToAssessmentDraft,
-    () => effectiveStage ? localStorage.getItem(draftStorageKey) ?? "{}" : "{}",
+    () => effectiveStage ? readAssessmentDraft(effectiveStage) ?? "{}" : "{}",
     () => null,
   );
   const draft = useMemo(

@@ -8,7 +8,7 @@ export type {
     AssessmentValidationRule as ValidationRule,
 } from "@/modules/assessment";
 
-export type AssessmentStage = "grade8" | "grade9" | "grade10";
+export type AssessmentStage = "grade8" | "grade9" | "grade10" | "grade11" | "grade12";
 
 export interface LocationData {
     state: string;

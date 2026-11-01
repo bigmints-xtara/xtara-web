@@ -59,9 +59,9 @@ export function createEmptyFutureDirection(): Omit<FutureDirection, 'id'> {
     toolIds: [],
     courseQueries: [],
     gradeGuidance: {
-      en: { grade8: [], grade9: [], grade10: [] },
-      ml: { grade8: [], grade9: [], grade10: [] },
-      hi: { grade8: [], grade9: [], grade10: [] },
+      en: { grade8: [], grade9: [], grade10: [], grade11: [], grade12: [] },
+      ml: { grade8: [], grade9: [], grade10: [], grade11: [], grade12: [] },
+      hi: { grade8: [], grade9: [], grade10: [], grade11: [], grade12: [] },
     },
     displayOrder: 0,
     review: {},

@@ -28,7 +28,9 @@
       "options": {
         "grade8": "Grade 8",
         "grade9": "Grade 9",
-        "grade10": "Grade 10"
+        "grade10": "Grade 10",
+        "grade11": "Grade 11",
+        "grade12": "Grade 12"
       }
     }
   },
@@ -306,6 +308,64 @@
           { "id": "stillLearning", "label": "I am still discovering this", "metadata": { "exclusive": true } }
         ]
       }
+    ],
+    "grade11": [
+      {
+        "id": "grade11Focus",
+        "fieldType": "singleSelect",
+        "label": "What would help you explore your next steps during Grade 11?",
+        "description": "Use your current subjects as context, not a limit on your interests.",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "subjects",
+            "label": "Connecting my current subjects to careers"
+          },
+          {
+            "id": "experience",
+            "label": "Trying a project or talking to someone about their work"
+          },
+          {
+            "id": "routes",
+            "label": "Understanding alternative study routes"
+          },
+          {
+            "id": "discussion",
+            "label": "Discussing my options with a teacher or family member"
+          }
+        ]
+      }
+    ],
+    "grade12": [
+      {
+        "id": "grade12NextStep",
+        "fieldType": "singleSelect",
+        "label": "What would help you prepare for life after Grade 12?",
+        "description": "Compare possible routes; this assessment does not decide your eligibility.",
+        "validation": {
+          "required": true
+        },
+        "options": [
+          {
+            "id": "routes",
+            "label": "Comparing degrees, diplomas, training or apprenticeships"
+          },
+          {
+            "id": "requirements",
+            "label": "Checking current entry requirements and application dates"
+          },
+          {
+            "id": "practical",
+            "label": "Understanding costs, location and available support"
+          },
+          {
+            "id": "discussion",
+            "label": "Discussing my options before choosing a route"
+          }
+        ]
+      }
     ]
   },
   "signals": {
@@ -398,6 +458,16 @@
   "nextActions": {
     "grade8": ["Choose a Career Direction and discover its Dream Careers.", "Tell Xtara which Career Directions feel interesting or inaccurate.", "Add your study details to see useful courses and colleges."],
     "grade9": ["Compare Dream Careers by what people actually do each day.", "Choose up to three Dream Careers while you are still exploring.", "Add your study details to see subjects, courses, and colleges."],
-    "grade10": ["Compare how school subjects and courses keep different Career Directions open.", "Review the suggestions with your family, teacher, or counselor.", "Add your location and fee preference before comparing colleges."]
+    "grade10": ["Compare how school subjects and courses keep different Career Directions open.", "Review the suggestions with your family, teacher, or counselor.", "Add your location and fee preference before comparing colleges."],
+    "grade11": [
+      "Connect your current subjects with several careers worth exploring.",
+      "Try a small project or discuss the work with someone who knows it.",
+      "Check prerequisites before assuming a study route is available."
+    ],
+    "grade12": [
+      "Compare degree, diploma, training and apprenticeship routes.",
+      "Verify current entry requirements, costs and deadlines with official sources.",
+      "Discuss your shortlist and a practical next step with a trusted adult."
+    ]
   }
 }

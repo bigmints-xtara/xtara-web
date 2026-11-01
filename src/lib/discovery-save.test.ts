@@ -15,6 +15,7 @@ import {
 import {
   savePendingCareerChoiceToAccount,
   savePendingDiscoveryToAccount,
+  hydrateDiscoveryFromAccount,
 } from "@/lib/discovery-save";
 import { savePathwayProfile } from "@/lib/pathway-profile";
 
@@ -26,7 +27,10 @@ const mocks = vi.hoisted(() => ({
   saveDirectionToApi: vi.fn(),
   getDirectionFromApi: vi.fn(),
   getIdToken: vi.fn(),
+  evaluateAssessment: vi.fn(),
 }));
+
+vi.mock("@/lib/assessment-api", () => ({ evaluateAssessmentOnServer: mocks.evaluateAssessment }));
 
 vi.mock("@/lib/api/auth", () => ({
   createApiSession: mocks.createApiSession,
@@ -78,6 +82,24 @@ describe("staged discovery account sync", () => {
     mocks.patch.mockResolvedValue({ id: "learner-1" });
   });
 
+  it.each(["grade11", "grade12"] as const)("hydrates a saved %s without downgrading it", async (stage) => {
+    const { result, plan } = pendingCareerChoice();
+    const profile = savePathwayProfile({
+      state: "Kerala", district: "Ernakulam", city: "Kochi", educationBoard: "CBSE",
+      studyLanguage: "English", locationPreference: "Near home",
+      affordability: "We can consider moderate fees", scholarshipInterest: "Maybe, show me what is available",
+    });
+    const remote = { ...result, stage, answers: { ...result.answers, currentGrade: stage } };
+    mocks.getDirectionFromApi.mockResolvedValue(plan);
+    mocks.get.mockImplementation(async (path: string) => path === "/me" ? { pathwayProfile: profile } : {
+      assessment: { answers: { definitionId: remote.definitionId, schemaVersion: "3.1.0", stage,
+        answers: remote.answers, result: remote, pathwayProfile: profile } },
+    });
+    const hydrated = await hydrateDiscoveryFromAccount();
+    expect(hydrated?.assessment.stage).toBe(stage);
+    expect(loadDiscoveryResult()?.stage).toBe(stage);
+  });
+
   it("persists assessment and career choice before any location profile exists", async () => {
     const { result, plan } = pendingCareerChoice();
     mocks.saveDirectionToApi.mockResolvedValue(plan);
@@ -115,6 +137,29 @@ describe("staged discovery account sync", () => {
     expect(mocks.saveAssessment).not.toHaveBeenCalled();
     expect(mocks.patch).not.toHaveBeenCalled();
     expect(mocks.saveDirectionToApi).not.toHaveBeenCalled();
+  });
+
+  it("upgrades a pending 3.0 result before verifying 3.1 account readback", async () => {
+    const { result, plan } = pendingCareerChoice();
+    saveDiscoveryResult({ ...result, version: "3.0.0" });
+    mocks.evaluateAssessment.mockResolvedValue(result);
+    mocks.saveDirectionToApi.mockResolvedValue(plan);
+    mocks.get.mockResolvedValue({ assessment: { answers: {
+      definitionId: result.definitionId, schemaVersion: "3.1.0", stage: result.stage,
+    } } });
+    await expect(savePendingCareerChoiceToAccount("learner-1")).resolves.toBe(true);
+    expect(mocks.evaluateAssessment).toHaveBeenCalledWith(expect.objectContaining({ version: "3.0.0", stage: "grade8" }));
+    expect(mocks.saveAssessment).toHaveBeenCalledWith("learner-1", expect.objectContaining({ schemaVersion: "3.1.0" }));
+    expect(loadDiscoveryResult()).toMatchObject({ version: "3.1.0", syncStatus: "synced" });
+  });
+
+  it("preserves the old pending result if server re-evaluation fails", async () => {
+    const { result } = pendingCareerChoice();
+    saveDiscoveryResult({ ...result, version: "3.0.0" });
+    mocks.evaluateAssessment.mockRejectedValue(new Error("offline"));
+    await expect(savePendingCareerChoiceToAccount("learner-1")).rejects.toThrow("offline");
+    expect(loadDiscoveryResult()).toMatchObject({ version: "3.0.0", syncStatus: "temporary" });
+    expect(mocks.saveAssessment).not.toHaveBeenCalled();
   });
 
   it("completes location only after assessment, direction, and profile readback", async () => {

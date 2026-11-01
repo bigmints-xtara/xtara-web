@@ -40,7 +40,7 @@ export interface CareerSubjectGuidance {
   subjectId: string;
   importance: 'core' | 'helpful' | 'optional';
   guidance: string;
-  gradeIds: Array<'grade8' | 'grade9' | 'grade10'>;
+  gradeIds: Array<'grade8' | 'grade9' | 'grade10' | 'grade11' | 'grade12'>;
   sourceIds: StudentGuideSourceIds;
 }
 
@@ -362,6 +362,6 @@ export interface CareerStudentContextResponse {
   careerId: string;
   saved: boolean;
   assessmentReasons: Array<{ signalId: string; label: string; evidence: string }>;
-  grade?: 'grade8' | 'grade9' | 'grade10';
+  grade?: 'grade8' | 'grade9' | 'grade10' | 'grade11' | 'grade12';
   location: { city?: string; state?: string; country?: string };
 }

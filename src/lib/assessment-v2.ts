@@ -14,7 +14,7 @@ import type { CareerAreaId } from "@/types/career-knowledge";
 import type { AssessmentAnswers, AssessmentStage, Question } from "@/types/assessment";
 import type { CuratedDreamCareer, FutureDirection } from "@/types/curated-career";
 
-export const assessmentV2Version = "3.0.0";
+export const assessmentV2Version = "3.1.0";
 export const assessmentV2StorageKey = "xtara_assessment_v2";
 export const assessmentStageStorageKey = "xtara_assessment_stage_v1";
 
@@ -171,7 +171,7 @@ export function getCareerAssessmentDefinition(
   return {
     id: "career-discovery",
     version: assessmentV2Version,
-    contexts: ["grade8", "grade9", "grade10"],
+    contexts: ["grade8", "grade9", "grade10", "grade11", "grade12"],
     commonQuestions: catalog.questions as Question[],
     contextualQuestions: catalog.stageQuestions as Record<AssessmentStage, Question[]>,
   };
@@ -189,12 +189,12 @@ export function getAssessmentStageQuestion(locale: Locale): Question {
     label: copy.label,
     description: copy.description,
     validation: { required: true },
-    options: (["grade8", "grade9", "grade10"] as const).map((id) => ({ id, label: copy.options[id] })),
+    options: (["grade8", "grade9", "grade10", "grade11", "grade12"] as const).map((id) => ({ id, label: copy.options[id] })),
   };
 }
 
 export function parseOptionalAssessmentStage(value: string | null | undefined): AssessmentStage | null {
-  return value === "grade8" || value === "grade9" || value === "grade10" ? value : null;
+  return value === "grade8" || value === "grade9" || value === "grade10" || value === "grade11" || value === "grade12" ? value : null;
 }
 
 export function parseAssessmentStage(value: string | null): AssessmentStage {
@@ -420,7 +420,7 @@ export function parseDiscoveryResult(raw: string | null): DiscoveryResult | null
     if (
       value.definitionId === "career-discovery"
       && typeof value.version === "string"
-      && (value.stage === "grade8" || value.stage === "grade9" || value.stage === "grade10")
+      && parseOptionalAssessmentStage(value.stage) !== null
       && value.answers
       && Array.isArray(value.signals)
       && Array.isArray(value.traits)
@@ -429,7 +429,7 @@ export function parseDiscoveryResult(raw: string | null): DiscoveryResult | null
 
     if (
       (value.version === "2.0.0" || value.version === "2.1.0")
-      && (value.stage === "grade8" || value.stage === "grade9" || value.stage === "grade10")
+      && parseOptionalAssessmentStage(value.stage) !== null
       && value.answers
     ) {
       const migrated = buildDiscoveryResult(value.stage, value.locale ?? "en", value.answers);
@@ -446,7 +446,16 @@ export function saveAssessmentDraft(stage: AssessmentStage, answers: AssessmentA
 }
 
 export function loadAssessmentDraft(stage: AssessmentStage): AssessmentAnswers {
-  return parseAssessmentDraft(localStorage.getItem(getAssessmentDraftStorageKey(stage)));
+  return parseAssessmentDraft(readAssessmentDraft(stage));
+}
+
+export function readAssessmentDraft(stage: AssessmentStage): string | null {
+  const current = localStorage.getItem(getAssessmentDraftStorageKey(stage));
+  if (current !== null) return current;
+  // Grades 8–10 questions are unchanged in 3.1; preserve unfinished 3.0 drafts.
+  return ["grade8", "grade9", "grade10"].includes(stage)
+    ? localStorage.getItem(`${assessmentV2StorageKey}:draft:3.0.0:${stage}`)
+    : null;
 }
 
 export function getAssessmentDraftStorageKey(stage: AssessmentStage): string {
@@ -463,6 +472,7 @@ export function parseAssessmentDraft(raw: string | null): AssessmentAnswers {
 
 export function clearAssessmentDraft(stage: AssessmentStage): void {
   localStorage.removeItem(getAssessmentDraftStorageKey(stage));
+  localStorage.removeItem(`${assessmentV2StorageKey}:draft:3.0.0:${stage}`);
 }
 
 function localizeEvidenceReasons(references: EvidenceReference[], questions: Question[]): string[] {

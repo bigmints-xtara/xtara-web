@@ -75,8 +75,8 @@ export function FutureDirectionEditor({ entity, onSave, onCancel }: EditorProps<
       </Section>
 
       <Section title="Grade-specific next steps" description="These alter guidance detail, not the learner's intrinsic direction score.">
-        {(['en', 'ml', 'hi', 'ta'] as const).map((locale) => <div key={locale} className="rounded-lg border p-4"><p className="mb-3 text-sm font-semibold">{locale === 'en' ? 'English' : locale === 'ml' ? 'Malayalam' : locale === 'hi' ? 'Hindi' : 'Tamil'}</p>{(['grade8', 'grade9', 'grade10'] as const).map((grade) => (
-          <ListField key={grade} label={grade.replace('grade', 'Grade ')} values={form.gradeGuidance[locale]?.[grade] || []} onChange={(items) => setForm({ ...form, gradeGuidance: { ...form.gradeGuidance, [locale]: { ...(form.gradeGuidance[locale] || { grade8: [], grade9: [], grade10: [] }), [grade]: items } } })} multiline />
+        {(['en', 'ml', 'hi', 'ta'] as const).map((locale) => <div key={locale} className="rounded-lg border p-4"><p className="mb-3 text-sm font-semibold">{locale === 'en' ? 'English' : locale === 'ml' ? 'Malayalam' : locale === 'hi' ? 'Hindi' : 'Tamil'}</p>{(['grade8', 'grade9', 'grade10', 'grade11', 'grade12'] as const).map((grade) => (
+          <ListField key={grade} label={grade.replace('grade', 'Grade ')} values={form.gradeGuidance[locale]?.[grade] || []} onChange={(items) => setForm({ ...form, gradeGuidance: { ...form.gradeGuidance, [locale]: { ...(form.gradeGuidance[locale] || { grade8: [], grade9: [], grade10: [], grade11: [], grade12: [] }), [grade]: items } } })} multiline />
         ))}</div>)}
       </Section>
 

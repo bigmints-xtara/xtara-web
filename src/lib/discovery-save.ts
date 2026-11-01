@@ -1,8 +1,10 @@
 import { xtaraApi } from "@/lib/api/client";
 import { createApiSession } from "@/lib/api/auth";
+import { evaluateAssessmentOnServer } from "@/lib/assessment-api";
 import {
   assessmentV2StorageKey,
   parseDiscoveryResult,
+  parseOptionalAssessmentStage,
   saveDiscoveryResult,
   type DiscoveryResult,
 } from "@/lib/assessment-v2";
@@ -56,6 +58,10 @@ export async function savePendingDiscoveryToAccount(userId: string): Promise<boo
 
   await ensureApiSession(userId);
 
+  bundle.assessment = await currentAssessment(bundle.assessment);
+  if (!isDirectionPlanCompatible(bundle.assessment, bundle.directionPlan)) {
+    throw new Error("Please review your career choices against your updated assessment.");
+  }
   const [latestBeforeSave, directionBeforeSave] = await Promise.all([
     getLatestAssessment().catch(() => null),
     getDirectionFromApi().catch(() => null),
@@ -92,9 +98,10 @@ export async function savePendingDiscoveryToAccount(userId: string): Promise<boo
 }
 
 export async function savePendingAssessmentToAccount(userId: string): Promise<boolean> {
-  const assessment = parseDiscoveryResult(localStorage.getItem(assessmentV2StorageKey));
+  let assessment = parseDiscoveryResult(localStorage.getItem(assessmentV2StorageKey));
   if (!assessment) return false;
   await ensureApiSession(userId);
+  assessment = await currentAssessment(assessment);
   await saveAssessment(userId, assessmentAnswers(assessment, "exploration_map"));
   const latest = await getLatestAssessment();
   if (!assessmentMatches(latest, assessment)) {
@@ -109,6 +116,10 @@ async function persistCareerChoice(
   assessment: DiscoveryResult,
   directionPlan: DirectionPlan,
 ): Promise<void> {
+  assessment = await currentAssessment(assessment);
+  if (!isDirectionPlanCompatible(assessment, directionPlan)) {
+    throw new Error("Please review your career choices against your updated assessment.");
+  }
   await saveAssessment(userId, assessmentAnswers(assessment, "future_directions"));
   await xtaraApi.patch("/me", {
     gradeStage: assessment.stage,
@@ -121,6 +132,21 @@ async function persistCareerChoice(
   }
   saveDiscoveryResult({ ...assessment, syncStatus: "synced" });
   saveDirectionPlan(savedDirection);
+}
+
+async function currentAssessment(assessment: DiscoveryResult): Promise<DiscoveryResult> {
+  if (assessment.version !== "3.0.0") return assessment;
+  const current = await evaluateAssessmentOnServer({
+    definitionId: assessment.definitionId,
+    version: assessment.version,
+    stage: assessment.stage,
+    locale: assessment.locale ?? "en",
+    answers: assessment.answers,
+  });
+  if (current.version !== "3.1.0" || current.stage !== assessment.stage) {
+    throw new Error("Your updated assessment was not returned by the server.");
+  }
+  return { ...current, reflection: assessment.reflection };
 }
 
 function assessmentAnswers(
@@ -226,7 +252,7 @@ export async function hydrateDiscoveryFromAccount(): Promise<DiscoverySaveBundle
   const directionPlan = parseDirectionPlan(remoteDirection ? JSON.stringify(remoteDirection) : null);
   if (
     saved?.definitionId !== "career-discovery"
-    || saved.schemaVersion !== "3.0.0"
+    || (saved.schemaVersion !== "3.0.0" && saved.schemaVersion !== "3.1.0")
     || !resultData?.signals
     || !resultData.traits
     || !resultData.areas
@@ -234,10 +260,12 @@ export async function hydrateDiscoveryFromAccount(): Promise<DiscoverySaveBundle
     || !pathwayProfile
   ) return null;
 
+  const savedStage = parseOptionalAssessmentStage(typeof saved.stage === "string" ? saved.stage : null);
+  if (!savedStage) return null;
   const assessment: DiscoveryResult = {
     definitionId: "career-discovery",
     version: String(saved.schemaVersion),
-    stage: saved.stage === "grade9" || saved.stage === "grade10" ? saved.stage : "grade8",
+    stage: savedStage,
     locale: saved.locale === "ml" || saved.locale === "hi" || saved.locale === "ta" ? saved.locale : "en",
     createdAt: typeof saved.completedAt === "string" ? saved.completedAt : new Date().toISOString(),
     answers: typeof saved.answers === "object" && saved.answers ? saved.answers as DiscoveryResult["answers"] : {},
