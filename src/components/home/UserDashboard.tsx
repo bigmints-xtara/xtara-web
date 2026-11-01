@@ -51,6 +51,8 @@ import { AchievementsService } from "@/lib/firebase/achievements-service";
 import { getDirectionCourseQueries } from "@/lib/pathway-recommendations";
 import type { CuratedDreamCareer } from "@/types/curated-career";
 
+import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from "@/lib/mvp-navigation";
+
 type RewardSummary = { points: number; medals: number; level: string };
 
 export default function UserDashboard() {
@@ -83,7 +85,7 @@ export default function UserDashboard() {
   }, [userId]);
 
   useEffect(() => {
-    if (!userId || isAnonymous) return;
+    if (MVP_NAVIGATION_ENABLED || !userId || isAnonymous) return;
     let active = true;
     const service = new AchievementsService();
     Promise.all([service.getTotalPoints(userId), service.getMedalData(userId), service.getTierData(userId)])
@@ -95,7 +97,7 @@ export default function UserDashboard() {
   }, [isAnonymous, userId]);
 
   useEffect(() => {
-    if (!userId || isAnonymous) {
+    if (MVP_NAVIGATION_ENABLED || !userId || isAnonymous) {
       return;
     }
     let active = true;
@@ -168,7 +170,7 @@ export default function UserDashboard() {
   return (
     <main className="mx-auto max-w-6xl px-5 py-8 pb-28 sm:py-10 xl:pb-20">
       <p className="text-sm font-medium text-muted-foreground">{greeting}</p>
-      <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-primary sm:text-4xl">{text.title}</h1>
+      <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-primary sm:text-4xl">{MVP_NAVIGATION_ENABLED ? mvpNavigationCopy[locale].myDirection : text.title}</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{text.nextStepsDescription}</p>
 
       <section
@@ -246,12 +248,12 @@ export default function UserDashboard() {
 
       {selectedCareers.length ? (
         <>
-      <section className="mt-8" aria-label={text.progress}>
+      {!MVP_NAVIGATION_ENABLED ? <section className="mt-8" aria-label={text.progress}>
         <WeeklyPlanCard />
-      </section>
+      </section> : null}
 
-      <section id="next-steps" className="mt-8 grid scroll-mt-24 gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
-            <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
+      <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? "max-w-xl" : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
+            {!MVP_NAVIGATION_ENABLED ? <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
               <div className="flex items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold text-primary">{text.myNextSteps}</h2><p className="mt-2 text-sm text-muted-foreground">{stepsDone}</p></div><span className="text-2xl font-semibold text-primary">{completedSteps}/{totalSteps}</span></div>
               {experience?.nextBest ? (
                 <div className="mt-6 rounded-2xl bg-secondary/25 p-4" data-testid="next-best-recommendation">
@@ -277,7 +279,7 @@ export default function UserDashboard() {
                   );
                 })}
               </div>
-            </CardContent></Card>
+            </CardContent></Card> : null}
             <Card className="border-0 bg-secondary/20 shadow-none"><CardContent className="flex h-full flex-col p-6">
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-primary"><MessageCircleMore className="h-5 w-5" /></span>
               <h2 className="mt-5 text-lg font-semibold text-primary">{text.careerConversation}</h2>
@@ -286,13 +288,13 @@ export default function UserDashboard() {
             </CardContent></Card>
           </section>
 
-          <section className="mt-8" aria-labelledby="career-achievements-title">
+          {!MVP_NAVIGATION_ENABLED ? <section className="mt-8" aria-labelledby="career-achievements-title">
             <Card className="border-0 bg-secondary/20 shadow-none"><CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
               <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">{text.rewards}</p><h2 id="career-achievements-title" className="mt-2 text-xl font-semibold text-primary">{text.viewRewards}</h2></div>
               <div className="grid grid-cols-3 gap-2 text-center sm:min-w-80"><RewardValue value={rewards.points.toLocaleString()} label={text.points} /><RewardValue value={String(rewards.medals)} label={text.medals} /><RewardValue value={localizeRewardLevel(rewards.level, locale)} label={text.level} compact /></div>
               <Button asChild className="rounded-full"><Link href="/achievements">{text.viewRewards}<ArrowRight className="h-4 w-4" /></Link></Button>
             </CardContent></Card>
-          </section>
+          </section> : null}
         </>
       ) : null}
 

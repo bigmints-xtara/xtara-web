@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import Header from "@/components/Header";
+import { mvpNavigationCopy } from "@/lib/mvp-navigation";
 import { LanguageProvider } from "@/i18n/language-provider";
 
 const mocks = vi.hoisted(() => ({
@@ -30,6 +31,17 @@ describe("workspace-aware header", () => {
     mocks.useAuth.mockReturnValue({ user: { uid: "user-1" } });
   });
 
+  it.each(["en", "ml", "hi", "ta"] as const)("shows exactly three mobile destinations in %s", (locale) => {
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
+    render(<LanguageProvider initialLocale={locale}><Header /></LanguageProvider>);
+    const mobile = document.querySelector('nav.fixed');
+    const links = mobile?.querySelectorAll('a');
+    expect(links).toHaveLength(3);
+    expect(Array.from(links || []).map((link) => link.textContent)).toEqual([
+      mvpNavigationCopy[locale].myDirection, mvpNavigationCopy[locale].exploreCareers, mvpNavigationCopy[locale].profile,
+    ]);
+  });
+
   it("keeps organization staff inside the educator workspace", () => {
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: true, loading: false });
     renderHeader();
@@ -43,12 +55,13 @@ describe("workspace-aware header", () => {
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
     renderHeader();
     expect(screen.getByRole("link", { name: "Xtara Logo" })).toHaveAttribute("href", "/dashboard");
-    expect(screen.getAllByRole("link", { name: "Career" })[0]).toHaveAttribute("href", "/dashboard");
-    expect(screen.getAllByRole("link", { name: "Learn" })[0]).toHaveAttribute("href", "/learn");
-    expect(screen.getAllByRole("link", { name: "Play" })[0]).toHaveAttribute("href", "/play");
-    expect(screen.getAllByRole("link", { name: "Achievements" })[0]).toHaveAttribute("href", "/achievements");
+    expect(screen.getAllByRole("link", { name: "My Direction" })[0]).toHaveAttribute("href", "/dashboard");
+    expect(screen.queryByRole("link", { name: "Learn" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Play" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Achievements" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Explore Careers" })[0]).toHaveAttribute("href", "/explore");
     expect(screen.getAllByRole("link", { name: "Profile" })[0]).toHaveAttribute("href", "/profile");
-    expect(screen.getAllByRole("link", { name: "Notifications" })[0]).toHaveAttribute("href", "/notifications");
+    expect(screen.queryByRole("link", { name: "Notifications" })).not.toBeInTheDocument();
   });
 
   it("keeps institution setup out of the learner shell before membership exists", () => {

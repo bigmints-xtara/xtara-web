@@ -3,7 +3,7 @@ import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersC
 import { createEmptyFutureDirection } from '@/lib/admin/configs/futureDirectionsConfig';
 import type { CuratedDreamCareer, FutureDirection } from '@/types/curated-career';
 
-type ListResponse<T> = { items?: T[] } | T[];
+type ListResponse<T> = { items?: T[]; pagination?: { totalPages: number } } | T[];
 
 function itemsFrom<T>(response: ListResponse<T>): T[] {
   return Array.isArray(response) ? response : response.items || [];
@@ -25,7 +25,13 @@ export async function getPublishedFutureDirections(): Promise<FutureDirection[]>
 
 export async function getPublishedDreamCareers(): Promise<CuratedDreamCareer[]> {
   const response = await xtaraApi.get<ListResponse<Record<string, unknown>>>('/dream-careers?limit=100');
-  return itemsFrom(response).map(normalizeDreamCareer);
+  const records = itemsFrom(response);
+  const totalPages = Array.isArray(response) ? 1 : response.pagination?.totalPages ?? 1;
+  for (let page = 2; Number.isInteger(totalPages) && page <= totalPages; page += 1) {
+    const next = await xtaraApi.get<ListResponse<Record<string, unknown>>>(`/dream-careers?limit=100&page=${page}`);
+    records.push(...itemsFrom(next));
+  }
+  return [...new Map(records.map((record) => [String(record.id), normalizeDreamCareer(record)])).values()];
 }
 
 export async function getPublishedDreamCareer(id: string): Promise<CuratedDreamCareer> {

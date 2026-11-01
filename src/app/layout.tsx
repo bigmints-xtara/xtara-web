@@ -12,6 +12,7 @@ import type { Metadata } from "next";
 import WaitlistScript from "@/components/WaitlistScript";
 import { OrganizationProvider } from "@/context/OrganizationContext";
 import WorkspaceRouteBoundary from "@/components/auth/WorkspaceRouteBoundary";
+import MvpRouteBoundary from "@/components/MvpRouteBoundary";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -56,7 +57,7 @@ gtag('config', '${gaMeasurementId}');`}
               <Suspense fallback={null}>
                 <AnalyticsProvider />
               </Suspense>
-              <WorkspaceRouteBoundary>{children}</WorkspaceRouteBoundary>
+              <WorkspaceRouteBoundary><MvpRouteBoundary>{children}</MvpRouteBoundary></WorkspaceRouteBoundary>
             </LanguageProvider>
           </OrganizationProvider>
         </AuthProvider>

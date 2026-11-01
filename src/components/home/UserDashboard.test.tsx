@@ -6,6 +6,7 @@ import { assessmentV2StorageKey, type DiscoveryResult } from '@/lib/assessment-v
 import { createAreaDirectionPlan, directionStorageKey, selectDirectionRole, setDreamCareers } from '@/lib/direction';
 
 const mocks = vi.hoisted(() => ({
+  mvpEnabled: false,
   hydrate: vi.fn(),
   getPoints: vi.fn(),
   getMedals: vi.fn(),
@@ -13,6 +14,11 @@ const mocks = vi.hoisted(() => ({
   getExperience: vi.fn(),
   recordRecommendation: vi.fn(),
 }));
+
+vi.mock('@/lib/mvp-navigation', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/mvp-navigation')>();
+  return { ...actual, get MVP_NAVIGATION_ENABLED() { return mocks.mvpEnabled; } };
+});
 
 vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({ user: { uid: 'student-1', displayName: 'Anu' }, userProfile: { fullName: 'Anu Student' } }),
@@ -85,6 +91,7 @@ describe('pursued-area learner dashboard', () => {
   beforeEach(() => {
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
     Object.defineProperty(window, 'localStorage', { configurable: true, value: storage });
+    mocks.mvpEnabled = false;
     localStorage.clear();
     mocks.hydrate.mockReset().mockResolvedValue(null);
     mocks.getPoints.mockReset().mockResolvedValue(120);
@@ -103,6 +110,22 @@ describe('pursued-area learner dashboard', () => {
   afterEach(() => {
     if (root) act(() => root.unmount());
     container?.remove();
+  });
+
+  it('keeps direction, careers and conversation without fetching hidden engagement data in MVP', async () => {
+    mocks.mvpEnabled = true;
+    const before = localStorage.getItem(directionStorageKey);
+    await act(async () => { root.render(<UserDashboard />); });
+    expect(container.textContent).toContain('My Direction');
+    expect(container.textContent).toContain('UX Designer');
+    expect(container.textContent).toContain('Career Conversation');
+    expect(container.textContent).not.toContain('My Rewards');
+    expect(container.textContent).not.toContain('My goals this week');
+    expect(container.textContent).not.toContain('My Next Steps');
+    expect(container.querySelector('a[href="/achievements"]')).toBeNull();
+    expect(mocks.getPoints).not.toHaveBeenCalled();
+    expect(mocks.getExperience).not.toHaveBeenCalled();
+    expect(localStorage.getItem(directionStorageKey)).toBe(before);
   });
 
   it('focuses Career on direction, Dream Careers, next steps, and an achievements snapshot', async () => {

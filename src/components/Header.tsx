@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, BookOpen, Gamepad2, Menu, Route, Trophy, UserRound } from 'lucide-react';
+import { Bell, BookOpen, Compass, Gamepad2, Menu, Route, Trophy, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from "@/context/AuthContext";
 import { useOrganizationWorkspace } from "@/context/OrganizationContext";
@@ -21,10 +21,12 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslations } from "@/i18n/language-provider";
 import { isWorkspaceRoute, WORKSPACE_MANIFESTS } from "@/lib/workspace-manifest";
 
+import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from "@/lib/mvp-navigation";
+
 const Header = () => {
     const { user } = useAuth();
     const { isStaff, loading: workspaceLoading, error: workspaceError } = useOrganizationWorkspace();
-    const { t } = useTranslations();
+    const { t, locale } = useTranslations();
     const pathname = usePathname();
     const isLoggedIn = Boolean(user);
     const organizationRoute = isWorkspaceRoute("educator", pathname);
@@ -42,7 +44,11 @@ const Header = () => {
             { key: "educatorProfile", url: WORKSPACE_MANIFESTS.educator.profilePath },
         ]
         : isLoggedIn
-        ? [
+        ? MVP_NAVIGATION_ENABLED ? [
+            { key: "career", url: WORKSPACE_MANIFESTS.student.homePath },
+            { key: "explore", url: "/explore" },
+            { key: "profile", url: WORKSPACE_MANIFESTS.student.profilePath },
+        ] : [
             { key: "career", url: WORKSPACE_MANIFESTS.student.homePath },
             { key: "learn", url: "/learn" },
             { key: "play", url: "/play" },
@@ -55,7 +61,15 @@ const Header = () => {
             { key: "about", url: "/about" },
         ];
 
+    const navLabel = (key: string) => {
+        const copy = mvpNavigationCopy[locale];
+        if (MVP_NAVIGATION_ENABLED && key === "career") return copy.myDirection;
+        if (MVP_NAVIGATION_ENABLED && key === "explore") return copy.exploreCareers;
+        if (MVP_NAVIGATION_ENABLED && key === "profile") return copy.profile;
+        return t(`header.nav.${key}`);
+    };
     const isActive = (url: string) => {
+        if (url === "/explore" && pathname.startsWith("/dream-careers/")) return true;
         // Normalize pathname by removing trailing slash
         const normalizedPathname = pathname.endsWith('/') && pathname !== '/'
             ? pathname.slice(0, -1)
@@ -76,6 +90,7 @@ const Header = () => {
     };
 
     const learnerIcon = (key: string) => {
+        if (key === "explore") return Compass;
         if (key === "learn") return BookOpen;
         if (key === "play") return Gamepad2;
         if (key === "achievements") return Trophy;
@@ -84,7 +99,7 @@ const Header = () => {
     };
 
     return <>
-        <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur-xl">
+        <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur-xl">
             <Container className="!px-0">
                 <nav className="flex min-h-16 items-center gap-4 px-4 md:px-6">
                     {/* Logo */}
@@ -111,7 +126,7 @@ const Header = () => {
                                         href={item.url}
                                         className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${active
                                             ? 'bg-primary/8 text-primary'
-                                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'
+                                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                             }`}
                                         onClick={() =>
                                             trackEvent({
@@ -121,7 +136,7 @@ const Header = () => {
                                             })
                                         }
                                     >
-                                        {t(`header.nav.${item.key}`)}
+                                        {navLabel(item.key)}
                                     </Link>
                                 </li>
                             );
@@ -143,7 +158,7 @@ const Header = () => {
                                 </Link>
                             </li>
                         )}
-                        {learnerShell ? (
+                        {learnerShell && !MVP_NAVIGATION_ENABLED ? (
                             <li className="ml-1">
                                 <Link
                                     href="/notifications"
@@ -161,7 +176,7 @@ const Header = () => {
 
                     {/* Mobile Menu */}
                     <div className="ml-auto flex items-center justify-end gap-1.5 xl:hidden">
-                        {learnerShell ? (
+                        {learnerShell && !MVP_NAVIGATION_ENABLED ? (
                             <Link
                                 href="/notifications"
                                 aria-label={t("header.nav.notifications")}
@@ -195,7 +210,7 @@ const Header = () => {
                                                 })
                                             }
                                         >
-                                            {t(`header.nav.${item.key}`)}
+                                            {navLabel(item.key)}
                                         </Link>
                                     </DropdownMenuItem>
                                 ))}
@@ -226,10 +241,10 @@ const Header = () => {
         </header>
         {learnerShell ? (
             <nav
-                className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/96 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl xl:hidden"
+                className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl xl:hidden"
                 aria-label={t("header.nav.learnerNavigation")}
             >
-                <ul className="mx-auto grid max-w-lg grid-cols-5 px-1">
+                <ul className={`mx-auto grid max-w-lg ${MVP_NAVIGATION_ENABLED ? "grid-cols-3" : "grid-cols-5"} px-1`}>
                     {navItems.map((item) => {
                         const Icon = learnerIcon(item.key);
                         const active = isActive(item.url);
@@ -238,10 +253,10 @@ const Header = () => {
                                 <Link
                                     href={item.url}
                                     aria-current={active ? "page" : undefined}
-                                    className={`flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-semibold transition-colors ${active ? "text-primary" : "text-slate-500 hover:text-slate-900"}`}
+                                    className={`flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-semibold transition-colors ${active ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
                                 >
                                     <Icon className="h-5 w-5" />
-                                    <span className="max-w-full truncate">{t(`header.nav.${item.key}`)}</span>
+                                    <span className="max-w-full text-center leading-tight">{navLabel(item.key)}</span>
                                 </Link>
                             </li>
                         );
