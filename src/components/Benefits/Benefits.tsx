@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslations } from "@/i18n/language-provider";
 import { trackEvent } from "@/lib/analytics";
+import { MVP_NAVIGATION_ENABLED } from "@/lib/mvp-navigation";
 
 const outcomeIcons = [Compass, Sparkles, Route];
 const momentumIcons = [BookOpenCheck, Gamepad2, GraduationCap, MessageCircleMore];
@@ -117,6 +118,7 @@ const Benefits = () => {
         </div>
       </section>
 
+      {!MVP_NAVIGATION_ENABLED && (
       <section className="py-16 sm:py-24">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <div>
@@ -155,6 +157,7 @@ const Benefits = () => {
           </div>
         </div>
       </section>
+      )}
 
       <section className="overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white sm:px-10 sm:py-16">
         <div className="mx-auto max-w-3xl text-center">

@@ -80,6 +80,30 @@ describe("value-led homepage conversion journey", () => {
     expect(container.querySelector('img[alt="A young woman sharing a warm moment with an older family member"]')).not.toBeNull();
   });
 
+  it.each(["en", "ml", "hi", "ta"] as const)("keeps %s homepage within MVP scope", async (locale) => {
+    const content = getMessages(locale).trustedDiscovery.home;
+    await act(async () => {
+      root.render(<LanguageProvider initialLocale={locale}><Hero /><Benefits /><FAQ /></LanguageProvider>);
+      rendered = true;
+    });
+    for (const item of content.momentum.items) {
+      expect(container.textContent).not.toContain(item.description);
+    }
+    expect(container.textContent).toContain("8–12");
+    expect(container.textContent).toContain(content.hero.proofs[1]);
+    const questions = container.querySelectorAll<HTMLButtonElement>("#faq button");
+    await act(async () => questions[questions.length - 1].click());
+    expect(container.textContent).toContain(content.questions.items.at(-1)!.answer);
+    expect(container.querySelector('a[href="/assessment"]')).not.toBeNull();
+  });
+
+  it("pairs the Hindi language answer with the language question", () => {
+    const items = getMessages("hi").trustedDiscovery.home.questions.items;
+    expect(items[0].answer).not.toContain("तमिल");
+    expect(items.at(-1)!.question).toBe("मैं कौन-सी भाषाएँ चुन सकता हूँ?");
+    expect(items.at(-1)!.answer).toContain("अंग्रेज़ी, मलयालम, हिंदी या तमिल");
+  });
+
   it("keeps the same value story available in Malayalam", () => {
     const content = getMessages("ml").trustedDiscovery.home;
     expect(content.hero.title).toContain("എനിക്ക് അറിയില്ല");

@@ -272,8 +272,8 @@
         "login": "Log in to my plan",
         "imageAlt": "A joyful group of Indian school students",
         "proofs": [
-          "For Grade 8 and above",
-          "English and Malayalam",
+          "Grades 8–12",
+          "Interface: English, Malayalam, Hindi and Tamil",
           "Clear reasons behind every direction"
         ],
         "resultLabel": "What you will discover",
@@ -451,11 +451,11 @@
           },
           {
             "question": "Do I need an account before starting?",
-            "answer": "No. Start the assessment first. Sign up or log in when you want to save the result, Dream Careers, study details, and learning progress."
+            "answer": "You can explore the assessment before signing in. Sign in to save your direction, career choices and study details."
           },
           {
-            "question": "Can we use Xtara in Malayalam?",
-            "answer": "Yes. The student journey is available in English and Malayalam."
+            "question": "Which languages can I choose?",
+            "answer": "You can choose English, Malayalam, Hindi or Tamil. Career guidance appears when reviewed content is available in your selected language."
           }
         ]
       },

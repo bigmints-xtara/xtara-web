@@ -272,9 +272,9 @@
         "login": "Log in करें",
         "imageAlt": "Career planning देखते students",
         "proofs": [
-          "Career path को साफ रखने वाला step",
-          "Career path को साफ रखने वाला step",
-          "Career path को साफ रखने वाला step"
+          "कक्षा 8–12",
+          "इंटरफ़ेस: अंग्रेज़ी, मलयालम, हिंदी और तमिल",
+          "हर दिशा का स्पष्ट कारण"
         ],
         "resultLabel": "Assessment के बाद",
         "resultTitle": "Career Direction और next steps",
@@ -451,11 +451,11 @@
           },
           {
             "question": "Start करने से पहले account चाहिए?",
-            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+            "answer": "साइन इन करने से पहले आप आकलन शुरू कर सकते हैं। अपनी दिशा, करियर विकल्प और पढ़ाई की जानकारी सहेजने के लिए साइन इन करें।"
           },
           {
-            "question": "क्या Xtara Malayalam में use कर सकते हैं?",
-            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+            "question": "मैं कौन-सी भाषाएँ चुन सकता हूँ?",
+            "answer": "आप अंग्रेज़ी, मलयालम, हिंदी या तमिल चुन सकते हैं। आपकी चुनी हुई भाषा में समीक्षा की गई सामग्री उपलब्ध होने पर करियर मार्गदर्शन दिखाई देगा।"
           }
         ]
       },
