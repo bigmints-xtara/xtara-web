@@ -51,7 +51,7 @@ export default function DreamCareerStudentGuideReviewPanel({ career }: { career:
           {completeness ? <Badge variant="outline">Guide {completeness.studentGuide}</Badge> : null}
           {completeness ? <Badge variant="outline">Translations {completeness.translations}</Badge> : null}
           <Badge variant={pendingSources ? 'secondary' : 'outline'}>
-            {pendingSources ? `${pendingSources} source${pendingSources === 1 ? '' : 's'} pending review` : 'Sources reviewed'}
+            {pendingSources ? `${pendingSources} source${pendingSources === 1 ? '' : 's'} pending review` : career.studentGuide.sources.length ? 'Sources marked reviewed' : 'No sources recorded'}
           </Badge>
         </div>
       </div>

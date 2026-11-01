@@ -12,6 +12,8 @@ const service = vi.hoisted(() => ({
 }));
 const approval = vi.hoisted(() => ({ approve: vi.fn() }));
 const versions = vi.hoisted(() => ({ history: vi.fn(), createDraft: vi.fn(), saveDraft: vi.fn(), action: vi.fn() }));
+const evidence = vi.hoisted(() => ({ getReviewSnapshot: vi.fn(), recordReviewEvidence: vi.fn(), revokeReviewEvidence: vi.fn() }));
+vi.mock('@/lib/career-review-evidence', () => evidence);
 const auth = vi.hoisted(() => ({ useAuth: vi.fn() }));
 
 vi.mock('@/lib/services/adminService', () => ({
@@ -55,6 +57,7 @@ describe('AdminContentEditorPage', () => {
   const replace = vi.fn();
 
   beforeEach(() => {
+    Object.values(evidence).forEach((mock) => mock.mockReset());
     service.create.mockReset();
     service.getById.mockReset();
     service.getPage.mockReset();
@@ -68,6 +71,45 @@ describe('AdminContentEditorPage', () => {
     push.mockReset();
     replace.mockReset();
     vi.mocked(useRouter).mockReturnValue({ push, replace } as unknown as ReturnType<typeof useRouter>);
+  });
+
+  it('uses the advanced receipt lock when approving the same content version', async () => {
+    const live = { ...createEmptyDreamCareer(), id: 'doctor', status: 'published' as const, published: true };
+    const version = { id: 'v2', collectionName: 'dream_careers', recordId: 'doctor', revision: 2, schemaVersion: 1, lockVersion: 2, status: 'inReview', content: live, basedOnVersionId: null, createdAt: '2026-11-02', createdBy: 'editor', updatedAt: '2026-11-02', updatedBy: 'editor' };
+    const snapshot = { versionId: 'v2', lockVersion: 2, contentChecksum: 'digest', status: 'inReview', content: live, receipts: [], coverage: { complete: false, blockers: [] }, allowedScopes: { grades: ['grade11'], locales: ['en'], jurisdictions: ['Kerala'] } };
+    service.getById.mockResolvedValue(live);
+    versions.history.mockResolvedValue({ active: version, live: null, versions: [version] });
+    evidence.getReviewSnapshot.mockResolvedValue(snapshot);
+    evidence.recordReviewEvidence.mockResolvedValue({ ...snapshot, lockVersion: 3 });
+    versions.action.mockResolvedValue({ ...version, status: 'approved', lockVersion: 4 });
+    render(<AdminContentEditorPage contentType="dream-careers" recordId="doctor" />);
+    await screen.findByRole('button', { name: 'Approve version' });
+    fireEvent.click(screen.getByRole('tab', { name: 'Review evidence' }));
+    fireEvent.change(screen.getByLabelText('Content version'), { target: { value: 'v2' } });
+    await screen.findByText(/Content checksum: digest/);
+    for (const label of ['grade11', 'en', 'Kerala']) fireEvent.click(screen.getByLabelText(label));
+    fireEvent.change(screen.getByLabelText(/Content paths reviewed/), { target: { value: 'studentGuide.aboutCareer.whatYouDo' } });
+    fireEvent.change(screen.getByLabelText(/Evidence source IDs/), { target: { value: 'source1' } });
+    fireEvent.change(screen.getByLabelText(/Supported claims/), { target: { value: 'Checked claim' } });
+    fireEvent.change(screen.getByLabelText(/Applicability rationale/), { target: { value: 'Applies to the selected scope.' } });
+    fireEvent.click(screen.getByLabelText(/I reviewed this exact/));
+    fireEvent.click(screen.getByRole('button', { name: 'Record review evidence' }));
+    await screen.findByText(/Review evidence saved and verified/);
+    fireEvent.click(screen.getByRole('button', { name: 'Approve version' }));
+    await waitFor(() => expect(versions.action).toHaveBeenCalledWith('dream_careers', 'doctor', expect.objectContaining({ id: 'v2', lockVersion: 3 }), 'approve'));
+  });
+
+  it('opens a separate evidence tab and does not treat failed history as empty', async () => {
+    service.getById.mockResolvedValue({ ...createEmptyDreamCareer(), id: 'doctor' });
+    versions.history.mockRejectedValueOnce(new Error('Version history unavailable')).mockResolvedValueOnce({ live: null, active: null, versions: [] });
+    render(<AdminContentEditorPage contentType="dream-careers" recordId="doctor" />);
+    await waitFor(() => expect(versions.history).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('tab', { name: 'Review evidence' }));
+    await screen.findByText('Version history unavailable');
+    expect(screen.queryByText(/No saved versions/)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Retry versions' }));
+    await screen.findByText(/No saved versions/);
+    expect(approval.approve).not.toHaveBeenCalled();
   });
 
   it('loads a routed record and switches between its edit and real preview', async () => {

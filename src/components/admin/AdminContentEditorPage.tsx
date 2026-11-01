@@ -19,6 +19,8 @@ import { AdminService } from '@/lib/services/adminService';
 import type { AdminEntity } from '@/types/admin';
 import { cn } from '@/lib/utils';
 import { getAdminContentDefinition } from './adminContentRegistry';
+import CareerReviewEvidencePanel from './CareerReviewEvidencePanel';
+import type { ReviewSnapshot } from '@/lib/career-review-evidence';
 
 export default function AdminContentEditorPage({ contentType, recordId }: { contentType: string; recordId: string }) {
   const router = useRouter();
@@ -28,7 +30,7 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
   const [persistedId, setPersistedId] = useState<string | null>(recordId === 'new' ? null : recordId);
   const [loading, setLoading] = useState(recordId !== 'new');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'edit' | 'preview' | 'versions'>('edit');
+  const [activeTab, setActiveTab] = useState<'edit' | 'preview' | 'versions' | 'evidence'>('edit');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [approving, setApproving] = useState(false);
   const [versionAction, setVersionAction] = useState<string | null>(null);
@@ -255,8 +257,9 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
         </div>
         {actionMessage ? <div className="mb-3 flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"><CheckCircle2 className="size-4" />{actionMessage}</div> : null}
         {actionError ? <div className="mb-3 rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive" role="alert">{actionError}</div> : null}
-        <div aria-label="Content editor views" className="flex gap-1" role="tablist">
+        <div aria-label="Content editor views" className="flex flex-wrap gap-1" role="tablist">
           <TabButton active={activeTab === 'edit'} icon={FilePenLine} label="Edit" onClick={() => setActiveTab('edit')} />
+          {versionedCollection === 'dream_careers' && persistedId ? <TabButton active={activeTab === 'evidence'} icon={ShieldCheck} label="Review evidence" onClick={() => setActiveTab('evidence')} /> : null}
           <TabButton active={activeTab === 'preview'} disabled={!entity} icon={Eye} label="Preview" onClick={() => setActiveTab('preview')} />
           {versionedCollection && persistedId ? (
             <TabButton active={activeTab === 'versions'} icon={GitBranch} label="Versions" onClick={() => setActiveTab('versions')} />
@@ -276,6 +279,8 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
             </div>
           ) : activeTab === 'preview' ? (
             <div className="h-full overflow-y-auto bg-background" role="tabpanel">{selectedPreviewEntity ? definition.renderPreview(selectedPreviewEntity) : null}</div>
+          ) : activeTab === 'evidence' && versionedCollection && persistedId ? (
+            versionsLoading ? <p role="status" className="p-5">Loading saved versions…</p> : versionsError ? <div role="alert" className="p-5">{versionsError}<Button onClick={() => { void loadVersions(); }} variant="outline">Retry versions</Button></div> : <CareerReviewEvidencePanel collection={versionedCollection} recordId={persistedId} versions={versionHistory?.versions || []} mayRecord={mayApprove} onSnapshotMutation={(snapshot) => setVersionHistory((history) => updateReviewLock(history, snapshot))} />
           ) : (
             <VersionHistoryPanel
               error={versionsError}
@@ -381,4 +386,10 @@ function TabButton({ active, disabled, icon: Icon, label, onClick }: { active: b
       <Icon className="size-4" />{label}
     </button>
   );
+}
+
+function updateReviewLock(history: CareerContentVersionHistory | null, snapshot: ReviewSnapshot): CareerContentVersionHistory | null {
+  if (!history) return history;
+  const update = (version: CareerContentVersion) => version.id === snapshot.versionId ? { ...version, lockVersion: snapshot.lockVersion } : version;
+  return { ...history, active: history.active ? update(history.active) : null, live: history.live ? update(history.live) : null, versions: history.versions.map(update) };
 }
