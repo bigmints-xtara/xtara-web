@@ -5,7 +5,7 @@ export type CareerContentVersionStatus = 'draft' | 'inReview' | 'approved' | 'li
 export interface CareerContentVersion {
   id: string;
   schemaVersion: 1;
-  collectionName: 'dream_careers' | 'future_directions';
+  collectionName: 'dream_careers' | 'future_directions' | 'assessment_definitions';
   recordId: string;
   revision: number;
   lockVersion: number;

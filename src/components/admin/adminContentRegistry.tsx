@@ -1,3 +1,5 @@
+import AssessmentDefinitionEditor, { AssessmentDefinitionPreview } from './editors/AssessmentDefinitionEditor';
+import { assessmentDefinitionsConfig, type AssessmentDefinitionAdmin } from '@/lib/admin/configs/assessmentDefinitionsConfig';
 import type { ReactNode } from 'react';
 
 import ChallengeEditor from '@/components/admin/editors/ChallengeEditor';
@@ -60,6 +62,11 @@ function defineContent<T extends AdminEntity>(definition: {
 }
 
 export const ADMIN_CONTENT_DEFINITIONS: Record<string, AdminContentDefinition> = {
+  'assessment-definitions': defineContent<AssessmentDefinitionAdmin>({
+    slug: 'assessment-definitions', config: assessmentDefinitionsConfig,
+    editor: (entity, onSave, onCancel) => <AssessmentDefinitionEditor entity={entity} onSave={onSave} onCancel={onCancel} />,
+    preview: (entity) => <AssessmentDefinitionPreview entity={entity} />,
+  }),
   stories: defineContent<Story>({
     slug: 'stories', config: storiesConfig,
     editor: (entity, onSave, onCancel) => <StoryEditor onCancel={onCancel} onSave={onSave} story={entity} />,

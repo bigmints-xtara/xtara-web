@@ -45,7 +45,7 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
     () => definition ? new AdminService(definition.config) : null,
     [definition],
   );
-  const versionedCollection = definition && ['dream_careers', 'future_directions'].includes(definition.config.collectionName)
+  const versionedCollection = definition && ['dream_careers', 'future_directions', 'assessment_definitions'].includes(definition.config.collectionName)
     ? definition.config.collectionName
     : null;
 
@@ -111,7 +111,7 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
   const versionManaged = Boolean(
     versionedCollection
     && persistedId
-    && ((liveEntity && definition.config.getStatus(liveEntity) === 'published') || versionHistory?.versions.length),
+    && (versionedCollection === 'assessment_definitions' || (liveEntity && definition.config.getStatus(liveEntity) === 'published') || versionHistory?.versions.length),
   );
   const displayedStatus = activeVersion?.status || status;
   const selectedPreviewEntity = previewVersion

@@ -80,15 +80,10 @@ function AssessmentJourney() {
       });
     return () => { cancelled = true; };
   }, [effectiveStage, locale, definitionAttempt]);
-  const questions = useMemo(() => {
-    const contextualQuestions = activeDefinition?.stage === effectiveStage && activeDefinition.locale === locale
-      ? activeDefinition.questions
-      : [];
-    return [
-      getAssessmentStageQuestion(locale),
-      ...contextualQuestions.filter((question) => question.id !== "currentGrade"),
-    ];
-  }, [activeDefinition, effectiveStage, locale]);
+  const questions = useMemo(() => activeDefinition?.stage === effectiveStage && activeDefinition.locale === locale
+    ? activeDefinition.questions
+    : [getAssessmentStageQuestion(locale)], [activeDefinition, effectiveStage, locale]);
+  const ui = { ...catalog.ui, ...Object.fromEntries(Object.entries(activeDefinition?.ui ?? {}).filter(([key, value]) => key in catalog.ui && typeof value === 'string')) };
   const rawDraft = useSyncExternalStore(
     subscribeToAssessmentDraft,
     () => effectiveStage ? readAssessmentDraft(effectiveStage) ?? "{}" : "{}",
@@ -118,17 +113,17 @@ function AssessmentJourney() {
       const completedStage = parseAssessmentStage(typeof answers.currentGrade === "string" ? answers.currentGrade : effectiveStage);
       saveAssessmentDraft(completedStage, answers);
       if (!activeDefinition || activeDefinition.stage !== completedStage || activeDefinition.locale !== locale) {
-        throw new Error(catalog.ui.errorTitle);
+        throw new Error(ui.errorTitle);
       }
       const result = await evaluateAssessmentOnServer({
         definitionId: activeDefinition.id,
         version: activeDefinition.version,
         stage: completedStage, locale, answers,
       });
-      if (!result.areas.length) throw new Error(catalog.ui.errorTitle);
+      if (!result.areas.length) throw new Error(ui.errorTitle);
       saveDiscoveryResult(result);
       if (user && !user.isAnonymous) {
-        if (!await savePendingAssessmentToAccount(user.uid)) throw new Error(catalog.ui.errorTitle);
+        if (!await savePendingAssessmentToAccount(user.uid)) throw new Error(ui.errorTitle);
       }
       const pendingJoinCode = getPendingOrganizationJoin();
       router.push(pendingJoinCode
@@ -136,7 +131,7 @@ function AssessmentJourney() {
         : `/assessment/discovery?stage=${completedStage}`);
     } catch (error) {
       setProcessing(false);
-      setProcessingError(error instanceof Error ? error.message : catalog.ui.errorTitle);
+      setProcessingError(error instanceof Error ? error.message : ui.errorTitle);
     }
   };
 
@@ -149,10 +144,10 @@ function AssessmentJourney() {
   if (processingError || definitionFailed) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7fafc] px-6 text-center">
-        <h1 className="text-2xl font-semibold text-primary">{catalog.ui.errorTitle}</h1>
-        <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-slate-600">{processingError || catalog.ui.errorTitle}</p>
+        <h1 className="text-2xl font-semibold text-primary">{ui.errorTitle}</h1>
+        <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-slate-600">{processingError || ui.errorTitle}</p>
         <button type="button" onClick={() => { setProcessingError(""); if (definitionFailed) setDefinitionAttempt((attempt) => attempt + 1); }} className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white">
-          {catalog.ui.retry}
+          {ui.retry}
         </button>
       </div>
     );
@@ -164,8 +159,8 @@ function AssessmentJourney() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7fafc] px-6 text-center">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-        <h1 className="mt-6 text-2xl font-semibold text-primary">{catalog.ui.processingTitle}</h1>
-        <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">{catalog.ui.processingDescription}</p>
+        <h1 className="mt-6 text-2xl font-semibold text-primary">{ui.processingTitle}</h1>
+        <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">{ui.processingDescription}</p>
       </div>
     );
   }
@@ -178,7 +173,7 @@ function AssessmentJourney() {
           key={locale}
           questions={questions}
           initialAnswers={draft}
-          labels={catalog.ui}
+          labels={ui}
           onAnswersChange={(answers) => {
             const selectedStage = parseOptionalAssessmentStage(typeof answers.currentGrade === "string" ? answers.currentGrade : null);
             if (selectedStage) {

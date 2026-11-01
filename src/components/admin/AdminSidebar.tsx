@@ -64,6 +64,7 @@ const groups: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { name: 'MVP readiness', href: '/admin/mvp-readiness', icon: ShieldCheck },
       { name: 'Dream careers', href: '/admin/dream-careers', icon: Star },
+      { name: 'Assessment definitions', href: '/admin/assessment-definitions', icon: FileText },
       { name: 'Future directions', href: '/admin/future-directions', icon: Route },
       { name: 'Phase 1 review', href: '/admin/dream-career-phase1-review', icon: ShieldCheck },
       { name: 'Career sources', href: '/admin/career-sources', icon: BadgeCheck },

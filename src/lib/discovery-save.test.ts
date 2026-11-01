@@ -28,9 +28,11 @@ const mocks = vi.hoisted(() => ({
   getDirectionFromApi: vi.fn(),
   getIdToken: vi.fn(),
   evaluateAssessment: vi.fn(),
+  getDefinition: vi.fn(),
+  owner: "learner-1",
 }));
 
-vi.mock("@/lib/assessment-api", () => ({ evaluateAssessmentOnServer: mocks.evaluateAssessment }));
+vi.mock("@/lib/assessment-api", () => ({ evaluateAssessmentOnServer: mocks.evaluateAssessment, getActiveAssessmentDefinition: mocks.getDefinition }));
 
 vi.mock("@/lib/api/auth", () => ({
   createApiSession: mocks.createApiSession,
@@ -55,7 +57,7 @@ vi.mock("@/lib/direction-api", () => ({
 vi.mock("@/lib/firebase-client", () => ({
   getFirebaseAuth: () => ({
     currentUser: {
-      uid: "learner-1",
+      uid: mocks.owner,
       getIdToken: mocks.getIdToken,
     },
   }),
@@ -76,6 +78,8 @@ describe("staged discovery account sync", () => {
     Object.defineProperty(globalThis, "localStorage", { configurable: true, value: storage });
     Object.defineProperty(window, "localStorage", { configurable: true, value: storage });
     localStorage.clear();
+    mocks.owner = "learner-1";
+    mocks.getDefinition.mockImplementation(async (stage: string, locale: string) => ({ id: "career-discovery", stage, locale, version: "3.1.0" }));
     mocks.getIdToken.mockResolvedValue("token");
     mocks.createApiSession.mockResolvedValue(undefined);
     mocks.saveAssessment.mockResolvedValue("assessment-1");
@@ -89,14 +93,15 @@ describe("staged discovery account sync", () => {
       studyLanguage: "English", locationPreference: "Near home",
       affordability: "We can consider moderate fees", scholarshipInterest: "Maybe, show me what is available",
     });
-    const remote = { ...result, stage, answers: { ...result.answers, currentGrade: stage } };
+    const remote = { ...result, version: "3.1.1", stage, answers: { ...result.answers, currentGrade: stage } };
     mocks.getDirectionFromApi.mockResolvedValue(plan);
     mocks.get.mockImplementation(async (path: string) => path === "/me" ? { pathwayProfile: profile } : {
-      assessment: { answers: { definitionId: remote.definitionId, schemaVersion: "3.1.0", stage,
+      assessment: { id: "assessment-1", answers: { definitionId: remote.definitionId, schemaVersion: "3.1.1", stage,
         answers: remote.answers, result: remote, pathwayProfile: profile } },
     });
     const hydrated = await hydrateDiscoveryFromAccount();
     expect(hydrated?.assessment.stage).toBe(stage);
+    expect(hydrated?.assessment.version).toBe("3.1.1");
     expect(loadDiscoveryResult()?.stage).toBe(stage);
   });
 
@@ -104,10 +109,11 @@ describe("staged discovery account sync", () => {
     const { result, plan } = pendingCareerChoice();
     mocks.saveDirectionToApi.mockResolvedValue(plan);
     mocks.get.mockResolvedValue({
-      assessment: {
+      gradeStage: "grade8",
+      assessment: { id: "assessment-1",
         answers: {
           definitionId: result.definitionId,
-          schemaVersion: result.version,
+          schemaVersion: result.version, locale: result.locale, answers: result.answers,
           stage: result.stage,
         },
       },
@@ -121,9 +127,10 @@ describe("staged discovery account sync", () => {
     expect(mocks.patch).toHaveBeenCalledWith(
       "/me",
       expect.not.objectContaining({ pathwayProfile: expect.anything() }),
+      { expectedUserId: "learner-1" },
     );
-    expect(mocks.saveDirectionToApi).toHaveBeenCalledWith(plan);
-    expect(mocks.get).toHaveBeenCalledWith("/assessment/latest");
+    expect(mocks.saveDirectionToApi).toHaveBeenCalledWith(plan, "learner-1");
+    expect(mocks.get).toHaveBeenCalledWith("/assessment/latest", { expectedUserId: "learner-1" });
     expect(mocks.createApiSession).toHaveBeenCalledWith("token");
   });
 
@@ -144,12 +151,12 @@ describe("staged discovery account sync", () => {
     saveDiscoveryResult({ ...result, version: "3.0.0" });
     mocks.evaluateAssessment.mockResolvedValue(result);
     mocks.saveDirectionToApi.mockResolvedValue(plan);
-    mocks.get.mockResolvedValue({ assessment: { answers: {
-      definitionId: result.definitionId, schemaVersion: "3.1.0", stage: result.stage,
+    mocks.get.mockResolvedValue({ gradeStage: "grade8", assessment: { id: "assessment-1", answers: {
+      definitionId: result.definitionId, schemaVersion: "3.1.0", stage: result.stage, locale: result.locale, answers: result.answers,
     } } });
     await expect(savePendingCareerChoiceToAccount("learner-1")).resolves.toBe(true);
-    expect(mocks.evaluateAssessment).toHaveBeenCalledWith(expect.objectContaining({ version: "3.0.0", stage: "grade8" }));
-    expect(mocks.saveAssessment).toHaveBeenCalledWith("learner-1", expect.objectContaining({ schemaVersion: "3.1.0" }));
+    expect(mocks.evaluateAssessment).toHaveBeenCalledWith(expect.objectContaining({ version: "3.1.0", stage: "grade8" }));
+    expect(mocks.saveAssessment).toHaveBeenCalledWith("learner-1", expect.objectContaining({ version: "3.1.0" }));
     expect(loadDiscoveryResult()).toMatchObject({ version: "3.1.0", syncStatus: "synced" });
   });
 
@@ -160,6 +167,22 @@ describe("staged discovery account sync", () => {
     await expect(savePendingCareerChoiceToAccount("learner-1")).rejects.toThrow("offline");
     expect(loadDiscoveryResult()).toMatchObject({ version: "3.0.0", syncStatus: "temporary" });
     expect(mocks.saveAssessment).not.toHaveBeenCalled();
+  });
+
+  it.each(["identity", "created ID", "answers", "account", "grade"])("keeps pending answers on %s mismatch", async (mismatch) => {
+    const { result, plan } = pendingCareerChoice();
+    mocks.saveDirectionToApi.mockResolvedValue(plan);
+    if (mismatch === "identity") mocks.getDefinition.mockResolvedValue({ id: "wrong", stage: result.stage, locale: result.locale, version: result.version });
+    mocks.get.mockImplementation(async () => {
+      if (mismatch === "account") mocks.owner = "learner-2";
+      return { gradeStage: mismatch === "grade" ? "grade12" : "grade8", assessment: { id: mismatch === "created ID" ? "another" : "assessment-1", answers: {
+        definitionId: result.definitionId, schemaVersion: result.version, stage: result.stage,
+        locale: result.locale, answers: mismatch === "answers" ? {} : result.answers,
+      } } };
+    });
+    await expect(savePendingCareerChoiceToAccount("learner-1")).rejects.toThrow();
+    expect(loadDiscoveryResult()).toMatchObject({ syncStatus: "temporary", answers: result.answers });
+    if (mismatch === "identity") expect(mocks.saveAssessment).not.toHaveBeenCalled();
   });
 
   it("completes location only after assessment, direction, and profile readback", async () => {
@@ -174,15 +197,15 @@ describe("staged discovery account sync", () => {
       affordability: "We can consider moderate fees",
       scholarshipInterest: "Maybe, show me what is available",
     });
-    mocks.get.mockResolvedValue({
-      assessment: {
+    mocks.get.mockImplementation(async (path: string) => path === "/me" ? { pathwayProfile: profile } : ({
+      assessment: { id: "assessment-1",
         answers: {
           definitionId: result.definitionId,
-          schemaVersion: result.version,
+          schemaVersion: result.version, locale: result.locale, answers: result.answers,
           stage: result.stage,
         },
       },
-    });
+    }));
     mocks.getDirectionFromApi.mockResolvedValue(plan);
     mocks.patch.mockResolvedValue({ pathwayProfile: profile });
 
@@ -192,9 +215,10 @@ describe("staged discovery account sync", () => {
     expect(mocks.patch).toHaveBeenCalledWith(
       "/me",
       expect.objectContaining({ pathwayProfile: profile }),
+      { expectedUserId: "learner-1" },
     );
     expect(mocks.getDirectionFromApi).toHaveBeenCalledTimes(2);
-    expect(mocks.get).toHaveBeenCalledTimes(2);
+    expect(mocks.get).toHaveBeenCalledTimes(3);
     expect(loadDiscoveryResult()?.syncStatus).toBe("synced");
   });
 });

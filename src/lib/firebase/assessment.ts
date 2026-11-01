@@ -1,3 +1,4 @@
+import { assessmentSubmission } from '@/lib/assessment-submission';
 import { xtaraApi } from '@/lib/api/client';
 import type { Question } from '@/types/assessment';
 
@@ -8,11 +9,11 @@ export async function getQuestionnaire(): Promise<Question[]> {
   return Array.isArray(response) ? response : response.steps || [];
 }
 
-export async function saveAssessment(_userId: string, data: any, isRetake = false): Promise<string> {
+export async function saveAssessment(userId: string, data: Record<string, unknown>, isRetake = false): Promise<string> {
   const result = await xtaraApi.post<{ assessmentId: string }>('/assessment', {
-    answers: data,
+    answers: assessmentSubmission(data),
     isRetake,
-  });
+  }, { expectedUserId: userId });
   return result.assessmentId;
 }
 

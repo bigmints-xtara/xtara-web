@@ -60,11 +60,11 @@ describe('Assessment Service API boundary', () => {
     it('sends answers and returns the created assessment ID', async () => {
       api.post.mockResolvedValueOnce({ assessmentId: 'assessment-1' });
 
-      await expect(saveAssessment('user-1', { interests: ['coding'] }, true)).resolves.toBe('assessment-1');
+      await expect(saveAssessment('user-1', { definitionId: 'career-discovery', schemaVersion: '3.1.0', stage: 'grade11', locale: 'en', answers: { interests: ['coding'] }, result: { signals: ['forged'] }, catalogSnapshot: {} }, true)).resolves.toBe('assessment-1');
       expect(api.post).toHaveBeenCalledWith('/assessment', {
-        answers: { interests: ['coding'] },
+        answers: { definitionId: 'career-discovery', version: '3.1.0', stage: 'grade11', locale: 'en', answers: { interests: ['coding'] } },
         isRetake: true,
-      });
+      }, { expectedUserId: "user-1" });
     });
 
     it('surfaces save failures', async () => {
