@@ -36,6 +36,7 @@ import {
 } from '@/lib/direction';
 import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
 import { loadDiscoveryResult } from '@/lib/assessment-v2';
+import { MVP_NAVIGATION_ENABLED } from '@/lib/mvp-navigation';
 import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
 import type {
   CareerIdentityView,
@@ -356,17 +357,17 @@ function DreamCareerContent() {
             <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ArrowLeft className="h-4 w-4" />{text.back}
             </Link>
-            <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end lg:gap-16">
+            <div className={`mt-8 grid gap-8 ${MVP_NAVIGATION_ENABLED ? "" : "lg:grid-cols-[minmax(0,1fr)_18rem]"} lg:items-end lg:gap-16`}>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
                   {area ? <Badge variant="secondary">{area.title}</Badge> : null}
-                  {isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{journeyText.selected}</Badge> : null}
+                  {!MVP_NAVIGATION_ENABLED && isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{journeyText.selected}</Badge> : null}
                 </div>
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{hasReviewedGuidance ? text.overview : journeyText.overview}</p>
                 <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-5xl lg:text-6xl">{response.career.title}</h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">{response.career.summary}</p>
               </div>
-              <div className="flex flex-col gap-3 lg:pb-1">
+              {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
               {returnAreaId && from !== 'explore' && from !== 'dashboard' ? <Button asChild size="lg" className="rounded-full"><Link href={backHref}>{journeyText.continue}</Link></Button> : null}
                 <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
                   {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? journeyText.remove : journeyText.add}
@@ -376,7 +377,7 @@ function DreamCareerContent() {
                 </Button> : null}
 
                 {selectionError ? <p role="alert" className="text-sm font-medium text-destructive">{selectionError}</p> : null}
-              </div>
+              </div> : null}
             </div>
           </div>
         </section>

@@ -43,7 +43,7 @@ function SignupContent() {
         : "default";
   const variantCopy = signupCopy.variants[variantKey];
   const loginHref = shouldSaveDiscovery
-    ? "/login?saveDiscovery=1&next=%2Fassessment%2Fpathway"
+    ? "/login?saveDiscovery=1&next=%2Fdashboard"
     : shouldSaveAssessment && requestedNext
       ? `/login?saveAssessment=1&next=${encodeURIComponent(requestedNext)}`
       : educatorMode
@@ -72,7 +72,7 @@ function SignupContent() {
       if (shouldSaveDiscovery) {
         const didSave = await savePendingCareerChoiceToAccount(credential.user.uid);
         if (!didSave) throw new Error("Choose your Career Direction and Dream Careers before creating an account.");
-        router.push(safeDestination(requestedNext) ?? "/assessment/pathway");
+        router.push(safeDestination(requestedNext) ?? "/dashboard");
         return;
       }
 

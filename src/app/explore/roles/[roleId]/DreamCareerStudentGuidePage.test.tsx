@@ -14,6 +14,7 @@ import type {
 } from '@/types/dream-career-student-guide';
 
 const mocks = vi.hoisted(() => ({
+  mvp: false,
   getGuide: vi.fn(),
   getContext: vi.fn(),
   getDirection: vi.fn(),
@@ -22,6 +23,7 @@ const mocks = vi.hoisted(() => ({
   user: null as null | { uid: string; isAnonymous: boolean },
 }));
 
+vi.mock('@/lib/mvp-navigation', () => ({ get MVP_NAVIGATION_ENABLED() { return mocks.mvp; } }));
 vi.mock('@/components/Header', () => ({ default: () => <header>Header</header> }));
 vi.mock('@/components/Footer', () => ({ default: () => <footer>Footer</footer> }));
 vi.mock('@/components/career-path/SlideshowOverlay', () => ({ default: ({ isOpen }: { isOpen: boolean }) => isOpen ? <div>Career conversation</div> : null }));
@@ -128,6 +130,7 @@ describe('Dream Career Student Guide page', () => {
   };
 
   beforeEach(() => {
+    mocks.mvp = false;
     mocks.getGuide.mockReset();
     mocks.getContext.mockReset();
     mocks.getDirection.mockReset();
@@ -187,6 +190,18 @@ describe('Dream Career Student Guide page', () => {
     render(<DreamCareerPage />);
     await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
     expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/explore');
+  });
+
+  it('keeps the MVP career page read-only, with no duplicate selection or continue controls', async () => {
+    mocks.mvp = true;
+    saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('technology'), 'data-engineer'));
+    render(<DreamCareerPage />);
+    await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
+    expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Choose this career' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Continue' })).toBeNull();
+    expect(screen.queryByText('Selected')).toBeNull();
+    expect(screen.getByRole('link', { name: /Back/ })).toBeInTheDocument();
   });
 
   it('refreshes guide relationships with signed-in state and country context', async () => {

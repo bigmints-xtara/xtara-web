@@ -21,11 +21,11 @@ describe("assessment signup continuation", () => {
     Object.defineProperty(window, "localStorage", { configurable: true, value: storage });
     localStorage.clear();
     vi.mocked(useSearchParams).mockReturnValue(
-      new URLSearchParams("saveDiscovery=1&next=%2Fassessment%2Fpathway") as ReturnType<typeof useSearchParams>,
+      new URLSearchParams("saveDiscovery=1&next=%2Fdashboard") as ReturnType<typeof useSearchParams>,
     );
   });
 
-  it("returns account holders to location instead of Dashboard", () => {
+  it("returns account holders to My Direction after saving choices", () => {
     render(
       <LanguageProvider initialLocale="en">
         <SignupPage />
@@ -35,7 +35,7 @@ describe("assessment signup continuation", () => {
     expect(screen.getByRole("heading", { name: "Save your future plan" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Log in" })).toHaveAttribute(
       "href",
-      "/login?saveDiscovery=1&next=%2Fassessment%2Fpathway",
+      "/login?saveDiscovery=1&next=%2Fdashboard",
     );
   });
 });

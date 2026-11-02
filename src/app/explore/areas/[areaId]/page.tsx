@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Compass, Loader2, Plus } from "lucide-react";
 
+import CareerPreviewDialog from "@/components/careers/CareerPreviewDialog";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,7 @@ import {
   setDreamCareers,
   subscribeToDirection,
 } from "@/lib/direction";
-import { hydrateDiscoveryFromAccount, savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
+import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 import { canAccessPursuedArea } from "@/lib/exploration-access";
 import type { CuratedDreamCareer, FutureDirection } from "@/types/curated-career";
 
@@ -138,6 +139,7 @@ export default function CareerDirectionPage() {
   const rawSelectedIds = selectionOverride ?? (plan?.areaId === areaId ? plan.dreamCareerIds : []);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [preview, setPreview] = useState<DreamCareerView | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -172,8 +174,36 @@ export default function CareerDirectionPage() {
   }, [areaId, curatedCareers, locale, directionRecord]);
   const selectedIds = rawSelectedIds.filter((id) => careers.some((career) => career.id === id));
 
+  useEffect(() => {
+    const syncPreview = () => {
+      const id = new URL(window.location.href).searchParams.get('career');
+      setPreview(careers.find((career) => career.id === id) ?? null);
+    };
+    syncPreview();
+    window.addEventListener('popstate', syncPreview);
+    return () => window.removeEventListener('popstate', syncPreview);
+  }, [careers]);
+
+  const openPreview = (career: DreamCareerView) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('career', career.id);
+    window.history.pushState({ ...window.history.state, xtaraCareerPreview: career.id }, '', url);
+    setPreview(career);
+  };
+  const closePreview = () => {
+    if (preview && window.history.state?.xtaraCareerPreview === preview.id) {
+      window.history.back();
+    } else {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('career');
+      window.history.replaceState(window.history.state, '', url);
+      setPreview(null);
+    }
+  };
+
+
   if (authLoading || (!accountError && (!hydrated || loading || (owner && loadedOwner !== owner)))) {
-    return <div className="flex min-h-screen items-center justify-center bg-slate-50"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
+    return <div className="flex min-h-screen items-center justify-center bg-background"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
   }
 
   if (catalogError || accountError) {
@@ -218,42 +248,21 @@ export default function CareerDirectionPage() {
     }
   };
 
-  const buildCareerPath = async () => {
-    const scope = { ...currentScope.current };
-    const isCurrent = () => currentScope.current.owner === scope.owner && currentScope.current.areaId === scope.areaId && currentScope.current.generation === scope.generation;
-    if (!selectedIds.length || !plan) {
-      setError(text.chooseOne);
-      return;
-    }
-    setSaving(true);
-    const nextPlan = setDreamCareers(plan, selectedIds);
-    saveDirectionPlan(nextPlan);
-    if (user && !user.isAnonymous) {
-      try {
-        const didSave = await savePendingCareerChoiceToAccount(user.uid);
-        if (!isCurrent()) return;
-        if (!didSave) throw new Error(text.chooseOne);
-        router.push("/assessment/pathway");
-      } catch {
-        if (!isCurrent()) return;
-        setError(text.saveFailed);
-        setSaving(false);
-      }
-      return;
-    }
-    router.push("/signup?saveDiscovery=1&next=%2Fassessment%2Fpathway");
+  const continueToSummary = () => {
+    if (saving || !selectedIds.length || !plan) return;
+    router.push('/assessment/save');
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <main className="px-5 py-10 sm:py-14">
+      <main className="px-5 py-10 pb-28 sm:py-14 sm:pb-28">
         <div className="mx-auto max-w-6xl">
           <Link href="/assessment/discovery" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-4 w-4" />{text.results}
           </Link>
 
-          <section className="mt-7 flex items-center gap-4 rounded-2xl border bg-white px-4 py-4 sm:px-5">
+          <section className="mt-7 flex items-center gap-4 rounded-2xl border border-border bg-card px-4 py-4 sm:px-5">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary">
               <Compass className="h-6 w-6" />
             </span>
@@ -279,7 +288,7 @@ export default function CareerDirectionPage() {
                 return (
                   <Card key={career.id} className={`overflow-hidden shadow-none transition ${selected ? "border-primary bg-primary/[0.035] ring-2 ring-primary/10" : "border-border hover:border-primary/35"}`}>
                     <CardContent className="flex items-center gap-3 p-3">
-                      <Link href={`/dream-careers/${career.id}?from=direction`} aria-disabled={saving || undefined} tabIndex={saving ? -1 : undefined} onClick={(event) => { if (saving) event.preventDefault(); }} className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                      <button type="button" disabled={saving} onClick={() => openPreview(career)} className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${selected ? "bg-primary text-white" : "bg-primary/5 text-primary"}`}>
                           {selected ? <Check className="h-5 w-5" /> : <BriefcaseBusiness className="h-5 w-5" />}
                         </span>
@@ -288,7 +297,7 @@ export default function CareerDirectionPage() {
                           {locale !== "en" && career.englishTitle ? <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{career.englishTitle}</span> : null}
                         </span>
                         <ArrowRight className="h-4 w-4 shrink-0 text-primary/45 transition group-hover:translate-x-0.5 group-hover:text-primary" />
-                      </Link>
+                      </button>
                       <Button
                         type="button"
                         size="icon"
@@ -314,16 +323,17 @@ export default function CareerDirectionPage() {
               ta: 'இந்தத் திசையில் பரிந்துரைக்கப்பட்ட தொழில்கள் இன்னும் கிடைக்கவில்லை.',
             })[locale]}</p> : null}
 
-            <div className="sticky bottom-4 z-20 mt-8 rounded-2xl border bg-white/95 p-4 shadow-lg backdrop-blur sm:flex sm:items-center sm:justify-between sm:gap-5">
+            <div className="sticky bottom-24 z-20 xl:bottom-4 mt-8 rounded-2xl border border-border bg-card/95 p-4 shadow-lg backdrop-blur sm:flex sm:items-center sm:justify-between sm:gap-5">
               <p className="font-semibold text-primary">{selectedIds.length} / 3 {text.selected}</p>
-              <Button size="lg" className="mt-4 w-full rounded-xl sm:mt-0 sm:w-auto" disabled={saving || !selectedIds.length} onClick={buildCareerPath}>
-                {saving ? text.saving : text.build}{saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
+              <Button size="lg" className="mt-4 w-full rounded-xl sm:mt-0 sm:w-auto" disabled={saving || !selectedIds.length} onClick={continueToSummary}>
+                {saving ? text.saving : ({ en: 'Continue', ml: 'തുടരൂ', hi: 'आगे बढ़ें', ta: 'தொடர்க' })[locale]}{saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </div>
             {error ? <p role="alert" className="mt-3 text-sm font-medium text-destructive">{error}</p> : null}
           </section>
         </div>
       </main>
+      {preview ? <CareerPreviewDialog career={preview} onClose={closePreview} /> : null}
       <Footer />
     </div>
   );
@@ -342,7 +352,7 @@ function localizeCareer(career: CuratedDreamCareer, locale: "en" | "ml" | "hi" |
 }
 
 function EmptyState({ title, description, action, href }: { title: string; description?: string; action: string; href: string }) {
-  return <div className="min-h-screen bg-slate-50"><Header /><main className="mx-auto max-w-xl px-5 py-20 text-center"><Compass className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-5 text-2xl font-semibold text-primary">{title}</h1>{description ? <p className="mt-3 leading-7 text-muted-foreground">{description}</p> : null}<Button asChild className="mt-6 rounded-full"><Link href={href}>{action}</Link></Button></main></div>;
+  return <div className="min-h-screen bg-background"><Header /><main className="mx-auto max-w-xl px-5 py-20 text-center"><Compass className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-5 text-2xl font-semibold text-primary">{title}</h1>{description ? <p className="mt-3 leading-7 text-muted-foreground">{description}</p> : null}<Button asChild className="mt-6 rounded-full"><Link href={href}>{action}</Link></Button></main></div>;
 }
 
 function subscribeToAssessment(onChange: () => void) {

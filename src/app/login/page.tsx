@@ -48,7 +48,7 @@ function LoginContent() {
     if (searchParams.get("saveDiscovery") === "1") {
       const didSave = await savePendingCareerChoiceToAccount(userId);
       if (!didSave) throw new Error("Choose your Career Direction and Dream Careers before signing in.");
-      router.push(requestedNext || "/assessment/pathway");
+      router.push(requestedNext || "/dashboard");
       return;
     }
     if (searchParams.get("saveAssessment") === "1") {

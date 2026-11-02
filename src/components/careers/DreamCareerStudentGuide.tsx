@@ -250,7 +250,9 @@ export function DreamCareerStudentGuide({
   locale,
   onRetryRelationship,
   retryingRelationships = {},
+  embedded = false,
 }: {
+  embedded?: boolean;
   response: DreamCareerStudentGuideResponse;
   locale: DreamCareerGuideLocale;
   onRetryRelationship?: (subsection: CareerGuideRelationshipSubsection) => void;
@@ -383,7 +385,7 @@ export function DreamCareerStudentGuide({
               items={resolved.relatedCareers}
               labels={text}
               renderItem={(career) => (
-                <GuideItem title={<Link className="text-primary underline-offset-4 hover:underline" href={`/explore/roles/${encodeURIComponent(career.id)}`}>{career.title}</Link>}>
+                <GuideItem title={embedded ? career.title : <Link className="text-primary underline-offset-4 hover:underline" href={`/explore/roles/${encodeURIComponent(career.id)}`}>{career.title}</Link>}>
                   {career.summary}
                 </GuideItem>
               )}
@@ -598,9 +600,11 @@ export function DreamCareerStudentGuide({
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
   const [focusRequest, setFocusRequest] = useState(0);
   const pendingFocusQuestionId = useRef('');
-  const compactLayout = useSyncExternalStore(subscribeCompactLayout, getCompactLayout, getServerCompactLayout);
+  const viewportCompact = useSyncExternalStore(subscribeCompactLayout, getCompactLayout, getServerCompactLayout);
+  const compactLayout = embedded || viewportCompact;
 
   useEffect(() => {
+    if (embedded) return;
     const syncHash = () => {
       const next = readQuestionHash();
       if (next && questionSignature.split('|').includes(next)) {
@@ -612,7 +616,7 @@ export function DreamCareerStudentGuide({
     syncHash();
     window.addEventListener('hashchange', syncHash);
     return () => window.removeEventListener('hashchange', syncHash);
-  }, [questionSignature]);
+  }, [questionSignature, embedded]);
 
   const activeQuestionId = selectedQuestionId || questionEntries[0]?.question.id || '';
 
@@ -654,7 +658,7 @@ export function DreamCareerStudentGuide({
     <div data-testid="dream-career-student-guide" className="min-w-0 scroll-smooth bg-background text-foreground motion-reduce:scroll-auto dark:bg-background">
       {compactLayout ? (
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14" data-testid="compact-question-reader">
-          <main className="min-w-0 space-y-14 sm:space-y-18">
+          <div className="min-w-0 space-y-14 sm:space-y-18">
             {chapters.map((chapter, index) => (
               <Fragment key={chapter.id}>
                 <GuideChapter chapter={chapter} />
@@ -666,7 +670,7 @@ export function DreamCareerStudentGuide({
               </Fragment>
             ))}
             {sourcesPanel}
-          </main>
+          </div>
         </div>
       ) : (
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_minmax(0,18rem)] lg:gap-12 lg:py-20">

@@ -1,7 +1,8 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-const mocks = vi.hoisted(() => ({ catalog: vi.fn(), hydrate: vi.fn(), save: vi.fn(), user: null as null | { uid: string; isAnonymous: boolean } }));
-vi.mock('next/navigation', () => ({ useParams: () => ({ areaId: 'engineering-and-built-world' }), useRouter: () => ({ push: vi.fn() }) }));
+const mocks = vi.hoisted(() => ({ push: vi.fn(), catalog: vi.fn(), hydrate: vi.fn(), save: vi.fn(), user: null as null | { uid: string; isAnonymous: boolean } }));
+vi.mock('next/navigation', () => ({ useParams: () => ({ areaId: 'engineering-and-built-world' }), useRouter: () => ({ push: mocks.push }) }));
+vi.mock('@/components/careers/CareerPreviewDialog', () => ({ default: ({ career, onClose }: { career: { title: string }; onClose: () => void }) => <div role="dialog"><h2>{career.title}</h2><button onClick={onClose}>Back to careers</button></div> }));
 vi.mock('@/components/Header', () => ({ default: () => null }));
 vi.mock('@/components/Footer', () => ({ default: () => null }));
 vi.mock('@/context/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }) }));
@@ -14,7 +15,7 @@ import CareerDirectionPage from './page';
 import { createAreaDirectionPlan, saveDirectionPlan, loadDirectionPlan } from '@/lib/direction';
 const catalog = { directions: [{ id: 'engineering-and-built-world', translations: { en: { title: 'API engineering direction' } } }], roles: [] };
 describe('API-backed career direction page', () => {
-  beforeEach(() => { mocks.catalog.mockReset(); mocks.user = null; mocks.hydrate.mockReset(); mocks.save.mockReset(); });
+  beforeEach(() => { window.history.replaceState({}, '', '/'); mocks.push.mockReset(); mocks.catalog.mockReset(); mocks.user = null; mocks.hydrate.mockReset(); mocks.save.mockReset(); });
   it('preserves anonymous selection when a guide is opened and the chooser remounts', async () => {
     const values = new Map<string, string>();
     const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value), removeItem: (key: string) => values.delete(key) };
@@ -28,6 +29,13 @@ describe('API-backed career direction page', () => {
     const view = render(<CareerDirectionPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'Choose Aeronautical Engineer' }));
     expect(loadDirectionPlan()?.dreamCareerIds).toEqual(['aeronautical-engineer']);
+    fireEvent.click(screen.getByRole('button', { name: 'Aeronautical Engineer' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Back to careers' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Remove Aeronautical Engineer' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(mocks.push).toHaveBeenCalledWith('/assessment/save');
     view.unmount();
     render(<CareerDirectionPage />);
     expect(await screen.findByRole('button', { name: 'Remove Aeronautical Engineer' })).toHaveAttribute('aria-pressed', 'true');
@@ -47,10 +55,10 @@ describe('API-backed career direction page', () => {
     });
     render(<CareerDirectionPage />);
     fireEvent.click(await screen.findByRole('button', { name: 'Choose Aeronautical Engineer' }));
-    expect(screen.getByRole('link', { name: 'Aeronautical Engineer' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Aeronautical Engineer' })).toBeDisabled();
     await act(async () => resolveSave(mocks.save.mock.calls[0][0]));
     expect(await screen.findByRole('button', { name: 'Remove Aeronautical Engineer' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('link', { name: 'Aeronautical Engineer' })).not.toHaveAttribute('aria-disabled');
+    expect(screen.getByRole('button', { name: 'Aeronautical Engineer' })).toBeEnabled();
     expect(mocks.save).toHaveBeenCalledWith(expect.objectContaining({ dreamCareerIds: ['aeronautical-engineer'] }), 'student-1');
     expect(loadDirectionPlan()?.dreamCareerIds).toEqual(['aeronautical-engineer']);
   });

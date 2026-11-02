@@ -1254,7 +1254,7 @@
   },
   "result": {
     "eyebrow": "Your Career Directions",
-    "title": "Choose a Career Direction to explore.",
+    "title": "Your results",
     "description": "We looked for patterns across your interests, strengths, ways of working, values and experience. No single answer decides a career recommendation.",
     "patternsTitle": "Things you may enjoy",
     "patternsDescription": "",
@@ -1272,7 +1272,7 @@
     "emptyTitle": "Start with the career discovery assessment.",
     "areasLabel": "Choose a Career Direction",
     "roleExamples": "Dream Careers you can explore in this direction",
-    "viewArea": "Explore this direction",
+    "viewArea": "Explore these careers",
     "contextTitle": "Things that may affect your answers",
     "familyTitle": "Family influence",
     "weaknessTitle": "Understanding difficulty",

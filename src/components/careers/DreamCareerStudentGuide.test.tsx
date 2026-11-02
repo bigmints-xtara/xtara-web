@@ -188,6 +188,20 @@ function stubCompactLayout() {
 }
 
 describe('DreamCareerStudentGuide', () => {
+  it('keeps embedded previews compact and leaves the chooser history untouched', () => {
+    window.history.replaceState({ xtaraCareerPreview: 'data-engineer' }, '', '/explore/areas/technology?career=data-engineer');
+    const push = vi.spyOn(window.history, 'pushState');
+    render(<DreamCareerStudentGuide response={response()} locale="en" embedded />);
+    expect(screen.getByTestId('compact-question-reader')).toBeInTheDocument();
+    expect(screen.queryByTestId('desktop-question-navigation')).toBeNull();
+    expect(screen.queryByTestId('desktop-editorial-reader')).toBeNull();
+    expect(document.querySelector('a[href^="/explore/roles/"]')).toBeNull();
+    expect(push).not.toHaveBeenCalled();
+    expect(window.history.state.xtaraCareerPreview).toBe('data-engineer');
+    push.mockRestore();
+    window.history.replaceState({}, '', '/');
+  });
+
   it('keeps evolving guide content visible while omitting pending source links', () => {
     const value = response();
     value.guide.sources[0].reviewStatus = 'pending';
