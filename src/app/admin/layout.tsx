@@ -1,5 +1,4 @@
 'use client';
-import { isAdminMvpRouteEnabled } from '@/lib/admin-mvp';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -122,7 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="truncate text-sm font-semibold">{title}</p>
             <p className="hidden text-xs text-muted-foreground sm:block">Manage Xtara content and platform operations</p>
           </div>
-          {isAdminMvpRouteEnabled('/admin/assistant') && pathname !== '/admin/assistant' ? (
+          {pathname !== '/admin/assistant' ? (
             <Button asChild size="sm" variant="outline">
               <Link href="/admin/assistant">
                 <Bot />
@@ -131,13 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Button>
           ) : null}
         </header>
-        <main className="min-h-0 flex-1 overflow-hidden">{isAdminMvpRouteEnabled(pathname) ? children : (
-            <section className="p-6" aria-label="Unavailable in MVP">
-              <h1 className="text-xl font-semibold">This workspace is paused for the MVP.</h1>
-              <p className="mt-3 text-muted-foreground">Its content and saved data are preserved. Manage assessments and career guidance from the MVP overview.</p>
-              <Button asChild className="mt-5"><Link href="/admin">Back to MVP overview</Link></Button>
-            </section>
-          )}</main>
+        <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
       </div>
     </div>
   );
