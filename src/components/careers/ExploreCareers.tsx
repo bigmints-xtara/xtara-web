@@ -49,7 +49,7 @@ export default function ExploreCareers() {
               const title = translated?.title || career.translations.en.title;
               const summary = translated?.summary || career.translations.en.summary;
               return <li key={career.id}>
-                <Link href={`/dream-careers/${encodeURIComponent(career.id)}`} className="flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <Link href={`/dream-careers/${encodeURIComponent(career.id)}?from=explore`} className="flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                   <h2 className="text-lg font-semibold">{title}</h2>
                   <p className="mt-2 flex-1 text-sm leading-6 text-muted-foreground">{summary}</p>
                   <span className="mt-5 text-sm font-semibold text-primary">{copy.openCareer}</span>

@@ -24,10 +24,10 @@ export async function getDreamCareerStudentGuide(
 
 export async function getDreamCareerStudentContext(
   careerId: string,
-  options: { signal?: AbortSignal } = {},
+  options: { signal?: AbortSignal; expectedUserId?: string } = {},
 ): Promise<CareerStudentContextResponse> {
   const path = xtaraApiOperationPath('getMeDreamCareersCareerIdStudentContext', { careerId });
-  return xtaraApi.get<CareerStudentContextResponse>(path, { signal: options.signal });
+  return xtaraApi.get<CareerStudentContextResponse>(path, { signal: options.signal, expectedUserId: options.expectedUserId });
 }
 
 function appendLocation(

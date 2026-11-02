@@ -34,16 +34,16 @@
       "signupAction": "Create one",
       "learner": {
         "title": "Welcome back",
-        "description": "Continue your Career Directions, Dream Careers, learning, and next steps.",
+        "description": "Return to your assessment and career choices.",
         "submit": "Open my career path",
         "submitting": "Opening your path…",
         "google": "Continue with Google",
         "sideEyebrow": "Your career path",
         "sideTitle": "Your future can become clearer one step at a time.",
-        "sideDescription": "Return to the directions you chose, build useful skills, and prepare for better conversations with parents and teachers.",
+        "sideDescription": "Explore careers and discuss your choices with someone you trust.",
         "sideProofs": [
           "Your Career Directions and Dream Careers stay together",
-          "Learning, games, and challenges move your plan forward",
+          "Explore the careers that interest you",
           "You can change your choices as you learn more"
         ],
         "imageAlt": "A group of Indian students exploring their future together"
@@ -81,24 +81,24 @@
           "submit": "Create account",
           "sideEyebrow": "Start with possibility",
           "sideTitle": "A career plan should grow with the student.",
-          "sideDescription": "Xtara keeps exploration, learning, and family conversations connected as interests and circumstances change.",
+          "sideDescription": "Explore careers and discuss your choices with someone you trust.",
           "sideProofs": [
             "Keep Career Directions and Dream Careers in one place",
-            "Build skills through short learning and challenges",
+            "Explore the careers that interest you",
             "Use your plan in conversations with adults you trust"
           ]
         },
         "saveDiscovery": {
           "title": "Save your future plan",
-          "description": "Create an account to keep the assessment, Career Directions, Dream Careers, and learning progress you started.",
+          "description": "Create an account to save your assessment and chosen careers.",
           "submit": "Create account and save",
           "sideEyebrow": "Keep what you discovered",
           "sideTitle": "Your assessment is the beginning, not the final answer.",
-          "sideDescription": "Save your work, explore the suggested directions, and keep refining the plan through real learning and conversations.",
+          "sideDescription": "Explore careers and discuss your choices with someone you trust.",
           "sideProofs": [
             "Your completed assessment stays with your account",
             "Prefer up to three Dream Careers to explore",
-            "Return to learning, challenges, and your conversation slides"
+            "Return to your choices whenever you need them"
           ]
         },
         "saveAssessment": {

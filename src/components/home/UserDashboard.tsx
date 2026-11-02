@@ -249,7 +249,7 @@ export default function UserDashboard() {
             {selectedCareers.map((career, index) => (
               <li key={career.id}>
                 <Link
-                  href={`/dream-careers/${career.id}`}
+                  href={`/dream-careers/${career.id}?from=dashboard`}
                   className="group flex min-h-20 h-full items-center gap-4 rounded-2xl border border-primary/10 bg-card px-4 py-4 text-primary transition hover:border-primary/25 hover:bg-secondary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/25 text-sm font-semibold">{index + 1}</span>

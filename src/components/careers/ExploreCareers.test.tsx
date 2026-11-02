@@ -16,7 +16,7 @@ describe('Explore Careers catalogue', () => {
     vi.mocked(getPublishedDreamCareers).mockResolvedValue([career, draft]);
     render(<ExploreCareers />);
     const title = await screen.findByRole('heading', { name: 'Doctor' });
-    expect(title.closest('a')).toHaveAttribute('href', '/dream-careers/doctor');
+    expect(title.closest('a')).toHaveAttribute('href', '/dream-careers/doctor?from=explore');
     expect(screen.queryByText('Unreviewed')).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'engineer' } });
     expect(screen.getByRole('status')).toHaveTextContent('No careers match');

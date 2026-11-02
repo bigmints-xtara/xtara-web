@@ -183,7 +183,7 @@ describe('pursued-area learner dashboard', () => {
 
     const hero = container.querySelector('[data-testid="career-direction-hero"]');
     const careerList = container.querySelector('[data-testid="dream-career-list"]');
-    const careerLink = careerList?.querySelector('a[href="/dream-careers/ux-designer"]');
+    const careerLink = careerList?.querySelector('a[href="/dream-careers/ux-designer?from=dashboard"]');
     const contextMenu = hero?.querySelector(
       'button[aria-label="Change Career Direction; Change my Dream Careers"]',
     );

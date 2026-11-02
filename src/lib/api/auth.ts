@@ -34,14 +34,14 @@ export async function getPostAuthDestination(): Promise<string> {
   try {
     const careerPaths = await xtaraApi.get<{ items?: Array<{ id: string }> }>('/career-paths/me');
     const firstPath = careerPaths.items?.[0];
-    if (firstPath?.id) return '/';
+    if (firstPath?.id) return '/dashboard';
   } catch {
     // Fall through to the assessment route.
   }
 
   try {
     const latest = await xtaraApi.get<{ assessment?: unknown }>('/assessment/latest');
-    return latest.assessment ? '/' : '/assessment';
+    return latest.assessment ? '/dashboard' : '/assessment';
   } catch {
     return '/assessment';
   }

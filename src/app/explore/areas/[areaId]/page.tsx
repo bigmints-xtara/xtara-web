@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Compass, Loader2, Plus } from "lucide-react";
@@ -22,9 +22,12 @@ import {
   setDreamCareers,
   subscribeToDirection,
 } from "@/lib/direction";
-import { savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
+import { hydrateDiscoveryFromAccount, savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
 import { canAccessPursuedArea } from "@/lib/exploration-access";
 import type { CuratedDreamCareer, FutureDirection } from "@/types/curated-career";
+
+import { saveDirectionToApi } from '@/lib/direction-api';
+import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
 
 const serverSnapshot = () => null;
 const subscribeToHydration = () => () => undefined;
@@ -108,7 +111,13 @@ type DreamCareerView = {
 export default function CareerDirectionPage() {
   const { areaId } = useParams<{ areaId: string }>();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const owner = user && !user.isAnonymous ? user.uid : null;
+  const currentScope = useRef({ owner, areaId, generation: 0 });
+  currentScope.current.owner = owner;
+  currentScope.current.areaId = areaId;
+  const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
+  const [accountError, setAccountError] = useState(false);
   const { locale } = useTranslations();
   const text = copy[locale];
   const fallbackCatalog = getCareerKnowledgeCatalog(locale);
@@ -132,6 +141,19 @@ export default function CareerDirectionPage() {
 
   useEffect(() => {
     let active = true;
+    currentScope.current.generation += 1;
+    setSelectionOverride(null);
+    setSaving(false);
+    setAccountError(false);
+    setLoadedOwner(null);
+    if (owner) void hydrateDiscoveryFromAccount()
+      .then(() => { if (active) setLoadedOwner(owner); })
+      .catch(() => { if (active) setAccountError(true); });
+    return () => { active = false; currentScope.current.generation += 1; };
+  }, [owner, areaId, reload]);
+
+  useEffect(() => {
+    let active = true;
     setLoading(true);
     setCatalogError(false);
     getPublishedCareerCatalog()
@@ -150,11 +172,11 @@ export default function CareerDirectionPage() {
   }, [areaId, curatedCareers, locale, directionRecord]);
   const selectedIds = rawSelectedIds.filter((id) => careers.some((career) => career.id === id));
 
-  if (!hydrated || loading) {
+  if (authLoading || (!accountError && (!hydrated || loading || (owner && loadedOwner !== owner)))) {
     return <div className="flex min-h-screen items-center justify-center bg-slate-50"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
   }
 
-  if (catalogError) {
+  if (catalogError || accountError) {
     return <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6"><p role="alert">{assessmentCopy.ui.errorTitle}</p><Button onClick={() => setReload((value) => value + 1)}>{assessmentCopy.ui.retry}</Button></div>;
   }
   if (!direction) {
@@ -165,20 +187,40 @@ export default function CareerDirectionPage() {
     return <EmptyState title={text.lockedTitle} description={text.lockedDescription} action={storedResult ? text.results : fallbackCatalog.ui.back} href={storedResult ? "/assessment/discovery" : "/assessment"} />;
   }
 
-  const toggle = (careerId: string) => {
+  const toggle = async (careerId: string) => {
+    if (saving || !plan) return;
     setError("");
-    setSelectionOverride((override) => {
-      const current = (override ?? (plan?.areaId === areaId ? plan.dreamCareerIds : [])).filter((id) => careers.some((career) => career.id === id));
-      if (current.includes(careerId)) return current.filter((id) => id !== careerId);
-      if (current.length >= 3) {
-        setError(text.max);
-        return current;
+    const current = selectedIds;
+    if (!current.includes(careerId) && current.length >= 3) {
+      setError(text.max);
+      return;
+    }
+    const next = current.includes(careerId) ? current.filter((id) => id !== careerId) : [...current, careerId];
+    // Anonymous choices are a resumable draft, including while opening a guide.
+    if ((!user || user.isAnonymous) && plan) {
+      saveDirectionPlan(setDreamCareers(plan, next));
+      setSelectionOverride(null);
+    } else if (owner) {
+      const scope = { ...currentScope.current };
+      const isCurrent = () => currentScope.current.owner === scope.owner && currentScope.current.areaId === scope.areaId && currentScope.current.generation === scope.generation;
+      setSaving(true);
+      try {
+        const saved = await saveDirectionToApi(setDreamCareers(plan, next), owner);
+        if (!isCurrent()) return;
+        markDiscoveryCacheOwner(owner);
+        saveDirectionPlan(saved);
+        setSelectionOverride(null);
+      } catch {
+        if (isCurrent()) setError(text.saveFailed);
+      } finally {
+        if (isCurrent()) setSaving(false);
       }
-      return [...current, careerId];
-    });
+    }
   };
 
   const buildCareerPath = async () => {
+    const scope = { ...currentScope.current };
+    const isCurrent = () => currentScope.current.owner === scope.owner && currentScope.current.areaId === scope.areaId && currentScope.current.generation === scope.generation;
     if (!selectedIds.length || !plan) {
       setError(text.chooseOne);
       return;
@@ -189,9 +231,11 @@ export default function CareerDirectionPage() {
     if (user && !user.isAnonymous) {
       try {
         const didSave = await savePendingCareerChoiceToAccount(user.uid);
+        if (!isCurrent()) return;
         if (!didSave) throw new Error(text.chooseOne);
         router.push("/assessment/pathway");
       } catch {
+        if (!isCurrent()) return;
         setError(text.saveFailed);
         setSaving(false);
       }
@@ -235,7 +279,7 @@ export default function CareerDirectionPage() {
                 return (
                   <Card key={career.id} className={`overflow-hidden shadow-none transition ${selected ? "border-primary bg-primary/[0.035] ring-2 ring-primary/10" : "border-border hover:border-primary/35"}`}>
                     <CardContent className="flex items-center gap-3 p-3">
-                      <Link href={`/dream-careers/${career.id}`} className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                      <Link href={`/dream-careers/${career.id}?from=direction`} aria-disabled={saving || undefined} tabIndex={saving ? -1 : undefined} onClick={(event) => { if (saving) event.preventDefault(); }} className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${selected ? "bg-primary text-white" : "bg-primary/5 text-primary"}`}>
                           {selected ? <Check className="h-5 w-5" /> : <BriefcaseBusiness className="h-5 w-5" />}
                         </span>
@@ -250,7 +294,8 @@ export default function CareerDirectionPage() {
                         size="icon"
                         variant={selected ? "default" : "outline"}
                         className="h-11 w-11 shrink-0 rounded-full"
-                        onClick={() => toggle(career.id)}
+                        disabled={saving}
+                        onClick={() => void toggle(career.id)}
                         aria-pressed={selected}
                         aria-label={`${selected ? "Remove" : "Choose"} ${career.title}`}
                       >

@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, MessageCircleMore, Plus, X } from 'lucide-react';
 
 import SlideshowOverlay from '@/components/career-path/SlideshowOverlay';
@@ -20,7 +20,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from '@/i18n/language-provider';
 import { XtaraApiError } from '@/lib/api/client';
 import { getCareerArea } from '@/lib/career-knowledge';
-import { getCareerDirectionImage } from '@/lib/career-direction-imagery';
 import { generateCareerConversationSlides } from '@/lib/career-slides-utils';
 import {
   getDreamCareerStudentContext,
@@ -36,6 +35,8 @@ import {
   type DirectionPlan,
 } from '@/lib/direction';
 import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
+import { loadDiscoveryResult } from '@/lib/assessment-v2';
+import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
 import type {
   CareerIdentityView,
   CareerGuideQuestionId,
@@ -44,6 +45,13 @@ import type {
   DreamCareerGuideLocale,
   DreamCareerStudentGuideResponse,
 } from '@/types/dream-career-student-guide';
+
+const journeyCopy = {
+  en: { selected: 'Selected', remove: 'Remove', add: 'Choose this career', continue: 'Continue', overview: 'Career overview' },
+  ml: { selected: 'തിരഞ്ഞെടുത്തു', remove: 'നീക്കൂ', add: 'ഈ കരിയർ തിരഞ്ഞെടുക്കൂ', continue: 'തുടരൂ', overview: 'കരിയർ പരിചയം' },
+  hi: { selected: 'चुना गया', remove: 'हटाएँ', add: 'यह करियर चुनें', continue: 'आगे बढ़ें', overview: 'करियर परिचय' },
+  ta: { selected: 'தேர்ந்தெடுக்கப்பட்டது', remove: 'நீக்குக', add: 'இந்தத் தொழிலைத் தேர்ந்தெடுக்கவும்', continue: 'தொடர்க', overview: 'தொழில் அறிமுகம்' },
+} as const;
 
 const serverDirectionSnapshot = () => null;
 
@@ -106,12 +114,21 @@ const selectionCopy: Record<DreamCareerGuideLocale, {
 };
 
 export default function DreamCareerPage() {
+  return <Suspense fallback={<div aria-busy="true" className="min-h-screen bg-background" />}><DreamCareerContent /></Suspense>;
+}
+
+function DreamCareerContent() {
   const { roleId } = useParams<{ roleId: string }>();
-  const { user } = useAuth();
+  const from = useSearchParams().get('from');
+  const { user, loading: authLoading } = useAuth();
+  const currentOwner = useRef(user?.uid);
+  const selectionGeneration = useRef(0);
+  currentOwner.current = user?.uid;
   const { locale } = useTranslations();
   const guideLocale = locale as DreamCareerGuideLocale;
   const text = pageCopy[guideLocale];
   const stateText = selectionCopy[guideLocale];
+  const journeyText = journeyCopy[guideLocale];
   const [response, setResponse] = useState<DreamCareerStudentGuideResponse | null>(null);
   const [missingGuideCareer, setMissingGuideCareer] = useState<CareerIdentityView | null>(null);
   const [loading, setLoading] = useState(true);
@@ -151,13 +168,16 @@ export default function DreamCareerPage() {
   }, [loadGuide]);
 
   useEffect(() => {
+    selectionGeneration.current += 1;
     setStudentContext(null);
     setRemotePlan(null);
+    setSelectionUpdating(false);
+    setSelectionError('');
     if (!user || user.isAnonymous) return;
     const controller = new AbortController();
     Promise.all([
-      getDreamCareerStudentContext(roleId, { signal: controller.signal }),
-      getDirectionFromApi(),
+      getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: user.uid }),
+      getDirectionFromApi(user.uid),
     ])
       .then(([context, direction]) => {
         if (controller.signal.aborted) return;
@@ -165,14 +185,30 @@ export default function DreamCareerPage() {
         setRemotePlan(direction);
       })
       .catch(() => undefined);
-    return () => controller.abort();
-  }, [roleId, user]);
+    return () => { controller.abort(); selectionGeneration.current += 1; };
+  }, [roleId, user?.uid, user?.isAnonymous]);
 
   const careerId = response?.career.id ?? roleId;
   const area = response?.career.primaryFutureDirectionId
     ? getCareerArea(locale, response.career.primaryFutureDirectionId)
     : null;
   const signedIn = Boolean(user && !user.isAnonymous);
+  const activePlan = signedIn ? remotePlan : plan;
+  const careerIdentity = response?.career ?? missingGuideCareer;
+  const compatibleWithActiveDirection = Boolean(activePlan && (
+    careerIdentity?.futureDirectionIds.length
+      ? careerIdentity.futureDirectionIds.includes(activePlan.areaId)
+      : !signedIn && (() => {
+        const catalog = loadDiscoveryResult()?.catalogSnapshot;
+        return catalog?.roles.some((career) => career.id === careerId && career.futureDirectionIds.includes(activePlan.areaId))
+          && catalog.directions.some((direction) => direction.id === activePlan.areaId && direction.roleIds.includes(careerId));
+      })()
+  ));
+  const returnAreaId = activePlan && compatibleWithActiveDirection
+    ? activePlan.areaId : null;
+  const backHref = from === 'explore' ? '/explore'
+    : from === 'dashboard' && signedIn ? '/dashboard'
+    : returnAreaId ? `/explore/areas/${encodeURIComponent(returnAreaId)}` : '/explore';
   const isSelected = signedIn
     ? Boolean(studentContext?.saved)
     : Boolean(plan?.dreamCareerIds.includes(careerId));
@@ -181,6 +217,10 @@ export default function DreamCareerPage() {
     setSelectionError('');
     if (!signedIn) {
       if (!plan) {
+        setSelectionError(text.needsDirection);
+        return;
+      }
+      if (!isSelected && !compatibleWithActiveDirection) {
         setSelectionError(text.needsDirection);
         return;
       }
@@ -212,12 +252,17 @@ export default function DreamCareerPage() {
     }
 
     setSelectionUpdating(true);
+    const owner = user!.uid;
+    const generation = selectionGeneration.current;
+    const isCurrent = () => currentOwner.current === owner && selectionGeneration.current === generation;
     try {
-      const saved = await saveDirectionToApi(mutation.plan);
+      const saved = await saveDirectionToApi(mutation.plan, owner);
+      if (!isCurrent()) return;
       const [readPlan, readContext] = await Promise.all([
-        getDirectionFromApi(),
-        getDreamCareerStudentContext(careerId),
+        getDirectionFromApi(owner),
+        getDreamCareerStudentContext(careerId, { expectedUserId: owner }),
       ]);
+      if (!isCurrent()) return;
       if (!readPlan
         || !directionSelectionsMatch(readPlan, saved)
         || readContext.saved !== mutation.expectedSaved) {
@@ -225,11 +270,13 @@ export default function DreamCareerPage() {
       }
       setRemotePlan(readPlan);
       setStudentContext(readContext);
+      markDiscoveryCacheOwner(owner);
       saveDirectionPlan(readPlan);
     } catch {
+      if (!isCurrent()) return;
       setSelectionError(stateText.saveFailed);
     } finally {
-      setSelectionUpdating(false);
+      if (isCurrent()) setSelectionUpdating(false);
     }
   };
 
@@ -245,12 +292,13 @@ export default function DreamCareerPage() {
     }
   };
 
-  if (loading && !response) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
+  if (authLoading || (loading && !response)) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
   if (missingGuideCareer) {
     return (
       <PageFrame>
         <section className="bg-muted/20 px-4 py-10 sm:px-6 sm:py-16">
           <div className="mx-auto max-w-5xl rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10 lg:p-12">
+            <Link href={backHref} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-primary"><ArrowLeft className="h-4 w-4" />{text.back}</Link>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
             <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-primary sm:text-6xl">{missingGuideCareer.title}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
@@ -293,8 +341,10 @@ export default function DreamCareerPage() {
       ? response.resolved.courseOptions.items.map((option) => option.courseTitle)
       : [],
   });
-  const directionImage = getCareerDirectionImage(response.career.primaryFutureDirectionId);
-  const editorialImage = directionImage ?? response.career.imageUrl ?? null;
+  const hasReviewedGuidance = (covered('whatYouDo') && guide.aboutCareer.activities.length > 0)
+    || (covered('educationRoutes') && guide.howToGetThere.educationRoutes.length > 0)
+    || (covered('starterActivity') && Boolean(guide.whatYouCanDoNow.starterActivity?.description));
+  const editorialImage = hasReviewedGuidance ? response.career.imageUrl ?? null : null;
   const editorialCaption = covered('whatYouDo') ? guide.aboutCareer.activities[0]?.title : undefined;
 
   return (
@@ -303,27 +353,28 @@ export default function DreamCareerPage() {
       <main>
         <section className="border-b border-border bg-background px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
           <div className="mx-auto max-w-7xl">
-            <Link href={area ? `/explore/areas/${area.id}` : '/explore'} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ArrowLeft className="h-4 w-4" />{text.back}
             </Link>
             <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end lg:gap-16">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
                   {area ? <Badge variant="secondary">{area.title}</Badge> : null}
-                  {isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{text.selected}</Badge> : null}
+                  {isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{journeyText.selected}</Badge> : null}
                 </div>
-                <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
-                <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-6xl lg:text-7xl">{response.career.title}</h1>
+                <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{hasReviewedGuidance ? text.overview : journeyText.overview}</p>
+                <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-5xl lg:text-6xl">{response.career.title}</h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">{response.career.summary}</p>
               </div>
               <div className="flex flex-col gap-3 lg:pb-1">
+              {returnAreaId && from !== 'explore' && from !== 'dashboard' ? <Button asChild size="lg" className="rounded-full"><Link href={backHref}>{journeyText.continue}</Link></Button> : null}
                 <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
-                  {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? text.remove : text.add}
+                  {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? journeyText.remove : journeyText.add}
                 </Button>
-                <Button size="lg" variant="secondary" className="rounded-full" onClick={() => setConversationOpen(true)}>
+                {hasReviewedGuidance ? <Button size="lg" variant="ghost" className="rounded-full" onClick={() => setConversationOpen(true)}>
                   <MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}
-                </Button>
-                <p className="text-sm leading-6 text-muted-foreground">{text.conversationHelp}</p>
+                </Button> : null}
+
                 {selectionError ? <p role="alert" className="text-sm font-medium text-destructive">{selectionError}</p> : null}
               </div>
             </div>

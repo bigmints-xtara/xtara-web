@@ -34,16 +34,16 @@
       "signupAction": "Account बनाएँ",
       "learner": {
         "title": "वापस स्वागत है",
-        "description": "अपनी Career Directions, Dream Careers, learning और अगले steps आगे बढ़ाएँ।",
+        "description": "अपने आकलन और चुने हुए करियर पर लौटें।",
         "submit": "मेरा career path खोलें",
         "submitting": "खोल रहे हैं...",
         "google": "Google से जारी रखें",
         "sideEyebrow": "आपका career path",
         "sideTitle": "एक-एक step से future साफ हो सकता है।",
-        "sideDescription": "आपने जो directions चुनी हैं, skills बनाएँ, family या teacher से बात की तैयारी करें, और अपना plan update करते रहें।",
+        "sideDescription": "करियर खोजें और किसी भरोसेमंद व्यक्ति से अपने विकल्पों पर बात करें।",
         "sideProofs": [
           "Career Directions और Careers एक जगह",
-          "Skills और छोटे next steps saved",
+          "अपनी रुचि के करियर खोजें",
           "Family conversation के लिए clear notes"
         ],
         "imageAlt": "अपने future पर साथ में बात करते भारतीय students"
@@ -81,24 +81,24 @@
           "submit": "Account बनाएँ",
           "sideEyebrow": "Possibility से शुरू करें",
           "sideTitle": "Career plan student के साथ grow होना चाहिए।",
-          "sideDescription": "Xtara interests और situations बदलने पर exploration, learning और family conversations को साथ रखता है।",
+          "sideDescription": "करियर खोजें और किसी भरोसेमंद व्यक्ति से अपने विकल्पों पर बात करें।",
           "sideProofs": [
             "Career Directions और Dream Careers एक जगह रखें",
-            "छोटी learning से skills बनाएँ",
+            "अपनी रुचि के करियर खोजें",
             "Family conversations के लिए clear plan रखें"
           ]
         },
         "saveDiscovery": {
           "title": "अपना future plan save करें",
-          "description": "Assessment, Career Directions, Dream Careers और next steps अपने account में रखें।",
+          "description": "अपना आकलन और चुने हुए करियर सेव करने के लिए खाता बनाएँ।",
           "submit": "Plan save करें",
           "sideEyebrow": "आपने शुरुआत कर दी है",
           "sideTitle": "Assessment शुरुआत है, final answer नहीं।",
-          "sideDescription": "अपना काम save करें, suggested directions explore करें, और सीखते समय plan refine करते रहें।",
+          "sideDescription": "करियर खोजें और किसी भरोसेमंद व्यक्ति से अपने विकल्पों पर बात करें।",
           "sideProofs": [
             "Assessment answers सुरक्षित रखें",
             "Suggested directions compare करें",
-            "Next steps account में रखें"
+            "जब चाहें अपने चुने हुए करियर पर लौटें"
           ]
         },
         "saveAssessment": {

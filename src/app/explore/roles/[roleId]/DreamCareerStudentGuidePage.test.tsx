@@ -1,5 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useParams } from 'next/navigation';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { XtaraApiError } from '@/lib/api/client';
@@ -138,11 +138,55 @@ describe('Dream Career Student Guide page', () => {
     Object.defineProperty(window, 'localStorage', { configurable: true, value: storage });
     vi.mocked(useParams).mockReturnValue({ roleId: 'data-engineer' });
     mocks.user = null;
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams() as ReturnType<typeof useSearchParams>);
     mocks.getGuide.mockResolvedValue(guideResponse());
     mocks.getContext.mockResolvedValue({ careerId: 'data-engineer', saved: false, assessmentReasons: [], location: {} });
     mocks.getDirection.mockResolvedValue(null);
     mocks.saveDirection.mockRejectedValue(new Error('save not configured'));
     localStorage.clear();
+  });
+
+  it('returns to the selected API direction even when it is absent from bundled area copy', async () => {
+    const response = guideResponse();
+    response.career.futureDirectionIds = ['custom-api-direction'];
+    response.career.primaryFutureDirectionId = 'custom-api-direction';
+    mocks.getGuide.mockResolvedValue(response);
+    saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('custom-api-direction'), 'data-engineer'));
+    render(<DreamCareerPage />);
+    await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
+    expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/explore/areas/custom-api-direction');
+    expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
+  });
+
+  it('does not add an unrelated career to an anonymous direction', async () => {
+    saveDirectionPlan(createAreaDirectionPlan('unrelated-direction'));
+    render(<DreamCareerPage />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Choose this career' }));
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Continue' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Selected')).not.toBeInTheDocument();
+  });
+
+  it('uses a simple overview without conversation or generic imagery when guide content is empty', async () => {
+    const response = guideResponse();
+    response.guide.aboutCareer.activities = [];
+    response.guide.howToGetThere.educationRoutes = [];
+    response.guide.whatYouCanDoNow.starterActivity = null;
+    mocks.getGuide.mockResolvedValue(response);
+    render(<DreamCareerPage />);
+    await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
+    expect(screen.getByText('Career overview')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Start Career Conversation' })).not.toBeInTheDocument();
+    expect(document.querySelector('figure')).toBeNull();
+    expect(screen.queryByText(/browser|draft/i)).not.toBeInTheDocument();
+  });
+
+  it('returns to Explore when opened from the catalogue', async () => {
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('from=explore') as ReturnType<typeof useSearchParams>);
+    saveDirectionPlan(createAreaDirectionPlan('technology'));
+    render(<DreamCareerPage />);
+    await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
+    expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/explore');
   });
 
   it('refreshes guide relationships with signed-in state and country context', async () => {
@@ -166,7 +210,7 @@ describe('Dream Career Student Guide page', () => {
   it('preserves save and career-conversation actions in the hero', async () => {
     render(<DreamCareerPage />);
 
-    expect(await screen.findByRole('button', { name: 'Add to My Dream Careers' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Choose this career' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Start Career Conversation' }));
     expect(screen.getByText('Career conversation')).toBeInTheDocument();
   });
@@ -205,6 +249,25 @@ describe('Dream Career Student Guide page', () => {
     }));
   });
 
+  it('ignores a delayed selection save after leaving the page', async () => {
+    mocks.user = { uid: 'student-1', isAnonymous: false };
+    const remote = createAreaDirectionPlan('technology');
+    const saved = toggleDreamCareer(remote, 'data-engineer');
+    mocks.getDirection.mockResolvedValue(remote);
+    let resolveSave!: (value: typeof saved) => void;
+    mocks.saveDirection.mockReturnValue(new Promise((resolve) => { resolveSave = resolve; }));
+    const view = render(<DreamCareerPage />);
+    const add = await screen.findByRole('button', { name: 'Choose this career' });
+    await waitFor(() => expect(mocks.getDirection).toHaveBeenCalledOnce());
+    fireEvent.click(add);
+    await waitFor(() => expect(mocks.saveDirection).toHaveBeenCalledOnce());
+    view.unmount();
+    await act(async () => resolveSave(saved));
+    expect(mocks.getDirection).toHaveBeenCalledOnce();
+    expect(mocks.getContext).toHaveBeenCalledOnce();
+    expect(localStorage.getItem('xtara_my_direction_v1')).toBeNull();
+  });
+
   it('derives signed-in mutations from the remote Direction plan and updates only after readback', async () => {
     mocks.user = { uid: 'student-1', isAnonymous: false };
     const response = guideResponse();
@@ -222,17 +285,17 @@ describe('Dream Career Student Guide page', () => {
 
     render(<DreamCareerPage />);
 
-    const add = await screen.findByRole('button', { name: 'Add to My Dream Careers' });
+    const add = await screen.findByRole('button', { name: 'Choose this career' });
     await waitFor(() => expect(mocks.getDirection).toHaveBeenCalledOnce());
     fireEvent.click(add);
     await waitFor(() => expect(mocks.saveDirection).toHaveBeenCalledWith(expect.objectContaining({
       areaId: 'technology',
       dreamCareerIds: ['data-engineer'],
-    })));
-    expect(screen.getByRole('button', { name: 'Add to My Dream Careers' })).toBeInTheDocument();
+    }), 'student-1'));
+    expect(screen.getByRole('button', { name: 'Choose this career' })).toBeInTheDocument();
 
     resolveSave(saved);
-    expect(await screen.findByRole('button', { name: 'Remove from My Dream Careers' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Remove' })).toBeInTheDocument();
     expect(mocks.getDirection).toHaveBeenCalledTimes(2);
     expect(mocks.getContext).toHaveBeenCalledTimes(2);
   });
@@ -243,7 +306,7 @@ describe('Dream Career Student Guide page', () => {
 
     render(<DreamCareerPage />);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Add to My Dream Careers' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Choose this career' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Saving is unavailable because this career does not match a saved Career Direction in your account.');
     expect(mocks.saveDirection).not.toHaveBeenCalled();
   });
@@ -255,9 +318,9 @@ describe('Dream Career Student Guide page', () => {
 
     render(<DreamCareerPage />);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Add to My Dream Careers' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Choose this career' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('We could not update My Dream Careers. Your saved state has not changed.');
-    expect(screen.getByRole('button', { name: 'Add to My Dream Careers' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Choose this career' })).toBeInTheDocument();
   });
 
   it('shows loading and an honest retryable guide error without legacy fallback content', async () => {
