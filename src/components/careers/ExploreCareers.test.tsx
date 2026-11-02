@@ -7,7 +7,7 @@ vi.mock('@/components/Header', () => ({ default: () => <nav>Navigation</nav> }))
 vi.mock('@/i18n/language-provider', () => ({ useTranslations: () => ({ locale: 'en' }) }));
 vi.mock('@/lib/curated-career-api', () => ({ getPublishedDreamCareers: vi.fn() }));
 describe('Explore Careers catalogue', () => {
-  beforeEach(() => vi.mocked(getPublishedDreamCareers).mockReset());
+  beforeEach(() => { vi.mocked(getPublishedDreamCareers).mockReset(); window.history.replaceState({}, '', '/explore'); });
   it('opens published career guides and excludes drafts', async () => {
     const career = { ...createEmptyDreamCareer(), id: 'doctor' };
     career.status = 'published';
@@ -16,12 +16,15 @@ describe('Explore Careers catalogue', () => {
     vi.mocked(getPublishedDreamCareers).mockResolvedValue([career, draft]);
     render(<ExploreCareers />);
     const title = await screen.findByRole('heading', { name: 'Doctor' });
+    expect(screen.getByRole('list', { name: 'Explore Careers' })).toBeInTheDocument();
+    expect(screen.getByRole('listitem')).toContainElement(title);
     expect(title.closest('a')).toHaveAttribute('href', '/dream-careers/doctor?from=explore');
     expect(screen.queryByText('Unreviewed')).not.toBeInTheDocument();
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'engineer' } });
     expect(screen.getByRole('status')).toHaveTextContent('No careers match');
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'DOC' } });
     expect(screen.getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
+    expect(new URL(window.location.href).searchParams.get('q')).toBe('DOC');
   });
   it('offers retry after failure and an honest empty state', async () => {
     vi.mocked(getPublishedDreamCareers).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce([]);
