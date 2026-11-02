@@ -396,7 +396,7 @@ function DreamCareerContent() {
         <DreamCareerStudentGuide response={response} locale={guideLocale} onRetryRelationship={(subsection) => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
       </main>
       <Footer />
-      <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />
+      {!MVP_NAVIGATION_ENABLED ? <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} /> : null}
     </div>
   );
 }

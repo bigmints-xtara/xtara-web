@@ -137,13 +137,14 @@ describe('pursued-area learner dashboard', () => {
     expect(container.querySelector('[role="alert"]')).toBeNull();
   });
 
-  it('keeps direction, careers and conversation without fetching hidden engagement data in MVP', async () => {
+  it('keeps direction and careers without a slideshow or hidden engagement data in MVP', async () => {
     mocks.mvpEnabled = true;
     const before = localStorage.getItem(directionStorageKey);
     await act(async () => { root.render(<UserDashboard />); });
     expect(container.textContent).toContain('My Direction');
     expect(container.textContent).toContain('UX Designer');
-    expect(container.textContent).toContain('Career Conversation');
+    expect(container.textContent).not.toContain('Career Conversation');
+    expect(container.querySelector('#next-steps')).toBeNull();
     expect(container.textContent).not.toContain('My Rewards');
     expect(container.textContent).not.toContain('My goals this week');
     expect(container.textContent).not.toContain('My Next Steps');

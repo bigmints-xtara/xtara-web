@@ -158,7 +158,7 @@ export default function UserDashboard() {
     locale,
     curatedCareers,
   ));
-  const conversationSlides = generateCareerConversationSlides({
+  const conversationSlides = MVP_NAVIGATION_ENABLED ? [] : generateCareerConversationSlides({
     locale,
     directionTitle: focusedDirection.title,
     careers: conversationCareers,
@@ -271,7 +271,7 @@ export default function UserDashboard() {
         <WeeklyPlanCard />
       </section> : null}
 
-      <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? styles.conversation : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
+      {!MVP_NAVIGATION_ENABLED ? <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? styles.conversation : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
             {!MVP_NAVIGATION_ENABLED ? <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
               <div className="flex items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold text-primary">{text.myNextSteps}</h2><p className="mt-2 text-sm text-muted-foreground">{stepsDone}</p></div><span className="text-2xl font-semibold text-primary">{completedSteps}/{totalSteps}</span></div>
               {experience?.nextBest ? (
@@ -305,7 +305,7 @@ export default function UserDashboard() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{text.careerConversationHelp}</p>
               <Button className="mt-6 w-full rounded-full lg:mt-auto" onClick={() => setConversationOpen(true)}>{text.start}<ArrowRight className="ml-2 h-4 w-4" /></Button>
             </CardContent></Card>
-          </section>
+          </section> : null}
 
           {!MVP_NAVIGATION_ENABLED ? <section className="mt-8" aria-labelledby="career-achievements-title">
             <Card className="border-0 bg-secondary/20 shadow-none"><CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -317,7 +317,7 @@ export default function UserDashboard() {
         </>
       ) : null}
 
-      <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />
+      {!MVP_NAVIGATION_ENABLED ? <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} /> : null}
     </main>
   );
 }
