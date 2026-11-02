@@ -1,5 +1,6 @@
 "use client";
 
+import DirectionImage from "@/components/journey/DirectionImage";
 import styles from '@/components/journey/journey.module.css';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
@@ -197,7 +198,7 @@ export default function UserDashboard() {
         className={styles.dashboardHero}
         aria-labelledby="career-direction-title"
       >
-        <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full border border-white/10 bg-white/[0.04]" />
+        <DirectionImage directionId={focusedDirection.id} />
         <div className="relative p-6 sm:p-10">
           <div className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">

@@ -7,6 +7,7 @@ import {
   ArrowRight, Check, ChevronDown, Compass,
 } from "lucide-react";
 
+import DirectionImage from "@/components/journey/DirectionImage";
 import styles from '@/components/journey/journey.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
@@ -92,8 +93,8 @@ export default function DiscoveryResultPage() {
             <h2 className="sr-only">{catalog.result.areasLabel}</h2>
             <div className="mt-5 grid gap-5 lg:grid-cols-3">
               {result.areas.map((area) => (
-                <Card key={area.id} className={styles.resultCard}><CardContent className={styles.resultBody}>
-                  <span className={styles.motif} aria-hidden="true"><Compass size={26} strokeWidth={1.5} /></span>
+                <Card key={area.id} className={styles.resultCard}><DirectionImage directionId={area.id} sizes="(max-width: 1023px) 100vw, 400px" /><CardContent className={styles.resultBody}>
+
                   <h3 className="text-2xl font-semibold text-primary">{area.title}</h3>
                   <p className="mt-3 leading-7 text-muted-foreground">{area.description}</p>
                   {area.roles.length ? (
@@ -106,7 +107,7 @@ export default function DiscoveryResultPage() {
                       ))}
                     </ul>
                   ) : null}
-                  {reasonsByArea[area.id]?.length ? <div className="mt-6 border-t border-slate-100 pt-5"><p className="text-sm font-semibold text-primary">{catalog.result.why}</p><ul className="mt-3 space-y-3">{reasonsByArea[area.id].map((reason) => <li key={reason} className="flex gap-3 text-sm leading-6 text-muted-foreground"><Check className="mt-1 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />{reason}</li>)}</ul></div> : null}
+                  {reasonsByArea[area.id]?.length ? <div className="mt-6 border-t border-slate-100 pt-5"><p className="text-sm font-semibold text-primary">{catalog.result.why}</p><ul className="mt-3 space-y-3">{reasonsByArea[area.id].map((reason) => <li key={reason} className="flex gap-3 text-sm leading-6 text-muted-foreground"><Check className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{reason}</li>)}</ul></div> : null}
                   <Button type="button" className="mt-7 min-h-12 w-full justify-between rounded-xl" aria-label={`${catalog.result.viewArea}: ${area.title}`} onClick={() => pursueArea(area.id)}>{catalog.result.viewArea}<ArrowRight className="h-4 w-4" /></Button>
                 </CardContent></Card>
               ))}
