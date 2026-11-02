@@ -21,7 +21,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from '@/i18n/language-provider';
 import { XtaraApiError } from '@/lib/api/client';
 import { getCareerArea } from '@/lib/career-knowledge';
-import { generateCareerConversationSlides } from '@/lib/career-slides-utils';
+import { careerConversationFromGuides } from '@/lib/career-conversation-data';
 import {
   getDreamCareerStudentContext,
   getDreamCareerStudentGuide,
@@ -317,32 +317,7 @@ function DreamCareerContent() {
     const status = response.coverage.byQuestion[questionId]?.status;
     return status === 'available' || status === 'partial';
   };
-  const firstEarning = covered('earnings') ? guide.aboutCareer.earnings[0] : undefined;
-  const conversationSlides = generateCareerConversationSlides({
-    locale,
-    directionTitle: area?.title ?? text.dreamCareer,
-    careers: [{
-      title: response.career.title,
-      summary: response.career.summary,
-      dailyWork: covered('whatYouDo')
-        ? guide.aboutCareer.activities.map((activity) => activity.title)
-        : [],
-      workSetting: '',
-      preparation: covered('educationRoutes')
-        ? guide.howToGetThere.educationRoutes.map((route) => route.description).join(' ')
-        : '',
-      tryThis: covered('starterActivity')
-        ? guide.whatYouCanDoNow.starterActivity?.description ?? ''
-        : '',
-      difficultParts: [],
-      salaryRange: firstEarning ? `${firstEarning.amountMin}–${firstEarning.amountMax} ${firstEarning.currency} per ${firstEarning.period}` : undefined,
-      growthOutlook: undefined,
-    }],
-    strengths: studentContext?.assessmentReasons.map((reason) => reason.label) ?? [],
-    courses: covered('coursesAndColleges') && response.resolved.courseOptions.status === 'available'
-      ? response.resolved.courseOptions.items.map((option) => option.courseTitle)
-      : [],
-  });
+  const conversationSlides = careerConversationFromGuides([response], locale);
   const hasReviewedGuidance = (covered('whatYouDo') && guide.aboutCareer.activities.length > 0)
     || (covered('educationRoutes') && guide.howToGetThere.educationRoutes.length > 0)
     || (covered('starterActivity') && Boolean(guide.whatYouCanDoNow.starterActivity?.description));
@@ -368,8 +343,8 @@ function DreamCareerContent() {
                 <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-4xl lg:text-5xl">{response.career.title}</h1>
                 <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{response.career.summary}</p>
               </div>
-              {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
               {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="w-fit rounded-xl" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
+              {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
               {returnAreaId && from !== 'explore' && from !== 'dashboard' ? <Button asChild size="lg" className="rounded-full"><Link href={backHref}>{journeyText.continue}</Link></Button> : null}
                 <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
                   {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? journeyText.remove : journeyText.add}

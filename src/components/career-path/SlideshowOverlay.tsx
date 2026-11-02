@@ -6,7 +6,7 @@ import { useTranslations } from '@/i18n/language-provider';
 import type { CareerSlideData } from '@/types/career';
 import styles from './SlideshowOverlay.module.css';
 
-interface SlideshowOverlayProps { isOpen: boolean; onClose: () => void; slides: CareerSlideData[] }
+interface SlideshowOverlayProps { isOpen: boolean; onClose: () => void; slides: CareerSlideData[]; onRetry?: () => void; retryLabel?: string; status?: 'loading' | 'error' }
 const copy = {
   en: { title: 'Career conversation', topics: 'Conversation topics', previous: 'Previous', next: 'Next topic', finish: 'Back to my careers', close: 'Close career conversation' },
   ml: { title: 'കരിയർ സംഭാഷണം', topics: 'സംഭാഷണ വിഷയങ്ങൾ', previous: 'മുമ്പത്തേത്', next: 'അടുത്ത വിഷയം', finish: 'എന്റെ കരിയറുകളിലേക്ക് മടങ്ങൂ', close: 'കരിയർ സംഭാഷണം അടയ്ക്കുക' },
@@ -15,10 +15,10 @@ const copy = {
 };
 
 export default function SlideshowOverlay(props: SlideshowOverlayProps) {
-  return props.isOpen && props.slides.length ? <ConversationViewer onClose={props.onClose} slides={props.slides} /> : null;
+  return props.isOpen && props.slides.length ? <ConversationViewer onClose={props.onClose} slides={props.slides} onRetry={props.onRetry} retryLabel={props.retryLabel} status={props.status} /> : null;
 }
 
-function ConversationViewer({ onClose, slides }: Omit<SlideshowOverlayProps, 'isOpen'>) {
+function ConversationViewer({ onClose, slides, onRetry, retryLabel, status }: Omit<SlideshowOverlayProps, 'isOpen'>) {
   const { locale } = useTranslations();
   const text = copy[locale];
   const [index, setIndex] = useState(0);
@@ -38,8 +38,8 @@ function ConversationViewer({ onClose, slides }: Omit<SlideshowOverlayProps, 'is
   useEffect(() => {
     if (reader.current) reader.current.scrollTop = 0;
     heading.current?.focus();
-  }, [current]);
-  return <dialog ref={dialog} className={styles.dialog} aria-label={text.title} onCancel={(event) => { event.preventDefault(); onClose(); }}>
+  }, [current, slide.title]);
+  return <dialog ref={dialog} className={styles.dialog} aria-label={text.title} aria-busy={status === 'loading'} onCancel={(event) => { event.preventDefault(); onClose(); }}>
     <header className={styles.header}>
       <span>{text.title}</span>
       <button type="button" onClick={onClose} aria-label={text.close}><X size={20} aria-hidden="true" /></button>
@@ -53,14 +53,16 @@ function ConversationViewer({ onClose, slides }: Omit<SlideshowOverlayProps, 'is
         <div className={styles.readingWidth}>
           <p className={styles.position}>{current + 1} / {slides.length}</p>
           <h2 ref={heading} tabIndex={-1}>{slide.title}</h2>
-          <p className={styles.subtitle}>{slide.subtitle}</p>
+          <p className={styles.subtitle} role={status === 'error' ? 'alert' : status === 'loading' ? 'status' : undefined}>{slide.subtitle}</p>
           <ul className={styles.content}>{slide.content.filter((item) => item.subtitle.trim() || item.titlesOnly).map((item, position) => <li key={position}>
             <h3>{item.title}</h3>{item.subtitle ? <p>{item.subtitle}</p> : null}
+            {item.sources?.length ? <ul className={styles.sources}>{item.sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label}</a></li>)}</ul> : null}
           </li>)}</ul>
         </div>
       </div>
     </div>
     <footer className={styles.footer}>
+      {onRetry ? <button type="button" onClick={onRetry}>{retryLabel}</button> : null}
       <button type="button" disabled={current === 0} onClick={() => setIndex(current - 1)}><ArrowLeft size={17} aria-hidden="true" />{text.previous}</button>
       <button type="button" className={styles.next} onClick={() => current === slides.length - 1 ? onClose() : setIndex(current + 1)}>{current === slides.length - 1 ? text.finish : text.next}<ArrowRight size={17} aria-hidden="true" /></button>
     </footer>

@@ -15,6 +15,7 @@ export interface SlideContent {
     subtitle: string;
     icon: string;
     titlesOnly?: boolean;
+    sources?: Array<{ label: string; url: string }>;
 }
 
 export interface CareerSlideData {

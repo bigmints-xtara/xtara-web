@@ -14,7 +14,7 @@ import {
   MessageCircleMore,
 } from "lucide-react";
 
-import SlideshowOverlay from "@/components/career-path/SlideshowOverlay";
+import CareerConversation from "@/components/career-path/CareerConversation";
 import WeeklyPlanCard from "@/components/home/WeeklyPlanCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,11 +27,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { getAssessmentV2Catalog, assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
-import { getCareerRole } from "@/lib/career-knowledge";
-import {
-  type CareerConversationCareer,
-  generateCareerConversationSlides,
-} from "@/lib/career-slides-utils";
 import { dashboardCopy } from "@/lib/dashboard-copy";
 import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 import {
@@ -50,8 +45,6 @@ import {
   type MyCareerPathExperience,
 } from "@/lib/experience-api";
 import { AchievementsService } from "@/lib/firebase/achievements-service";
-import { getDirectionCourseQueries } from "@/lib/pathway-recommendations";
-import type { CuratedDreamCareer } from "@/types/curated-career";
 
 import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from "@/lib/mvp-navigation";
 
@@ -84,10 +77,6 @@ export default function UserDashboard() {
       return [{ id, title: translation.title, summary: translation.summary }];
     });
   }, [storedResult, focusedDirection, plan, locale]);
-  const curatedCareers = storedResult?.catalogSnapshot?.roles ?? [];
-  const courseQueries = storedResult && focusedDirection
-    ? getDirectionCourseQueries(storedResult, focusedDirection.id).slice(0, 6)
-    : [];
   const userId = user?.uid;
   const isAnonymous = user?.isAnonymous;
 
@@ -152,21 +141,6 @@ export default function UserDashboard() {
   const completedSteps = experience?.progress.completed ?? progressGoals.filter((step) => step.completed).length;
   const totalSteps = experience?.progress.total ?? 3;
   const stepsDone = text.stepsDone.replace("{done}", String(completedSteps)).replace("{total}", String(totalSteps));
-  const conversationCareers = selectedCareers.map((career) => conversationCareer(
-    career.id,
-    career.title,
-    career.summary,
-    locale,
-    curatedCareers,
-  ));
-  const conversationSlides = generateCareerConversationSlides({
-    locale,
-    directionTitle: focusedDirection.title,
-    careers: conversationCareers,
-    strengths: result.signals.map((signal) => text.skillLabels[signal.id] ?? signal.title),
-    courses: courseQueries,
-  });
-
   const updateStep = async (actionId: DirectionActionId) => {
     if (!plan) return;
     if (experience && actionId !== "discuss") return;
@@ -310,7 +284,7 @@ export default function UserDashboard() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{text.careerConversationHelp}</p>
               <Button className="mt-6 w-full rounded-full lg:mt-auto" onClick={() => setConversationOpen(true)}>{text.start}<ArrowRight className="ml-2 h-4 w-4" /></Button>
             </CardContent></Card>
-          </section> : null}
+          </section>
 
           {!MVP_NAVIGATION_ENABLED ? <section className="mt-8" aria-labelledby="career-achievements-title">
             <Card className="border-0 bg-secondary/20 shadow-none"><CardContent className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -318,11 +292,11 @@ export default function UserDashboard() {
               <div className="grid grid-cols-3 gap-2 text-center sm:min-w-80"><RewardValue value={rewards.points.toLocaleString()} label={text.points} /><RewardValue value={String(rewards.medals)} label={text.medals} /><RewardValue value={localizeRewardLevel(rewards.level, locale)} label={text.level} compact /></div>
               <Button asChild className="rounded-full"><Link href="/achievements">{text.viewRewards}<ArrowRight className="h-4 w-4" /></Link></Button>
             </CardContent></Card>
-          </section>
+          </section> : null}
         </>
       ) : null}
 
-      <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />
+      <CareerConversation isOpen={conversationOpen} onClose={() => setConversationOpen(false)} careerIds={selectedCareers.map((career) => career.id)} />
     </main>
   );
 }
@@ -333,23 +307,6 @@ function RewardValue({ value, label, compact = false }: { value: string; label: 
 
 function EmptyState({ title, description, action, href }: { title: string; description: string; action: string; href: string }) {
   return <main className="mx-auto max-w-4xl px-5 py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><Button asChild className="mt-7 rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button></main>;
-}
-
-function conversationCareer(id: string, title: string, summary: string, locale: "en" | "ml" | "hi" | "ta", curatedCareers: CuratedDreamCareer[]): CareerConversationCareer {
-  const fallback = getCareerRole(locale, id);
-  const curated = curatedCareers.find((career) => career.id === id || career.slug === id);
-  const translation = curated?.translations[locale] || curated?.translations.en;
-  return {
-    title: translation?.title || fallback?.title || title,
-    summary: translation?.summary || fallback?.summary || summary,
-    dailyWork: translation?.dailyWork?.length ? translation.dailyWork : fallback?.dailyWork || [],
-    workSetting: translation?.workSetting || fallback?.workSetting || "",
-    preparation: translation?.pathway || fallback?.pathway || "Compare current study routes and entry requirements.",
-    tryThis: translation?.tryThis || fallback?.tryThis || "Try one small related activity and discuss what you learned.",
-    difficultParts: translation?.tradeoffs?.length ? translation.tradeoffs : fallback?.tradeoffs || [],
-    salaryRange: curated?.salaryRange || fallback?.salaryRange,
-    growthOutlook: curated?.growthOutlook || fallback?.growthOutlook,
-  };
 }
 
 function subscribeToDiscovery(onChange: () => void) {

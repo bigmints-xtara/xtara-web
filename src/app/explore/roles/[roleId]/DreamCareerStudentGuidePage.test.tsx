@@ -37,8 +37,8 @@ vi.mock('@/lib/direction-api', () => ({
   getDirectionFromApi: mocks.getDirection,
   saveDirectionToApi: mocks.saveDirection,
 }));
-vi.mock('@/lib/career-slides-utils', () => ({
-  generateCareerConversationSlides: mocks.generateSlides,
+vi.mock('@/lib/career-conversation-data', () => ({
+  careerConversationFromGuides: mocks.generateSlides,
 }));
 
 import DreamCareerPage from './page';
@@ -253,15 +253,8 @@ describe('Dream Career Student Guide page', () => {
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer' })).toBeInTheDocument();
     expect(screen.queryByText('Good data helps people make sound decisions.')).not.toBeInTheDocument();
-    expect(mocks.generateSlides).toHaveBeenLastCalledWith(expect.objectContaining({
-      careers: [expect.objectContaining({
-        dailyWork: [],
-        preparation: '',
-        tryThis: '',
-        salaryRange: undefined,
-      })],
-      courses: [],
-    }));
+    expect(mocks.generateSlides).toHaveBeenLastCalledWith([value], 'en');
+    // Coverage filtering is exercised against the actual mapper in career-conversation-data.test.ts.
   });
 
   it('ignores a delayed selection save after leaving the page', async () => {
