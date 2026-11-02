@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { AlertDialog } from 'radix-ui';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Eye, FilePenLine, GitBranch, Loader2, RotateCcw, Rocket, Send, ShieldCheck } from 'lucide-react';
 
@@ -33,7 +34,29 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
   const [activeTab, setActiveTab] = useState<'edit' | 'preview' | 'versions' | 'evidence'>('edit');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [approving, setApproving] = useState(false);
-  const [versionAction, setVersionAction] = useState<string | null>(null);
+const [confirmation, setConfirmation] = useState<{ message: string; resolve: (accepted: boolean) => void } | null>(null);
+const confirmationRef = useRef<typeof confirmation>(null);
+const confirmationInvoker = useRef<HTMLElement | null>(null);
+const requestConfirmation = (message: string) => new Promise<boolean>((resolve) => {
+  confirmationRef.current?.resolve(false);
+  confirmationInvoker.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const pending = { message, resolve };
+  confirmationRef.current = pending;
+  setConfirmation(pending);
+});
+const settleConfirmation = (accepted: boolean) => {
+  confirmationRef.current?.resolve(accepted);
+  confirmationRef.current = null;
+  setConfirmation(null);
+};
+useEffect(() => {
+  setConfirmation(null);
+  return () => {
+    confirmationRef.current?.resolve(false);
+    confirmationRef.current = null;
+  };
+}, [recordId, contentType]);
+const [versionAction, setVersionAction] = useState<string | null>(null);
   const [versionHistory, setVersionHistory] = useState<CareerContentVersionHistory | null>(null);
   const [versionsLoading, setVersionsLoading] = useState(false);
   const [versionsError, setVersionsError] = useState('');
@@ -164,7 +187,7 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
       promote: 'Promote this approved version to live? Learners will receive it immediately after the persisted write succeeds.',
       'return-to-draft': 'Return this version to draft for more editing?',
     };
-    if (confirmations[action] && !confirm(confirmations[action]!)) return;
+    if (confirmations[action] && !await requestConfirmation(confirmations[action]!)) return;
     setVersionAction(action);
     setActionMessage('');
     setActionError('');
@@ -206,7 +229,7 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
 
   const approve = async () => {
     if (!persistedId || !definition.config.supportsApproval || !mayApprove) return;
-    if (!confirm(`Approve this ${definition.config.entityName}? This records you as the human reviewer.`)) return;
+    if (!await requestConfirmation(`Approve this ${definition.config.entityName}? This records you as the human reviewer.`)) return;
     setApproving(true);
     setActionMessage('');
     setActionError('');
@@ -229,6 +252,19 @@ export default function AdminContentEditorPage({ contentType, recordId }: { cont
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-muted/20">
+      <AlertDialog.Root open={Boolean(confirmation)} onOpenChange={(open) => { if (!open) settleConfirmation(false); }}>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay className="fixed inset-0 z-50 bg-black/50" />
+          <AlertDialog.Content onCloseAutoFocus={(event) => { event.preventDefault(); confirmationInvoker.current?.focus(); }} className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-background p-6 shadow-lg">
+            <AlertDialog.Title className="text-lg font-semibold">Confirm content action</AlertDialog.Title>
+            <AlertDialog.Description className="mt-3 text-sm text-muted-foreground">{confirmation?.message}</AlertDialog.Description>
+            <div className="mt-6 flex justify-end gap-2">
+              <AlertDialog.Cancel asChild><Button type="button" variant="outline" onClick={() => settleConfirmation(false)}>Cancel</Button></AlertDialog.Cancel>
+              <AlertDialog.Action asChild><Button type="button" onClick={() => settleConfirmation(true)}>Confirm action</Button></AlertDialog.Action>
+            </div>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
       <div className="shrink-0 border-b bg-background px-4 pt-4 sm:px-6">
         <Button asChild className="-ml-2" size="sm" variant="ghost">
           <Link href={listHref}><ArrowLeft />Back to {definition.config.entityNamePlural}</Link>

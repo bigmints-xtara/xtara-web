@@ -73,6 +73,27 @@ describe('AdminContentEditorPage', () => {
     vi.mocked(useRouter).mockReturnValue({ push, replace } as unknown as ReturnType<typeof useRouter>);
   });
 
+  it('cancels without a write and restores keyboard focus to the invoker', async () => {
+    service.getById.mockResolvedValue({ ...createEmptyDreamCareer(), id: 'cancel-role' });
+    render(<AdminContentEditorPage contentType="dream-careers" recordId="cancel-role" />);
+    const button = await screen.findByRole('button', { name: 'Approve' });
+    button.focus();
+    fireEvent.click(button);
+    const cancel = await screen.findByRole('button', { name: 'Cancel' });
+    await waitFor(() => expect(cancel).toHaveFocus());
+    fireEvent.click(cancel);
+    await waitFor(() => expect(button).toHaveFocus());
+    expect(approval.approve).not.toHaveBeenCalled();
+  });
+  it('discards a pending approval when the route changes', async () => {
+    service.getById.mockResolvedValue({ ...createEmptyDreamCareer(), id: 'old-role' });
+    const view = render(<AdminContentEditorPage contentType="dream-careers" recordId="old-role" />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Approve' }));
+    await screen.findByRole('alertdialog');
+    view.rerender(<AdminContentEditorPage contentType="dream-careers" recordId="new-role" />);
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(approval.approve).not.toHaveBeenCalled();
+  });
   it('uses the advanced receipt lock when approving the same content version', async () => {
     const live = { ...createEmptyDreamCareer(), id: 'doctor', status: 'published' as const, published: true };
     const version = { id: 'v2', collectionName: 'dream_careers', recordId: 'doctor', revision: 2, schemaVersion: 1, lockVersion: 2, status: 'inReview', content: live, basedOnVersionId: null, createdAt: '2026-11-02', createdBy: 'editor', updatedAt: '2026-11-02', updatedBy: 'editor' };
@@ -96,6 +117,7 @@ describe('AdminContentEditorPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Record review evidence' }));
     await screen.findByText(/Review evidence saved and verified/);
     fireEvent.click(screen.getByRole('button', { name: 'Approve version' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Confirm action' }));
     await waitFor(() => expect(versions.action).toHaveBeenCalledWith('dream_careers', 'doctor', expect.objectContaining({ id: 'v2', lockVersion: 3 }), 'approve'));
   });
 
@@ -157,6 +179,7 @@ describe('AdminContentEditorPage', () => {
     render(<AdminContentEditorPage contentType="dream-careers" recordId={draft.id} />);
     await screen.findByRole('heading', { name: 'Approval Career', level: 1 });
     fireEvent.click(screen.getByRole('button', { name: 'Approve' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Confirm action' }));
 
     await waitFor(() => expect(approval.approve).toHaveBeenCalledWith('dream_careers', [draft.id]));
     expect(await screen.findByText('Approved and verified. This record is ready to publish.')).toBeInTheDocument();
@@ -210,8 +233,10 @@ describe('AdminContentEditorPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Submit for review' }));
     expect(await screen.findByRole('button', { name: 'Approve version' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Approve version' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Confirm action' }));
     expect(await screen.findByRole('button', { name: 'Promote to live' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Promote to live' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Confirm action' }));
 
     expect(await screen.findByText('Version 2 is live and verified.')).toBeInTheDocument();
     expect(versions.action).toHaveBeenNthCalledWith(3, 'dream_careers', live.id, approved, 'promote');
@@ -255,6 +280,7 @@ describe('AdminContentEditorPage', () => {
     render(<AdminContentEditorPage contentType="dream-careers" recordId={live.id} />);
     await screen.findByRole('heading', { name: 'Versioned Career', level: 1 });
     fireEvent.click(await screen.findByRole('button', { name: 'Promote to live' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Confirm action' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Promotion completed, but canonical live readback could not verify the promoted version.');
     expect(screen.queryByText('Version 2 is live and verified.')).not.toBeInTheDocument();
@@ -287,6 +313,7 @@ describe('AdminContentEditorPage', () => {
     render(<AdminContentEditorPage contentType="dream-careers" recordId={live.id} />);
     await screen.findByRole('heading', { name: 'Versioned Career', level: 1 });
     fireEvent.click(await screen.findByRole('button', { name: 'Promote to live' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Confirm action' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Promotion completed, but canonical live readback could not verify the promoted version.');
     expect(screen.queryByText('Version 2 is live and verified.')).not.toBeInTheDocument();

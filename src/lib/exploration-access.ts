@@ -20,10 +20,19 @@ export function canAccessPursuedRole(
   roleId: string,
 ): boolean {
   const area = getRecommendedArea(result, areaId);
-  return Boolean(area && plan?.areaId === areaId && area.roleIds.includes(roleId));
+  return Boolean(area && plan?.areaId === areaId && belongsToArea(result!, areaId, roleId));
+}
+
+function belongsToArea(result: DiscoveryResult, areaId: string, roleId: string): boolean {
+  if (result.catalogSnapshot) {
+    const direction = result.catalogSnapshot.directions.find((item) => item.id === areaId);
+    const role = result.catalogSnapshot.roles.find((item) => item.id === roleId);
+    return Boolean(direction?.roleIds.includes(roleId) && role?.futureDirectionIds.includes(areaId));
+  }
+  return Boolean(getRecommendedArea(result, areaId)?.roleIds.includes(roleId));
 }
 
 export function isDirectionPlanCompatible(result: DiscoveryResult, plan: DirectionPlan): boolean {
   const area = getRecommendedArea(result, plan.areaId);
-  return Boolean(area && plan.dreamCareerIds.every((id) => area.roleIds.includes(id)));
+  return Boolean(area && plan.dreamCareerIds.every((id) => belongsToArea(result, plan.areaId, id)));
 }

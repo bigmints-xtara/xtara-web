@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
-import { assessmentV2StorageKey, parseDiscoveryResult } from "@/lib/assessment-v2";
-import { getCareerArea, getCareerKnowledgeCatalog, getCareerRolesByArea } from "@/lib/career-knowledge";
+import { assessmentV2StorageKey, getAssessmentV2Catalog, parseDiscoveryResult } from "@/lib/assessment-v2";
+import { getCareerKnowledgeCatalog } from "@/lib/career-knowledge";
 import { getPublishedCareerCatalog } from "@/lib/curated-career-api";
 import {
   getDirectionSnapshot,
@@ -24,8 +24,7 @@ import {
 } from "@/lib/direction";
 import { savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
 import { canAccessPursuedArea } from "@/lib/exploration-access";
-import type { CareerAreaId } from "@/types/career-knowledge";
-import type { CuratedDreamCareer } from "@/types/curated-career";
+import type { CuratedDreamCareer, FutureDirection } from "@/types/curated-career";
 
 const serverSnapshot = () => null;
 const subscribeToHydration = () => () => undefined;
@@ -117,45 +116,47 @@ export default function CareerDirectionPage() {
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, serverSnapshot);
   const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
   const plan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
-  const direction = getCareerArea(locale, areaId);
+  const [directions, setDirections] = useState<FutureDirection[]>([]);
+  const directionRecord = directions.find((item) => item.id === areaId);
+  const direction = directionRecord ? { id: directionRecord.id, title: directionRecord.translations[locale]?.title || directionRecord.translations.en.title } : null;
+  const [catalogError, setCatalogError] = useState(false);
+  const [reload, setReload] = useState(0);
+  const assessmentCopy = getAssessmentV2Catalog(locale);
   const [curatedCareers, setCuratedCareers] = useState<CuratedDreamCareer[]>([]);
   const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [loading, setLoading] = useState(true);
   const [selectionOverride, setSelectionOverride] = useState<string[] | null>(null);
-  const selectedIds = selectionOverride ?? (plan?.areaId === areaId ? plan.dreamCareerIds : []);
+  const rawSelectedIds = selectionOverride ?? (plan?.areaId === areaId ? plan.dreamCareerIds : []);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setCatalogError(false);
     getPublishedCareerCatalog()
-      .then(({ roles }) => { if (active) setCuratedCareers(roles); })
-      .catch(() => undefined)
+      .then(({ roles, directions }) => { if (active) { setCuratedCareers(roles); setDirections(directions); } })
+      .catch(() => { if (active) setCatalogError(true); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, []);
+  }, [reload]);
 
   const careers = useMemo(() => {
     const dynamic = curatedCareers
-      .filter((career) => career.futureDirectionIds.includes(areaId))
+      .filter((career) => career.futureDirectionIds.includes(areaId)
+        && directionRecord?.roleIds.includes(career.id))
       .map((career) => localizeCareer(career, locale));
-    if (dynamic.length) return dynamic;
-    if (!direction) return [];
-    return getCareerRolesByArea(locale, direction.id as CareerAreaId)
-      .map((career) => ({
-        id: career.id,
-        title: career.title,
-        englishTitle: career.englishTitle,
-        summary: career.summary,
-        workSetting: career.workSetting,
-        salaryRange: undefined,
-      }));
-  }, [areaId, curatedCareers, direction, locale]);
+    return dynamic;
+  }, [areaId, curatedCareers, locale, directionRecord]);
+  const selectedIds = rawSelectedIds.filter((id) => careers.some((career) => career.id === id));
 
-  if (!hydrated) {
+  if (!hydrated || loading) {
     return <div className="flex min-h-screen items-center justify-center bg-slate-50"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
   }
 
+  if (catalogError) {
+    return <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6"><p role="alert">{assessmentCopy.ui.errorTitle}</p><Button onClick={() => setReload((value) => value + 1)}>{assessmentCopy.ui.retry}</Button></div>;
+  }
   if (!direction) {
     return <EmptyState title={fallbackCatalog.ui.notFound} action={fallbackCatalog.ui.back} href="/assessment" />;
   }
@@ -167,7 +168,7 @@ export default function CareerDirectionPage() {
   const toggle = (careerId: string) => {
     setError("");
     setSelectionOverride((override) => {
-      const current = override ?? (plan?.areaId === areaId ? plan.dreamCareerIds : []);
+      const current = (override ?? (plan?.areaId === areaId ? plan.dreamCareerIds : [])).filter((id) => careers.some((career) => career.id === id));
       if (current.includes(careerId)) return current.filter((id) => id !== careerId);
       if (current.length >= 3) {
         setError(text.max);
@@ -260,6 +261,13 @@ export default function CareerDirectionPage() {
                 );
               })}
             </div>
+
+            {!careers.length ? <p role="status" className="py-6 text-muted-foreground">{({
+              en: 'No recommended careers are available for this direction yet.',
+              ml: 'ഈ ദിശയിൽ ശുപാർശ ചെയ്ത കരിയറുകൾ ഇപ്പോൾ ലഭ്യമല്ല.',
+              hi: 'इस दिशा के लिए सुझाए गए करियर अभी उपलब्ध नहीं हैं।',
+              ta: 'இந்தத் திசையில் பரிந்துரைக்கப்பட்ட தொழில்கள் இன்னும் கிடைக்கவில்லை.',
+            })[locale]}</p> : null}
 
             <div className="sticky bottom-4 z-20 mt-8 rounded-2xl border bg-white/95 p-4 shadow-lg backdrop-blur sm:flex sm:items-center sm:justify-between sm:gap-5">
               <p className="font-semibold text-primary">{selectedIds.length} / 3 {text.selected}</p>
