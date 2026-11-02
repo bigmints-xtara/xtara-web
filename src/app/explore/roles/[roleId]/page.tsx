@@ -368,6 +368,7 @@ function DreamCareerContent() {
                 <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{response.career.summary}</p>
               </div>
               {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
+              {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="w-fit rounded-xl" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
               {returnAreaId && from !== 'explore' && from !== 'dashboard' ? <Button asChild size="lg" className="rounded-full"><Link href={backHref}>{journeyText.continue}</Link></Button> : null}
                 <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
                   {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? journeyText.remove : journeyText.add}
@@ -396,7 +397,7 @@ function DreamCareerContent() {
         <DreamCareerStudentGuide response={response} locale={guideLocale} onRetryRelationship={(subsection) => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
       </main>
       <Footer />
-      {!MVP_NAVIGATION_ENABLED ? <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} /> : null}
+      <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />
     </div>
   );
 }

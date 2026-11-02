@@ -1,74 +1,68 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import UniversalSlide from "./UniversalSlide";
-import { CareerSlideData } from "@/types/career";
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, X } from 'lucide-react';
+import { useTranslations } from '@/i18n/language-provider';
+import type { CareerSlideData } from '@/types/career';
+import styles from './SlideshowOverlay.module.css';
 
-interface SlideshowOverlayProps {
-    isOpen: boolean;
-    onClose: () => void;
-    slides: CareerSlideData[];
+interface SlideshowOverlayProps { isOpen: boolean; onClose: () => void; slides: CareerSlideData[] }
+const copy = {
+  en: { title: 'Career conversation', topics: 'Conversation topics', previous: 'Previous', next: 'Next topic', finish: 'Back to my careers', close: 'Close career conversation' },
+  ml: { title: 'കരിയർ സംഭാഷണം', topics: 'സംഭാഷണ വിഷയങ്ങൾ', previous: 'മുമ്പത്തേത്', next: 'അടുത്ത വിഷയം', finish: 'എന്റെ കരിയറുകളിലേക്ക് മടങ്ങൂ', close: 'കരിയർ സംഭാഷണം അടയ്ക്കുക' },
+  hi: { title: 'करियर पर बातचीत', topics: 'बातचीत के विषय', previous: 'पिछला', next: 'अगला विषय', finish: 'मेरे करियर पर लौटें', close: 'करियर बातचीत बंद करें' },
+  ta: { title: 'தொழில் உரையாடல்', topics: 'உரையாடல் தலைப்புகள்', previous: 'முந்தையது', next: 'அடுத்த தலைப்பு', finish: 'எனது தொழில்களுக்குத் திரும்புக', close: 'தொழில் உரையாடலை மூடுக' },
+};
+
+export default function SlideshowOverlay(props: SlideshowOverlayProps) {
+  return props.isOpen && props.slides.length ? <ConversationViewer onClose={props.onClose} slides={props.slides} /> : null;
 }
 
-export default function SlideshowOverlay({ isOpen, onClose, slides }: SlideshowOverlayProps) {
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    const close = () => {
-        setCurrentIndex(0);
-        onClose();
-    };
-
-    const handleNext = () => {
-        if (currentIndex < slides.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-        } else {
-            close();
-        }
-    };
-
-    if (!isOpen || !slides.length) return null;
-
-    return (
-        <div className="fixed inset-0 z-[100] bg-[#12192E] text-white overflow-hidden flex flex-col" role="dialog" aria-modal="true" aria-label="Career Conversation">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20 pointer-events-none" />
-
-            {/* Progress Bar */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-white/10 z-[110]">
-                <motion.div
-                    className="h-full bg-blue-500"
-                    initial={{ width: "0%" }}
-                    animate={{ width: `${((currentIndex + 1) / slides.length) * 100}%` }}
-                    transition={{ duration: 0.5 }}
-                />
-            </div>
-
-            {/* Close Button */}
-            <button
-                onClick={close}
-                aria-label="Close Career Conversation"
-                className="absolute top-4 right-4 z-[120] p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-            >
-                <X size={24} />
-            </button>
-
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex-1 pt-12"
-                >
-                    <UniversalSlide
-                        slideData={slides[currentIndex]}
-                        onButtonClick={handleNext}
-                        isLastSlide={currentIndex === slides.length - 1}
-                    />
-                </motion.div>
-            </AnimatePresence>
+function ConversationViewer({ onClose, slides }: Omit<SlideshowOverlayProps, 'isOpen'>) {
+  const { locale } = useTranslations();
+  const text = copy[locale];
+  const [index, setIndex] = useState(0);
+  const current = Math.min(index, slides.length - 1);
+  const slide = slides[current];
+  const dialog = useRef<HTMLDialogElement>(null);
+  const reader = useRef<HTMLDivElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    const trigger = document.activeElement as HTMLElement | null;
+    const element = dialog.current;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    element?.showModal();
+    return () => { element?.close(); document.body.style.overflow = overflow; trigger?.focus(); };
+  }, []);
+  useEffect(() => {
+    if (reader.current) reader.current.scrollTop = 0;
+    heading.current?.focus();
+  }, [current]);
+  return <dialog ref={dialog} className={styles.dialog} aria-label={text.title} onCancel={(event) => { event.preventDefault(); onClose(); }}>
+    <header className={styles.header}>
+      <span>{text.title}</span>
+      <button type="button" onClick={onClose} aria-label={text.close}><X size={20} aria-hidden="true" /></button>
+    </header>
+    <div className={styles.layout}>
+      <nav className={styles.topics} aria-label={text.topics}>
+        <p>{text.topics}</p>
+        <ol>{slides.map((item, position) => <li key={`${item.type}-${position}`}><button type="button" aria-current={current === position ? 'step' : undefined} onClick={() => setIndex(position)}><span aria-hidden="true">{String(position + 1).padStart(2, '0')}</span>{item.title}</button></li>)}</ol>
+      </nav>
+      <div className={styles.reader} ref={reader}>
+        <div className={styles.readingWidth}>
+          <p className={styles.position}>{current + 1} / {slides.length}</p>
+          <h2 ref={heading} tabIndex={-1}>{slide.title}</h2>
+          <p className={styles.subtitle}>{slide.subtitle}</p>
+          <ul className={styles.content}>{slide.content.filter((item) => item.subtitle.trim() || item.titlesOnly).map((item, position) => <li key={position}>
+            <h3>{item.title}</h3>{item.subtitle ? <p>{item.subtitle}</p> : null}
+          </li>)}</ul>
         </div>
-    );
+      </div>
+    </div>
+    <footer className={styles.footer}>
+      <button type="button" disabled={current === 0} onClick={() => setIndex(current - 1)}><ArrowLeft size={17} aria-hidden="true" />{text.previous}</button>
+      <button type="button" className={styles.next} onClick={() => current === slides.length - 1 ? onClose() : setIndex(current + 1)}>{current === slides.length - 1 ? text.finish : text.next}<ArrowRight size={17} aria-hidden="true" /></button>
+    </footer>
+  </dialog>;
 }

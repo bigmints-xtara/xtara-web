@@ -158,7 +158,7 @@ export default function UserDashboard() {
     locale,
     curatedCareers,
   ));
-  const conversationSlides = MVP_NAVIGATION_ENABLED ? [] : generateCareerConversationSlides({
+  const conversationSlides = generateCareerConversationSlides({
     locale,
     directionTitle: focusedDirection.title,
     careers: conversationCareers,
@@ -271,7 +271,7 @@ export default function UserDashboard() {
         <WeeklyPlanCard />
       </section> : null}
 
-      {!MVP_NAVIGATION_ENABLED ? <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? styles.conversation : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
+      <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? styles.conversation : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
             {!MVP_NAVIGATION_ENABLED ? <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
               <div className="flex items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold text-primary">{text.myNextSteps}</h2><p className="mt-2 text-sm text-muted-foreground">{stepsDone}</p></div><span className="text-2xl font-semibold text-primary">{completedSteps}/{totalSteps}</span></div>
               {experience?.nextBest ? (
@@ -313,11 +313,11 @@ export default function UserDashboard() {
               <div className="grid grid-cols-3 gap-2 text-center sm:min-w-80"><RewardValue value={rewards.points.toLocaleString()} label={text.points} /><RewardValue value={String(rewards.medals)} label={text.medals} /><RewardValue value={localizeRewardLevel(rewards.level, locale)} label={text.level} compact /></div>
               <Button asChild className="rounded-full"><Link href="/achievements">{text.viewRewards}<ArrowRight className="h-4 w-4" /></Link></Button>
             </CardContent></Card>
-          </section> : null}
+          </section>
         </>
       ) : null}
 
-      {!MVP_NAVIGATION_ENABLED ? <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} /> : null}
+      <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />
     </main>
   );
 }
