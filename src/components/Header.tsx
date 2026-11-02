@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useAuth } from "@/context/AuthContext";
 import { useOrganizationWorkspace } from "@/context/OrganizationContext";
 
+import studentStyles from '@/components/journey/journey.module.css';
 import Container from './Container';
 import { Button } from "@/components/ui/button";
 import {
@@ -99,9 +100,9 @@ const Header = () => {
     };
 
     return <>
-        <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur-xl">
+        <header className={`${!isStaff && !organizationRoute ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border bg-background/95 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur-xl`}>
             <Container className="!px-0">
-                <nav className="flex min-h-16 items-center gap-4 px-4 md:px-6">
+                <nav className="flex min-h-20 items-center gap-4 px-4 md:px-6">
                     {/* Logo */}
                     <Link
                         href={logoHref}
@@ -117,15 +118,16 @@ const Header = () => {
                     </Link>
 
                     {/* Desktop Menu */}
-                    <ul className="ml-auto hidden items-center justify-end gap-1 xl:flex">
+                    <ul className="ml-auto hidden items-center justify-end gap-1 lg:flex">
                         {navItems.map(item => {
                             const active = isActive(item.url);
                             return (
                                 <li key={item.key}>
                                     <Link
                                         href={item.url}
-                                        className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${active
-                                            ? 'bg-primary/8 text-primary'
+                                        aria-current={active ? "page" : undefined}
+                                        className={`rounded-md px-4 py-3 text-sm font-medium transition-colors ${active
+                                            ? 'bg-primary/8 text-primary underline decoration-2 underline-offset-8'
                                             : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                                             }`}
                                         onClick={() =>
@@ -175,7 +177,7 @@ const Header = () => {
                     </ul>
 
                     {/* Mobile Menu */}
-                    <div className="ml-auto flex items-center justify-end gap-1.5 xl:hidden">
+                    <div className="ml-auto flex items-center justify-end gap-1.5 lg:hidden">
                         {learnerShell && !MVP_NAVIGATION_ENABLED ? (
                             <Link
                                 href="/notifications"
@@ -241,7 +243,7 @@ const Header = () => {
         </header>
         {learnerShell ? (
             <nav
-                className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl xl:hidden"
+                className={`${studentStyles.studentChrome} fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden`}
                 aria-label={t("header.nav.learnerNavigation")}
             >
                 <ul className={`mx-auto grid max-w-lg ${MVP_NAVIGATION_ENABLED ? "grid-cols-3" : "grid-cols-5"} px-1`}>

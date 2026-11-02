@@ -83,7 +83,7 @@ export default function DiscoveryResultPage() {
         <JourneySteps step={1} locale={locale} />
         <div className="mx-auto max-w-6xl">
           <div className={styles.resultsHeader}><div>
-            <h1 className={styles.heading}>{catalog.result.title}</h1>
+            <h1 className={styles.heading}>{{ en: "Choose a Career Direction to explore.", ml: "അറിയാൻ ഒരു കരിയർ ദിശ തിരഞ്ഞെടുക്കൂ.", hi: "खोजने के लिए एक करियर दिशा चुनें।", ta: "ஆராய ஒரு தொழில் திசையைத் தேர்ந்தெடுங்கள்." }[locale]}</h1>
             <p className={styles.intro}>{catalog.result.description}</p>
           </div><span className={styles.compass} aria-hidden="true"><Compass size={52} strokeWidth={1.3} /></span></div>
 

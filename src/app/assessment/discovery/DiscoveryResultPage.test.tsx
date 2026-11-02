@@ -71,7 +71,7 @@ describe("discovery result chooser", () => {
     const { container } = render(<DiscoveryResultPage />);
 
     expect(await screen.findByRole("heading", { name: "Choose a Career Direction to explore." })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Explore this direction:/ })).toHaveLength(3);
+    expect(screen.getAllByRole("button", { name: /Explore these careers:/ })).toHaveLength(3);
     expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physician");
     expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physiotherapist");
     expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Biomedical Engineer");

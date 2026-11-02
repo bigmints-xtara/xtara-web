@@ -265,6 +265,10 @@ export default function UserDashboard() {
         )}
       </section>
 
+      {MVP_NAVIGATION_ENABLED ? <section className={styles.dashboardBrowse}>
+        <p>{mvpNavigationCopy[locale].description}</p><Link href="/explore">{mvpNavigationCopy[locale].exploreCareers}<ArrowRight size={18} aria-hidden="true" /></Link>
+      </section> : null}
+
       {selectedCareers.length ? (
         <>
       {!MVP_NAVIGATION_ENABLED ? <section className="mt-8" aria-label={text.progress}>

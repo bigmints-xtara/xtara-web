@@ -12,6 +12,7 @@ import {
   DreamCareerStudentGuideError,
   DreamCareerStudentGuideLoading,
 } from '@/components/careers/DreamCareerStudentGuide';
+import styles from '@/components/journey/journey.module.css';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { Badge } from '@/components/ui/badge';
@@ -349,10 +350,10 @@ function DreamCareerContent() {
   const editorialCaption = covered('whatYouDo') ? guide.aboutCareer.activities[0]?.title : undefined;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={styles.surface}>
       <Header />
       <main>
-        <section className="border-b border-border bg-background px-4 py-10 sm:px-6 sm:py-14 lg:py-16">
+        <section className="border-b border-border px-6 py-10 sm:px-8 sm:py-14 lg:py-16">
           <div className="mx-auto max-w-7xl">
             <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ArrowLeft className="h-4 w-4" />{text.back}
@@ -403,7 +404,7 @@ function DreamCareerContent() {
 }
 
 function PageFrame({ children }: { children: React.ReactNode }) {
-  return <div className="min-h-screen bg-background text-foreground"><Header /><main>{children}</main><Footer /></div>;
+  return <div className={styles.surface}><Header /><main>{children}</main><Footer /></div>;
 }
 
 function careerIdentityFromMissingGuide(error: unknown): CareerIdentityView | null {

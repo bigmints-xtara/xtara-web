@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import styles from "@/components/journey/journey.module.css";
 import Header from "@/components/Header";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import LocationInput from "@/components/assessment/LocationInput";
@@ -458,7 +459,7 @@ export default function ProfilePage() {
 
   if (loading || !user) return <ProfileSkeleton />;
 
-  const identity = <Card className="border-0 bg-gradient-to-br from-primary to-primary/75 text-white shadow-sm"><CardContent className="flex items-center gap-4 p-5 sm:p-6"><Avatar className="h-14 w-14 border border-white/20"><AvatarFallback className="bg-white/10 text-lg text-white">{initials(name)}</AvatarFallback></Avatar><div className="min-w-0 flex-1"><h2 className="truncate text-lg font-semibold">{name}</h2><p className="truncate text-sm text-white/70">{email}</p></div>{user.emailVerified ? <Badge className="bg-emerald-400/15 text-emerald-100 hover:bg-emerald-400/15"><BadgeCheck className="mr-1 h-3.5 w-3.5" />{text.verified}</Badge> : <Badge className="bg-amber-300/15 text-amber-100 hover:bg-amber-300/15">{text.notVerified}</Badge>}</CardContent></Card>;
+  const identity = <Card className={styles.profileIdentity}><CardContent className="flex items-center gap-4 p-5 sm:p-6"><Avatar className="h-14 w-14 border border-white/20"><AvatarFallback className="bg-white/10 text-lg text-white">{initials(name)}</AvatarFallback></Avatar><div className="min-w-0 flex-1"><h2 className="truncate text-lg font-semibold">{name}</h2><p className="truncate text-sm text-white/70">{email}</p></div>{user.emailVerified ? <Badge className="bg-emerald-400/15 text-emerald-100 hover:bg-emerald-400/15"><BadgeCheck className="mr-1 h-3.5 w-3.5" />{text.verified}</Badge> : <Badge className="bg-amber-300/15 text-amber-100 hover:bg-amber-300/15">{text.notVerified}</Badge>}</CardContent></Card>;
 
   if (!section) {
     const destinations = [
@@ -469,13 +470,13 @@ export default function ProfilePage() {
       { key: "support", icon: HelpCircle, title: hub.support, description: hub.supportHelp },
       { key: "legal", icon: ShieldCheck, title: hub.legal, description: hub.legalHelp },
     ];
-    return <div className="min-h-screen bg-[#f7fafc] text-foreground"><Header /><main className="mx-auto max-w-4xl px-4 py-7 pb-28 sm:px-6 sm:py-10 xl:pb-20"><div><h1 className="text-3xl font-semibold tracking-tight text-primary sm:text-4xl">{text.title}</h1><p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">{text.description}</p></div><div className="mt-6">{identity}</div><div className="mt-6 grid gap-3 md:grid-cols-2">{destinations.map(({ key, icon: Icon, title, description }) => <Link key={key} href={`/profile?section=${key}`} className="group flex min-h-28 items-center gap-4 rounded-2xl border border-primary/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-sm"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-secondary/20 text-primary"><Icon className="h-6 w-6" /></span><span className="min-w-0 flex-1"><span className="block text-lg font-semibold text-primary">{title}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{description}</span></span><ChevronRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-primary" /></Link>)}</div></main></div>;
+    return <div className={styles.profileSurface}><Header /><main className={styles.profileMain}><div><h1 className="text-3xl font-semibold tracking-tight text-primary sm:text-4xl">{text.title}</h1><p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">{text.description}</p></div><div className="mt-6">{identity}</div><div className={styles.profileDestinations}>{destinations.map(({ key, icon: Icon, title, description }) => <Link key={key} href={`/profile?section=${key}`} className={styles.profileDestination}><span className="profile-icon"><Icon className="h-6 w-6" /></span><span className="min-w-0 flex-1"><span className="block text-lg font-semibold text-primary">{title}</span><span className="mt-1 block text-sm leading-5 text-slate-600">{description}</span></span><ChevronRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-primary" /></Link>)}</div></main></div>;
   }
 
   const sectionTitle = section === "personal" ? hub.personal : section === "academic" ? hub.academic : section === "institutions" ? hub.institutions : section === "settings" ? hub.settings : section === "support" ? hub.support : hub.legal;
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground"><Header />
-      <main className="mx-auto max-w-5xl px-4 py-7 pb-28 sm:px-6 sm:py-10 xl:pb-20">
+    <div className={styles.profileSurface}><Header />
+      <main className={styles.profileMain}>
         <Link href="/profile" className="inline-flex min-h-10 items-center gap-2 rounded-full px-2 text-sm font-semibold text-primary hover:bg-primary/5"><ChevronLeft className="h-4 w-4" />{hub.back}</Link>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">{sectionTitle}</h1>
         {status ? <p role="status" className={`mt-5 rounded-xl px-4 py-3 text-sm ${status === text.saved ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-950"}`}>{status}</p> : null}

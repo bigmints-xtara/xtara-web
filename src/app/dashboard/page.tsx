@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import styles from "@/components/journey/journey.module.css";
 import UserDashboard from "@/components/home/UserDashboard";
 import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 import { useRouter } from "next/navigation";
@@ -22,7 +23,7 @@ export default function DashboardPage() {
     // Show skeleton while loading or redirecting
     if (loading || !user) {
         return (
-            <div className="min-h-screen bg-background text-foreground">
+            <div className={styles.surface}>
                 <Navbar />
                 <DashboardSkeleton />
                 <Footer />
@@ -31,7 +32,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className={styles.surface}>
             <Navbar />
             <OrganizationMembershipCard />
             <UserDashboard />

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ExploreCareers from './ExploreCareers';
 import { getPublishedDreamCareers } from '@/lib/curated-career-api';
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
+vi.mock('@/context/AuthContext', () => ({ useAuth: () => ({ user: null }) }));
 vi.mock('@/components/Header', () => ({ default: () => <nav>Navigation</nav> }));
 vi.mock('@/i18n/language-provider', () => ({ useTranslations: () => ({ locale: 'en' }) }));
 vi.mock('@/lib/curated-career-api', () => ({ getPublishedDreamCareers: vi.fn() }));
@@ -25,6 +26,10 @@ describe('Explore Careers catalogue', () => {
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'DOC' } });
     expect(screen.getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
     expect(new URL(window.location.href).searchParams.get('q')).toBe('DOC');
+    fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+    expect(screen.getByRole('searchbox', { name: 'Search careers' })).toHaveFocus();
+    expect(new URL(window.location.href).searchParams.has('q')).toBe(false);
+    expect(screen.getByRole('link', { name: 'Find my direction' })).toHaveAttribute('href', '/assessment');
   });
   it('offers retry after failure and an honest empty state', async () => {
     vi.mocked(getPublishedDreamCareers).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce([]);
