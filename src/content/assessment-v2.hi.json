@@ -1,45 +1,45 @@
 {
   "ui": {
-    "eyebrow": "एक simple adaptive career discovery",
+    "eyebrow": "करियर के विकल्पों को समझने की एक सरल शुरुआत",
     "title": "आपको अभी यह पता होना जरूरी नहीं कि आप क्या बनना चाहते हैं।",
-    "description": "हमें बताइए आपको क्या interesting लगता है, आप कैसे काम करते हैं, क्या strength जैसा लगता है, और आपके आसपास क्या matter करता है। Xtara इन answers को explore करने लायक Career Directions में बदलेगा।",
-    "loading": "आपकी discovery journey तैयार हो रही है...",
+    "description": "बताइए कि आपको किन कामों में रुचि है, आप कैसे काम करते हैं, अपनी किन खूबियों को पहचानते हैं और आपके आसपास की परिस्थितियाँ कैसी हैं। इन उत्तरों से Xtara आपको करियर की ऐसी दिशाएँ सुझाएगा जिन्हें आप आगे जान सकते हैं।",
+    "loading": "आपका आकलन तैयार हो रहा है…",
     "errorTitle": "हम आगे नहीं बढ़ पाए",
-    "retry": "फिर try करें",
+    "retry": "फिर कोशिश करें",
     "startAssessment": "Assessment शुरू करें",
     "chooseGrade": "पहले अपनी grade चुनें",
-    "stepOf": "Step {current} of {total}",
-    "back": "Back",
-    "next": "Next",
-    "finish": "नतीजे देखें",
+    "stepOf": "{total} में से चरण {current}",
+    "back": "पीछे",
+    "next": "आगे",
+    "finish": "मेरी करियर दिशाएँ देखें",
     "exit": "बाहर निकलें",
     "exitTitle": "बाहर निकलें?",
     "exitDescription": "Assessment छोड़ें? आप बाद में लौटकर जारी रख सकते हैं।",
     "stay": "यहीं रहें",
     "chooseUpTo": "{count} तक चुनें",
-    "textPlaceholder": "अपना answer यहाँ लिखें",
+    "textPlaceholder": "अपना उत्तर यहाँ लिखें",
     "gradeQuestion": {
-      "label": "आप अभी किस grade में पढ़ रहे हैं?",
-      "description": "आपकी grade assessment की detail और next steps बदलती है। यह आपकी explore कर सकने वाली directions को limit नहीं करती।",
+      "label": "आप अभी किस कक्षा में पढ़ते हैं?",
+      "description": "आपकी कक्षा के अनुसार प्रश्नों की जानकारी और अगले कदम बदलते हैं। इससे आपके लिए करियर की संभावनाएँ सीमित नहीं होतीं।",
       "options": {
-        "grade8": "Grade 8",
-        "grade9": "Grade 9",
-        "grade10": "Grade 10",
+        "grade8": "कक्षा 8",
+        "grade9": "कक्षा 9",
+        "grade10": "कक्षा 10",
         "grade11": "कक्षा 11",
         "grade12": "कक्षा 12"
       }
     },
-    "processingTitle": "आपकी Career Directions बन रही हैं",
-    "processingDescription": "हम आपकी interests, strengths, personality, values और family context में patterns देख रहे हैं। यह perfect-career score नहीं है।",
-    "privacy": "आपके answers guidance बनाने के लिए use होते हैं। आप बाद में अपना plan बदल सकते हैं।",
-    "noQuestions": "इस grade के लिए questions अभी available नहीं हैं।"
+    "processingTitle": "आपकी करियर दिशाएँ तैयार हो रही हैं",
+    "processingDescription": "हम आपकी रुचियों, खूबियों, काम करने के तरीकों, प्राथमिकताओं और पारिवारिक परिस्थितियों में दिखने वाले संकेत देख रहे हैं। यह किसी एक करियर के लिए उपयुक्तता का निश्चित अंक नहीं है।",
+    "privacy": "आपके उत्तर मार्गदर्शन तैयार करने के लिए उपयोग किए जाते हैं। आप बाद में अपनी योजना बदल सकते हैं।",
+    "noQuestions": "इस कक्षा के लिए अभी प्रश्न उपलब्ध नहीं हैं।"
   },
   "questions": [
     {
       "id": "activityCuriosity",
       "fieldType": "multiSelect",
-      "label": "कौन-सी activities आपको curious बनाती हैं, भले आपने उन्हें कभी try न किया हो?",
-      "description": "Curiosity शुरुआत है। इसका मतलब यह नहीं कि आपको वही career चुनना ही है।",
+      "label": "इनमें से किन कामों के बारे में जानने या उन्हें आज़माने की इच्छा होती है, भले ही आपने उन्हें पहले न किया हो?",
+      "description": "जिज्ञासा एक शुरुआत है। इसका मतलब यह नहीं कि आपको उससे जुड़ा करियर ही चुनना चाहिए।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -48,7 +48,7 @@
       "options": [
         {
           "id": "performMusic",
-          "label": "गाना, music बजाना, perform करना या entertain करना",
+          "label": "गाना, संगीत बजाना, मंच पर प्रस्तुति देना या मनोरंजन करना",
           "metadata": {
             "scores": {
               "signal:creativeExpression": 2,
@@ -58,7 +58,7 @@
         },
         {
           "id": "createStory",
-          "label": "Draw, design, write, film बनाना या story बताना",
+          "label": "चित्र बनाना, डिज़ाइन करना, लिखना, फ़िल्म बनाना या कहानी सुनाना",
           "metadata": {
             "scores": {
               "signal:creativeExpression": 2,
@@ -68,7 +68,7 @@
         },
         {
           "id": "buildDigital",
-          "label": "App, game, website या digital tool बनाना",
+          "label": "ऐप, खेल, वेबसाइट या कोई डिजिटल साधन बनाना",
           "metadata": {
             "scores": {
               "signal:analysis": 1,
@@ -78,7 +78,7 @@
         },
         {
           "id": "makeRepair",
-          "label": "कुछ बनाना, ठीक करना, पकाना, उगाना या improve करना",
+          "label": "कुछ बनाना, मरम्मत करना, खाना पकाना, पौधे उगाना या किसी चीज़ को बेहतर बनाना",
           "metadata": {
             "scores": {
               "signal:making": 2,
@@ -88,7 +88,7 @@
         },
         {
           "id": "helpHealth",
-          "label": "किसी को health समझने या improve करने में मदद करना",
+          "label": "किसी को अपने स्वास्थ्य को समझने या बेहतर बनाने में मदद करना",
           "metadata": {
             "scores": {
               "signal:care": 2,
@@ -98,7 +98,7 @@
         },
         {
           "id": "investigate",
-          "label": "Facts या experiments से किसी सवाल की जांच करना",
+          "label": "तथ्यों या प्रयोगों के ज़रिए किसी सवाल की जाँच करना",
           "metadata": {
             "scores": {
               "signal:analysis": 2,
@@ -108,7 +108,7 @@
         },
         {
           "id": "organize",
-          "label": "Event, project, budget या छोटा venture plan करना",
+          "label": "किसी कार्यक्रम, परियोजना, बजट या छोटे व्यवसाय की योजना बनाना",
           "metadata": {
             "scores": {
               "signal:organizing": 2,
@@ -118,7 +118,7 @@
         },
         {
           "id": "community",
-          "label": "Community problem समझना और solve करने में मदद करना",
+          "label": "समुदाय की किसी समस्या को समझना और उसे हल करने में मदद करना",
           "metadata": {
             "scores": {
               "signal:care": 1,
@@ -132,8 +132,8 @@
     {
       "id": "activityExperience",
       "fieldType": "multiSelect",
-      "label": "किस तरह की activities आपने सच में try की हैं और enjoy की हैं?",
-      "description": "इससे curiosity और real experience अलग समझने में मदद मिलती है। कम experience होना normal है।",
+      "label": "इनमें से कौन-से काम आपने सच में करके देखे हैं और आपको अच्छे लगे?",
+      "description": "इससे जिज्ञासा और वास्तविक अनुभव के बीच अंतर समझने में मदद मिलती है। कम अनुभव होना बिल्कुल सामान्य है।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -142,7 +142,7 @@
       "options": [
         {
           "id": "expression",
-          "label": "Art, music, writing, performance या content creation",
+          "label": "कला, संगीत, लेखन, अभिनय या वीडियो जैसी सामग्री बनाना",
           "metadata": {
             "scores": {
               "signal:creativeExpression": 2
@@ -151,7 +151,7 @@
         },
         {
           "id": "problemSolving",
-          "label": "Puzzles, science investigations, coding या research",
+          "label": "पहेलियाँ सुलझाना, वैज्ञानिक जाँच करना, कंप्यूटर प्रोग्राम लिखना या शोध करना",
           "metadata": {
             "scores": {
               "signal:analysis": 2
@@ -160,7 +160,7 @@
         },
         {
           "id": "handsOn",
-          "label": "Building, repairing, cooking, crafts, gardening या practical work",
+          "label": "चीज़ें बनाना, मरम्मत करना, खाना पकाना, हस्तकला, बागवानी या हाथों से काम करना",
           "metadata": {
             "scores": {
               "signal:making": 2,
@@ -170,7 +170,7 @@
         },
         {
           "id": "people",
-          "label": "किसी को पढ़ाना, समझाना, support करना या care करना",
+          "label": "किसी को पढ़ाना, समझाना, सहारा देना या उसकी देखभाल करना",
           "metadata": {
             "scores": {
               "signal:communication": 1,
@@ -180,7 +180,7 @@
         },
         {
           "id": "lead",
-          "label": "Lead करना, plan करना, sell करना, coordinate करना या responsibility लेना",
+          "label": "नेतृत्व करना, योजना बनाना, चीज़ें बेचना, कामों में तालमेल बैठाना या ज़िम्मेदारी लेना",
           "metadata": {
             "scores": {
               "signal:organizing": 2,
@@ -190,7 +190,7 @@
         },
         {
           "id": "noneYet",
-          "label": "मुझे अभी जानने के लिए enough chances नहीं मिले हैं",
+          "label": "यह समझने के लिए मुझे अभी पर्याप्त अवसर नहीं मिले हैं",
           "metadata": {
             "exclusive": true
           }
@@ -200,8 +200,8 @@
     {
       "id": "strengthConfidence",
       "fieldType": "multiSelect",
-      "label": "आज इनमें से क्या आपकी strengths जैसा लगता है?",
-      "description": "आप natural strength या practice से बनी strength दोनों चुन सकते हैं।",
+      "label": "आज इनमें से किन बातों को आप अपनी खूबियाँ मानते हैं?",
+      "description": "आप ऐसी खूबी चुन सकते हैं जो स्वाभाविक लगती हो या जिसे आपने अभ्यास से विकसित किया हो।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -210,7 +210,7 @@
       "options": [
         {
           "id": "express",
-          "label": "Idea, feeling या story express करना",
+          "label": "किसी विचार, भावना या कहानी को व्यक्त करना",
           "metadata": {
             "scores": {
               "signal:creativeExpression": 2
@@ -219,7 +219,7 @@
         },
         {
           "id": "understand",
-          "label": "कुछ कैसे या क्यों काम करता है यह समझना",
+          "label": "यह समझना कि कोई चीज़ कैसे या क्यों काम करती है",
           "metadata": {
             "scores": {
               "signal:analysis": 2,
@@ -229,7 +229,7 @@
         },
         {
           "id": "make",
-          "label": "करके, बनाकर या fix करके सीखना",
+          "label": "खुद करके, चीज़ें बनाकर या ठीक करके सीखना",
           "metadata": {
             "scores": {
               "signal:making": 2,
@@ -239,7 +239,7 @@
         },
         {
           "id": "explain",
-          "label": "सुनना, समझाना या किसी को समझने में help करना",
+          "label": "ध्यान से सुनना, समझाना या किसी को समझने में मदद करना",
           "metadata": {
             "scores": {
               "signal:communication": 2,
@@ -249,7 +249,7 @@
         },
         {
           "id": "care",
-          "label": "लोगों को क्या चाहिए यह notice करना और support करना",
+          "label": "लोगों की ज़रूरतों को पहचानना और उनका साथ देना",
           "metadata": {
             "scores": {
               "signal:care": 2
@@ -258,7 +258,7 @@
         },
         {
           "id": "coordinate",
-          "label": "Responsibility लेना और लोगों या tasks को साथ लाना",
+          "label": "ज़िम्मेदारी लेना और लोगों या कामों के बीच तालमेल बनाना",
           "metadata": {
             "scores": {
               "signal:organizing": 2,
@@ -268,7 +268,7 @@
         },
         {
           "id": "notSure",
-          "label": "मैं अभी अपनी strengths discover कर रहा/रही हूँ",
+          "label": "मैं अभी अपनी खूबियों को पहचान रहा/रही हूँ",
           "metadata": {
             "exclusive": true
           }
@@ -278,8 +278,8 @@
     {
       "id": "strengthEvidence",
       "fieldType": "multiSelect",
-      "label": "आपको क्यों लगता है कि ये आपकी strengths हो सकती हैं?",
-      "description": "Marks useful evidence हो सकते हैं, लेकिन सिर्फ marks ही evidence नहीं हैं।",
+      "label": "आपको क्यों लगता है कि ये आपकी खूबियाँ हो सकती हैं?",
+      "description": "अंक उपयोगी संकेत हो सकते हैं, लेकिन वे अकेले संकेत नहीं हैं।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -288,7 +288,7 @@
       "options": [
         {
           "id": "practice",
-          "label": "Difficult होने पर भी मैं practice जारी रखता/रखती हूँ",
+          "label": "मुश्किल होने पर भी मैं अभ्यास जारी रखता/रखती हूँ",
           "metadata": {
             "scores": {
               "trait:persistence": 2
@@ -297,7 +297,7 @@
         },
         {
           "id": "project",
-          "label": "मैंने इससे कुछ बनाया या complete किया है",
+          "label": "मैंने इस खूबी का उपयोग करके कुछ बनाया या पूरा किया है",
           "metadata": {
             "scores": {
               "evidence:demonstrated": 2
@@ -306,7 +306,7 @@
         },
         {
           "id": "feedback",
-          "label": "Teacher, friend या family member ने इसे notice किया है",
+          "label": "किसी शिक्षक, मित्र या परिवार के सदस्य ने इस खूबी को पहचाना है",
           "metadata": {
             "scores": {
               "evidence:observed": 2
@@ -315,7 +315,7 @@
         },
         {
           "id": "responsibility",
-          "label": "लोग related responsibilities में मुझ पर भरोसा करते हैं",
+          "label": "लोग इससे जुड़ी ज़िम्मेदारियों के लिए मुझ पर भरोसा करते हैं",
           "metadata": {
             "scores": {
               "evidence:observed": 2,
@@ -325,7 +325,7 @@
         },
         {
           "id": "marks",
-          "label": "मेरे schoolwork या marks यह दिखाते हैं",
+          "label": "मेरे स्कूल के काम या अंक यह दिखाते हैं",
           "metadata": {
             "scores": {
               "evidence:academic": 2
@@ -334,7 +334,7 @@
         },
         {
           "id": "feeling",
-          "label": "अभी यह mainly एक feeling है; मैंने test नहीं किया है",
+          "label": "अभी यह मुख्य रूप से मेरा अनुमान है; मैंने इसे आज़माकर नहीं देखा है",
           "metadata": {
             "scores": {
               "evidence:early": 1
@@ -343,7 +343,7 @@
         },
         {
           "id": "noneYet",
-          "label": "मेरे पास अभी clear evidence नहीं है",
+          "label": "मेरे पास अभी इसके स्पष्ट संकेत नहीं हैं",
           "metadata": {
             "exclusive": true
           }
@@ -353,8 +353,8 @@
     {
       "id": "weaknessPattern",
       "fieldType": "multiSelect",
-      "label": "जब कुछ weakness जैसा लगता है, आम तौर पर क्या हो रहा होता है?",
-      "description": "Low mark, low confidence, कम exposure और सच में dislike करना अलग-अलग बातें हैं।",
+      "label": "जब कोई काम अपनी कमज़ोरी लगता है, तो आम तौर पर क्या हो रहा होता है?",
+      "description": "कम अंक, कम आत्मविश्वास, कम अवसर और किसी काम का सच में पसंद न होना अलग-अलग बातें हैं।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -363,7 +363,7 @@
       "options": [
         {
           "id": "dislike",
-          "label": "मैंने try किया है और आम तौर पर enjoy नहीं करता/करती"
+          "label": "मैंने करके देखा है और आम तौर पर मुझे यह अच्छा नहीं लगता"
         },
         {
           "id": "confidence",
@@ -371,19 +371,19 @@
         },
         {
           "id": "marks",
-          "label": "मेरे marks मेरी expectation से कम हैं"
+          "label": "मेरे अंक मेरी अपेक्षा से कम हैं"
         },
         {
           "id": "exposure",
-          "label": "मुझे properly try करने का enough chance नहीं मिला"
+          "label": "मुझे इसे अच्छी तरह आज़माने का पर्याप्त अवसर नहीं मिला"
         },
         {
           "id": "teaching",
-          "label": "जिस तरह मैंने सीखा, वह मेरे लिए काम नहीं आया"
+          "label": "जिस तरह मुझे सिखाया गया, वह तरीका मेरे लिए उपयोगी नहीं रहा"
         },
         {
           "id": "improve",
-          "label": "यह difficult है, लेकिन मैं improve करना चाहता/चाहती हूँ",
+          "label": "यह कठिन है, लेकिन मैं इसमें बेहतर होना चाहता/चाहती हूँ",
           "metadata": {
             "scores": {
               "trait:persistence": 1
@@ -392,7 +392,7 @@
         },
         {
           "id": "notSure",
-          "label": "मुझे अभी sure नहीं है",
+          "label": "मुझे अभी पक्का पता नहीं है",
           "metadata": {
             "exclusive": true
           }
@@ -402,15 +402,15 @@
     {
       "id": "groupProjectStyle",
       "fieldType": "singleSelect",
-      "label": "आपकी class में नया group project शुरू होता है। आप natural रूप से सबसे पहले क्या करेंगे?",
-      "description": "जो आप normally करते हैं उसके सबसे करीब answer चुनें, जो impressive लगे वह नहीं।",
+      "label": "आपकी कक्षा में समूह की एक नई परियोजना शुरू होती है। आप स्वाभाविक रूप से सबसे पहले क्या करेंगे?",
+      "description": "आप आम तौर पर जो करते हैं, उसके सबसे करीब का उत्तर चुनें। वह नहीं जो दूसरों को सबसे अच्छा लगे।",
       "validation": {
         "required": true
       },
       "options": [
         {
           "id": "ideas",
-          "label": "Interesting ideas suggest करना",
+          "label": "दिलचस्प विचार सुझाना",
           "metadata": {
             "scores": {
               "signal:creativeExpression": 1,
@@ -420,7 +420,7 @@
         },
         {
           "id": "problem",
-          "label": "Problem समझना और information इकट्ठा करना",
+          "label": "समस्या समझना और जानकारी जुटाना",
           "metadata": {
             "scores": {
               "signal:analysis": 1,
@@ -430,7 +430,7 @@
         },
         {
           "id": "plan",
-          "label": "Plan बनाना और काम divide करना",
+          "label": "योजना बनाना और काम बाँटना",
           "metadata": {
             "scores": {
               "signal:organizing": 1,
@@ -440,7 +440,7 @@
         },
         {
           "id": "start",
-          "label": "पहला version बनाना शुरू करना",
+          "label": "पहला नमूना बनाना शुरू करना",
           "metadata": {
             "scores": {
               "signal:making": 1,
@@ -450,7 +450,7 @@
         },
         {
           "id": "include",
-          "label": "यह देखना कि सबकी बात सुनी जाए",
+          "label": "यह सुनिश्चित करना कि सभी की बात सुनी जाए",
           "metadata": {
             "scores": {
               "signal:care": 1,
@@ -460,7 +460,7 @@
         },
         {
           "id": "observe",
-          "label": "Role चुनने से पहले थोड़ी देर observe करना",
+          "label": "अपनी भूमिका चुनने से पहले कुछ समय ध्यान से देखना",
           "metadata": {
             "scores": {
               "trait:reflective": 2,
@@ -473,14 +473,14 @@
     {
       "id": "newProblemStyle",
       "fieldType": "singleSelect",
-      "label": "जब आप नई problem face करते हैं, आगे बढ़ने में क्या मदद करता है?",
+      "label": "नई समस्या का सामना करते समय आगे बढ़ने में आपको किससे मदद मिलती है?",
       "validation": {
         "required": true
       },
       "options": [
         {
           "id": "facts",
-          "label": "Facts ढूँढना और rules समझना",
+          "label": "तथ्य खोजना और नियम समझना",
           "metadata": {
             "scores": {
               "signal:analysis": 1,
@@ -490,7 +490,7 @@
         },
         {
           "id": "try",
-          "label": "कुछ try करना और जो होता है उससे सीखना",
+          "label": "कुछ करके देखना और उसके परिणाम से सीखना",
           "metadata": {
             "scores": {
               "signal:making": 1,
@@ -500,7 +500,7 @@
         },
         {
           "id": "talk",
-          "label": "दूसरे लोगों से discuss करना",
+          "label": "दूसरों से चर्चा करना",
           "metadata": {
             "scores": {
               "signal:communication": 1,
@@ -510,7 +510,7 @@
         },
         {
           "id": "imagine",
-          "label": "कई अलग possibilities imagine करना",
+          "label": "कई अलग और अनोखी संभावनाओं की कल्पना करना",
           "metadata": {
             "scores": {
               "signal:creativeExpression": 1,
@@ -520,7 +520,7 @@
         },
         {
           "id": "steps",
-          "label": "इसे छोटे steps में तोड़ना",
+          "label": "समस्या को छोटे-छोटे चरणों में बाँटना",
           "metadata": {
             "scores": {
               "signal:organizing": 1,
@@ -533,14 +533,14 @@
     {
       "id": "socialEnergy",
       "fieldType": "singleSelect",
-      "label": "Group के साथ time बिताने के बाद आप आम तौर पर कैसा feel करते हैं?",
+      "label": "लोगों के समूह के साथ समय बिताने के बाद आप आम तौर पर कैसा महसूस करते हैं?",
       "validation": {
         "required": true
       },
       "options": [
         {
           "id": "energized",
-          "label": "और energetic, और ready",
+          "label": "मुझे और ऊर्जा मिलती है और मैं आगे भी साथ समय बिताना चाहता/चाहती हूँ",
           "metadata": {
             "scores": {
               "trait:socialEnergy": 2
@@ -549,7 +549,7 @@
         },
         {
           "id": "balanced",
-          "label": "लोगों और activity पर depend करता है",
+          "label": "यह लोगों और गतिविधि पर निर्भर करता है",
           "metadata": {
             "scores": {
               "trait:adaptive": 2
@@ -558,7 +558,7 @@
         },
         {
           "id": "recharge",
-          "label": "मुझे usually recharge के लिए quiet time चाहिए",
+          "label": "मुझे फिर से तरोताज़ा होने के लिए आम तौर पर कुछ शांत समय चाहिए",
           "metadata": {
             "scores": {
               "trait:reflective": 2
@@ -570,14 +570,14 @@
     {
       "id": "setbackStyle",
       "fieldType": "singleSelect",
-      "label": "कोई important चीज पहली बार काम नहीं करती। आप सबसे likely क्या करेंगे?",
+      "label": "कोई महत्वपूर्ण काम पहली बार में सफल नहीं होता। आप सबसे अधिक संभावना से क्या करेंगे?",
       "validation": {
         "required": true
       },
       "options": [
         {
           "id": "retry",
-          "label": "दूसरे तरीके से फिर try करना",
+          "label": "किसी दूसरे तरीके से फिर कोशिश करना",
           "metadata": {
             "scores": {
               "trait:persistence": 2,
@@ -587,7 +587,7 @@
         },
         {
           "id": "analyse",
-          "label": "Exactly क्यों fail हुआ यह पता करना",
+          "label": "ठीक-ठीक पता करना कि काम सफल क्यों नहीं हुआ",
           "metadata": {
             "scores": {
               "signal:analysis": 1,
@@ -597,7 +597,7 @@
         },
         {
           "id": "ask",
-          "label": "किसी से help या feedback माँगना",
+          "label": "किसी से मदद या सुझाव माँगना",
           "metadata": {
             "scores": {
               "signal:communication": 1,
@@ -607,7 +607,7 @@
         },
         {
           "id": "pause",
-          "label": "Break लेकर ready होने पर वापस आना",
+          "label": "थोड़ा विराम लेकर तैयार होने पर फिर कोशिश करना",
           "metadata": {
             "scores": {
               "trait:reflective": 1,
@@ -617,15 +617,15 @@
         },
         {
           "id": "loseConfidence",
-          "label": "मैं अक्सर confidence खो देता/देती हूँ और encouragement चाहिए होता है"
+          "label": "मेरा आत्मविश्वास अक्सर कम हो जाता है और मुझे हौसला चाहिए होता है"
         }
       ]
     },
     {
       "id": "workValues",
       "fieldType": "multiSelect",
-      "label": "आप future work से क्या पाना चाहेंगे?",
-      "description": "आज जो matter करता है उसे चुनें। ज्यादा सीखने पर answers बदल सकते हैं।",
+      "label": "आप भविष्य के काम से क्या पाना चाहेंगे?",
+      "description": "आज जो बातें आपके लिए महत्वपूर्ण हैं, उन्हें चुनें। अधिक जानने के साथ आपके उत्तर बदल सकते हैं।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -634,7 +634,7 @@
       "options": [
         {
           "id": "create",
-          "label": "Ideas create या express करने की freedom",
+          "label": "कुछ नया बनाने या विचार व्यक्त करने की आज़ादी",
           "metadata": {
             "scores": {
               "value:creativity": 2,
@@ -644,7 +644,7 @@
         },
         {
           "id": "help",
-          "label": "लोगों की help करने का clear तरीका",
+          "label": "लोगों की मदद करने का स्पष्ट अवसर",
           "metadata": {
             "scores": {
               "value:service": 2,
@@ -654,7 +654,7 @@
         },
         {
           "id": "mastery",
-          "label": "Difficult problems और लगातार learning",
+          "label": "कठिन समस्याएँ सुलझाने और लगातार सीखने का अवसर",
           "metadata": {
             "scores": {
               "value:mastery": 2,
@@ -664,7 +664,7 @@
         },
         {
           "id": "build",
-          "label": "दिखने वाले practical results",
+          "label": "ऐसे व्यावहारिक परिणाम जिन्हें देखा जा सके",
           "metadata": {
             "scores": {
               "value:making": 2,
@@ -674,7 +674,7 @@
         },
         {
           "id": "lead",
-          "label": "Responsibility और influence",
+          "label": "ज़िम्मेदारी और असर डालने का अवसर",
           "metadata": {
             "scores": {
               "value:leadership": 2,
@@ -684,7 +684,7 @@
         },
         {
           "id": "security",
-          "label": "Stability और reliable income",
+          "label": "स्थिरता और भरोसेमंद आय",
           "metadata": {
             "scores": {
               "value:security": 2
@@ -693,7 +693,7 @@
         },
         {
           "id": "recognition",
-          "label": "Recognition और respect",
+          "label": "पहचान और सम्मान",
           "metadata": {
             "scores": {
               "value:recognition": 2
@@ -702,7 +702,7 @@
         },
         {
           "id": "balance",
-          "label": "Work के बाहर time और flexibility",
+          "label": "काम के बाहर समय और अपने समय में बदलाव की गुंजाइश",
           "metadata": {
             "scores": {
               "value:balance": 2
@@ -714,43 +714,43 @@
     {
       "id": "familyInfluence",
       "fieldType": "singleSelect",
-      "label": "आपके घर में career conversations आम तौर पर कैसी लगती हैं?",
-      "description": "Family guidance important है। हम इसे आपकी strengths से अलग रखते हैं ताकि यह बेहतर conversation में मदद करे, आपकी potential decide न करे।",
+      "label": "आपके परिवार में करियर के बारे में बातचीत आम तौर पर कैसी होती है?",
+      "description": "परिवार का मार्गदर्शन महत्वपूर्ण है। हम इसे आपकी खूबियों से अलग रखते हैं, ताकि यह बेहतर बातचीत में मदद करे और आपकी क्षमता का फैसला न बने।",
       "validation": {
         "required": true
       },
       "options": [
         {
           "id": "open",
-          "label": "मेरी family अलग possibilities के लिए open है"
+          "label": "मेरा परिवार अलग-अलग संभावनाओं पर विचार करने के लिए तैयार है"
         },
         {
           "id": "preferred",
-          "label": "मेरी family कुछ careers prefer करती है, पर हम discuss कर सकते हैं"
+          "label": "मेरे परिवार को कुछ करियर पसंद हैं, लेकिन हम चर्चा कर सकते हैं"
         },
         {
           "id": "strong",
-          "label": "मेरी family किसी एक direction को strongly prefer करती है"
+          "label": "मेरा परिवार किसी एक करियर दिशा को बहुत अधिक पसंद करता है"
         },
         {
           "id": "uncertain",
-          "label": "मेरी family help करना चाहती है, पर options को लेकर unsure है"
+          "label": "मेरा परिवार मदद करना चाहता है, लेकिन विकल्पों को लेकर निश्चित नहीं है"
         },
         {
           "id": "notDiscussed",
-          "label": "हमने careers पर सच में अभी बात नहीं की है"
+          "label": "हमने अभी करियर के बारे में ठीक से बातचीत नहीं की है"
         },
         {
           "id": "preferNot",
-          "label": "मैं answer नहीं देना चाहता/चाहती"
+          "label": "मैं इसका उत्तर नहीं देना चाहता/चाहती"
         }
       ]
     },
     {
       "id": "familyPriorities",
       "fieldType": "multiSelect",
-      "label": "आपकी family आपके future के लिए आम तौर पर क्या important मानती है?",
-      "description": "ये priorities बाद में pathway conversations में मदद करेंगी; ये आपके career-direction signals नहीं बदलतीं।",
+      "label": "आपके भविष्य के लिए आपका परिवार आम तौर पर किन बातों को महत्वपूर्ण मानता है?",
+      "description": "ये प्राथमिकताएँ आगे पढ़ाई और करियर के रास्तों पर बातचीत में मदद करेंगी। ये आपकी करियर दिशाओं के संकेत नहीं बदलतीं।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -759,31 +759,31 @@
       "options": [
         {
           "id": "security",
-          "label": "Job stability"
+          "label": "नौकरी की स्थिरता"
         },
         {
           "id": "income",
-          "label": "अच्छी earning potential"
+          "label": "अच्छी कमाई की संभावना"
         },
         {
           "id": "respect",
-          "label": "Social recognition या professional status"
+          "label": "समाज में पहचान या पेशे का सम्मान"
         },
         {
           "id": "location",
-          "label": "Family के पास रहना"
+          "label": "परिवार के पास रहना"
         },
         {
           "id": "duration",
-          "label": "Manageable education duration"
+          "label": "पढ़ाई पूरी करने में लगने वाला समय उचित होना"
         },
         {
           "id": "interest",
-          "label": "Student की genuine interest"
+          "label": "विद्यार्थी की वास्तविक रुचि"
         },
         {
           "id": "notSure",
-          "label": "मुझे sure नहीं है",
+          "label": "मुझे पक्का पता नहीं है",
           "metadata": {
             "exclusive": true
           }
@@ -793,8 +793,8 @@
     {
       "id": "familyExposure",
       "fieldType": "multiSelect",
-      "label": "Family या जान-पहचान के लोगों से आपने किस तरह का work करीब से देखा है?",
-      "description": "Exposure से कुछ careers familiar लग सकते हैं। इससे unfamiliar possibilities बंद नहीं होनी चाहिए।",
+      "label": "परिवार या परिचित लोगों के ज़रिए आपने किस तरह के काम को करीब से देखा है?",
+      "description": "परिचय के कारण कुछ करियर अधिक जाने-पहचाने लग सकते हैं। इससे अनजान करियर की संभावनाएँ बंद नहीं होनी चाहिए।",
       "validation": {
         "required": true,
         "minSelect": 1,
@@ -803,35 +803,35 @@
       "options": [
         {
           "id": "health",
-          "label": "Healthcare या wellbeing"
+          "label": "स्वास्थ्य सेवाएँ या लोगों का स्वास्थ्य बेहतर बनाने का काम"
         },
         {
           "id": "technology",
-          "label": "Technology, engineering या skilled trades"
+          "label": "तकनीक, इंजीनियरिंग या विशेष हुनर वाले व्यावहारिक काम"
         },
         {
           "id": "business",
-          "label": "Business, finance, sales या family enterprise"
+          "label": "व्यवसाय, वित्त, बिक्री या परिवार का व्यवसाय"
         },
         {
           "id": "public",
-          "label": "Education, government, law या public service"
+          "label": "शिक्षा, सरकारी काम, कानून या सार्वजनिक सेवा"
         },
         {
           "id": "creative",
-          "label": "Arts, media, design या entertainment"
+          "label": "कला, मीडिया, डिज़ाइन या मनोरंजन"
         },
         {
           "id": "science",
-          "label": "Science, research, agriculture या environment"
+          "label": "विज्ञान, शोध, कृषि या पर्यावरण"
         },
         {
           "id": "other",
-          "label": "दूसरे kinds of work"
+          "label": "अन्य तरह के काम"
         },
         {
           "id": "limited",
-          "label": "मुझे different careers का limited exposure मिला है",
+          "label": "मुझे अलग-अलग करियर को जानने के सीमित अवसर मिले हैं",
           "metadata": {
             "exclusive": true
           }
@@ -841,23 +841,23 @@
     {
       "id": "experienceLevel",
       "fieldType": "singleSelect",
-      "label": "Overall, आपको अपनी interests explore करने के कितने मौके मिले हैं?",
-      "description": "Limited opportunity weakness नहीं है। इससे Xtara समझता है कि guidance कितनी certain या tentative रखनी है।",
+      "label": "कुल मिलाकर, अपनी रुचियों को आज़माने और समझने के कितने अवसर आपको मिले हैं?",
+      "description": "कम अवसर मिलना कमज़ोरी नहीं है। इससे Xtara समझता है कि मार्गदर्शन में कितनी अनिश्चितता को ध्यान में रखना चाहिए।",
       "validation": {
         "required": true
       },
       "options": [
         {
           "id": "new",
-          "label": "अब तक बहुत कम"
+          "label": "अभी तक बहुत कम"
         },
         {
           "id": "some",
-          "label": "मैंने कुछ related activities try की हैं"
+          "label": "मैंने अपनी रुचियों से जुड़ी कुछ गतिविधियाँ आज़माई हैं"
         },
         {
           "id": "regular",
-          "label": "मैं regularly related activities में भाग लेता/लेती हूँ"
+          "label": "मैं अपनी रुचियों से जुड़ी गतिविधियों में नियमित रूप से भाग लेता/लेती हूँ"
         }
       ]
     }
@@ -867,8 +867,8 @@
       {
         "id": "grade8Exposure",
         "fieldType": "multiSelect",
-        "label": "नई interests discover करने के मौके आपको कहाँ मिले हैं?",
-        "description": "Few opportunities weakness नहीं हैं। इसका मतलब directions broad रहनी चाहिए।",
+        "label": "नई रुचियाँ पहचानने के अवसर आपको कहाँ मिले हैं?",
+        "description": "कम अवसर मिलना कमज़ोरी नहीं है। इसका मतलब है कि करियर की कई दिशाएँ खुली रखनी चाहिए।",
         "validation": {
           "required": true,
           "minSelect": 1,
@@ -877,23 +877,23 @@
         "options": [
           {
             "id": "school",
-            "label": "School clubs, events, labs या competitions"
+            "label": "स्कूल के क्लब, कार्यक्रम, प्रयोगशालाएँ या प्रतियोगिताएँ"
           },
           {
             "id": "home",
-            "label": "Home, family work, hobbies या responsibilities"
+            "label": "घर, परिवार का काम, शौक या ज़िम्मेदारियाँ"
           },
           {
             "id": "community",
-            "label": "Sports, arts, community groups या volunteering"
+            "label": "खेल, कला, सामुदायिक समूह या स्वयंसेवा"
           },
           {
             "id": "online",
-            "label": "Online videos, courses, games या communities"
+            "label": "इंटरनेट पर वीडियो, पाठ्यक्रम, खेल या समूह"
           },
           {
             "id": "noneYet",
-            "label": "मुझे अब तक बहुत कम chances मिले हैं",
+            "label": "मुझे अभी तक बहुत कम अवसर मिले हैं",
             "metadata": {
               "exclusive": true
             }
@@ -905,8 +905,8 @@
       {
         "id": "grade9Evidence",
         "fieldType": "multiSelect",
-        "label": "किस experiences ने आपको खुद को बेहतर समझने में help की है?",
-        "description": "यह exposure के बारे में है, achievement के बारे में नहीं।",
+        "label": "किन अनुभवों ने आपको खुद को बेहतर समझने में मदद की है?",
+        "description": "यह अवसरों और अनुभवों के बारे में है, उपलब्धियों के बारे में नहीं।",
         "validation": {
           "required": true,
           "minSelect": 1,
@@ -915,7 +915,7 @@
         "options": [
           {
             "id": "project",
-            "label": "Personal या school project",
+            "label": "निजी या स्कूल की कोई परियोजना",
             "metadata": {
               "scores": {
                 "evidence:demonstrated": 1
@@ -924,7 +924,7 @@
           },
           {
             "id": "conversation",
-            "label": "किसी के work के बारे में conversation",
+            "label": "किसी से उनके काम के बारे में बातचीत",
             "metadata": {
               "scores": {
                 "evidence:exposure": 1
@@ -933,7 +933,7 @@
           },
           {
             "id": "club",
-            "label": "Club, competition, workshop, sport या volunteering activity",
+            "label": "क्लब, प्रतियोगिता, कार्यशाला, खेल या स्वयंसेवा की कोई गतिविधि",
             "metadata": {
               "scores": {
                 "evidence:demonstrated": 1
@@ -942,7 +942,7 @@
           },
           {
             "id": "familyWork",
-            "label": "Family work या responsibilities में help करना",
+            "label": "परिवार के काम या ज़िम्मेदारियों में मदद करना",
             "metadata": {
               "scores": {
                 "evidence:observed": 1
@@ -951,7 +951,7 @@
           },
           {
             "id": "noneYet",
-            "label": "मुझे अभी ऐसे experiences नहीं मिले हैं",
+            "label": "मुझे अभी ऐसे अनुभव नहीं मिले हैं",
             "metadata": {
               "exclusive": true
             }
@@ -963,34 +963,34 @@
       {
         "id": "grade10Decision",
         "fieldType": "singleSelect",
-        "label": "Grade 10 का कौन-सा decision सबसे urgent लगता है?",
+        "label": "कक्षा 10 में किस निर्णय पर आपको सबसे पहले स्पष्टता चाहिए?",
         "validation": {
           "required": true
         },
         "options": [
           {
             "id": "subjects",
-            "label": "कौन-से subjects continue करने हैं यह समझना"
+            "label": "यह समझना कि आगे कौन-से विषय पढ़ूँ"
           },
           {
             "id": "stream",
-            "label": "Streams या study routes compare करना"
+            "label": "विषय-समूहों या पढ़ाई के रास्तों की तुलना करना"
           },
           {
             "id": "options",
-            "label": "कई future options open रखना"
+            "label": "भविष्य के कई विकल्प खुले रखना"
           },
           {
             "id": "discussion",
-            "label": "Family या school के साथ conversation की तैयारी करना"
+            "label": "परिवार या स्कूल के साथ बातचीत की तैयारी करना"
           }
         ]
       },
       {
         "id": "subjectConfidence",
         "fieldType": "multiSelect",
-        "label": "कौन-से subjects अभी आपको energy या confidence देते हैं?",
-        "description": "Subjects evidence का एक हिस्सा हैं। ये permanently limit नहीं करते कि आप क्या बन सकते हैं।",
+        "label": "अभी कौन-से विषय आपको उत्साहित करते हैं या आत्मविश्वास देते हैं?",
+        "description": "विषय आपके बारे में मिलने वाले संकेतों का एक हिस्सा हैं। वे हमेशा के लिए यह सीमा तय नहीं करते कि आप क्या बन सकते हैं।",
         "validation": {
           "required": true,
           "minSelect": 1,
@@ -999,7 +999,7 @@
         "options": [
           {
             "id": "math",
-            "label": "Mathematics",
+            "label": "गणित",
             "metadata": {
               "scores": {
                 "signal:analysis": 1
@@ -1008,7 +1008,7 @@
           },
           {
             "id": "science",
-            "label": "Science",
+            "label": "विज्ञान",
             "metadata": {
               "scores": {
                 "signal:analysis": 1,
@@ -1018,7 +1018,7 @@
           },
           {
             "id": "languages",
-            "label": "Languages",
+            "label": "भाषाएँ",
             "metadata": {
               "scores": {
                 "signal:creativeExpression": 1,
@@ -1028,7 +1028,7 @@
           },
           {
             "id": "socialScience",
-            "label": "Social science",
+            "label": "सामाजिक विज्ञान",
             "metadata": {
               "scores": {
                 "signal:communication": 1,
@@ -1038,7 +1038,7 @@
           },
           {
             "id": "arts",
-            "label": "Arts या design",
+            "label": "कला या डिज़ाइन",
             "metadata": {
               "scores": {
                 "signal:creativeExpression": 1,
@@ -1048,7 +1048,7 @@
           },
           {
             "id": "computing",
-            "label": "Computing",
+            "label": "कंप्यूटर से जुड़े विषय",
             "metadata": {
               "scores": {
                 "signal:analysis": 1,
@@ -1058,7 +1058,7 @@
           },
           {
             "id": "commerce",
-            "label": "Commerce या economics",
+            "label": "वाणिज्य या अर्थशास्त्र",
             "metadata": {
               "scores": {
                 "signal:analysis": 1,
@@ -1068,7 +1068,7 @@
           },
           {
             "id": "stillLearning",
-            "label": "मैं अभी इसे discover कर रहा/रही हूँ",
+            "label": "मैं अभी इसे समझ रहा/रही हूँ",
             "metadata": {
               "exclusive": true
             }
@@ -1137,175 +1137,175 @@
   },
   "signals": {
     "creativeExpression": {
-      "title": "Creating and sharing ideas",
-      "description": "You may enjoy expressing ideas through stories, sound, images, or performance."
+      "title": "रचनात्मक अभिव्यक्ति",
+      "description": "विचार, भावनाएँ, कहानियाँ, संगीत या दृश्य रूप व्यक्त करना आपको उत्साहित कर सकता है।"
     },
     "analysis": {
-      "title": "Solving problems",
-      "description": "You may enjoy asking why, finding patterns, testing ideas, or making things work."
+      "title": "जाँच और समस्या समाधान",
+      "description": "आपको सवाल पूछना, समानताएँ खोजना, विचारों को परखना या किसी व्यवस्था को ठीक से चलाना अच्छा लग सकता है।"
     },
     "making": {
-      "title": "Learning by doing",
-      "description": "You may learn well by building, repairing, making, or trying something yourself."
+      "title": "बनाकर सीखना",
+      "description": "चीज़ें बनाने, ठीक करने, प्रयोग करने या कोई ठोस परिणाम तैयार करने से आप बेहतर समझ सकते हैं।"
     },
     "communication": {
-      "title": "Explaining and listening",
-      "description": "You may enjoy listening, explaining, teaching, or helping an idea make sense."
+      "title": "बातचीत और समझ",
+      "description": "आपको सुनना, समझाना, पढ़ाना, कहानी सुनाना या विचारों को स्पष्ट करने में मदद करना अच्छा लग सकता है।"
     },
     "care": {
-      "title": "Helping people",
-      "description": "You may notice what people need and enjoy work that improves someone’s life."
+      "title": "देखभाल और योगदान",
+      "description": "आप लोगों की ज़रूरतें पहचान सकते हैं और ऐसे काम को महत्व दे सकते हैं जो किसी के जीवन या समुदाय को बेहतर बनाए।"
     },
     "organizing": {
-      "title": "Planning and taking responsibility",
-      "description": "You may enjoy bringing people, tasks, and plans together to finish something."
+      "title": "तालमेल और ज़िम्मेदारी",
+      "description": "आपको लोगों, संसाधनों, योजनाओं या फैसलों में तालमेल बनाना और परिणाम की ज़िम्मेदारी लेना अच्छा लग सकता है।"
     }
   },
   "traits": {
     "socialEnergy": {
-      "title": "Working with people",
-      "description": "Being with a group may give you energy when everyone shares a goal."
+      "title": "मेलजोल से ऊर्जा मिलना",
+      "description": "समूह में बातचीत से आपको ऊर्जा मिल सकती है, खासकर जब सबका कोई साझा उद्देश्य हो।"
     },
     "reflective": {
-      "title": "Thinking before responding",
-      "description": "You may like time to observe and understand before you answer."
+      "title": "सोच-समझकर उत्तर देना",
+      "description": "आप जवाब देने से पहले देखने, सोचने और समझने के लिए समय लेना पसंद कर सकते हैं।"
     },
     "structured": {
-      "title": "Following a clear plan",
-      "description": "Clear steps and responsibilities may help you work well."
+      "title": "योजना के साथ काम करना",
+      "description": "स्पष्ट योजनाएँ, चरण और ज़िम्मेदारियाँ आपको अच्छी तरह काम करने में मदद कर सकती हैं।"
     },
     "flexible": {
-      "title": "Trying and adjusting",
-      "description": "You may like trying an idea and changing your approach as you learn."
+      "title": "आज़माना और बदलाव करना",
+      "description": "आप अलग संभावनाएँ आज़माना और सीखते हुए अपना तरीका बदलना पसंद कर सकते हैं।"
     },
     "collaborative": {
-      "title": "Working together",
-      "description": "You may think and work well by discussing ideas with other people."
+      "title": "साथ मिलकर काम करना",
+      "description": "बातचीत और साझा प्रयास से आपको सोचने और काम करने में मदद मिल सकती है।"
     },
     "independent": {
-      "title": "Working on your own",
-      "description": "You may like having space to focus and find your own answer."
+      "title": "अपने ढंग से समझना",
+      "description": "ध्यान लगाने और अपनी समझ बनाने के लिए आप कुछ स्वतंत्र समय और जगह को महत्व दे सकते हैं।"
     },
     "practical": {
-      "title": "Learning by doing",
-      "description": "Trying something yourself may help you learn more than hearing an explanation."
+      "title": "करके सीखना",
+      "description": "केवल समझाए जाने के मुकाबले खुद काम करने और चीज़ें बनाने से आप बेहतर सीख सकते हैं।"
     },
     "conceptual": {
-      "title": "Thinking about ideas",
-      "description": "You may enjoy seeing how ideas connect and understanding why things happen."
+      "title": "विचारों को समझना",
+      "description": "आपको विचारों, समानताओं और संभावनाओं को जानना तथा किसी बात का कारण समझना अच्छा लग सकता है।"
     },
     "persistence": {
-      "title": "Keeping going",
-      "description": "You may continue when something is difficult if the result matters to you."
+      "title": "प्रयास जारी रखना",
+      "description": "जब कोई परिणाम आपके लिए महत्वपूर्ण हो, तो आप मुश्किलों के बावजूद कोशिश जारी रख सकते हैं।"
     },
     "adaptive": {
-      "title": "Changing your approach",
-      "description": "You may work differently depending on the people, goal, and situation."
+      "title": "परिस्थिति के अनुसार बदलना",
+      "description": "लोगों, उद्देश्य और परिस्थिति के अनुसार आपकी पसंद बदल सकती है।"
     },
     "responsibility": {
-      "title": "Following through",
-      "description": "Other people may trust you to complete an important task."
+      "title": "ज़िम्मेदारी निभाना",
+      "description": "महत्वपूर्ण काम पूरा करने के लिए दूसरे लोग आप पर भरोसा कर सकते हैं।"
     }
   },
   "context": {
     "family": {
-      "open": "Your family appears open to exploration.",
-      "preferred": "Your family has preferred ideas, with room for discussion.",
-      "strong": "Your family has strong ideas about your future. Their view is shown separately from your own interests.",
-      "uncertain": "Your family wants to help but may need clearer career and education information.",
-      "notDiscussed": "Career conversations have not really started at home yet.",
-      "preferNot": "You chose not to share this. It does not change your Career Directions."
+      "open": "आपका परिवार अलग-अलग संभावनाएँ जानने के लिए तैयार लगता है।",
+      "preferred": "आपके परिवार की कुछ पसंद हैं, लेकिन बातचीत की गुंजाइश भी है।",
+      "strong": "परिवार की अपेक्षाएँ आपको प्रबल लग सकती हैं। Xtara उन्हें आपकी रुचियों से अलग रखता है; उनसे करियर के लिए आपकी उपयुक्तता तय नहीं होती।",
+      "uncertain": "आपका परिवार मदद करना चाहता है, लेकिन उसे करियर और पढ़ाई के बारे में अधिक स्पष्ट जानकारी की ज़रूरत हो सकती है।",
+      "notDiscussed": "घर में करियर के बारे में अभी ठीक से बातचीत शुरू नहीं हुई है।",
+      "preferNot": "आपने परिवार के बारे में जानकारी न देने का विकल्प चुना। इससे आपकी करियर दिशाओं के संकेत नहीं बदलते।"
     },
     "weakness": {
-      "dislike": "Some difficult areas may reflect genuine dislike after experience.",
-      "confidence": "Low confidence may be affecting how you judge some abilities.",
-      "marks": "Marks show only part of what you can do.",
-      "exposure": "You may not know whether you enjoy something until you have a chance to try it.",
-      "teaching": "The way something was taught may have affected your experience of it.",
-      "improve": "You are willing to improve in areas that currently feel difficult.",
-      "notSure": "You are still learning what difficulty means for you."
+      "dislike": "कुछ काम आज़माने के बाद भी आपको पसंद नहीं आ सकते हैं।",
+      "confidence": "कम आत्मविश्वास के कारण कुछ क्षमताओं के बारे में आपकी राय प्रभावित हो सकती है।",
+      "marks": "अंक अभी उपलब्ध जानकारी का एक हिस्सा हैं; वे आपकी पूरी क्षमता नहीं बताते।",
+      "exposure": "कम अवसर मिलने पर कुछ क्षमताएँ अभी अनजानी हो सकती हैं। इसका मतलब यह नहीं कि वे कमज़ोर हैं।",
+      "teaching": "किसी चीज़ को सिखाने के तरीके का असर आपके अनुभव पर पड़ सकता है।",
+      "improve": "अभी कठिन लगने वाले कुछ कामों में आप बेहतर होना चाहते हैं।",
+      "notSure": "किसी काम में कठिनाई का आपके लिए क्या मतलब है, इसे आप अभी समझ रहे हैं।"
     }
   },
   "areas": {
     "technology": {
-      "title": "Technology",
-      "description": "Build apps, solve problems, and create useful digital tools."
+      "title": "तकनीक और डिजिटल काम",
+      "description": "सॉफ़्टवेयर, उत्पाद, प्रणालियाँ और डिजिटल अनुभव बनाएँ।"
     },
     "health": {
-      "title": "Health",
-      "description": "Help people stay healthy, recover, and live well."
+      "title": "स्वास्थ्य और खुशहाली",
+      "description": "इलाज, शोध, समुदाय और तकनीक से जुड़े कामों के ज़रिए स्वास्थ्य बेहतर बनाने में मदद करें।"
     },
     "science": {
-      "title": "Science",
-      "description": "Ask questions, test ideas, and learn how things work."
+      "title": "विज्ञान और खोज",
+      "description": "सवालों की जाँच करें, विचारों को परखें और नई जानकारी खोजें।"
     },
     "business": {
-      "title": "Business",
-      "description": "Turn ideas into useful products, services, and organisations."
+      "title": "व्यवसाय और उद्यम",
+      "description": "रणनीति, कामकाज, वित्त और नया व्यवसाय शुरू करने के ज़रिए उपयोगी उत्पाद या सेवाएँ तैयार करें।"
     },
     "design": {
-      "title": "Design and Media",
-      "description": "Create clear, useful, and engaging experiences and stories."
+      "title": "डिज़ाइन और संचार",
+      "description": "विचारों, कहानियों, सेवाओं, स्थानों, ध्वनियों और दृश्य अनुभवों को आकार दें।"
     },
     "society": {
-      "title": "Education and Society",
-      "description": "Teach, support communities, and help solve public problems."
+      "title": "समाज और सार्वजनिक सेवा",
+      "description": "लोगों, नीतियों, शिक्षा, न्याय और समुदायों से जुड़े काम करें।"
     }
   },
   "result": {
-    "eyebrow": "Your Career Directions",
-    "title": "खोजने के लिए एक Career Direction चुनें।",
-    "description": "ये आपके जवाबों पर आधारित शुरुआती विकल्प हैं। अभी एक चुनें—आप इसे बाद में बदल सकते हैं।",
-    "patternsTitle": "वे चीज़ें जिनमें आपकी रुचि हो सकती है",
-    "patternsDescription": "",
-    "traitsTitle": "आप किस तरह काम करना पसंद कर सकते हैं",
-    "traitsDescription": "",
-    "why": "आपने जो बताया उसके आधार पर",
-    "evidence": "Evidence level",
-    "early": "Worth exploring",
-    "developing": "Strong pattern",
-    "noticed": "Noticed",
-    "repeated": "Repeated pattern",
-    "nextTitle": "What to do next",
-    "savedTemporarily": "Temporary until signup",
-    "noScore": "No perfect-career percentage",
-    "emptyTitle": "Start with the career discovery assessment.",
-    "areasLabel": "एक Career Direction चुनें",
-    "roleExamples": "Dream Careers you can explore in this direction",
-    "viewArea": "इस दिशा को देखें",
-    "contextTitle": "आपके जवाबों को प्रभावित करने वाली बातें",
-    "familyTitle": "Family influence",
-    "weaknessTitle": "Understanding difficulty",
-    "reflectionTitle": "ये विकल्प सही नहीं लग रहे?",
-    "reflectionDescription": "अपने जवाब दोबारा देखें और जो सही न लगे उसे बदलें।",
-    "reflectionAccurate": "This sounds like me",
-    "reflectionInaccurate": "Not accurate",
-    "reflectionUnsure": "I am unsure",
-    "reflectionMissing": "Something is missing",
-    "reflectionSaved": "Your response has been recorded temporarily.",
-    "personalizeTitle": "Add your study details",
-    "personalizeDescription": "Add your location, school board, language, fee preference, and study-location preference so Xtara can show useful courses, colleges, and scholarships.",
-    "personalize": "Add my study details",
-    "edit": "अपने जवाब देखें",
-    "explore": "अपनी Career Direction देखें",
+    "eyebrow": "आपकी करियर दिशाएँ",
+    "title": "यहाँ करियर की अधिकतम तीन दिशाएँ हैं जिन्हें आप आगे जान सकते हैं।",
+    "description": "हमने आपकी रुचियों, खूबियों, काम करने के तरीकों, प्राथमिकताओं और अनुभवों में मिलते-जुलते संकेत देखे हैं। किसी एक उत्तर से करियर की सिफारिश तय नहीं होती।",
+    "patternsTitle": "उभरती खूबियों के संकेत",
+    "patternsDescription": "ये संकेत आपके कई उत्तरों में दिखे। समय और अनुभव के साथ ये विकसित हो सकते हैं और बदल सकते हैं।",
+    "traitsTitle": "अभी आपका काम करने का तरीका",
+    "traitsDescription": "ये पूछी गई परिस्थितियों में आपकी बताई प्रवृत्तियाँ हैं। ये आपके व्यक्तित्व की स्थायी पहचान नहीं हैं।",
+    "why": "यह दिशा क्यों सुझाई गई",
+    "evidence": "संकेतों की स्थिति",
+    "early": "आगे जानने योग्य",
+    "developing": "उभरता हुआ संकेत",
+    "noticed": "ध्यान में आया",
+    "repeated": "कई उत्तरों में दिखा संकेत",
+    "nextTitle": "अब क्या करें",
+    "savedTemporarily": "खाता बनाकर सहेजने तक अस्थायी",
+    "noScore": "किसी एक करियर के लिए निश्चित उपयुक्तता का प्रतिशत नहीं",
+    "emptyTitle": "करियर की संभावनाएँ जानने के आकलन से शुरुआत करें।",
+    "areasLabel": "आपके लिए सुझाई गई करियर दिशाएँ",
+    "roleExamples": "इस दिशा में जानने योग्य करियर",
+    "viewArea": "यह करियर दिशा चुनें",
+    "contextTitle": "बेहतर बातचीत के लिए परिस्थितियों को समझें",
+    "familyTitle": "परिवार का प्रभाव",
+    "weaknessTitle": "कठिनाई को समझना",
+    "reflectionTitle": "क्या यह आपकी समझ से मेल खाता है?",
+    "reflectionDescription": "इन दिशाओं को सहेजने से पहले बताइए कि सुझाव आपके अनुभव से मेल खाते हैं या नहीं।",
+    "reflectionAccurate": "यह मुझसे मेल खाता है",
+    "reflectionInaccurate": "यह सही नहीं लगता",
+    "reflectionUnsure": "मुझे पक्का पता नहीं है",
+    "reflectionMissing": "कुछ छूट गया है",
+    "reflectionSaved": "आपकी प्रतिक्रिया अस्थायी रूप से दर्ज की गई है।",
+    "personalizeTitle": "अपनी पढ़ाई की जानकारी जोड़ें",
+    "personalizeDescription": "अपना स्थान, स्कूल बोर्ड, भाषा, शुल्क की पसंद और पढ़ने के लिए पसंदीदा स्थान जोड़ें। यह जानकारी अपनी योजना सहेजने और आगे के विकल्पों पर बातचीत करने में काम आएगी।",
+    "personalize": "अपनी पढ़ाई की जानकारी जोड़ें",
+    "edit": "अपने उत्तर फिर देखें",
+    "explore": "अपनी करियर दिशा फिर देखें",
     "detailsTitle": "देखें कि आपके जवाबों में क्या दिखा",
     "detailsDescription": "इन दिशाओं के आने का कारण जानना हो तभी इसे खोलें।"
   },
   "nextActions": {
     "grade8": [
-      "Choose a Career Direction and discover its Dream Careers.",
-      "Tell Xtara which Career Directions feel interesting or inaccurate.",
-      "Add your study details to see useful courses and colleges."
+      "एक करियर दिशा चुनकर उसमें आने वाले कामों को जानें।",
+      "बताइए कि कौन-सी करियर दिशाएँ दिलचस्प लगती हैं या आपके अनुभव से मेल नहीं खातीं।",
+      "अपनी योजना सहेजने और आगे बातचीत करने के लिए पढ़ाई की जानकारी जोड़ें।"
     ],
     "grade9": [
-      "Compare Dream Careers by what people actually do each day.",
-      "Choose up to three Dream Careers while you are still exploring.",
-      "Add your study details to see subjects, courses, and colleges."
+      "अलग-अलग करियर की तुलना उनमें रोज़ किए जाने वाले कामों के आधार पर करें।",
+      "संभावनाएँ जानने के दौरान अधिकतम तीन पसंदीदा करियर चुनें।",
+      "विषयों और आगे की पढ़ाई पर बातचीत के लिए अपनी पढ़ाई की जानकारी जोड़ें।"
     ],
     "grade10": [
-      "Compare how school subjects and courses keep different Career Directions open.",
-      "Review the suggestions with your family, teacher, or counselor.",
-      "Add your location and fee preference before comparing colleges."
+      "तुलना करें कि स्कूल के विषय और पढ़ाई के रास्ते कैसे अलग-अलग करियर दिशाएँ खुली रखते हैं।",
+      "सुझावों पर परिवार, शिक्षक या परामर्शदाता के साथ चर्चा करें।",
+      "आगे की पढ़ाई पर बातचीत के लिए अपना स्थान और शुल्क की पसंद जोड़ें।"
     ],
     "grade11": [
       "अपने वर्तमान विषयों से जुड़े कई करियर तलाशें।",

@@ -36,258 +36,1043 @@
   },
   "questions": [
     {
-      "id": "activityCuriosity", "fieldType": "multiSelect",
+      "id": "activityCuriosity",
+      "fieldType": "multiSelect",
       "label": "ഇതുവരെ ചെയ്തിട്ടില്ലെങ്കിലും, ഇവയിൽ എന്തൊക്കെ പരീക്ഷിക്കാൻ തോന്നുന്നു?",
       "description": "ഇഷ്ടം തോന്നുന്ന മൂന്ന് കാര്യങ്ങൾ വരെ തിരഞ്ഞെടുക്കൂ.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "performMusic", "label": "പാട്ട്, സംഗീതം, സ്റ്റേജ് പരിപാടികൾ", "metadata": { "scores": { "signal:creativeExpression": 2, "trait:socialEnergy": 1 } } },
-        { "id": "createStory", "label": "ചിത്രം വരയ്ക്കൽ, ഡിസൈൻ, എഴുത്ത്, കഥ പറയൽ", "metadata": { "scores": { "signal:creativeExpression": 2, "signal:communication": 1 } } },
-        { "id": "buildDigital", "label": "ആപ്പ്, ഗെയിം, വെബ്‌സൈറ്റ് എന്നിവ ഉണ്ടാക്കൽ", "metadata": { "scores": { "signal:analysis": 1, "signal:making": 2 } } },
-        { "id": "makeRepair", "label": "സാധനങ്ങൾ ഉണ്ടാക്കൽ, നന്നാക്കൽ, പാചകം, കൃഷി", "metadata": { "scores": { "signal:making": 2, "trait:practical": 1 } } },
-        { "id": "helpHealth", "label": "ഒരാളുടെ ആരോഗ്യവും സുഖവും മെച്ചപ്പെടുത്താൻ സഹായിക്കൽ", "metadata": { "scores": { "signal:care": 2, "signal:communication": 1 } } },
-        { "id": "investigate", "label": "ചോദ്യങ്ങൾ ചോദിച്ച് പരീക്ഷിച്ചും അന്വേഷിച്ചും ഉത്തരം കണ്ടെത്തൽ", "metadata": { "scores": { "signal:analysis": 2, "trait:conceptual": 1 } } },
-        { "id": "organize", "label": "പരിപാടി, പ്രോജക്ട്, ബജറ്റ് എന്നിവ പ്ലാൻ ചെയ്യൽ", "metadata": { "scores": { "signal:organizing": 2, "trait:structured": 1 } } },
-        { "id": "community", "label": "നാട്ടിലോ സമൂഹത്തിലോ ഉള്ള പ്രശ്നം പരിഹരിക്കാൻ സഹായിക്കൽ", "metadata": { "scores": { "signal:care": 1, "signal:organizing": 1, "signal:communication": 1 } } }
+        {
+          "id": "performMusic",
+          "label": "പാട്ട്, സംഗീതം, സ്റ്റേജ് പരിപാടികൾ",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2,
+              "trait:socialEnergy": 1
+            }
+          }
+        },
+        {
+          "id": "createStory",
+          "label": "ചിത്രം വരയ്ക്കൽ, ഡിസൈൻ, എഴുത്ത്, കഥ പറയൽ",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2,
+              "signal:communication": 1
+            }
+          }
+        },
+        {
+          "id": "buildDigital",
+          "label": "ആപ്പ്, ഗെയിം, വെബ്‌സൈറ്റ് എന്നിവ ഉണ്ടാക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "signal:making": 2
+            }
+          }
+        },
+        {
+          "id": "makeRepair",
+          "label": "സാധനങ്ങൾ ഉണ്ടാക്കൽ, നന്നാക്കൽ, പാചകം, കൃഷി",
+          "metadata": {
+            "scores": {
+              "signal:making": 2,
+              "trait:practical": 1
+            }
+          }
+        },
+        {
+          "id": "helpHealth",
+          "label": "ഒരാളുടെ ആരോഗ്യവും സുഖവും മെച്ചപ്പെടുത്താൻ സഹായിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:care": 2,
+              "signal:communication": 1
+            }
+          }
+        },
+        {
+          "id": "investigate",
+          "label": "ചോദ്യങ്ങൾ ചോദിച്ച് പരീക്ഷിച്ചും അന്വേഷിച്ചും ഉത്തരം കണ്ടെത്തൽ",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 2,
+              "trait:conceptual": 1
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "label": "പരിപാടി, പ്രോജക്ട്, ബജറ്റ് എന്നിവ പ്ലാൻ ചെയ്യൽ",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 2,
+              "trait:structured": 1
+            }
+          }
+        },
+        {
+          "id": "community",
+          "label": "നാട്ടിലോ സമൂഹത്തിലോ ഉള്ള പ്രശ്നം പരിഹരിക്കാൻ സഹായിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:care": 1,
+              "signal:organizing": 1,
+              "signal:communication": 1
+            }
+          }
+        }
       ]
     },
     {
-      "id": "activityExperience", "fieldType": "multiSelect",
+      "id": "activityExperience",
+      "fieldType": "multiSelect",
       "label": "ഇവയിൽ ഏതൊക്കെയാണ് ചെയ്തു നോക്കിയപ്പോൾ ഇഷ്ടപ്പെട്ടത്?",
       "description": "അധികം അവസരം കിട്ടിയിട്ടില്ലെങ്കിലും പ്രശ്നമില്ല.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "expression", "label": "കല, സംഗീതം, എഴുത്ത്, അവതരണം, കണ്ടന്റ് ഉണ്ടാക്കൽ", "metadata": { "scores": { "signal:creativeExpression": 2 } } },
-        { "id": "problemSolving", "label": "പസിൽ, സയൻസ് പരീക്ഷണം, കോഡിംഗ്, റിസർച്ച്", "metadata": { "scores": { "signal:analysis": 2 } } },
-        { "id": "handsOn", "label": "ഉണ്ടാക്കൽ, നന്നാക്കൽ, പാചകം, കൈത്തൊഴിൽ, കൃഷി", "metadata": { "scores": { "signal:making": 2, "trait:practical": 1 } } },
-        { "id": "people", "label": "പഠിപ്പിക്കൽ, പറഞ്ഞുകൊടുക്കൽ, സഹായിക്കൽ, പരിചരിക്കൽ", "metadata": { "scores": { "signal:communication": 1, "signal:care": 2 } } },
-        { "id": "lead", "label": "ടീമിനെ നയിക്കൽ, പ്ലാൻ ചെയ്യൽ, കാര്യങ്ങൾ നടത്തിക്കൽ", "metadata": { "scores": { "signal:organizing": 2, "trait:socialEnergy": 1 } } },
-        { "id": "noneYet", "label": "ഇതൊന്നും ചെയ്തു നോക്കാൻ ഇതുവരെ അവസരം കിട്ടിയിട്ടില്ല", "metadata": { "exclusive": true } }
+        {
+          "id": "expression",
+          "label": "കല, സംഗീതം, എഴുത്ത്, അവതരണം, കണ്ടന്റ് ഉണ്ടാക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2
+            }
+          }
+        },
+        {
+          "id": "problemSolving",
+          "label": "പസിൽ, സയൻസ് പരീക്ഷണം, കോഡിംഗ്, റിസർച്ച്",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 2
+            }
+          }
+        },
+        {
+          "id": "handsOn",
+          "label": "ഉണ്ടാക്കൽ, നന്നാക്കൽ, പാചകം, കൈത്തൊഴിൽ, കൃഷി",
+          "metadata": {
+            "scores": {
+              "signal:making": 2,
+              "trait:practical": 1
+            }
+          }
+        },
+        {
+          "id": "people",
+          "label": "പഠിപ്പിക്കൽ, പറഞ്ഞുകൊടുക്കൽ, സഹായിക്കൽ, പരിചരിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:communication": 1,
+              "signal:care": 2
+            }
+          }
+        },
+        {
+          "id": "lead",
+          "label": "ടീമിനെ നയിക്കൽ, പ്ലാൻ ചെയ്യൽ, കാര്യങ്ങൾ നടത്തിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 2,
+              "trait:socialEnergy": 1
+            }
+          }
+        },
+        {
+          "id": "noneYet",
+          "label": "ഇതൊന്നും ചെയ്തു നോക്കാൻ ഇതുവരെ അവസരം കിട്ടിയിട്ടില്ല",
+          "metadata": {
+            "exclusive": true
+          }
+        }
       ]
     },
     {
-      "id": "strengthConfidence", "fieldType": "multiSelect",
+      "id": "strengthConfidence",
+      "fieldType": "multiSelect",
       "label": "ഇവയിൽ ഏതൊക്കെയാണ് നിങ്ങൾ നന്നായി ചെയ്യുന്നത്?",
       "description": "സ്വാഭാവികമായി കഴിയുന്നതോ പരിശീലിച്ച് പഠിച്ചതോ തിരഞ്ഞെടുക്കാം.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "express", "label": "ആശയങ്ങളും വികാരങ്ങളും കഥകളും അവതരിപ്പിക്കൽ", "metadata": { "scores": { "signal:creativeExpression": 2 } } },
-        { "id": "understand", "label": "ഒരു കാര്യം എങ്ങനെ പ്രവർത്തിക്കുന്നു എന്ന് കണ്ടെത്തൽ", "metadata": { "scores": { "signal:analysis": 2, "trait:conceptual": 1 } } },
-        { "id": "make", "label": "ചെയ്തുനോക്കിയും ഉണ്ടാക്കിയും പഠിക്കൽ", "metadata": { "scores": { "signal:making": 2, "trait:practical": 1 } } },
-        { "id": "explain", "label": "കേൾക്കൽ, പറഞ്ഞുകൊടുക്കൽ, മറ്റുള്ളവരെ മനസ്സിലാക്കൽ", "metadata": { "scores": { "signal:communication": 2, "signal:care": 1 } } },
-        { "id": "care", "label": "ആർക്കാണ് സഹായം വേണ്ടതെന്ന് ശ്രദ്ധിക്കൽ", "metadata": { "scores": { "signal:care": 2 } } },
-        { "id": "coordinate", "label": "ഉത്തരവാദിത്തം ഏറ്റെടുത്ത് കാര്യങ്ങൾ നടത്തിക്കൽ", "metadata": { "scores": { "signal:organizing": 2, "trait:structured": 1 } } },
-        { "id": "notSure", "label": "എന്തിലാണ് ഞാൻ മിടുക്കനെന്ന് ഇപ്പോഴും മനസ്സിലാക്കിവരുന്നു", "metadata": { "exclusive": true } }
+        {
+          "id": "express",
+          "label": "ആശയങ്ങളും വികാരങ്ങളും കഥകളും അവതരിപ്പിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 2
+            }
+          }
+        },
+        {
+          "id": "understand",
+          "label": "ഒരു കാര്യം എങ്ങനെ പ്രവർത്തിക്കുന്നു എന്ന് കണ്ടെത്തൽ",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 2,
+              "trait:conceptual": 1
+            }
+          }
+        },
+        {
+          "id": "make",
+          "label": "ചെയ്തുനോക്കിയും ഉണ്ടാക്കിയും പഠിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:making": 2,
+              "trait:practical": 1
+            }
+          }
+        },
+        {
+          "id": "explain",
+          "label": "കേൾക്കൽ, പറഞ്ഞുകൊടുക്കൽ, മറ്റുള്ളവരെ മനസ്സിലാക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:communication": 2,
+              "signal:care": 1
+            }
+          }
+        },
+        {
+          "id": "care",
+          "label": "ആർക്കാണ് സഹായം വേണ്ടതെന്ന് ശ്രദ്ധിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:care": 2
+            }
+          }
+        },
+        {
+          "id": "coordinate",
+          "label": "ഉത്തരവാദിത്തം ഏറ്റെടുത്ത് കാര്യങ്ങൾ നടത്തിക്കൽ",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 2,
+              "trait:structured": 1
+            }
+          }
+        },
+        {
+          "id": "notSure",
+          "label": "എന്തിലാണ് ഞാൻ മിടുക്കനെന്ന് ഇപ്പോഴും മനസ്സിലാക്കിവരുന്നു",
+          "metadata": {
+            "exclusive": true
+          }
+        }
       ]
     },
     {
-      "id": "strengthEvidence", "fieldType": "multiSelect",
+      "id": "strengthEvidence",
+      "fieldType": "multiSelect",
       "label": "അങ്ങനെ തോന്നാൻ കാരണം എന്താണ്?",
       "description": "മാർക്ക് മാത്രമല്ല കഴിവ് കാണിക്കുന്നത്.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "practice", "label": "ബുദ്ധിമുട്ടുണ്ടെങ്കിലും ഞാൻ പരിശീലനം തുടരാറുണ്ട്", "metadata": { "scores": { "trait:persistence": 2 } } },
-        { "id": "project", "label": "ഈ കഴിവ് ഉപയോഗിച്ച് ഞാൻ ഒരു കാര്യം പൂർത്തിയാക്കിയിട്ടുണ്ട്", "metadata": { "scores": { "evidence:demonstrated": 2 } } },
-        { "id": "feedback", "label": "അധ്യാപകരോ സുഹൃത്തുക്കളോ വീട്ടുകാരോ പറഞ്ഞിട്ടുണ്ട്", "metadata": { "scores": { "evidence:observed": 2 } } },
-        { "id": "responsibility", "label": "ഇത്തരം കാര്യങ്ങൾ മറ്റുള്ളവർ എന്നെ ഏൽപ്പിക്കാറുണ്ട്", "metadata": { "scores": { "evidence:observed": 2, "trait:responsibility": 1 } } },
-        { "id": "marks", "label": "സ്കൂൾ വർക്കിലും മാർക്കിലും അത് കാണുന്നുണ്ട്", "metadata": { "scores": { "evidence:academic": 2 } } },
-        { "id": "feeling", "label": "അങ്ങനെ തോന്നുന്നു; പക്ഷേ ചെയ്തു തെളിയിച്ചിട്ടില്ല", "metadata": { "scores": { "evidence:early": 1 } } },
-        { "id": "noneYet", "label": "ഇപ്പോൾ പറയാൻ വ്യക്തമായ കാരണമില്ല", "metadata": { "exclusive": true } }
+        {
+          "id": "practice",
+          "label": "ബുദ്ധിമുട്ടുണ്ടെങ്കിലും ഞാൻ പരിശീലനം തുടരാറുണ്ട്",
+          "metadata": {
+            "scores": {
+              "trait:persistence": 2
+            }
+          }
+        },
+        {
+          "id": "project",
+          "label": "ഈ കഴിവ് ഉപയോഗിച്ച് ഞാൻ ഒരു കാര്യം പൂർത്തിയാക്കിയിട്ടുണ്ട്",
+          "metadata": {
+            "scores": {
+              "evidence:demonstrated": 2
+            }
+          }
+        },
+        {
+          "id": "feedback",
+          "label": "അധ്യാപകരോ സുഹൃത്തുക്കളോ വീട്ടുകാരോ പറഞ്ഞിട്ടുണ്ട്",
+          "metadata": {
+            "scores": {
+              "evidence:observed": 2
+            }
+          }
+        },
+        {
+          "id": "responsibility",
+          "label": "ഇത്തരം കാര്യങ്ങൾ മറ്റുള്ളവർ എന്നെ ഏൽപ്പിക്കാറുണ്ട്",
+          "metadata": {
+            "scores": {
+              "evidence:observed": 2,
+              "trait:responsibility": 1
+            }
+          }
+        },
+        {
+          "id": "marks",
+          "label": "സ്കൂൾ വർക്കിലും മാർക്കിലും അത് കാണുന്നുണ്ട്",
+          "metadata": {
+            "scores": {
+              "evidence:academic": 2
+            }
+          }
+        },
+        {
+          "id": "feeling",
+          "label": "അങ്ങനെ തോന്നുന്നു; പക്ഷേ ചെയ്തു തെളിയിച്ചിട്ടില്ല",
+          "metadata": {
+            "scores": {
+              "evidence:early": 1
+            }
+          }
+        },
+        {
+          "id": "noneYet",
+          "label": "ഇപ്പോൾ പറയാൻ വ്യക്തമായ കാരണമില്ല",
+          "metadata": {
+            "exclusive": true
+          }
+        }
       ]
     },
     {
-      "id": "weaknessPattern", "fieldType": "multiSelect",
+      "id": "weaknessPattern",
+      "fieldType": "multiSelect",
       "label": "ഒരു കാര്യം എനിക്ക് പറ്റില്ലെന്ന് തോന്നുമ്പോൾ, സാധാരണ കാരണം എന്താണ്?",
       "description": "നിങ്ങളുടെ അനുഭവത്തിന് ഏറ്റവും അടുത്തത് തിരഞ്ഞെടുക്കൂ.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "dislike", "label": "ചെയ്തുനോക്കിയിട്ടുണ്ട്; എനിക്ക് ഇഷ്ടപ്പെട്ടില്ല" },
-        { "id": "confidence", "label": "തെറ്റിപ്പോകുമോ എന്ന് പേടിയാണ്" },
-        { "id": "marks", "label": "പ്രതീക്ഷിച്ച മാർക്ക് കിട്ടുന്നില്ല" },
-        { "id": "exposure", "label": "ശരിക്കും ചെയ്തു നോക്കാൻ അവസരം കിട്ടിയിട്ടില്ല" },
-        { "id": "teaching", "label": "പഠിപ്പിച്ച രീതി എനിക്ക് മനസ്സിലായില്ല" },
-        { "id": "improve", "label": "ബുദ്ധിമുട്ടുണ്ട്; എങ്കിലും പഠിക്കാൻ താൽപ്പര്യമുണ്ട്", "metadata": { "scores": { "trait:persistence": 1 } } },
-        { "id": "notSure", "label": "എനിക്ക് ഇപ്പോഴും ഉറപ്പില്ല", "metadata": { "exclusive": true } }
+        {
+          "id": "dislike",
+          "label": "ചെയ്തുനോക്കിയിട്ടുണ്ട്; എനിക്ക് ഇഷ്ടപ്പെട്ടില്ല"
+        },
+        {
+          "id": "confidence",
+          "label": "തെറ്റിപ്പോകുമോ എന്ന് പേടിയാണ്"
+        },
+        {
+          "id": "marks",
+          "label": "പ്രതീക്ഷിച്ച മാർക്ക് കിട്ടുന്നില്ല"
+        },
+        {
+          "id": "exposure",
+          "label": "ശരിക്കും ചെയ്തു നോക്കാൻ അവസരം കിട്ടിയിട്ടില്ല"
+        },
+        {
+          "id": "teaching",
+          "label": "പഠിപ്പിച്ച രീതി എനിക്ക് മനസ്സിലായില്ല"
+        },
+        {
+          "id": "improve",
+          "label": "ബുദ്ധിമുട്ടുണ്ട്; എങ്കിലും പഠിക്കാൻ താൽപ്പര്യമുണ്ട്",
+          "metadata": {
+            "scores": {
+              "trait:persistence": 1
+            }
+          }
+        },
+        {
+          "id": "notSure",
+          "label": "എനിക്ക് ഇപ്പോഴും ഉറപ്പില്ല",
+          "metadata": {
+            "exclusive": true
+          }
+        }
       ]
     },
     {
-      "id": "groupProjectStyle", "fieldType": "singleSelect",
+      "id": "groupProjectStyle",
+      "fieldType": "singleSelect",
       "label": "ക്ലാസിൽ ഒരു ഗ്രൂപ്പ് പ്രോജക്ട് കിട്ടിയാൽ നിങ്ങൾ ആദ്യം എന്ത് ചെയ്യും?",
       "description": "നല്ലതായി തോന്നുന്ന മറുപടിയല്ല, നിങ്ങൾ ശരിക്കും ചെയ്യാറുള്ളത് തിരഞ്ഞെടുക്കൂ.",
-      "validation": { "required": true },
+      "validation": {
+        "required": true
+      },
       "options": [
-        { "id": "ideas", "label": "രസകരമായ ആശയങ്ങൾ നിർദ്ദേശിക്കും", "metadata": { "scores": { "signal:creativeExpression": 1, "trait:flexible": 1 } } },
-        { "id": "problem", "label": "പ്രശ്നം മനസ്സിലാക്കി വിവരങ്ങൾ ശേഖരിക്കും", "metadata": { "scores": { "signal:analysis": 1, "trait:reflective": 1 } } },
-        { "id": "plan", "label": "പദ്ധതി തയ്യാറാക്കി ജോലികൾ വിഭജിക്കും", "metadata": { "scores": { "signal:organizing": 1, "trait:structured": 2 } } },
-        { "id": "start", "label": "ആദ്യ രൂപം നിർമ്മിക്കാൻ തുടങ്ങും", "metadata": { "scores": { "signal:making": 1, "trait:practical": 2 } } },
-        { "id": "include", "label": "എല്ലാവർക്കും പറയാനുള്ളത് കേൾക്കും", "metadata": { "scores": { "signal:care": 1, "trait:collaborative": 2 } } },
-        { "id": "observe", "label": "ആദ്യം കാര്യങ്ങൾ നോക്കി മനസ്സിലാക്കും", "metadata": { "scores": { "trait:reflective": 2, "trait:independent": 1 } } }
+        {
+          "id": "ideas",
+          "label": "രസകരമായ ആശയങ്ങൾ നിർദ്ദേശിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 1,
+              "trait:flexible": 1
+            }
+          }
+        },
+        {
+          "id": "problem",
+          "label": "പ്രശ്നം മനസ്സിലാക്കി വിവരങ്ങൾ ശേഖരിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "trait:reflective": 1
+            }
+          }
+        },
+        {
+          "id": "plan",
+          "label": "പദ്ധതി തയ്യാറാക്കി ജോലികൾ വിഭജിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 1,
+              "trait:structured": 2
+            }
+          }
+        },
+        {
+          "id": "start",
+          "label": "ആദ്യ രൂപം നിർമ്മിക്കാൻ തുടങ്ങും",
+          "metadata": {
+            "scores": {
+              "signal:making": 1,
+              "trait:practical": 2
+            }
+          }
+        },
+        {
+          "id": "include",
+          "label": "എല്ലാവർക്കും പറയാനുള്ളത് കേൾക്കും",
+          "metadata": {
+            "scores": {
+              "signal:care": 1,
+              "trait:collaborative": 2
+            }
+          }
+        },
+        {
+          "id": "observe",
+          "label": "ആദ്യം കാര്യങ്ങൾ നോക്കി മനസ്സിലാക്കും",
+          "metadata": {
+            "scores": {
+              "trait:reflective": 2,
+              "trait:independent": 1
+            }
+          }
+        }
       ]
     },
     {
-      "id": "newProblemStyle", "fieldType": "singleSelect",
+      "id": "newProblemStyle",
+      "fieldType": "singleSelect",
       "label": "പുതിയൊരു പ്രശ്നം വന്നാൽ നിങ്ങൾ സാധാരണ എങ്ങനെ തുടങ്ങും?",
-      "validation": { "required": true },
+      "validation": {
+        "required": true
+      },
       "options": [
-        { "id": "facts", "label": "ആദ്യം വേണ്ട വിവരങ്ങൾ കണ്ടെത്തും", "metadata": { "scores": { "signal:analysis": 1, "trait:structured": 1 } } },
-        { "id": "try", "label": "ഒന്ന് ചെയ്തു നോക്കി അതിൽ നിന്ന് പഠിക്കും", "metadata": { "scores": { "signal:making": 1, "trait:flexible": 2 } } },
-        { "id": "talk", "label": "ആരോടെങ്കിലും സംസാരിച്ചു നോക്കും", "metadata": { "scores": { "signal:communication": 1, "trait:collaborative": 2 } } },
-        { "id": "imagine", "label": "പല വഴികൾ ആലോചിക്കും", "metadata": { "scores": { "signal:creativeExpression": 1, "trait:conceptual": 1 } } },
-        { "id": "steps", "label": "ചെറിയ ജോലികളായി തിരിക്കും", "metadata": { "scores": { "signal:organizing": 1, "trait:structured": 2 } } }
+        {
+          "id": "facts",
+          "label": "ആദ്യം വേണ്ട വിവരങ്ങൾ കണ്ടെത്തും",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "trait:structured": 1
+            }
+          }
+        },
+        {
+          "id": "try",
+          "label": "ഒന്ന് ചെയ്തു നോക്കി അതിൽ നിന്ന് പഠിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:making": 1,
+              "trait:flexible": 2
+            }
+          }
+        },
+        {
+          "id": "talk",
+          "label": "ആരോടെങ്കിലും സംസാരിച്ചു നോക്കും",
+          "metadata": {
+            "scores": {
+              "signal:communication": 1,
+              "trait:collaborative": 2
+            }
+          }
+        },
+        {
+          "id": "imagine",
+          "label": "പല വഴികൾ ആലോചിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:creativeExpression": 1,
+              "trait:conceptual": 1
+            }
+          }
+        },
+        {
+          "id": "steps",
+          "label": "ചെറിയ ജോലികളായി തിരിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:organizing": 1,
+              "trait:structured": 2
+            }
+          }
+        }
       ]
     },
     {
-      "id": "socialEnergy", "fieldType": "singleSelect",
+      "id": "socialEnergy",
+      "fieldType": "singleSelect",
       "label": "ഒരു കൂട്ടം ആളുകളോടൊപ്പം കുറേ സമയം കഴിഞ്ഞാൽ എങ്ങനെ തോന്നും?",
-      "validation": { "required": true },
+      "validation": {
+        "required": true
+      },
       "options": [
-        { "id": "energized", "label": "കൂടുതൽ ഉത്സാഹം തോന്നും", "metadata": { "scores": { "trait:socialEnergy": 2 } } },
-        { "id": "balanced", "label": "ആളുകളെയും പരിപാടിയെയും ആശ്രയിച്ചിരിക്കും", "metadata": { "scores": { "trait:adaptive": 2 } } },
-        { "id": "recharge", "label": "കുറച്ച് സമയം ഒറ്റയ്ക്കിരിക്കണം എന്ന് തോന്നും", "metadata": { "scores": { "trait:reflective": 2 } } }
+        {
+          "id": "energized",
+          "label": "കൂടുതൽ ഉത്സാഹം തോന്നും",
+          "metadata": {
+            "scores": {
+              "trait:socialEnergy": 2
+            }
+          }
+        },
+        {
+          "id": "balanced",
+          "label": "ആളുകളെയും പരിപാടിയെയും ആശ്രയിച്ചിരിക്കും",
+          "metadata": {
+            "scores": {
+              "trait:adaptive": 2
+            }
+          }
+        },
+        {
+          "id": "recharge",
+          "label": "കുറച്ച് സമയം ഒറ്റയ്ക്കിരിക്കണം എന്ന് തോന്നും",
+          "metadata": {
+            "scores": {
+              "trait:reflective": 2
+            }
+          }
+        }
       ]
     },
     {
-      "id": "setbackStyle", "fieldType": "singleSelect",
+      "id": "setbackStyle",
+      "fieldType": "singleSelect",
       "label": "ശ്രമിച്ച കാര്യം ആദ്യ തവണ ശരിയായില്ലെങ്കിൽ എന്ത് ചെയ്യും?",
-      "validation": { "required": true },
+      "validation": {
+        "required": true
+      },
       "options": [
-        { "id": "retry", "label": "മറ്റൊരു രീതിയിൽ വീണ്ടും ശ്രമിക്കും", "metadata": { "scores": { "trait:persistence": 2, "trait:flexible": 1 } } },
-        { "id": "analyse", "label": "എവിടെയാണ് തെറ്റിയത് എന്ന് നോക്കും", "metadata": { "scores": { "signal:analysis": 1, "trait:reflective": 1 } } },
-        { "id": "ask", "label": "ആരോടെങ്കിലും സഹായം ചോദിക്കും", "metadata": { "scores": { "signal:communication": 1, "trait:collaborative": 1 } } },
-        { "id": "pause", "label": "ഇടവേള എടുത്ത് തയ്യാറായപ്പോൾ മടങ്ങിവരും", "metadata": { "scores": { "trait:reflective": 1, "trait:adaptive": 1 } } },
-        { "id": "loseConfidence", "label": "എനിക്ക് പറ്റില്ലെന്ന് തോന്നും; ആരെങ്കിലും പ്രോത്സാഹിപ്പിക്കണം" }
+        {
+          "id": "retry",
+          "label": "മറ്റൊരു രീതിയിൽ വീണ്ടും ശ്രമിക്കും",
+          "metadata": {
+            "scores": {
+              "trait:persistence": 2,
+              "trait:flexible": 1
+            }
+          }
+        },
+        {
+          "id": "analyse",
+          "label": "എവിടെയാണ് തെറ്റിയത് എന്ന് നോക്കും",
+          "metadata": {
+            "scores": {
+              "signal:analysis": 1,
+              "trait:reflective": 1
+            }
+          }
+        },
+        {
+          "id": "ask",
+          "label": "ആരോടെങ്കിലും സഹായം ചോദിക്കും",
+          "metadata": {
+            "scores": {
+              "signal:communication": 1,
+              "trait:collaborative": 1
+            }
+          }
+        },
+        {
+          "id": "pause",
+          "label": "ഇടവേള എടുത്ത് തയ്യാറായപ്പോൾ മടങ്ങിവരും",
+          "metadata": {
+            "scores": {
+              "trait:reflective": 1,
+              "trait:adaptive": 1
+            }
+          }
+        },
+        {
+          "id": "loseConfidence",
+          "label": "എനിക്ക് പറ്റില്ലെന്ന് തോന്നും; ആരെങ്കിലും പ്രോത്സാഹിപ്പിക്കണം"
+        }
       ]
     },
     {
-      "id": "workValues", "fieldType": "multiSelect",
+      "id": "workValues",
+      "fieldType": "multiSelect",
       "label": "ഭാവിയിലെ ജോലിയിൽ നിങ്ങൾക്ക് ഏറ്റവും പ്രധാനപ്പെട്ടത് എന്താണ്?",
       "description": "ഇപ്പോൾ തോന്നുന്നത് തിരഞ്ഞെടുക്കൂ. ഇത് പിന്നീട് മാറാം.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "create", "label": "പുതിയ ആശയങ്ങൾ പരീക്ഷിക്കാനുള്ള സ്വാതന്ത്ര്യം", "metadata": { "scores": { "value:creativity": 2, "signal:creativeExpression": 1 } } },
-        { "id": "help", "label": "മറ്റുള്ളവരെ സഹായിക്കാൻ കഴിയണം", "metadata": { "scores": { "value:service": 2, "signal:care": 1 } } },
-        { "id": "mastery", "label": "പുതിയ കാര്യങ്ങൾ പഠിക്കാനും വലിയ പ്രശ്നങ്ങൾ പരിഹരിക്കാനും കഴിയണം", "metadata": { "scores": { "value:mastery": 2, "signal:analysis": 1 } } },
-        { "id": "build", "label": "ചെയ്ത ജോലിയുടെ ഫലം നേരിട്ട് കാണണം", "metadata": { "scores": { "value:making": 2, "signal:making": 1 } } },
-        { "id": "lead", "label": "ഉത്തരവാദിത്തവും തീരുമാനമെടുക്കാനുള്ള അവസരവും വേണം", "metadata": { "scores": { "value:leadership": 2, "signal:organizing": 1 } } },
-        { "id": "security", "label": "സ്ഥിരമായ ജോലിയും വരുമാനവും വേണം", "metadata": { "scores": { "value:security": 2 } } },
-        { "id": "recognition", "label": "നല്ല അംഗീകാരവും ബഹുമാനവും വേണം", "metadata": { "scores": { "value:recognition": 2 } } },
-        { "id": "balance", "label": "ജോലിക്കു പുറത്തും വേണ്ടത്ര സമയം കിട്ടണം", "metadata": { "scores": { "value:balance": 2 } } }
+        {
+          "id": "create",
+          "label": "പുതിയ ആശയങ്ങൾ പരീക്ഷിക്കാനുള്ള സ്വാതന്ത്ര്യം",
+          "metadata": {
+            "scores": {
+              "value:creativity": 2,
+              "signal:creativeExpression": 1
+            }
+          }
+        },
+        {
+          "id": "help",
+          "label": "മറ്റുള്ളവരെ സഹായിക്കാൻ കഴിയണം",
+          "metadata": {
+            "scores": {
+              "value:service": 2,
+              "signal:care": 1
+            }
+          }
+        },
+        {
+          "id": "mastery",
+          "label": "പുതിയ കാര്യങ്ങൾ പഠിക്കാനും വലിയ പ്രശ്നങ്ങൾ പരിഹരിക്കാനും കഴിയണം",
+          "metadata": {
+            "scores": {
+              "value:mastery": 2,
+              "signal:analysis": 1
+            }
+          }
+        },
+        {
+          "id": "build",
+          "label": "ചെയ്ത ജോലിയുടെ ഫലം നേരിട്ട് കാണണം",
+          "metadata": {
+            "scores": {
+              "value:making": 2,
+              "signal:making": 1
+            }
+          }
+        },
+        {
+          "id": "lead",
+          "label": "ഉത്തരവാദിത്തവും തീരുമാനമെടുക്കാനുള്ള അവസരവും വേണം",
+          "metadata": {
+            "scores": {
+              "value:leadership": 2,
+              "signal:organizing": 1
+            }
+          }
+        },
+        {
+          "id": "security",
+          "label": "സ്ഥിരമായ ജോലിയും വരുമാനവും വേണം",
+          "metadata": {
+            "scores": {
+              "value:security": 2
+            }
+          }
+        },
+        {
+          "id": "recognition",
+          "label": "നല്ല അംഗീകാരവും ബഹുമാനവും വേണം",
+          "metadata": {
+            "scores": {
+              "value:recognition": 2
+            }
+          }
+        },
+        {
+          "id": "balance",
+          "label": "ജോലിക്കു പുറത്തും വേണ്ടത്ര സമയം കിട്ടണം",
+          "metadata": {
+            "scores": {
+              "value:balance": 2
+            }
+          }
+        }
       ]
     },
     {
-      "id": "familyInfluence", "fieldType": "singleSelect",
+      "id": "familyInfluence",
+      "fieldType": "singleSelect",
       "label": "വീട്ടിൽ കരിയറിനെക്കുറിച്ച് സംസാരിക്കുമ്പോൾ എങ്ങനെയാണ്?",
       "description": "നിങ്ങളുടെ വീട്ടിലെ സാഹചര്യം മനസ്സിലാക്കാനാണ് ഈ ചോദ്യം.",
-      "validation": { "required": true },
+      "validation": {
+        "required": true
+      },
       "options": [
-        { "id": "open", "label": "പല കരിയറുകളും നോക്കാൻ വീട്ടുകാർ സമ്മതിക്കും" },
-        { "id": "preferred", "label": "വീട്ടുകാർക്ക് ചില ഇഷ്ടങ്ങളുണ്ട്; എങ്കിലും സംസാരിക്കാം" },
-        { "id": "strong", "label": "ഒരു പ്രത്യേക കരിയർ തന്നെ വേണമെന്ന് വീട്ടുകാർ പറയുന്നു" },
-        { "id": "uncertain", "label": "സഹായിക്കാൻ ആഗ്രഹമുണ്ട്; പക്ഷേ എന്താണ് നല്ലതെന്ന് അവർക്കും അറിയില്ല" },
-        { "id": "notDiscussed", "label": "കരിയറിനെക്കുറിച്ച് ഇതുവരെ കാര്യമായി ചർച്ച ചെയ്തിട്ടില്ല" },
-        { "id": "preferNot", "label": "മറുപടി നൽകാൻ താൽപ്പര്യമില്ല" }
+        {
+          "id": "open",
+          "label": "പല കരിയറുകളും നോക്കാൻ വീട്ടുകാർ സമ്മതിക്കും"
+        },
+        {
+          "id": "preferred",
+          "label": "വീട്ടുകാർക്ക് ചില ഇഷ്ടങ്ങളുണ്ട്; എങ്കിലും സംസാരിക്കാം"
+        },
+        {
+          "id": "strong",
+          "label": "ഒരു പ്രത്യേക കരിയർ തന്നെ വേണമെന്ന് വീട്ടുകാർ പറയുന്നു"
+        },
+        {
+          "id": "uncertain",
+          "label": "സഹായിക്കാൻ ആഗ്രഹമുണ്ട്; പക്ഷേ എന്താണ് നല്ലതെന്ന് അവർക്കും അറിയില്ല"
+        },
+        {
+          "id": "notDiscussed",
+          "label": "കരിയറിനെക്കുറിച്ച് ഇതുവരെ കാര്യമായി ചർച്ച ചെയ്തിട്ടില്ല"
+        },
+        {
+          "id": "preferNot",
+          "label": "മറുപടി നൽകാൻ താൽപ്പര്യമില്ല"
+        }
       ]
     },
     {
-      "id": "familyPriorities", "fieldType": "multiSelect",
+      "id": "familyPriorities",
+      "fieldType": "multiSelect",
       "label": "നിങ്ങളുടെ ഭാവിയെക്കുറിച്ച് വീട്ടുകാർക്ക് പ്രധാനപ്പെട്ടത് എന്താണ്?",
       "description": "പഠനവും കോളേജും പ്ലാൻ ചെയ്യുമ്പോൾ ഇത് സഹായിക്കും.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 3
+      },
       "options": [
-        { "id": "security", "label": "ജോലി സ്ഥിരത" },
-        { "id": "income", "label": "നല്ല വരുമാന സാധ്യത" },
-        { "id": "respect", "label": "നല്ല പേരും ബഹുമാനവും" },
-        { "id": "location", "label": "വീട്ടിൽ നിന്ന് അധികം ദൂരെയല്ലാതെ താമസിക്കൽ" },
-        { "id": "duration", "label": "വളരെ നീളാത്ത പഠനകാലം" },
-        { "id": "interest", "label": "എനിക്ക് ശരിക്കും ഇഷ്ടമുള്ളത്" },
-        { "id": "notSure", "label": "എനിക്ക് ഉറപ്പില്ല", "metadata": { "exclusive": true } }
+        {
+          "id": "security",
+          "label": "ജോലി സ്ഥിരത"
+        },
+        {
+          "id": "income",
+          "label": "നല്ല വരുമാന സാധ്യത"
+        },
+        {
+          "id": "respect",
+          "label": "നല്ല പേരും ബഹുമാനവും"
+        },
+        {
+          "id": "location",
+          "label": "വീട്ടിൽ നിന്ന് അധികം ദൂരെയല്ലാതെ താമസിക്കൽ"
+        },
+        {
+          "id": "duration",
+          "label": "വളരെ നീളാത്ത പഠനകാലം"
+        },
+        {
+          "id": "interest",
+          "label": "എനിക്ക് ശരിക്കും ഇഷ്ടമുള്ളത്"
+        },
+        {
+          "id": "notSure",
+          "label": "എനിക്ക് ഉറപ്പില്ല",
+          "metadata": {
+            "exclusive": true
+          }
+        }
       ]
     },
     {
-      "id": "familyExposure", "fieldType": "multiSelect",
+      "id": "familyExposure",
+      "fieldType": "multiSelect",
       "label": "വീട്ടുകാരിലൂടെയോ പരിചയക്കാരിലൂടെയോ ഏതൊക്കെ ജോലികളെക്കുറിച്ച് അറിയാം?",
       "description": "അറിയാത്ത ജോലികളും നിങ്ങൾക്ക് ചേരാം. അറിയാവുന്നവ മാത്രം തിരഞ്ഞെടുക്കൂ.",
-      "validation": { "required": true, "minSelect": 1, "maxSelect": 4 },
+      "validation": {
+        "required": true,
+        "minSelect": 1,
+        "maxSelect": 4
+      },
       "options": [
-        { "id": "health", "label": "ആരോഗ്യരംഗം" },
-        { "id": "technology", "label": "ടെക്നോളജി, എഞ്ചിനീയറിംഗ്, കൈത്തൊഴിൽ" },
-        { "id": "business", "label": "ബിസിനസ്, ഫിനാൻസ്, സെയിൽസ്, കുടുംബ സംരംഭം" },
-        { "id": "public", "label": "വിദ്യാഭ്യാസം, സർക്കാർ, നിയമം, അല്ലെങ്കിൽ പൊതുസേവനം" },
-        { "id": "creative", "label": "കല, മാധ്യമം, ഡിസൈൻ, അല്ലെങ്കിൽ വിനോദം" },
-        { "id": "science", "label": "ശാസ്ത്രം, ഗവേഷണം, കൃഷി, അല്ലെങ്കിൽ പരിസ്ഥിതി" },
-        { "id": "other", "label": "മറ്റു ജോലികൾ" },
-        { "id": "limited", "label": "വ്യത്യസ്ത ജോലികളെക്കുറിച്ച് അധികം അറിയില്ല", "metadata": { "exclusive": true } }
+        {
+          "id": "health",
+          "label": "ആരോഗ്യരംഗം"
+        },
+        {
+          "id": "technology",
+          "label": "ടെക്നോളജി, എഞ്ചിനീയറിംഗ്, കൈത്തൊഴിൽ"
+        },
+        {
+          "id": "business",
+          "label": "ബിസിനസ്, ഫിനാൻസ്, സെയിൽസ്, കുടുംബ സംരംഭം"
+        },
+        {
+          "id": "public",
+          "label": "വിദ്യാഭ്യാസം, സർക്കാർ, നിയമം, അല്ലെങ്കിൽ പൊതുസേവനം"
+        },
+        {
+          "id": "creative",
+          "label": "കല, മാധ്യമം, ഡിസൈൻ, അല്ലെങ്കിൽ വിനോദം"
+        },
+        {
+          "id": "science",
+          "label": "ശാസ്ത്രം, ഗവേഷണം, കൃഷി, അല്ലെങ്കിൽ പരിസ്ഥിതി"
+        },
+        {
+          "id": "other",
+          "label": "മറ്റു ജോലികൾ"
+        },
+        {
+          "id": "limited",
+          "label": "വ്യത്യസ്ത ജോലികളെക്കുറിച്ച് അധികം അറിയില്ല",
+          "metadata": {
+            "exclusive": true
+          }
+        }
       ]
     },
     {
-      "id": "experienceLevel", "fieldType": "singleSelect",
+      "id": "experienceLevel",
+      "fieldType": "singleSelect",
       "label": "നിങ്ങളുടെ ഇഷ്ടങ്ങൾ കണ്ടെത്താൻ എത്രത്തോളം അവസരം കിട്ടിയിട്ടുണ്ട്?",
       "description": "അവസരം കുറവാണെങ്കിൽ അതിൽ തെറ്റൊന്നുമില്ല.",
-      "validation": { "required": true },
+      "validation": {
+        "required": true
+      },
       "options": [
-        { "id": "new", "label": "ഇതുവരെ വളരെ കുറച്ച്" },
-        { "id": "some", "label": "കുറച്ച് കാര്യങ്ങൾ ചെയ്തു നോക്കിയിട്ടുണ്ട്" },
-        { "id": "regular", "label": "ഇഷ്ടമുള്ള കാര്യങ്ങൾ പതിവായി ചെയ്യാറുണ്ട്" }
+        {
+          "id": "new",
+          "label": "ഇതുവരെ വളരെ കുറച്ച്"
+        },
+        {
+          "id": "some",
+          "label": "കുറച്ച് കാര്യങ്ങൾ ചെയ്തു നോക്കിയിട്ടുണ്ട്"
+        },
+        {
+          "id": "regular",
+          "label": "ഇഷ്ടമുള്ള കാര്യങ്ങൾ പതിവായി ചെയ്യാറുണ്ട്"
+        }
       ]
     }
   ],
   "stageQuestions": {
     "grade8": [
       {
-        "id": "grade8Exposure", "fieldType": "multiSelect",
+        "id": "grade8Exposure",
+        "fieldType": "multiSelect",
         "label": "പുതിയ കാര്യങ്ങൾ ചെയ്തു നോക്കാൻ എവിടെയാണ് അവസരം കിട്ടിയത്?",
         "description": "അവസരം കുറവാണെങ്കിലും പ്രശ്നമില്ല.",
-        "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+        "validation": {
+          "required": true,
+          "minSelect": 1,
+          "maxSelect": 3
+        },
         "options": [
-          { "id": "school", "label": "സ്കൂൾ ക്ലബ്ബുകൾ, പരിപാടികൾ, ലാബുകൾ, മത്സരങ്ങൾ" },
-          { "id": "home", "label": "വീട്, വീട്ടുകാരുടെ ജോലി, ഹോബികൾ, വീട്ടിലെ ചുമതലകൾ" },
-          { "id": "community", "label": "സ്പോർട്സ്, കല, നാട്ടിലെ കൂട്ടായ്മകൾ, സന്നദ്ധ പ്രവർത്തനം" },
-          { "id": "online", "label": "ഓൺലൈൻ വീഡിയോ, കോഴ്‌സ്, ഗെയിം, കമ്മ്യൂണിറ്റി" },
-          { "id": "noneYet", "label": "ഇതുവരെ വളരെ കുറച്ച് അവസരങ്ങൾ മാത്രമാണ് ലഭിച്ചത്", "metadata": { "exclusive": true } }
+          {
+            "id": "school",
+            "label": "സ്കൂൾ ക്ലബ്ബുകൾ, പരിപാടികൾ, ലാബുകൾ, മത്സരങ്ങൾ"
+          },
+          {
+            "id": "home",
+            "label": "വീട്, വീട്ടുകാരുടെ ജോലി, ഹോബികൾ, വീട്ടിലെ ചുമതലകൾ"
+          },
+          {
+            "id": "community",
+            "label": "സ്പോർട്സ്, കല, നാട്ടിലെ കൂട്ടായ്മകൾ, സന്നദ്ധ പ്രവർത്തനം"
+          },
+          {
+            "id": "online",
+            "label": "ഓൺലൈൻ വീഡിയോ, കോഴ്‌സ്, ഗെയിം, കമ്മ്യൂണിറ്റി"
+          },
+          {
+            "id": "noneYet",
+            "label": "ഇതുവരെ വളരെ കുറച്ച് അവസരങ്ങൾ മാത്രമാണ് ലഭിച്ചത്",
+            "metadata": {
+              "exclusive": true
+            }
+          }
         ]
       }
     ],
     "grade9": [
       {
-        "id": "grade9Evidence", "fieldType": "multiSelect",
+        "id": "grade9Evidence",
+        "fieldType": "multiSelect",
         "label": "നിങ്ങളെക്കുറിച്ച് കൂടുതൽ മനസ്സിലാക്കാൻ എന്തൊക്കെയാണ് സഹായിച്ചത്?",
         "description": "ജയിച്ചോ തോറ്റോ എന്നതല്ല, ചെയ്തു നോക്കിയതാണ് പ്രധാനം.",
-        "validation": { "required": true, "minSelect": 1, "maxSelect": 3 },
+        "validation": {
+          "required": true,
+          "minSelect": 1,
+          "maxSelect": 3
+        },
         "options": [
-          { "id": "project", "label": "വ്യക്തിഗത അല്ലെങ്കിൽ സ്കൂൾ പ്രോജക്ട്", "metadata": { "scores": { "evidence:demonstrated": 1 } } },
-          { "id": "conversation", "label": "ഒരാളോട് അവരുടെ ജോലിയെക്കുറിച്ച് സംസാരിച്ചത്", "metadata": { "scores": { "evidence:exposure": 1 } } },
-          { "id": "club", "label": "ക്ലബ്, മത്സരം, വർക്ക്‌ഷോപ്പ്, സ്പോർട്സ്, സന്നദ്ധ പ്രവർത്തനം", "metadata": { "scores": { "evidence:demonstrated": 1 } } },
-          { "id": "familyWork", "label": "വീട്ടുകാരുടെ ജോലിയിലോ വീട്ടിലെ ചുമതലകളിലോ സഹായിച്ചത്", "metadata": { "scores": { "evidence:observed": 1 } } },
-          { "id": "noneYet", "label": "ഇത്തരം അനുഭവങ്ങൾ ഇതുവരെ ലഭിച്ചിട്ടില്ല", "metadata": { "exclusive": true } }
+          {
+            "id": "project",
+            "label": "വ്യക്തിഗത അല്ലെങ്കിൽ സ്കൂൾ പ്രോജക്ട്",
+            "metadata": {
+              "scores": {
+                "evidence:demonstrated": 1
+              }
+            }
+          },
+          {
+            "id": "conversation",
+            "label": "ഒരാളോട് അവരുടെ ജോലിയെക്കുറിച്ച് സംസാരിച്ചത്",
+            "metadata": {
+              "scores": {
+                "evidence:exposure": 1
+              }
+            }
+          },
+          {
+            "id": "club",
+            "label": "ക്ലബ്, മത്സരം, വർക്ക്‌ഷോപ്പ്, സ്പോർട്സ്, സന്നദ്ധ പ്രവർത്തനം",
+            "metadata": {
+              "scores": {
+                "evidence:demonstrated": 1
+              }
+            }
+          },
+          {
+            "id": "familyWork",
+            "label": "വീട്ടുകാരുടെ ജോലിയിലോ വീട്ടിലെ ചുമതലകളിലോ സഹായിച്ചത്",
+            "metadata": {
+              "scores": {
+                "evidence:observed": 1
+              }
+            }
+          },
+          {
+            "id": "noneYet",
+            "label": "ഇത്തരം അനുഭവങ്ങൾ ഇതുവരെ ലഭിച്ചിട്ടില്ല",
+            "metadata": {
+              "exclusive": true
+            }
+          }
         ]
       }
     ],
     "grade10": [
       {
-        "id": "grade10Decision", "fieldType": "singleSelect",
+        "id": "grade10Decision",
+        "fieldType": "singleSelect",
         "label": "പത്താം ക്ലാസിൽ ഇപ്പോൾ ഏത് കാര്യത്തിലാണ് കൂടുതൽ വ്യക്തത വേണ്ടത്?",
-        "validation": { "required": true },
+        "validation": {
+          "required": true
+        },
         "options": [
-          { "id": "subjects", "label": "ഏത് വിഷയങ്ങൾ തുടരണം" },
-          { "id": "stream", "label": "ഏത് സ്ട്രീം അല്ലെങ്കിൽ പഠനവഴി തിരഞ്ഞെടുക്കണം" },
-          { "id": "options", "label": "കൂടുതൽ കരിയർ സാധ്യതകൾ തുറന്നുവയ്ക്കണം" },
-          { "id": "discussion", "label": "വീട്ടുകാരോടോ അധ്യാപകരോടോ എങ്ങനെ സംസാരിക്കണം" }
+          {
+            "id": "subjects",
+            "label": "ഏത് വിഷയങ്ങൾ തുടരണം"
+          },
+          {
+            "id": "stream",
+            "label": "ഏത് സ്ട്രീം അല്ലെങ്കിൽ പഠനവഴി തിരഞ്ഞെടുക്കണം"
+          },
+          {
+            "id": "options",
+            "label": "കൂടുതൽ കരിയർ സാധ്യതകൾ തുറന്നുവയ്ക്കണം"
+          },
+          {
+            "id": "discussion",
+            "label": "വീട്ടുകാരോടോ അധ്യാപകരോടോ എങ്ങനെ സംസാരിക്കണം"
+          }
         ]
       },
       {
-        "id": "subjectConfidence", "fieldType": "multiSelect",
+        "id": "subjectConfidence",
+        "fieldType": "multiSelect",
         "label": "ഇപ്പോൾ ഏതൊക്കെ വിഷയങ്ങളാണ് പഠിക്കാൻ ഇഷ്ടവും ആത്മവിശ്വാസവും നൽകുന്നത്?",
         "description": "ഇപ്പോഴത്തെ മാർക്കും ഇഷ്ടവും ഭാവിയെ പൂട്ടിവയ്ക്കുന്നില്ല.",
-        "validation": { "required": true, "minSelect": 1, "maxSelect": 4 },
+        "validation": {
+          "required": true,
+          "minSelect": 1,
+          "maxSelect": 4
+        },
         "options": [
-          { "id": "math", "label": "ഗണിതം", "metadata": { "scores": { "signal:analysis": 1 } } },
-          { "id": "science", "label": "ശാസ്ത്രം", "metadata": { "scores": { "signal:analysis": 1, "signal:making": 1 } } },
-          { "id": "languages", "label": "ഭാഷകൾ", "metadata": { "scores": { "signal:creativeExpression": 1, "signal:communication": 1 } } },
-          { "id": "socialScience", "label": "സാമൂഹ്യശാസ്ത്രം", "metadata": { "scores": { "signal:communication": 1, "signal:care": 1 } } },
-          { "id": "arts", "label": "കല അല്ലെങ്കിൽ ഡിസൈൻ", "metadata": { "scores": { "signal:creativeExpression": 1, "signal:making": 1 } } },
-          { "id": "computing", "label": "കമ്പ്യൂട്ടിംഗ്", "metadata": { "scores": { "signal:analysis": 1, "signal:making": 1 } } },
-          { "id": "commerce", "label": "കൊമേഴ്സ് അല്ലെങ്കിൽ സാമ്പത്തികശാസ്ത്രം", "metadata": { "scores": { "signal:analysis": 1, "signal:organizing": 1 } } },
-          { "id": "stillLearning", "label": "ഇതുവരെ ഉറപ്പായിട്ടില്ല", "metadata": { "exclusive": true } }
+          {
+            "id": "math",
+            "label": "ഗണിതം",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1
+              }
+            }
+          },
+          {
+            "id": "science",
+            "label": "ശാസ്ത്രം",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1,
+                "signal:making": 1
+              }
+            }
+          },
+          {
+            "id": "languages",
+            "label": "ഭാഷകൾ",
+            "metadata": {
+              "scores": {
+                "signal:creativeExpression": 1,
+                "signal:communication": 1
+              }
+            }
+          },
+          {
+            "id": "socialScience",
+            "label": "സാമൂഹ്യശാസ്ത്രം",
+            "metadata": {
+              "scores": {
+                "signal:communication": 1,
+                "signal:care": 1
+              }
+            }
+          },
+          {
+            "id": "arts",
+            "label": "കല അല്ലെങ്കിൽ ഡിസൈൻ",
+            "metadata": {
+              "scores": {
+                "signal:creativeExpression": 1,
+                "signal:making": 1
+              }
+            }
+          },
+          {
+            "id": "computing",
+            "label": "കമ്പ്യൂട്ടിംഗ്",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1,
+                "signal:making": 1
+              }
+            }
+          },
+          {
+            "id": "commerce",
+            "label": "കൊമേഴ്സ് അല്ലെങ്കിൽ സാമ്പത്തികശാസ്ത്രം",
+            "metadata": {
+              "scores": {
+                "signal:analysis": 1,
+                "signal:organizing": 1
+              }
+            }
+          },
+          {
+            "id": "stillLearning",
+            "label": "ഇതുവരെ ഉറപ്പായിട്ടില്ല",
+            "metadata": {
+              "exclusive": true
+            }
+          }
         ]
       }
     ],
@@ -351,25 +1136,76 @@
     ]
   },
   "signals": {
-    "creativeExpression": { "title": "ക്രിയേറ്റീവ് കാര്യങ്ങൾ", "description": "ആശയങ്ങൾ, കഥകൾ, സംഗീതം, ചിത്രങ്ങൾ എന്നിവയിലൂടെ സ്വയം പ്രകടിപ്പിക്കാൻ നിങ്ങൾക്ക് ഇഷ്ടമാണ്." },
-    "analysis": { "title": "അന്വേഷിച്ച് ഉത്തരം കണ്ടെത്തൽ", "description": "എന്തുകൊണ്ട് എന്ന് ചോദിക്കാനും പ്രശ്നത്തിന്റെ കാരണം കണ്ടെത്താനും നിങ്ങൾക്ക് ഇഷ്ടമാണ്." },
-    "making": { "title": "ചെയ്തുനോക്കി പഠിക്കൽ", "description": "ഉണ്ടാക്കിയും നന്നാക്കിയും പരീക്ഷിച്ചുമാണ് നിങ്ങൾ നന്നായി പഠിക്കുന്നത്." },
-    "communication": { "title": "പറയാനും മനസ്സിലാക്കാനും കഴിവ്", "description": "കേൾക്കാനും പറഞ്ഞുകൊടുക്കാനും പഠിപ്പിക്കാനും കഥ പറയാനും നിങ്ങൾക്ക് ഇഷ്ടമാണ്." },
-    "care": { "title": "മറ്റുള്ളവരെ സഹായിക്കൽ", "description": "ആളുകൾക്ക് എന്താണ് വേണ്ടതെന്ന് ശ്രദ്ധിക്കാനും സഹായിക്കാനും നിങ്ങൾക്ക് താൽപ്പര്യമുണ്ട്." },
-    "organizing": { "title": "കാര്യങ്ങൾ നടത്താനുള്ള കഴിവ്", "description": "ആളുകളെയും ജോലികളെയും ഒരുമിപ്പിച്ച് ഒരു കാര്യം പൂർത്തിയാക്കാൻ നിങ്ങൾക്ക് ഇഷ്ടമാണ്." }
+    "creativeExpression": {
+      "title": "ക്രിയേറ്റീവ് കാര്യങ്ങൾ",
+      "description": "ആശയങ്ങൾ, കഥകൾ, സംഗീതം, ചിത്രങ്ങൾ എന്നിവയിലൂടെ സ്വയം പ്രകടിപ്പിക്കാൻ നിങ്ങൾക്ക് ഇഷ്ടമുണ്ടാകാം."
+    },
+    "analysis": {
+      "title": "അന്വേഷിച്ച് ഉത്തരം കണ്ടെത്തൽ",
+      "description": "എന്തുകൊണ്ട് എന്ന് ചോദിക്കാനും പ്രശ്നങ്ങളുടെ കാരണം കണ്ടെത്താനും നിങ്ങൾക്ക് ഇഷ്ടമുണ്ടാകാം."
+    },
+    "making": {
+      "title": "ചെയ്തുനോക്കി പഠിക്കൽ",
+      "description": "ഉണ്ടാക്കിയും നന്നാക്കിയും പരീക്ഷിച്ചും പഠിക്കുന്നത് നിങ്ങൾക്ക് സഹായകരമായേക്കാം."
+    },
+    "communication": {
+      "title": "ആശയവിനിമയവും മനസ്സിലാക്കലും",
+      "description": "കേൾക്കാനും പറഞ്ഞുകൊടുക്കാനും പഠിപ്പിക്കാനും കഥ പറയാനും നിങ്ങൾക്ക് ഇഷ്ടമുണ്ടാകാം."
+    },
+    "care": {
+      "title": "മറ്റുള്ളവരെ സഹായിക്കൽ",
+      "description": "ആളുകളുടെ ആവശ്യങ്ങൾ ശ്രദ്ധിക്കാനും അവരെ സഹായിക്കാനും നിങ്ങൾക്ക് താൽപ്പര്യമുണ്ടാകാം."
+    },
+    "organizing": {
+      "title": "കാര്യങ്ങൾ ക്രമീകരിക്കലും ഉത്തരവാദിത്തവും",
+      "description": "ആളുകളെയും ജോലികളെയും ഒരുമിപ്പിച്ച് ഒരു കാര്യം പൂർത്തിയാക്കാൻ നിങ്ങൾക്ക് ഇഷ്ടമുണ്ടാകാം."
+    }
   },
   "traits": {
-    "socialEnergy": { "title": "ആളുകളോടൊപ്പം പ്രവർത്തിക്കാൻ ഇഷ്ടം", "description": "ഒരുമിച്ച് ഒരു ലക്ഷ്യത്തിനായി പ്രവർത്തിക്കുമ്പോൾ നിങ്ങൾ കൂടുതൽ ഉത്സാഹത്തിലാകും." },
-    "reflective": { "title": "ആലോചിച്ച് ചെയ്യുന്ന ശീലം", "description": "മറുപടി പറയുന്നതിന് മുമ്പ് നോക്കാനും ചിന്തിക്കാനും നിങ്ങൾക്ക് സമയം വേണം." },
-    "structured": { "title": "പ്ലാൻ ചെയ്ത് ചെയ്യുന്ന ശീലം", "description": "വ്യക്തമായ പ്ലാനും ഓരോ ഘട്ടവും അറിയുമ്പോൾ നിങ്ങൾ നന്നായി പ്രവർത്തിക്കും." },
-    "flexible": { "title": "പരീക്ഷിച്ച് മാറ്റുന്ന ശീലം", "description": "ഒന്ന് ചെയ്തു നോക്കി, പഠിച്ചതനുസരിച്ച് വഴി മാറ്റാൻ നിങ്ങൾക്ക് ഇഷ്ടമാണ്." },
-    "collaborative": { "title": "ടീമായി പ്രവർത്തിക്കാൻ ഇഷ്ടം", "description": "മറ്റുള്ളവരുമായി സംസാരിച്ചും ഒരുമിച്ച് ശ്രമിച്ചുമാണ് നിങ്ങൾ നന്നായി പ്രവർത്തിക്കുന്നത്." },
-    "independent": { "title": "സ്വന്തമായി പ്രവർത്തിക്കാൻ ഇഷ്ടം", "description": "ശ്രദ്ധിച്ച് ചിന്തിക്കാനും സ്വന്തം വഴി കണ്ടെത്താനും നിങ്ങൾക്ക് ഇടം വേണം." },
-    "practical": { "title": "ചെയ്തുനോക്കി പഠിക്കുന്ന ശീലം", "description": "കേൾക്കുന്നതിനെക്കാൾ നേരിട്ട് ചെയ്തു നോക്കുമ്പോഴാണ് നിങ്ങൾ നന്നായി പഠിക്കുന്നത്." },
-    "conceptual": { "title": "ആശയങ്ങൾ ആലോചിക്കാൻ ഇഷ്ടം", "description": "കാര്യങ്ങൾ എങ്ങനെ ബന്ധപ്പെടുന്നു, എന്തുകൊണ്ട് സംഭവിക്കുന്നു എന്ന് ചിന്തിക്കാൻ നിങ്ങൾക്ക് ഇഷ്ടമാണ്." },
-    "persistence": { "title": "വിട്ടുകൊടുക്കാത്ത ശീലം", "description": "കാര്യം പ്രധാനമാണെങ്കിൽ ബുദ്ധിമുട്ടുണ്ടെങ്കിലും നിങ്ങൾ ശ്രമം തുടരും." },
-    "adaptive": { "title": "സാഹചര്യത്തിന് ഒത്തു മാറുന്ന ശീലം", "description": "ആളുകളും ലക്ഷ്യവും സാഹചര്യവും മാറുമ്പോൾ നിങ്ങളുടെ രീതിയും മാറും." },
-    "responsibility": { "title": "ഉത്തരവാദിത്തം ഏറ്റെടുക്കുന്ന ശീലം", "description": "ഏൽപ്പിച്ച കാര്യം നിങ്ങൾ പൂർത്തിയാക്കുമെന്ന് മറ്റുള്ളവർ വിശ്വസിക്കുന്നു." }
+    "socialEnergy": {
+      "title": "ആളുകളോടൊപ്പം പ്രവർത്തിക്കാൻ ഇഷ്ടം",
+      "description": "ഒരുമിച്ച് ഒരു ലക്ഷ്യത്തിനായി പ്രവർത്തിക്കുമ്പോൾ നിങ്ങൾക്ക് കൂടുതൽ ഉത്സാഹം തോന്നിയേക്കാം."
+    },
+    "reflective": {
+      "title": "ആലോചിച്ച് ചെയ്യുന്ന ശീലം",
+      "description": "മറുപടി പറയുന്നതിന് മുമ്പ് നോക്കാനും ചിന്തിക്കാനും സമയം എടുക്കാൻ നിങ്ങൾ ഇഷ്ടപ്പെട്ടേക്കാം."
+    },
+    "structured": {
+      "title": "പ്ലാൻ ചെയ്ത് ചെയ്യുന്ന ശീലം",
+      "description": "വ്യക്തമായ പദ്ധതികളും ഘട്ടങ്ങളും ഉത്തരവാദിത്തങ്ങളും നന്നായി പ്രവർത്തിക്കാൻ നിങ്ങളെ സഹായിച്ചേക്കാം."
+    },
+    "flexible": {
+      "title": "പരീക്ഷിച്ച് മാറ്റുന്ന ശീലം",
+      "description": "ഒന്ന് ചെയ്തു നോക്കി, പഠിച്ചതനുസരിച്ച് വഴി മാറ്റാൻ നിങ്ങൾക്ക് ഇഷ്ടമുണ്ടാകാം."
+    },
+    "collaborative": {
+      "title": "ടീമായി പ്രവർത്തിക്കാൻ ഇഷ്ടം",
+      "description": "മറ്റുള്ളവരുമായി സംസാരിക്കുന്നതും ഒരുമിച്ച് ശ്രമിക്കുന്നതും നന്നായി പ്രവർത്തിക്കാൻ നിങ്ങളെ സഹായിച്ചേക്കാം."
+    },
+    "independent": {
+      "title": "സ്വന്തമായി പ്രവർത്തിക്കാൻ ഇഷ്ടം",
+      "description": "ശ്രദ്ധിച്ച് ചിന്തിക്കാനും സ്വന്തം ധാരണയിലെത്താനും കുറച്ച് സ്വതന്ത്ര സമയവും ഇടവും നിങ്ങൾ വിലമതിച്ചേക്കാം."
+    },
+    "practical": {
+      "title": "ചെയ്തുനോക്കി പഠിക്കുന്ന ശീലം",
+      "description": "വിശദീകരണം മാത്രം കേൾക്കുന്നതിനെക്കാൾ നേരിട്ട് ചെയ്തു നോക്കുന്നത് പഠിക്കാൻ നിങ്ങളെ സഹായിച്ചേക്കാം."
+    },
+    "conceptual": {
+      "title": "ആശയങ്ങൾ ആലോചിക്കാൻ ഇഷ്ടം",
+      "description": "കാര്യങ്ങൾ എങ്ങനെ ബന്ധപ്പെടുന്നു, എന്തുകൊണ്ട് സംഭവിക്കുന്നു എന്ന് ചിന്തിക്കാൻ നിങ്ങൾക്ക് ഇഷ്ടമുണ്ടാകാം."
+    },
+    "persistence": {
+      "title": "വിട്ടുകൊടുക്കാത്ത ശീലം",
+      "description": "ഒരു കാര്യം പ്രധാനമാണെങ്കിൽ ബുദ്ധിമുട്ടുണ്ടെങ്കിലും നിങ്ങൾ ശ്രമം തുടർന്നേക്കാം."
+    },
+    "adaptive": {
+      "title": "സാഹചര്യത്തിന് ഒത്തു മാറുന്ന ശീലം",
+      "description": "ആളുകളും ലക്ഷ്യവും സാഹചര്യവും അനുസരിച്ച് നിങ്ങളുടെ പ്രവർത്തനരീതി മാറിയേക്കാം."
+    },
+    "responsibility": {
+      "title": "ഉത്തരവാദിത്തം ഏറ്റെടുക്കുന്ന ശീലം",
+      "description": "പ്രധാനപ്പെട്ട കാര്യങ്ങൾ പൂർത്തിയാക്കാൻ മറ്റുള്ളവർ നിങ്ങളെ വിശ്വസിച്ചേക്കാം."
+    }
   },
   "context": {
     "family": {
@@ -391,18 +1227,36 @@
     }
   },
   "areas": {
-    "technology": { "title": "ടെക്നോളജി", "description": "ആപ്പുകൾ ഉണ്ടാക്കുക, പ്രശ്നങ്ങൾ പരിഹരിക്കുക, ഉപയോഗപ്രദമായ ഡിജിറ്റൽ ടൂളുകൾ സൃഷ്ടിക്കുക." },
-    "health": { "title": "ആരോഗ്യം", "description": "ചികിത്സ, പുനരധിവാസം, ഗവേഷണം, ഹെൽത്ത് ടെക്നോളജി എന്നിവയിലൂടെ ആളുകളെ സഹായിക്കുക." },
-    "science": { "title": "സയൻസ്", "description": "ചോദ്യങ്ങൾ ചോദിക്കുക, ആശയങ്ങൾ പരീക്ഷിക്കുക, കാര്യങ്ങൾ എങ്ങനെ പ്രവർത്തിക്കുന്നു എന്ന് മനസ്സിലാക്കുക." },
-    "business": { "title": "ബിസിനസ്", "description": "ആളുകൾ, പണം, ജോലികൾ, പുതിയ ആശയങ്ങൾ എന്നിവ നന്നായി നടത്തുക." },
-    "design": { "title": "ഡിസൈനും മീഡിയയും", "description": "വ്യക്തവും ഉപയോഗപ്രദവും ആകർഷകവുമായ അനുഭവങ്ങളും കഥകളും സൃഷ്ടിക്കുക." },
-    "society": { "title": "വിദ്യാഭ്യാസവും സമൂഹവും", "description": "പഠിപ്പിക്കുക, സമൂഹത്തെ സഹായിക്കുക, പൊതുപ്രശ്നങ്ങൾക്ക് പരിഹാരം കണ്ടെത്തുക." }
+    "technology": {
+      "title": "ടെക്നോളജി",
+      "description": "ആപ്പുകൾ ഉണ്ടാക്കുക, പ്രശ്നങ്ങൾ പരിഹരിക്കുക, ഉപയോഗപ്രദമായ ഡിജിറ്റൽ ടൂളുകൾ സൃഷ്ടിക്കുക."
+    },
+    "health": {
+      "title": "ആരോഗ്യം",
+      "description": "ചികിത്സ, പുനരധിവാസം, ഗവേഷണം, ഹെൽത്ത് ടെക്നോളജി എന്നിവയിലൂടെ ആളുകളെ സഹായിക്കുക."
+    },
+    "science": {
+      "title": "സയൻസ്",
+      "description": "ചോദ്യങ്ങൾ ചോദിക്കുക, ആശയങ്ങൾ പരീക്ഷിക്കുക, കാര്യങ്ങൾ എങ്ങനെ പ്രവർത്തിക്കുന്നു എന്ന് മനസ്സിലാക്കുക."
+    },
+    "business": {
+      "title": "ബിസിനസ്",
+      "description": "ആളുകൾ, പണം, ജോലികൾ, പുതിയ ആശയങ്ങൾ എന്നിവ നന്നായി നടത്തുക."
+    },
+    "design": {
+      "title": "ഡിസൈനും മീഡിയയും",
+      "description": "വ്യക്തവും ഉപയോഗപ്രദവും ആകർഷകവുമായ അനുഭവങ്ങളും കഥകളും സൃഷ്ടിക്കുക."
+    },
+    "society": {
+      "title": "വിദ്യാഭ്യാസവും സമൂഹവും",
+      "description": "പഠിപ്പിക്കുക, സമൂഹത്തെ സഹായിക്കുക, പൊതുപ്രശ്നങ്ങൾക്ക് പരിഹാരം കണ്ടെത്തുക."
+    }
   },
   "result": {
     "eyebrow": "നിങ്ങളുടെ ഫലം",
-    "title": "കൂടുതൽ അറിയാൻ ഒരു കരിയർ മേഖല തിരഞ്ഞെടുക്കൂ.",
+    "title": "കൂടുതൽ അറിയാൻ പറ്റിയ മൂന്ന് കരിയർ മേഖലകൾ വരെ ഇവിടെ കാണാം.",
     "description": "നിങ്ങളുടെ മറുപടികളെ അടിസ്ഥാനമാക്കിയുള്ള തുടക്കമാണിത്. ഇപ്പോൾ ഒന്ന് തിരഞ്ഞെടുക്കൂ—പിന്നീട് മാറ്റാം.",
-    "patternsTitle": "നിങ്ങൾക്ക് ഇഷ്ടപ്പെടാവുന്ന കാര്യങ്ങൾ",
+    "patternsTitle": "നിങ്ങളുടെ മറുപടികളിൽ കണ്ട സൂചനകൾ",
     "patternsDescription": "",
     "traitsTitle": "നിങ്ങൾക്ക് ഇഷ്ടപ്പെടാവുന്ന പ്രവർത്തനരീതി",
     "traitsDescription": "",
@@ -413,7 +1267,7 @@
     "noticed": "ചില മറുപടികളിൽ കണ്ടു",
     "repeated": "പല മറുപടികളിലും കണ്ടു",
     "nextTitle": "ഇനി എന്ത് ചെയ്യാം?",
-    "savedTemporarily": "സൈൻ അപ്പ് ചെയ്യുന്നതുവരെ മാത്രം",
+    "savedTemporarily": "അക്കൗണ്ടിലേക്ക് സേവ് ചെയ്യുന്നതുവരെ താൽക്കാലികം",
     "noScore": "ഇത് മാച്ച് ശതമാനമല്ല",
     "emptyTitle": "ആദ്യം കരിയർ അസസ്‌മെന്റ് ചെയ്യാം.",
     "areasLabel": "ഒരു കരിയർ മേഖല തിരഞ്ഞെടുക്കൂ",
@@ -430,7 +1284,7 @@
     "reflectionMissing": "പ്രധാനപ്പെട്ടൊരു കാര്യം കാണുന്നില്ല",
     "reflectionSaved": "നിങ്ങളുടെ അഭിപ്രായം ഇപ്പോൾ ഈ ഉപകരണത്തിൽ സേവ് ചെയ്തു.",
     "personalizeTitle": "നിങ്ങളുടെ പഠനവിവരങ്ങൾ ചേർക്കാം",
-    "personalizeDescription": "സ്ഥലം, സ്കൂൾ ബോർഡ്, ഭാഷ, ബജറ്റ് എന്നിവ ചേർത്താൽ യോജിച്ച കോഴ്‌സുകളും കോളേജുകളും കാണാം.",
+    "personalizeDescription": "സ്ഥലം, സ്കൂൾ ബോർഡ്, ഭാഷ, ഫീസ് സംബന്ധിച്ച മുൻഗണന, പഠിക്കാൻ ഇഷ്ടപ്പെടുന്ന സ്ഥലം എന്നിവ ചേർക്കൂ. മുന്നിലുള്ള വഴികളെക്കുറിച്ച് ചർച്ച ചെയ്യാൻ ഈ വിവരങ്ങൾ നിങ്ങളുടെ പദ്ധതിയോടൊപ്പം സൂക്ഷിക്കാം.",
     "personalize": "പഠനവിവരങ്ങൾ ചേർക്കാം",
     "edit": "എന്റെ മറുപടികൾ നോക്കാം",
     "explore": "എല്ലാ കരിയർ മേഖലകളും കാണാം",
@@ -438,9 +1292,21 @@
     "detailsDescription": "ഈ മേഖലകൾ വന്നത് എന്തുകൊണ്ടെന്ന് അറിയണമെങ്കിൽ മാത്രം തുറക്കൂ."
   },
   "nextActions": {
-    "grade8": ["ഇഷ്ടമുള്ള ഒരു മേഖല തുറന്ന് അതിലെ ജോലികൾ നോക്കൂ.", "ഫലത്തിൽ ശരിയെന്ന് തോന്നിയതും തോന്നാത്തതും പറയൂ.", "കോഴ്‌സുകളും കോളേജുകളും കാണാൻ പഠനവിവരങ്ങൾ ചേർക്കൂ."],
-    "grade9": ["ഓരോ ജോലിയിലും ദിവസേന എന്താണ് ചെയ്യുന്നതെന്ന് നോക്കി താരതമ്യം ചെയ്യൂ.", "ഇഷ്ടമുള്ള മൂന്ന് ജോലികൾ വരെ സേവ് ചെയ്യൂ.", "വിഷയങ്ങളും കോഴ്‌സുകളും കോളേജുകളും കാണാൻ പഠനവിവരങ്ങൾ ചേർക്കൂ."],
-    "grade10": ["ഏത് വിഷയങ്ങളും കോഴ്‌സുകളും കൂടുതൽ വഴികൾ തുറക്കുമെന്ന് താരതമ്യം ചെയ്യൂ.", "ഈ ഫലം വീട്ടുകാരോടോ അധ്യാപകരോടോ കൗൺസിലറോടോ ചർച്ച ചെയ്യൂ.", "കോളേജുകൾ നോക്കുന്നതിന് മുമ്പ് സ്ഥലവും ബജറ്റും ചേർക്കൂ."],
+    "grade8": [
+      "ഒരു കരിയർ മേഖല തുറന്ന് അതിലെ പല ജോലികളെക്കുറിച്ചും അറിയൂ.",
+      "ഏത് മേഖലകളാണ് താൽപ്പര്യമുള്ളതെന്നും നിങ്ങളുടെ അനുഭവത്തോട് ചേരാത്തതെന്നും പറയൂ.",
+      "പദ്ധതി സൂക്ഷിക്കാനും പിന്നീട് ചർച്ച ചെയ്യാനും പഠനവിവരങ്ങൾ ചേർക്കൂ."
+    ],
+    "grade9": [
+      "ഓരോ ജോലിയിലും ദിവസേന എന്താണ് ചെയ്യുന്നതെന്ന് നോക്കി താരതമ്യം ചെയ്യൂ.",
+      "കൂടുതൽ അറിയുന്നതിനായി ഇഷ്ടമുള്ള മൂന്ന് ജോലികൾ വരെ തിരഞ്ഞെടുക്കൂ.",
+      "വിഷയങ്ങളെയും മുന്നോട്ടുള്ള പഠനത്തെയും കുറിച്ച് ചർച്ച ചെയ്യാൻ പഠനവിവരങ്ങൾ ചേർക്കൂ."
+    ],
+    "grade10": [
+      "ഏത് വിഷയങ്ങളും പഠനവഴികളും പല കരിയർ മേഖലകൾ തുറന്നുവയ്ക്കുമെന്ന് താരതമ്യം ചെയ്യൂ.",
+      "നിർദേശങ്ങൾ വീട്ടുകാരോടോ അധ്യാപകരോടോ കൗൺസിലറോടോ ചർച്ച ചെയ്യൂ.",
+      "മുന്നോട്ടുള്ള പഠനത്തെക്കുറിച്ച് ചർച്ച ചെയ്യാൻ സ്ഥലവും ഫീസ് സംബന്ധിച്ച മുൻഗണനയും ചേർക്കൂ."
+    ],
     "grade11": [
       "ഇപ്പോഴത്തെ വിഷയങ്ങളുമായി ബന്ധപ്പെട്ട പല കരിയറുകളും കണ്ടെത്തൂ.",
       "ഒരു ചെറിയ പ്രോജക്ട് ചെയ്യൂ അല്ലെങ്കിൽ ആ ജോലി അറിയുന്ന ഒരാളോട് സംസാരിക്കൂ.",

@@ -39,6 +39,12 @@ it('imports only draft content and keeps storage identity separate from logical 
   expect(imported).toMatchObject({ definitionId: 'career-discovery', documentId: 'career-discovery-v3-1-0', status: 'draft', published: false });
   expect(imported).not.toHaveProperty('review');
   expect(imported).not.toHaveProperty('versionControl');
-  expect(assessmentDefinitionsConfig.fromFirestore({ ...definition(), id: 'career-discovery' }, 'career-discovery')).toMatchObject({ id: 'career-discovery-v3-1-0', definitionId: 'career-discovery' });
+  expect(assessmentDefinitionsConfig.fromFirestore({ ...definition(), id: 'career-discovery' }, 'career-discovery')).toMatchObject({ id: 'career-discovery', definitionId: 'career-discovery' });
   expect(() => importAssessmentDraft({ ...definition(), translations: { en: {} } })).toThrow('requires grade labels');
+});
+
+it('preserves distinct storage identities even when assessment content shares a documentId', () => {
+  const content = definition();
+  const records = ['career-discovery-v3-1-0', 'assessment-fixture-positive', 'assessment-fixture-negative'].map(id => assessmentDefinitionsConfig.fromFirestore({ ...content }, id));
+  expect(records.map(record => assessmentDefinitionsConfig.getId(record))).toEqual(['career-discovery-v3-1-0', 'assessment-fixture-positive', 'assessment-fixture-negative']);
 });

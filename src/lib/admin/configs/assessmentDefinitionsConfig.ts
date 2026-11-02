@@ -52,5 +52,5 @@ export const assessmentDefinitionsConfig: AdminConfig<AssessmentDefinitionAdmin>
   availableStatuses: ['all', 'draft', 'inReview', 'published', 'archived'], getAvailableDomains: () => ['all', 'career-discovery'],
   validateEntity: (record) => /^\d+\.\d+\.\d+$/.test(record.version || '') ? null : 'A semantic version such as 3.1.1 is required.',
   toFirestore: (record) => { const { id: _id, ...content } = record; void _id; return content; },
-  fromFirestore: (data, id) => ({ ...emptyAssessmentDefinition(), ...data, id: String(data.documentId || id), definitionId: 'career-discovery' }) as AssessmentDefinitionAdmin,
+  fromFirestore: (data, id) => ({ ...emptyAssessmentDefinition(), ...data, id, definitionId: 'career-discovery' }) as AssessmentDefinitionAdmin,
 };
