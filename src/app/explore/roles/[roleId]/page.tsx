@@ -301,7 +301,7 @@ function DreamCareerContent() {
           <div className="mx-auto max-w-5xl rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10 lg:p-12">
             <Link href={backHref} className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-primary"><ArrowLeft className="h-4 w-4" />{text.back}</Link>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
-            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-primary sm:text-6xl">{missingGuideCareer.title}</h1>
+            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-primary sm:text-4xl">{missingGuideCareer.title}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
             <p className="mt-8 max-w-2xl rounded-2xl bg-muted/55 px-5 py-4 text-foreground sm:px-6">{stateText.guideUnavailable}</p>
           </div>
@@ -364,8 +364,8 @@ function DreamCareerContent() {
                   {!MVP_NAVIGATION_ENABLED && isSelected ? <Badge className="bg-emerald-700 text-white hover:bg-emerald-700"><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />{journeyText.selected}</Badge> : null}
                 </div>
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{hasReviewedGuidance ? text.overview : journeyText.overview}</p>
-                <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-5xl lg:text-6xl">{response.career.title}</h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl sm:leading-9">{response.career.summary}</p>
+                <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-4xl lg:text-5xl">{response.career.title}</h1>
+                <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{response.career.summary}</p>
               </div>
               {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
               {returnAreaId && from !== 'explore' && from !== 'dashboard' ? <Button asChild size="lg" className="rounded-full"><Link href={backHref}>{journeyText.continue}</Link></Button> : null}

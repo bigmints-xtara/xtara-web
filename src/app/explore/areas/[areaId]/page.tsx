@@ -7,8 +7,9 @@ import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Compass, Loader2, Plus
 
 import CareerPreviewDialog from "@/components/careers/CareerPreviewDialog";
 import Footer from "@/components/Footer";
+import styles from '@/components/journey/journey.module.css';
+import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
@@ -37,12 +38,12 @@ const copy = {
   "en": {
     "lockedTitle": "Choose a Career Direction from your results first",
     "lockedDescription": "Complete the assessment, then choose one of the Career Directions suggested for you.",
-    "results": "Back to my Career Directions",
+    "results": "Back to results",
     "selectedDirection": "Selected Career Direction",
-    "title": "Choose your Dream Careers",
+    "title": "What would you like to explore?",
     "description": "Choose one to three careers you want to understand better. You can change these choices at any time.",
     "selected": "selected",
-    "max": "You can choose up to three Dream Careers.",
+    "max": "Choose up to three careers. You can change them later.",
     "details": "View career details",
     "build": "Build My Career Path",
     "chooseOne": "Choose at least one Dream Career to continue.",
@@ -139,6 +140,7 @@ export default function CareerDirectionPage() {
   const rawSelectedIds = selectionOverride ?? (plan?.areaId === areaId ? plan.dreamCareerIds : []);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [query, setQuery] = useState("");
   const [preview, setPreview] = useState<DreamCareerView | null>(null);
 
   useEffect(() => {
@@ -254,62 +256,53 @@ export default function CareerDirectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={styles.surface}>
       <Header />
-      <main className="px-5 py-10 pb-28 sm:py-14 sm:pb-28">
+      <main className={styles.shell}>
+        <JourneySteps step={2} locale={locale} />
         <div className="mx-auto max-w-6xl">
           <Link href="/assessment/discovery" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-4 w-4" />{text.results}
           </Link>
 
-          <section className="mt-7 flex items-center gap-4 rounded-2xl border border-border bg-card px-4 py-4 sm:px-5">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary">
-              <Compass className="h-6 w-6" />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary/70">{text.selectedDirection}</p>
-              <h1 className="mt-1 text-xl font-semibold leading-tight text-primary sm:text-2xl">{direction.title}</h1>
-            </div>
+          <section className={styles.directionContext}>
+            <span><Compass className="h-5 w-5" aria-hidden="true" /></span>
+            <div><p>{text.selectedDirection}</p><h1>{direction.title}</h1></div>
           </section>
 
           <section className="mt-8" aria-labelledby="dream-careers-title">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 id="dream-careers-title" className="text-2xl font-semibold text-primary sm:text-3xl">{text.title}</h2>
+                <h2 id="dream-careers-title" className={styles.heading}>{text.title}</h2>
                 <p className="mt-2 text-sm text-muted-foreground">{text.max}</p>
               </div>
-              <Badge variant="secondary" className="w-fit rounded-full px-4 py-2 text-sm">{selectedIds.length} / 3 {text.selected}</Badge>
+
             </div>
 
             {loading && !careers.length ? <p className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />{text.loading}</p> : null}
-            <div className="mt-6 grid gap-3 md:grid-cols-2">
-              {careers.map((career) => {
+            <label className="mt-6 block text-sm font-medium">{({ en: 'Find a career', ml: 'കരിയർ കണ്ടെത്തൂ', hi: 'करियर खोजें', ta: 'தொழிலைத் தேடுங்கள்' })[locale]}
+              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} className={`${styles.search} mt-2 block w-full border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`} />
+            </label>
+            {careers.length > 0 && !careers.some((career) => `${career.title} ${career.englishTitle || ''}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())) ? <p role="status" className="mt-6">{({ en: 'No careers found. Try another name.', ml: 'കരിയറുകൾ കണ്ടെത്താനായില്ല. മറ്റൊരു പേര് പരീക്ഷിക്കൂ.', hi: 'कोई करियर नहीं मिला। दूसरा नाम खोजें।', ta: 'தொழில்கள் கிடைக்கவில்லை. வேறு பெயரைத் தேடுங்கள்.' })[locale]}</p> : null}
+            <div className={styles.careerGrid}>
+              {careers.filter((career) => `${career.title} ${career.englishTitle || ""}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).map((career) => {
                 const selected = selectedIds.includes(career.id);
                 return (
-                  <Card key={career.id} className={`overflow-hidden shadow-none transition ${selected ? "border-primary bg-primary/[0.035] ring-2 ring-primary/10" : "border-border hover:border-primary/35"}`}>
-                    <CardContent className="flex items-center gap-3 p-3">
-                      <button type="button" disabled={saving} onClick={() => openPreview(career)} className="group flex min-w-0 flex-1 items-center gap-3 rounded-xl p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${selected ? "bg-primary text-white" : "bg-primary/5 text-primary"}`}>
-                          {selected ? <Check className="h-5 w-5" /> : <BriefcaseBusiness className="h-5 w-5" />}
+                  <Card key={career.id} className={styles.careerCard} data-selected={selected}>
+                    <CardContent className={styles.careerBody}>
+                      <div className={styles.cardToolbar}><span className={styles.careerIcon} aria-hidden="true"><BriefcaseBusiness size={23} strokeWidth={1.5} /></span>                      <Button type="button" variant={selected ? "default" : "outline"} className={styles.selectButton} disabled={saving} onClick={() => void toggle(career.id)} aria-pressed={selected} aria-label={`${selected ? ({ en: "Remove", ml: "നീക്കുക", hi: "हटाएँ", ta: "நீக்கு" })[locale] : ({ en: "Choose", ml: "തിരഞ്ഞെടുക്കൂ", hi: "चुनें", ta: "தேர்ந்தெடுக்கவும்" })[locale]} ${career.title}`}>
+                        {selected ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
+                        {selected ? ({ en: 'Remove', ml: 'നീക്കുക', hi: 'हटाएँ', ta: 'நீக்கு' })[locale] : ({ en: 'Choose', ml: 'തിരഞ്ഞെടുക്കൂ', hi: 'चुनें', ta: 'தேர்ந்தெடுக்கவும்' })[locale]}
+                      </Button></div>
+                      <button type="button" disabled={saving} onClick={() => openPreview(career)} className={styles.careerRead} aria-label={career.title}>
+
+                        <span><span className={styles.careerTitle}>{career.title}</span>
+                          {locale !== "en" && career.englishTitle ? <span className="mt-1 block text-xs text-muted-foreground">{career.englishTitle}</span> : null}
+                          <span className={styles.careerSummary}>{career.summary}</span>
                         </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-base font-semibold leading-snug text-primary">{career.title}</span>
-                          {locale !== "en" && career.englishTitle ? <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{career.englishTitle}</span> : null}
-                        </span>
-                        <ArrowRight className="h-4 w-4 shrink-0 text-primary/45 transition group-hover:translate-x-0.5 group-hover:text-primary" />
+                        <span className={styles.details}>{text.details}<ArrowRight size={14} aria-hidden="true" /></span>
                       </button>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant={selected ? "default" : "outline"}
-                        className="h-11 w-11 shrink-0 rounded-full"
-                        disabled={saving}
-                        onClick={() => void toggle(career.id)}
-                        aria-pressed={selected}
-                        aria-label={`${selected ? "Remove" : "Choose"} ${career.title}`}
-                      >
-                        {selected ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
-                      </Button>
+
                     </CardContent>
                   </Card>
                 );
@@ -323,9 +316,9 @@ export default function CareerDirectionPage() {
               ta: 'இந்தத் திசையில் பரிந்துரைக்கப்பட்ட தொழில்கள் இன்னும் கிடைக்கவில்லை.',
             })[locale]}</p> : null}
 
-            <div className="sticky bottom-24 z-20 xl:bottom-4 mt-8 rounded-2xl border border-border bg-card/95 p-4 shadow-lg backdrop-blur sm:flex sm:items-center sm:justify-between sm:gap-5">
-              <p className="font-semibold text-primary">{selectedIds.length} / 3 {text.selected}</p>
-              <Button size="lg" className="mt-4 w-full rounded-xl sm:mt-0 sm:w-auto" disabled={saving || !selectedIds.length} onClick={continueToSummary}>
+            <div className={styles.selectionBar}>
+              <div><p className="text-sm font-semibold" aria-live="polite" aria-label={`${selectedIds.length} / 3 ${text.selected}`}>{selectedIds.length} / 3</p><p className={styles.selectionNames}>{careers.filter((career) => selectedIds.includes(career.id)).map((career) => career.title).join(', ') || text.chooseOne}</p></div>
+              <Button size="lg" className="min-h-11" disabled={saving || !selectedIds.length} onClick={continueToSummary}>
                 {saving ? text.saving : ({ en: 'Continue', ml: 'തുടരൂ', hi: 'आगे बढ़ें', ta: 'தொடர்க' })[locale]}{saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </div>

@@ -34,6 +34,12 @@ describe('API-backed career direction page', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Back to careers' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByRole('button', { name: 'Remove Aeronautical Engineer' })).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'no-such-career' } });
+    expect(screen.getByRole('status')).toHaveTextContent('No careers found');
+    expect(loadDirectionPlan()?.dreamCareerIds).toEqual(['aeronautical-engineer']);
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+    fireEvent.change(screen.getByRole('searchbox'), { target: { value: '' } });
+    expect(screen.getByRole('button', { name: 'Remove Aeronautical Engineer' })).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(mocks.push).toHaveBeenCalledWith('/assessment/save');
     view.unmount();

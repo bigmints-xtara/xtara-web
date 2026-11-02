@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
+import styles from '@/components/journey/journey.module.css';
+import JourneySteps from '@/components/journey/JourneySteps';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -70,19 +72,22 @@ export default function SaveChoicesPage() {
       router.replace('/dashboard');
     } catch { if (current()) { setSaveError(true); setSaving(false); } }
   };
-  return <div className="min-h-screen bg-background text-foreground"><Header /><main className="mx-auto max-w-2xl px-5 py-10 pb-28 sm:py-16">
+  return <div className={styles.surface}><Header /><main className={styles.shell}><JourneySteps step={3} locale={locale} />
     {authLoading || !loaded ? <p role="status" className="flex items-center gap-3"><Loader2 className="h-5 w-5 animate-spin" />{text.loading}</p>
       : error ? <div><p role="alert">{text.error}</p><Button className="mt-4" onClick={() => setAttempt((n) => n + 1)}>{text.retry}</Button></div>
       : !summary ? <div><h1 className="text-2xl font-semibold">{text.empty}</h1><Button asChild className="mt-5"><Link href="/assessment/discovery">{text.results}</Link></Button></div>
       : <>
         <Link href={`/explore/areas/${encodeURIComponent(summary.plan.areaId)}`} className="inline-flex items-center gap-2 text-sm font-medium"><ArrowLeft className="h-4 w-4" />{text.back}</Link>
-        <h1 className="mt-7 text-3xl font-semibold sm:text-4xl">{text.title}</h1><p className="mt-3 leading-7 text-muted-foreground">{text.description}</p>
-        <section className="mt-8 rounded-2xl border border-border bg-card p-6"><h2 className="text-sm font-medium text-muted-foreground">{text.direction}</h2><p className="mt-2 text-xl font-semibold">{summary.direction}</p>
-          <h2 className="mt-7 text-sm font-medium text-muted-foreground">{text.careers}</h2><ul className="mt-3 divide-y divide-border">{summary.careers.map((career) => <li key={career.id} className="flex items-center gap-3 py-4"><Check className="h-5 w-5 shrink-0 text-primary" /><span className="font-medium">{career.title}</span></li>)}</ul>
-        </section>
+        <div className={styles.summaryLayout}>
+        <div><h1 className={styles.heading}>{text.title}</h1><p className={styles.intro}>{text.description}</p>
+        </div>
+        <section className={styles.summaryReceipt}>
+          <div className={styles.receiptHeader}><h2 className="text-xs font-semibold uppercase tracking-wider">{text.direction}</h2><p>{summary.direction}</p></div>
+          <div className={styles.receiptCareers}><h2 className="text-sm text-muted-foreground">{text.careers}</h2><ul>{summary.careers.map((career) => <li key={career.id}><Check size={20} /><span className="font-medium">{career.title}</span></li>)}</ul>
         {owner ? <Button size="lg" className="mt-7 w-full" disabled={saving} onClick={() => void save()}>{saving ? text.saving : text.save}</Button>
           : <div className="mt-7"><p className="text-sm leading-6 text-muted-foreground">{text.guest}</p><Button asChild size="lg" className="mt-4 w-full"><Link href={signupHref}>{text.save}</Link></Button><Link className="mt-4 block text-center text-sm underline underline-offset-4" href={loginHref}>{text.login}</Link></div>}
         {saveError ? <p role="alert" className="mt-4 text-destructive">{text.failed}</p> : null}
+        </div></section></div>
       </>}
   </main></div>;
 }

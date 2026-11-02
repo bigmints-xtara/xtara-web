@@ -1,5 +1,6 @@
 "use client";
 
+import styles from '@/components/journey/journey.module.css';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
@@ -186,14 +187,14 @@ export default function UserDashboard() {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-5 py-8 pb-28 sm:py-10 xl:pb-20">
+    <main className={styles.dashboard}>
       <p className="text-sm font-medium text-muted-foreground">{greeting}</p>
       <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-primary sm:text-4xl">{MVP_NAVIGATION_ENABLED ? mvpNavigationCopy[locale].myDirection : text.title}</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{text.nextStepsDescription}</p>
 
       <section
         data-testid="career-direction-hero"
-        className="relative -mx-5 mt-8 overflow-hidden bg-primary text-white sm:mx-0"
+        className={styles.dashboardHero}
         aria-labelledby="career-direction-title"
       >
         <div className="pointer-events-none absolute -right-20 -top-28 h-72 w-72 rounded-full border border-white/10 bg-white/[0.04]" />
@@ -245,15 +246,15 @@ export default function UserDashboard() {
       <section className="mt-7" aria-labelledby="dream-careers-title">
         <h2 id="dream-careers-title" className="text-xl font-semibold tracking-[-0.02em] text-primary sm:text-2xl">{text.dreamCareers}</h2>
         {selectedCareers.length ? (
-          <ol data-testid="dream-career-list" className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <ol data-testid="dream-career-list" className={styles.savedCareers}>
             {selectedCareers.map((career, index) => (
               <li key={career.id}>
                 <Link
                   href={`/dream-careers/${career.id}?from=dashboard`}
-                  className="group flex min-h-20 h-full items-center gap-4 rounded-2xl border border-primary/10 bg-card px-4 py-4 text-primary transition hover:border-primary/25 hover:bg-secondary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className={`${styles.dashboardCareer} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`}
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary/25 text-sm font-semibold">{index + 1}</span>
-                  <span className="min-w-0 flex-1 text-sm font-semibold leading-5 sm:text-base">{career.title}</span>
+                  <span className="min-w-0 flex-1"><span className={styles.careerTitle}>{career.title}</span>{MVP_NAVIGATION_ENABLED ? <span className={styles.careerSummary}>{career.summary}</span> : null}</span>
                   <ArrowRight className="h-4 w-4 shrink-0 text-primary/50 transition group-hover:translate-x-0.5 group-hover:text-primary" />
                 </Link>
               </li>
@@ -270,7 +271,7 @@ export default function UserDashboard() {
         <WeeklyPlanCard />
       </section> : null}
 
-      <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? "max-w-xl" : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
+      <section id="next-steps" className={`mt-8 grid scroll-mt-24 gap-5 ${MVP_NAVIGATION_ENABLED ? styles.conversation : "lg:grid-cols-[minmax(0,1fr)_19rem]"}`}>
             {!MVP_NAVIGATION_ENABLED ? <Card className="border-primary/10 shadow-none"><CardContent className="p-6 sm:p-8">
               <div className="flex items-center justify-between gap-4"><div><h2 className="text-2xl font-semibold text-primary">{text.myNextSteps}</h2><p className="mt-2 text-sm text-muted-foreground">{stepsDone}</p></div><span className="text-2xl font-semibold text-primary">{completedSteps}/{totalSteps}</span></div>
               {experience?.nextBest ? (
