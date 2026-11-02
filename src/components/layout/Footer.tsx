@@ -2,9 +2,16 @@
 
 import Link from "next/link";
 import { useTranslations } from "@/i18n/language-provider";
+import { useAuth } from '@/context/AuthContext';
+import { useOrganizationWorkspace } from '@/context/OrganizationContext';
+import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from '@/lib/mvp-navigation';
 
 export default function Footer() {
-    const { t } = useTranslations();
+    const { t, locale } = useTranslations();
+    const { user } = useAuth();
+    const { isStaff, loading, error } = useOrganizationWorkspace();
+    const studentMvp = MVP_NAVIGATION_ENABLED && Boolean(user) && !isStaff;
+    const copy = mvpNavigationCopy[locale];
     const year = new Date().getFullYear();
 
     return (
@@ -23,6 +30,12 @@ export default function Footer() {
                     <div>
                         <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-3">{t("footer.quickLinksTitle")}</h4>
                         <ul className="space-y-2">
+                            {studentMvp && !loading && !error && [
+                                { href: '/dashboard', label: copy.myDirection },
+                                { href: '/explore', label: copy.exploreCareers },
+                                { href: '/profile', label: copy.profile },
+                            ].map(({ href, label }) => <li key={href}><Link href={href} className="text-gray-400 hover:text-white text-sm transition-colors">{label}</Link></li>)}
+                            {!studentMvp && <>
                             <li>
                                 <Link href="/about" className="text-gray-400 hover:text-white text-sm transition-colors">
                                     {t("footer.links.about")}
@@ -33,6 +46,7 @@ export default function Footer() {
                                     {t("footer.links.news")}
                                 </Link>
                             </li>
+                            </>}
                             <li>
                                 <Link href="/contact" className="text-gray-400 hover:text-white text-sm transition-colors">
                                     {t("footer.links.contact")}
