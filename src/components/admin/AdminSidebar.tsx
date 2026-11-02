@@ -1,4 +1,5 @@
 'use client';
+import { isAdminMvpRouteEnabled } from '@/lib/admin-mvp';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -130,7 +131,8 @@ export default function AdminSidebar({
         {groups.map((group) => ({
           ...group,
           items: group.items.filter((item) => (
-            (item.href !== '/admin/settings' || managesSystem)
+            isAdminMvpRouteEnabled(item.href)
+        && (item.href !== '/admin/settings' || managesSystem)
             && (item.href !== '/admin/users' || managesUsers)
           )),
         })).filter((group) => group.items.length > 0).map((group) => (

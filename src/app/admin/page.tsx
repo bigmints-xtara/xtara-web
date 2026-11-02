@@ -1,11 +1,12 @@
 'use client';
+import { isAdminMvpRouteEnabled } from '@/lib/admin-mvp';
+import { MVP_NAVIGATION_ENABLED } from '@/lib/mvp-navigation';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
   BookOpen,
-  Bot,
   Building2,
   FileText,
   Gamepad2,
@@ -28,6 +29,9 @@ type Stats = {
 };
 
 const modules = [
+  { title: 'MVP readiness', description: 'Review launch coverage and missing content', href: '/admin/mvp-readiness', key: '', icon: ShieldCheck },
+  { title: 'Assessment definitions', description: 'Manage the grades 8–12 assessment', href: '/admin/assessment-definitions', key: 'assessment_definitions', icon: FileText },
+  { title: 'Career sources', description: 'Verify evidence behind career guidance', href: '/admin/career-sources', key: 'career_sources', icon: FileText },
   { title: 'Stories', description: 'Career narratives and slide content', href: '/admin/stories', key: 'stories', icon: BookOpen },
   { title: 'Good reads', description: 'Articles and external learning resources', href: '/admin/good-reads', key: 'good-reads', icon: FileText },
   { title: 'Sparks', description: 'Short motivational learning moments', href: '/admin/sparks', key: 'sparks', icon: Sparkles },
@@ -43,6 +47,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
+    if (MVP_NAVIGATION_ENABLED) return;
     let active = true;
     xtaraApi.get<Stats>('/admin/content/stats')
       .then((value) => active && setStats(value))
@@ -63,20 +68,20 @@ export default function AdminDashboard() {
             <Badge className="mb-4 border-white/20 bg-white/10 text-white" variant="outline">Platform workspace</Badge>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Run Xtara from one clear workspace.</h1>
             <p className="mt-3 max-w-xl text-sm leading-6 text-primary-foreground/75 sm:text-base">
-              Curate content, review guidance data, and ask the admin assistant to complete operational work for you.
+              Manage the grades 8–12 assessment, career directions, career guides and launch review.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild className="bg-white text-primary hover:bg-white/90">
-                <Link href="/admin/assistant"><Bot /> Open admin assistant</Link>
+                <Link href="/admin/mvp-readiness"><ShieldCheck /> Review MVP readiness</Link>
               </Button>
               <Button asChild className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white" variant="outline">
-                <Link href="/admin/good-reads">Create content <ArrowRight /></Link>
+                <Link href="/admin/assessment-definitions">Manage assessment <ArrowRight /></Link>
               </Button>
             </div>
           </div>
         </section>
 
-        {stats ? (
+        {stats && !MVP_NAVIGATION_ENABLED ? (
           <section className="grid gap-4 sm:grid-cols-3" aria-label="Content totals">
             <Card className="gap-2 py-5 shadow-none">
               <CardHeader className="px-5"><CardDescription>Total content</CardDescription><CardTitle className="text-3xl">{stats.grandTotal}</CardTitle></CardHeader>
@@ -96,7 +101,7 @@ export default function AdminDashboard() {
             <p className="text-sm text-muted-foreground">Open a workspace to review and manage its records.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {modules.map((module) => {
+            {modules.filter((module) => isAdminMvpRouteEnabled(module.href)).map((module) => {
               const Icon = module.icon;
               return (
                 <Link className="group" href={module.href} key={module.href}>

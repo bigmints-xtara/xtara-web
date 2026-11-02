@@ -16,6 +16,17 @@ describe("admin workspace routing", () => {
     vi.mocked(useRouter).mockReturnValue({ replace, refresh: vi.fn() } as never);
   });
 
+  it('blocks deferred deep links without mounting preserved editors', () => {
+    vi.mocked(usePathname).mockReturnValue('/admin/games/existing-record');
+    mocks.useAuth.mockReturnValue({ user: { uid: 'admin' }, userProfile: { adminRole: 'super_admin' }, loading: false });
+    render(<AdminLayout><p>Hidden game editor</p></AdminLayout>);
+    expect(screen.getByRole('heading', { name: 'This workspace is paused for the MVP.' })).toBeInTheDocument();
+    expect(screen.queryByText('Hidden game editor')).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Games' })).toBeNull();
+    expect(screen.queryByRole('link', { name: /assistant/i })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Assessment definitions' })).toBeInTheDocument();
+  });
+
   it("shows the dedicated admin login at /admin when signed out", () => {
     mocks.useAuth.mockReturnValue({ user: null, userProfile: null, loading: false, configurationError: null });
     render(<AdminLayout><p>Private admin content</p></AdminLayout>);
