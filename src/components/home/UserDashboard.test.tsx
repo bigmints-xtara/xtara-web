@@ -1,3 +1,5 @@
+import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
+import { createEmptyFutureDirection } from '@/lib/admin/configs/futureDirectionsConfig';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -110,6 +112,29 @@ describe('pursued-area learner dashboard', () => {
   afterEach(() => {
     if (root) act(() => root.unmount());
     container?.remove();
+  });
+
+  it('shows a selected reciprocal career outside the result preview', async () => {
+    const career = { ...createEmptyDreamCareer(), id: 'fourth-career', futureDirectionIds: ['design'] };
+    career.translations.en.title = 'Fourth API Career';
+    const remote = { ...assessment, catalogSnapshot: {
+      directions: [{ ...createEmptyFutureDirection(), id: 'design', roleIds: ['fourth-career'] }], roles: [career],
+    } };
+    localStorage.setItem(assessmentV2StorageKey, JSON.stringify(remote));
+    localStorage.setItem(directionStorageKey, JSON.stringify(setDreamCareers(createAreaDirectionPlan('design'), ['fourth-career'])));
+    await act(async () => { root.render(<UserDashboard />); });
+    expect(container.textContent).toContain('Fourth API Career');
+  });
+
+  it('hides cached direction while account hydration fails and permits retry', async () => {
+    mocks.hydrate.mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(null);
+    await act(async () => { root.render(<UserDashboard />); });
+    expect(container.querySelector('[role="alert"]')).not.toBeNull();
+    expect(container.textContent).not.toContain('UX Designer');
+    const retry = container.querySelector('button');
+    await act(async () => { retry?.click(); });
+    expect(mocks.hydrate).toHaveBeenCalledTimes(2);
+    expect(container.querySelector('[role="alert"]')).toBeNull();
   });
 
   it('keeps direction, careers and conversation without fetching hidden engagement data in MVP', async () => {

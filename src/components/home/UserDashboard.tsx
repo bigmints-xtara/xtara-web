@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
-import { assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
+import { getAssessmentV2Catalog, assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
 import { getCareerRole } from "@/lib/career-knowledge";
 import {
   type CareerConversationCareer,
@@ -59,6 +59,8 @@ export default function UserDashboard() {
   const { user, userProfile } = useAuth();
   const { locale } = useTranslations();
   const text = dashboardCopy[locale];
+  const [accountLoad, setAccountLoad] = useState<{ owner?: string; error: boolean }>({ error: false });
+  const [retryAccount, setRetryAccount] = useState(0);
   const [conversationOpen, setConversationOpen] = useState(false);
   const [rewards, setRewards] = useState<RewardSummary>({ points: 0, medals: 0, level: "Starter" });
   const [experience, setExperience] = useState<MyCareerPathExperience | null>(null);
@@ -69,10 +71,17 @@ export default function UserDashboard() {
   const result = useMemo(() => storedResult ? localizeDiscoveryResult(storedResult, locale) : null, [locale, storedResult]);
   const plan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
   const focusedDirection = result?.areas.find((area) => area.id === plan?.areaId) ?? null;
-  const selectedCareers = useMemo(
-    () => focusedDirection?.roles.filter((career) => plan?.dreamCareerIds.includes(career.id)) ?? [],
-    [focusedDirection, plan?.dreamCareerIds],
-  );
+  const selectedCareers = useMemo(() => {
+    const graph = storedResult?.catalogSnapshot;
+    if (!graph) return focusedDirection?.roles.filter((career) => plan?.dreamCareerIds.includes(career.id)) ?? [];
+    const direction = graph.directions.find((item) => item.id === plan?.areaId);
+    return (plan?.dreamCareerIds ?? []).flatMap((id) => {
+      const career = graph.roles.find((item) => item.id === id);
+      if (!career || !direction?.roleIds.includes(id) || !career.futureDirectionIds.includes(direction.id)) return [];
+      const translation = career.translations[locale] || career.translations.en;
+      return [{ id, title: translation.title, summary: translation.summary }];
+    });
+  }, [storedResult, focusedDirection, plan, locale]);
   const curatedCareers = storedResult?.catalogSnapshot?.roles ?? [];
   const courseQueries = storedResult && focusedDirection
     ? getDirectionCourseQueries(storedResult, focusedDirection.id).slice(0, 6)
@@ -81,8 +90,14 @@ export default function UserDashboard() {
   const isAnonymous = user?.isAnonymous;
 
   useEffect(() => {
-    if (userId) void hydrateDiscoveryFromAccount();
-  }, [userId]);
+    if (!userId || isAnonymous) return;
+    let active = true;
+    setAccountLoad({ error: false });
+    hydrateDiscoveryFromAccount()
+      .then(() => { if (active) setAccountLoad({ owner: userId, error: false }); })
+      .catch(() => { if (active) setAccountLoad({ owner: userId, error: true }); });
+    return () => { active = false; };
+  }, [userId, isAnonymous, retryAccount]);
 
   useEffect(() => {
     if (MVP_NAVIGATION_ENABLED || !userId || isAnonymous) return;
@@ -114,6 +129,9 @@ export default function UserDashboard() {
       .catch(() => undefined);
     return () => { active = false; };
   }, [isAnonymous, locale, rawPlan, userId]);
+
+  if (userId && !isAnonymous && accountLoad.owner !== userId) return <div className="p-8" role="status">{getAssessmentV2Catalog(locale).ui.loading}</div>;
+  if (accountLoad.error) return <div className="p-8"><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></div>;
 
   if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
   if (!focusedDirection) return <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />;

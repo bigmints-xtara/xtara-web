@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import PathwayPersonalizationPage from "@/app/assessment/pathway/page";
 import { buildDiscoveryResult, saveDiscoveryResult } from "@/lib/assessment-v2";
-import { createAreaDirectionPlan, saveDirectionPlan, setDreamCareers } from "@/lib/direction";
-import { savePendingDiscoveryToAccount } from "@/lib/discovery-save";
-import { savePathwayProfile } from "@/lib/pathway-profile";
+import { createAreaDirectionPlan, loadDirectionPlan, saveDirectionPlan, setDreamCareers } from "@/lib/direction";
+import { hydrateDiscoveryFromAccount, savePendingDiscoveryToAccount } from "@/lib/discovery-save";
+import { loadPathwayProfile, savePathwayProfile } from "@/lib/pathway-profile";
 import { LanguageProvider } from "@/i18n/language-provider";
 
 const mocks = vi.hoisted(() => ({
@@ -19,6 +19,7 @@ vi.mock("@/context/AuthContext", () => ({
 
 vi.mock("@/lib/discovery-save", () => ({
   savePendingDiscoveryToAccount: vi.fn(),
+  hydrateDiscoveryFromAccount: vi.fn(),
 }));
 
 vi.mock("@/lib/firebase/location", () => ({
@@ -85,6 +86,15 @@ describe("pathway account continuation", () => {
       affordability: "We can consider moderate fees",
       scholarshipInterest: "Maybe, show me what is available",
     });
+    vi.mocked(hydrateDiscoveryFromAccount).mockResolvedValue({ assessment: result, directionPlan: loadDirectionPlan(), pathwayProfile: loadPathwayProfile() });
+  });
+
+  it('does not render cached pathway details when the account API fails', async () => {
+    vi.mocked(hydrateDiscoveryFromAccount).mockRejectedValue(new Error('offline'));
+    render(<LanguageProvider initialLocale="en"><PathwayPersonalizationPage /></LanguageProvider>);
+    await screen.findByRole('alert');
+    expect(screen.queryByRole('button', { name: 'Save and continue' })).toBeNull();
+    expect(screen.queryByDisplayValue('Kochi')).toBeNull();
   });
 
   it("saves and reads back location before opening Dashboard", async () => {

@@ -323,3 +323,7 @@ For issues or questions:
 - Check [Cloud Run Documentation](https://cloud.google.com/run/docs)
 - Review [Next.js Docker Documentation](https://nextjs.org/docs/deployment#docker-image)
 - Contact: help@xtara.ai
+
+### Required API session origin configuration
+
+Set `XTARA_WEB_ORIGINS` on **xtara-api** to the exact HTTPS web origin(s), comma-separated, including every supported custom domain. A web rewrite preserves the browser Origin while the API request URL may use its Cloud Run hostname. Session creation requires `Content-Type: application/json` and accepts only same-origin or configured browser origins. Native JSON clients without an Origin remain supported. Localhost defaults are development-only; never add them to production configuration. Verify login through the deployed `/xtara-service` proxy before routing traffic to a new release.

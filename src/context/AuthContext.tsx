@@ -1,5 +1,6 @@
 "use client";
 
+import { reconcileDiscoveryCacheOwner } from "@/lib/discovery-cache-owner";
 import React, { createContext, useContext, useEffect } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (configurationError) return;
     const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (authUser) => {
+      reconcileDiscoveryCacheOwner(authUser && !authUser.isAnonymous ? authUser.uid : null);
       setUser(authUser);
       setLoading(false);
       if (authUser) {

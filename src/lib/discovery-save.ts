@@ -1,3 +1,4 @@
+import { markDiscoveryCacheOwner, preserveAnonymousDiscoveryDraft } from "@/lib/discovery-cache-owner";
 import { xtaraApi } from "@/lib/api/client";
 import { createApiSession } from "@/lib/api/auth";
 import { evaluateAssessmentOnServer, getActiveAssessmentDefinition } from "@/lib/assessment-api";
@@ -18,6 +19,7 @@ import {
 } from "@/lib/pathway-profile";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import {
+  directionStorageKey,
   getDirectionSnapshot,
   parseDirectionPlan,
   saveDirectionPlan,
@@ -65,7 +67,7 @@ export async function savePendingDiscoveryToAccount(userId: string): Promise<boo
   }
   const [latestBeforeSave, directionBeforeSave] = await Promise.all([
     getLatestAssessment(userId).catch(() => null),
-    getDirectionFromApi(userId).catch(() => null),
+    getDirectionFromApi(userId),
   ]);
   if (
     !assessmentMatches(latestBeforeSave, bundle.assessment)
@@ -94,6 +96,7 @@ export async function savePendingDiscoveryToAccount(userId: string): Promise<boo
   }
 
   assertOwner(userId);
+  markDiscoveryCacheOwner(userId);
   saveDiscoveryResult({ ...bundle.assessment, syncStatus: "synced" });
   saveDirectionPlan(savedDirection!);
   return true;
@@ -110,6 +113,7 @@ export async function savePendingAssessmentToAccount(userId: string): Promise<bo
     throw new Error("Your assessment was not returned by account readback.");
   }
   assertOwner(userId);
+  markDiscoveryCacheOwner(userId);
   saveDiscoveryResult({ ...assessment, syncStatus: "synced" });
   return true;
 }
@@ -137,6 +141,7 @@ async function persistCareerChoice(
   }
   assertOwner(userId);
   if (markSynced) {
+    markDiscoveryCacheOwner(userId);
     saveDiscoveryResult({ ...assessment, syncStatus: "synced" });
     saveDirectionPlan(savedDirection);
   }
@@ -221,14 +226,22 @@ function assertOwner(userId: string): void {
   if (getFirebaseAuth().currentUser?.uid !== userId) throw new Error('Your sign-in account changed. Please retry from your own account.');
 }
 
-export async function hydrateDiscoveryFromAccount(): Promise<DiscoverySaveBundle | null> {
+export async function hydrateDiscoveryFromAccount(): Promise<{ assessment: DiscoveryResult; pathwayProfile: PathwayProfile | null; directionPlan: DirectionPlan | null } | null> {
   const userId = getFirebaseAuth().currentUser?.uid;
   if (!userId) return null;
   const [response, remoteDirection, userProfile] = await Promise.all([
-    xtaraApi.get<LatestAssessmentResponse>("/assessment/latest", { expectedUserId: userId }).catch(() => ({ assessment: undefined })),
-    getDirectionFromApi(userId).catch(() => null),
-    xtaraApi.get<UserProfileResponse>("/me", { expectedUserId: userId }).catch(() => ({} as UserProfileResponse)),
+    xtaraApi.get<LatestAssessmentResponse>("/assessment/latest", { expectedUserId: userId }),
+    getDirectionFromApi(userId),
+    xtaraApi.get<UserProfileResponse>("/me", { expectedUserId: userId }),
   ]);
+  assertOwner(userId);
+  preserveAnonymousDiscoveryDraft();
+  if (!response.assessment) {
+    for (const key of [assessmentV2StorageKey, directionStorageKey, pathwayProfileStorageKey]) localStorage.removeItem(key);
+    window.dispatchEvent(new Event('xtara:assessment-result-changed'));
+    window.dispatchEvent(new Event('xtara:direction-changed'));
+    return null;
+  }
   const saved = response.assessment?.answers;
   const resultData = saved?.result as Partial<DiscoveryResult> | undefined;
   const pathwayProfile = parsePathwayProfile(
@@ -242,11 +255,10 @@ export async function hydrateDiscoveryFromAccount(): Promise<DiscoverySaveBundle
     || !resultData.traits
     || !resultData.areas
     || !resultData.context
-    || !pathwayProfile
-  ) return null;
+  ) throw new Error("Your saved assessment could not be loaded. Please retry.");
 
   const savedStage = parseOptionalAssessmentStage(typeof saved.stage === "string" ? saved.stage : null);
-  if (!savedStage) return null;
+  if (!savedStage) throw new Error("Your saved assessment grade is invalid. Please retry.");
   const assessment: DiscoveryResult = {
     definitionId: "career-discovery",
     version: String(saved.schemaVersion),
@@ -266,12 +278,18 @@ export async function hydrateDiscoveryFromAccount(): Promise<DiscoverySaveBundle
     syncStatus: "synced",
   };
   assertOwner(userId);
+  markDiscoveryCacheOwner(userId);
   saveDiscoveryResult(assessment);
-  localStorage.setItem(pathwayProfileStorageKey, JSON.stringify(pathwayProfile));
+  if (pathwayProfile) localStorage.setItem(pathwayProfileStorageKey, JSON.stringify(pathwayProfile));
+  else localStorage.removeItem(pathwayProfileStorageKey);
   window.dispatchEvent(new Event("xtara:pathway-profile-changed"));
-  if (!directionPlan || !isDirectionPlanCompatible(assessment, directionPlan)) return null;
-  saveDirectionPlan(directionPlan);
-  return { assessment, pathwayProfile, directionPlan };
+  const validDirection = directionPlan && isDirectionPlanCompatible(assessment, directionPlan) ? directionPlan : null;
+  if (validDirection) saveDirectionPlan(validDirection);
+  else {
+    localStorage.removeItem(directionStorageKey);
+    window.dispatchEvent(new Event('xtara:direction-changed'));
+  }
+  return { assessment, pathwayProfile, directionPlan: validDirection };
 }
 
 function stableJson(value: unknown): string {

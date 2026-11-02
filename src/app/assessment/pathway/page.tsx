@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, LockKeyhole, MapPin } from "lucide-react";
@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { loadDiscoveryResult, localizeDiscoveryResult, type DiscoveryResult } from "@/lib/assessment-v2";
-import { savePendingDiscoveryToAccount } from "@/lib/discovery-save";
+import { hydrateDiscoveryFromAccount, savePendingDiscoveryToAccount } from "@/lib/discovery-save";
 import { getStateDetails, getStates } from "@/lib/firebase/location";
 import {
   emptyPathwayProfile,
@@ -29,7 +29,7 @@ const copy = {
   "en": {
     "eyebrow": "My details",
     "title": "Where do you live and study?",
-    "description": "We use these details to show schools, colleges, courses, and scholarships that may suit you.",
+    "description": "Save your study context and preferences alongside your Career Direction.",
     "state": "State",
     "district": "District",
     "city": "Nearest major city",
@@ -51,7 +51,7 @@ const copy = {
     "saved": "Your details are saved.",
     "dashboard": "Back to My Career Path",
     "saveFailed": "We could not save your details yet. They are still safe on this device—please try again.",
-    "privacy": "Your location and budget only change the study options we show you.",
+    "privacy": "These details do not change your assessment results. College and scholarship matching is not available in this MVP.",
     "prerequisite": "Choose a Career Direction and at least one Dream Career first.",
     "prerequisiteAction": "See my assessment results",
     "careerArea": "Career Direction",
@@ -62,7 +62,7 @@ const copy = {
   "ml": {
     "eyebrow": "എന്റെ വിവരങ്ങൾ",
     "title": "നിങ്ങൾ എവിടെയാണ് താമസിക്കുകയും പഠിക്കുകയും ചെയ്യുന്നത്?",
-    "description": "നിങ്ങൾക്ക് യോജിച്ച സ്കൂളുകളും കോളേജുകളും കോഴ്‌സുകളും സ്കോളർഷിപ്പുകളും കാണിക്കാനാണ് ഈ വിവരങ്ങൾ.",
+    "description": "നിങ്ങളുടെ പഠന സാഹചര്യവും മുൻഗണനകളും കരിയർ ദിശയ്‌ക്കൊപ്പം സൂക്ഷിക്കൂ.",
     "state": "ഇപ്പോഴത്തെ സംസ്ഥാനം",
     "district": "ജില്ല",
     "city": "അടുത്തുള്ള പ്രധാന നഗരം",
@@ -84,7 +84,7 @@ const copy = {
     "saved": "നിങ്ങളുടെ വിവരങ്ങൾ സേവ് ചെയ്തു.",
     "dashboard": "എന്റെ കരിയർ പ്ലാനിലേക്ക് മടങ്ങാം",
     "saveFailed": "വിവരങ്ങൾ ഇപ്പോൾ സൂക്ഷിക്കാനായില്ല. അവ ഈ ഉപകരണത്തിൽ സുരക്ഷിതമാണ്—വീണ്ടും ശ്രമിക്കൂ.",
-    "privacy": "സ്ഥലവും ബജറ്റും ഞങ്ങൾ കാണിക്കുന്ന പഠന ഓപ്ഷനുകൾ മാത്രമാണ് മാറ്റുന്നത്.",
+    "privacy": "ഈ വിവരങ്ങൾ നിങ്ങളുടെ വിലയിരുത്തൽ ഫലങ്ങളെ മാറ്റില്ല. ഈ MVP-യിൽ കോളേജ്, സ്കോളർഷിപ്പ് നിർദേശങ്ങൾ ലഭ്യമല്ല.",
     "prerequisite": "ആദ്യം ഒരു കരിയർ മേഖലയും കുറഞ്ഞത് ഒരു ജോലിയും തിരഞ്ഞെടുക്കൂ.",
     "prerequisiteAction": "എന്റെ അസസ്‌മെന്റ് ഫലം കാണാം",
     "careerArea": "കരിയർ മേഖല",
@@ -95,7 +95,7 @@ const copy = {
   "hi": {
     "eyebrow": "My details",
     "title": "आप कहाँ रहते और पढ़ते हैं?",
-    "description": "ये details courses, colleges और practical next steps को आपके context से जोड़ती हैं।",
+    "description": "अपनी पढ़ाई की जानकारी और प्राथमिकताएँ अपनी करियर दिशा के साथ सहेजें।",
     "state": "State",
     "district": "District",
     "city": "City",
@@ -117,7 +117,7 @@ const copy = {
     "saved": "आपकी details save हो गईं।",
     "dashboard": "My Career Path पर लौटें",
     "saveFailed": "Details save नहीं हो पाए। फिर try करें।",
-    "privacy": "यह आपकी Career Direction नहीं बदलता। इससे planning ज्यादा useful होती है।",
+    "privacy": "इन जानकारियों से आपके आकलन के परिणाम नहीं बदलते। इस MVP में कॉलेज और छात्रवृत्ति मिलान उपलब्ध नहीं है।",
     "prerequisite": "पहले Career Direction और Dream Careers चुनें।",
     "prerequisiteAction": "Career Directions खोलें",
     "careerArea": "Career Direction",
@@ -128,7 +128,7 @@ const copy = {
   "ta": {
     "eyebrow": "என் விவரங்கள்",
     "title": "நீங்கள் எங்கே வசிக்கிறீர்கள், படிக்கிறீர்கள்?",
-    "description": "உங்களுக்குப் பொருத்தமான பள்ளிகள், கல்லூரிகள், படிப்புகள் மற்றும் உதவித்தொகைகளைக் காட்ட இந்த விவரங்களைப் பயன்படுத்துகிறோம்.",
+    "description": "உங்கள் படிப்புச் சூழலையும் விருப்பங்களையும் தொழில் திசையுடன் சேமிக்கவும்.",
     "state": "மாநிலம்",
     "district": "மாவட்டம்",
     "city": "அருகிலுள்ள பெரிய நகரம்",
@@ -150,7 +150,7 @@ const copy = {
     "saved": "உங்கள் விவரங்கள் சேமிக்கப்பட்டுள்ளன.",
     "dashboard": "எனது தொழில் பாதைக்குத் திரும்பு",
     "saveFailed": "உங்களது விவரங்களை எங்களால் சேமிக்க முடியவில்லை. அவை இந்தச் சாதனத்தில் பாதுகாப்பாக உள்ளன-தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
-    "privacy": "உங்கள் இருப்பிடமும் பட்ஜெட்டும் மட்டுமே நாங்கள் உங்களுக்குக் காட்டும் படிப்புத் தேர்வுகளை மாற்றி அமைக்கும்.",
+    "privacy": "இந்த விவரங்கள் உங்கள் மதிப்பீட்டு முடிவுகளை மாற்றாது. இந்த MVP-இல் கல்லூரி மற்றும் உதவித்தொகைப் பொருத்தம் கிடைக்காது.",
     "prerequisite": "முதலில் ஒரு Career Direction மற்றும் குறைந்தது ஒரு Dream Career-ஐத் தேர்வுசெய்யுங்கள்.",
     "prerequisiteAction": "என்னோட மதிப்பீட்டு முடிவுகளை பாருங்க",
     "careerArea": "தொழில் திசை",
@@ -168,13 +168,19 @@ const scholarshipOptions = ["Yes, show scholarships and financial aid", "Maybe, 
 
 export default function PathwayPersonalizationPage() {
   const { locale } = useTranslations();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const text = copy[locale];
   const [profile, setProfile] = useState<PathwayProfileDraft>(emptyPathwayProfile);
   const [storedResult, setStoredResult] = useState<DiscoveryResult | null>(null);
   const [directionPlan, setDirectionPlan] = useState<DirectionPlan | null>(null);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydratedOwner, setHydratedOwner] = useState<string | null>(null);
+  const [accountError, setAccountError] = useState(false);
+  const [retryAccount, setRetryAccount] = useState(0);
+  const owner = user && !user.isAnonymous ? user.uid : 'guest';
+  const activeOwner = useRef(owner);
+  activeOwner.current = owner;
+  const hydrated = !authLoading && hydratedOwner === owner;
   const [states, setStates] = useState<string[]>([]);
   const [districts, setDistricts] = useState<string[]>([]);
   const [cities, setCities] = useState<string[]>([]);
@@ -188,26 +194,37 @@ export default function PathwayPersonalizationPage() {
   const pursuedArea = result?.areas.find((area) => area.id === directionPlan?.areaId) ?? null;
 
   useEffect(() => {
-    const loadedProfile = loadPathwayProfile() ?? emptyPathwayProfile;
-    const savedProfile = loadedProfile.district === "Idukku"
-      ? { ...loadedProfile, district: "Idukki" }
-      : loadedProfile;
-    setProfile(savedProfile);
-    setStoredResult(loadDiscoveryResult());
-    setDirectionPlan(loadDirectionPlan());
-    setHydrated(true);
-    Promise.all([
-      getStates(),
-      savedProfile.state
-        ? getStateDetails(savedProfile.state)
-        : Promise.resolve({ districts: [], cities: [], unavailable: false }),
-    ]).then(([stateItems, details]) => {
-      setStates(stateItems);
-      setDistricts(details.districts);
-      setCities(details.cities);
-      setLocationError(Boolean(details.unavailable));
-    }).finally(() => setLoadingLocations(false));
-  }, []);
+    if (authLoading) return;
+    let active = true;
+    setHydratedOwner(null);
+    setAccountError(false);
+    setCompleted(false); setSaved(false); setSaving(false); setSaveError("");
+    setProfile(emptyPathwayProfile);
+    setStoredResult(null);
+    setDirectionPlan(null);
+    const initialize = async () => {
+      try {
+        const account = owner !== 'guest' ? await hydrateDiscoveryFromAccount() : null;
+        if (!active) return;
+        const savedProfile = owner !== 'guest' ? account?.pathwayProfile ?? emptyPathwayProfile : loadPathwayProfile() ?? emptyPathwayProfile;
+        setProfile(savedProfile);
+        setStoredResult(owner !== 'guest' ? account?.assessment ?? null : loadDiscoveryResult());
+        setDirectionPlan(owner !== 'guest' ? account?.directionPlan ?? null : loadDirectionPlan());
+        const [stateItems, details] = await Promise.all([
+          getStates(), savedProfile.state ? getStateDetails(savedProfile.state) : Promise.resolve({ districts: [], cities: [], unavailable: false }),
+        ]);
+        if (!active) return;
+        setStates(stateItems); setDistricts(details.districts); setCities(details.cities);
+        setLocationError(Boolean(details.unavailable));
+      } catch {
+        if (active) setAccountError(true);
+      } finally {
+        if (active) { setHydratedOwner(owner); setLoadingLocations(false); }
+      }
+    };
+    void initialize();
+    return () => { active = false; };
+  }, [authLoading, owner, retryAccount]);
 
   const changeState = async (state: string) => {
     setProfile((current) => ({ ...current, state, district: "", city: "" }));
@@ -231,7 +248,8 @@ export default function PathwayPersonalizationPage() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!complete) return;
+    if (!complete || !hydrated || accountError) return;
+    const savingOwner = owner;
     savePathwayProfile(profile);
     if (!user) {
       setCompleted(true);
@@ -242,33 +260,40 @@ export default function PathwayPersonalizationPage() {
     setSaving(true);
     try {
       const didSave = await savePendingDiscoveryToAccount(user.uid);
+      if (activeOwner.current !== savingOwner) return;
       if (!didSave) throw new Error(text.saveFailed);
       setSaved(true);
       router.push("/dashboard");
     } catch {
+      if (activeOwner.current !== savingOwner) return;
       setSaveError(text.saveFailed);
       setSaving(false);
     }
   };
 
   const handleAccountSave = async () => {
-    if (!user) return;
+    if (!user || !hydrated || accountError) return;
+    const savingOwner = owner;
     setSaveError("");
     setSaving(true);
     try {
       const didSave = await savePendingDiscoveryToAccount(user.uid);
+      if (activeOwner.current !== savingOwner) return;
       setSaved(didSave);
       if (!didSave) setSaveError(text.saveFailed);
     } catch {
+      if (activeOwner.current !== savingOwner) return;
       setSaveError(text.saveFailed);
     } finally {
-      setSaving(false);
+      if (activeOwner.current === savingOwner) setSaving(false);
     }
   };
 
   if (!hydrated) {
     return <div className="flex min-h-screen items-center justify-center bg-[#f7fafc]"><Loader2 className="h-7 w-7 animate-spin text-primary" /></div>;
   }
+
+  if (accountError) return <div className="min-h-screen bg-background p-8"><Header /><p role="alert">{text.saveFailed}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{text.retry}</Button></div>;
 
   if (!result || !storedResult || !directionPlan || !directionPlan.dreamCareerIds.length || !isDirectionPlanCompatible(storedResult, directionPlan)) {
     return (

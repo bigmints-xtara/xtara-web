@@ -1,3 +1,4 @@
+import { reconcileDiscoveryCacheOwner } from "./discovery-cache-owner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -84,6 +85,38 @@ describe("staged discovery account sync", () => {
     mocks.createApiSession.mockResolvedValue(undefined);
     mocks.saveAssessment.mockResolvedValue("assessment-1");
     mocks.patch.mockResolvedValue({ id: "learner-1" });
+  });
+
+  it('does not replace API failure with browser-cached account data', async () => {
+    pendingCareerChoice();
+    const before = localStorage.getItem(assessmentV2StorageKey);
+    mocks.get.mockRejectedValue(new Error('API unavailable'));
+    mocks.getDirectionFromApi.mockResolvedValue(null);
+    await expect(hydrateDiscoveryFromAccount()).rejects.toThrow('API unavailable');
+    expect(localStorage.getItem(assessmentV2StorageKey)).toBe(before);
+  });
+
+  it('hydrates an incomplete pathway from the account without stale browser profile', async () => {
+    const { result, plan } = pendingCareerChoice();
+    mocks.getDirectionFromApi.mockResolvedValue(plan);
+    mocks.get.mockImplementation(async (path: string) => path === '/me' ? {} : {
+      assessment: { answers: { definitionId: result.definitionId, schemaVersion: result.version, stage: result.stage, answers: result.answers, result } },
+    });
+    const hydrated = await hydrateDiscoveryFromAccount();
+    expect(hydrated?.directionPlan?.areaId).toBe(plan.areaId);
+    expect(hydrated?.pathwayProfile).toBeNull();
+  });
+
+  it('clears stale browser discovery for an account with no saved assessment', async () => {
+    pendingCareerChoice();
+    mocks.get.mockResolvedValue({});
+    mocks.getDirectionFromApi.mockResolvedValue(null);
+    expect(await hydrateDiscoveryFromAccount()).toBeNull();
+    expect(localStorage.getItem(assessmentV2StorageKey)).toBeNull();
+    expect(localStorage.getItem('xtara_anonymous_discovery_backup_v1')).not.toBeNull();
+    reconcileDiscoveryCacheOwner(null);
+    expect(localStorage.getItem(assessmentV2StorageKey)).not.toBeNull();
+    expect(localStorage.getItem('xtara_anonymous_discovery_backup_v1')).toBeNull();
   });
 
   it.each(["grade11", "grade12"] as const)("hydrates a saved %s without downgrading it", async (stage) => {
@@ -220,6 +253,7 @@ describe("staged discovery account sync", () => {
     expect(mocks.getDirectionFromApi).toHaveBeenCalledTimes(2);
     expect(mocks.get).toHaveBeenCalledTimes(3);
     expect(loadDiscoveryResult()?.syncStatus).toBe("synced");
+    expect(localStorage.getItem("xtara_discovery_cache_owner_v1")).toBe("learner-1");
   });
 });
 
