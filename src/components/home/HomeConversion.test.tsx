@@ -67,17 +67,16 @@ describe("value-led homepage conversion journey", () => {
       rendered = true;
     });
 
-    expect(container.textContent).toContain("Turn “I don’t know” into a future worth exploring.");
+    expect(container.textContent).toContain("Your future starts with curiosity.");
     expect(container.textContent).toContain("Leave with direction, choices, and a next step.");
     expect(container.textContent).toContain("Make the next career conversation easier.");
     expect(container.textContent).toContain("Curated, not generated");
     expect(container.textContent).toContain("No perfect-match claims");
 
     expect(container.querySelectorAll('a[href="/assessment"]').length).toBeGreaterThanOrEqual(3);
-    expect(container.querySelectorAll('a[href="/login"]').length).toBeGreaterThanOrEqual(3);
+    expect(container.querySelectorAll('a[href="/login"]').length).toBeGreaterThanOrEqual(2);
     expect(container.querySelector('header a[href="/assessment"]')).toBeNull();
-    expect(container.querySelector('img[alt="A joyful group of Indian school students"]')).not.toBeNull();
-    expect(container.querySelector('img[alt="A young woman sharing a warm moment with an older family member"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/explore"]')).not.toBeNull();
   });
 
   it.each(["en", "ml", "hi", "ta"] as const)("keeps %s homepage within MVP scope", async (locale) => {

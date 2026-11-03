@@ -8,6 +8,8 @@ import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Compass, Loader2, Plus
 import CareerPreviewDialog from "@/components/careers/CareerPreviewDialog";
 import Footer from "@/components/Footer";
 import styles from '@/components/journey/journey.module.css';
+import DirectionImage from '@/components/journey/DirectionImage';
+import launchpad from '@/components/launchpad/launchpad.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -265,9 +267,9 @@ export default function CareerDirectionPage() {
             <ArrowLeft className="h-4 w-4" />{text.results}
           </Link>
 
-          <section className={styles.directionContext}>
-            <span><Compass className="h-5 w-5" aria-hidden="true" /></span>
-            <div><p>{text.selectedDirection}</p><h1>{direction.title}</h1></div>
+          <section className={launchpad.directionHero}>
+            <div><p className={launchpad.eyebrow}>{text.selectedDirection}</p><h1>{direction.title}</h1></div>
+            <DirectionImage directionId={direction.id} />
           </section>
 
           <section className="mt-8" aria-labelledby="dream-careers-title">

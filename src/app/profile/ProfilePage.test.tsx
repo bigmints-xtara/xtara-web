@@ -170,9 +170,36 @@ describe("learner profile information architecture", () => {
     expect(screen.queryByText("Saved")).toBeNull();
   });
 
-  it("presents scalable profile destinations from one hub", () => {
+  it("keeps only one profile editor active so another save cannot replace its draft", () => {
+    render(<ProfilePage />);
+    const edits = screen.getAllByRole("button", { name: "Edit" });
+    fireEvent.click(edits[0]);
+    expect(edits[1]).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Full name"), { target: { value: "Unsaved learner name" } });
+    expect(screen.getByLabelText("Full name")).toHaveValue("Unsaved learner name");
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(edits[1]).toBeEnabled();
+    fireEvent.click(edits[1]);
+    expect(edits[0]).toBeDisabled();
+  });
+
+  it("releases the editor interlock when navigating between profile sections", () => {
+    const view = render(<ProfilePage />);
+    fireEvent.click(screen.getAllByRole("button", { name: "Edit" })[0]);
+    mocks.section = "academic";
+    view.rerender(<ProfilePage />);
+    expect(screen.getByRole("button", { name: "Edit" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    mocks.section = "personal";
+    view.rerender(<ProfilePage />);
+    expect(screen.getByRole("button", { name: "Edit" })).toBeEnabled();
+  });
+
+  it("shows personal and study details alongside profile destinations", () => {
     render(<ProfilePage />);
 
+    expect(screen.getByRole("heading", { name: "Personal details" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "School & study" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Personal profile/ })).toHaveAttribute(
       "href",
       "/profile?section=personal",

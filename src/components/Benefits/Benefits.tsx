@@ -24,6 +24,8 @@ import { useTranslations } from "@/i18n/language-provider";
 import { trackEvent } from "@/lib/analytics";
 import { MVP_NAVIGATION_ENABLED } from "@/lib/mvp-navigation";
 
+import HomeBenefits from '@/components/launchpad/HomeBenefits';
+
 const outcomeIcons = [Compass, Sparkles, Route];
 const momentumIcons = [BookOpenCheck, Gamepad2, GraduationCap, MessageCircleMore];
 const trustIcons = [ShieldCheck, CheckCircle2, RefreshCcw, Users];
@@ -31,6 +33,7 @@ const trustIcons = [ShieldCheck, CheckCircle2, RefreshCcw, Users];
 const Benefits = () => {
   const { messages } = useTranslations();
   const content = messages.trustedDiscovery.home;
+  if (MVP_NAVIGATION_ENABLED) return <HomeBenefits />;
 
   return (
     <div>

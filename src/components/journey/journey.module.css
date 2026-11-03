@@ -115,11 +115,6 @@
 .cardToolbar .selectButton { width: auto; max-width: 75%; }
 
 /* Editorial student workspace, November 2026. */
-.surface, .dashboard, .profileSurface {
- --journey-ink:#153b56; --journey-muted:#5d6c76; --journey-soft:#eef3f5; --journey-line:#cbd5da; --journey-accent:#296c96;
- --background:#fafafa; --foreground:#173b52; --card:#fff; --card-foreground:#173b52; --border:#e0e4e4; --primary:#173b52; --muted-foreground:#5d6c76;
- background:var(--background); color:var(--foreground);
-}
 .shell, .dashboard { max-width:1248px; padding:48px 32px 112px; }
 .heading { font-size:clamp(34px,4vw,54px); font-weight:600; }
 .resultCard, .careerCard, .summaryReceipt { border-radius:12px; border-color:var(--border); box-shadow:none; }
@@ -148,54 +143,55 @@
 .profileDestination { display:flex; align-items:center; gap:18px; padding:28px 0; border-bottom:1px solid var(--border); }
 .profileDestination:hover { background:var(--journey-soft); }
 .profileDestination > span:first-child { display:grid; place-items:center; width:44px; height:44px; flex-shrink:0; color:var(--journey-accent); }
-:global(.dark) .surface, :global(.dark) .dashboard, :global(.dark) .profileSurface { --journey-ink:#daebf5; --journey-muted:#b3c3ce; --journey-soft:#203649; --journey-line:#496074; --journey-accent:#85c7ed; --background:#112432; --foreground:#e7eff5; --card:#192e3e; --card-foreground:#e7eff5; --primary:#a8d6f1; --border:#304656; --muted-foreground:#b3c3ce; background:var(--background); }
 :global(.dark) .careerCard[data-selected='true'] { background:#203e53; border-color:var(--journey-accent); }
 :global(.dark) .dashboardCareer:hover { background:var(--journey-soft); }
 :global(.dark) .profileMain :global(.bg-white) { background:var(--card); }
 :global(.dark) .profileMain :global(.text-slate-600) { color:var(--journey-muted); }
 @media(max-width:700px) { .shell, .dashboard, .profileMain { padding:32px 22px 112px; } .dashboardBrowse { align-items:start; flex-direction:column; } .profileDestinations { grid-template-columns:1fr; } }
 
-/* Achromatic student surfaces with restrained Xtara blue accents. */
+/* Launchpad brand tokens, scoped to learner/marketing surfaces. */
 .surface, .dashboard, .profileSurface, .studentChrome {
- --journey-ink:#292929; --journey-muted:#666666; --journey-soft:#f0f0f0; --journey-line:#cccccc; --journey-accent:#2375a6;
- --background:#fafafa; --foreground:#292929; --card:#ffffff; --card-foreground:#292929; --primary:#292929; --primary-foreground:#ffffff; --muted:#eeeeee; --muted-foreground:#666666; --border:#e1e1e1; --ring:#2375a6;
+ background:var(--background); color:var(--foreground);
+ --journey-ink:#003763; --journey-muted:#506679; --journey-soft:#edf6fb; --journey-line:#b6c5cf; --journey-accent:#003763;
+ --background:#ffffff; --foreground:#003763; --card:#ffffff; --card-foreground:#003763; --primary:#003763; --primary-foreground:#ffffff; --muted:#edf6fb; --muted-foreground:#506679; --border:#dce4e8; --ring:#003763;
  --color-background:var(--background); --color-foreground:var(--foreground); --color-card:var(--card); --color-card-foreground:var(--card-foreground); --color-primary:var(--primary); --color-primary-foreground:var(--primary-foreground); --color-muted:var(--muted); --color-muted-foreground:var(--muted-foreground); --color-border:var(--border); --color-ring:var(--ring);
 }
-.dashboardHero { background:#eeeeee; color:#292929; border:1px solid #dddddd; }
-.dashboardHero :global(.text-white), .dashboardHero :global(.text-white\/70), .dashboardHero :global(.text-white\/75) { color:#555555; }
-.dashboardHero :global(.text-secondary) { color:#2375a6; }
-.dashboardHero :global(.bg-white\/10) { background:#dddddd; }
-.dashboardHero button:hover { background:#d6d6d6; color:#292929; }
+.dashboardHero { background:#edf6fb; color:#003763; border:1px solid #d5e7f3; }
+.dashboardHero :global(.text-white), .dashboardHero :global(.text-white\/70), .dashboardHero :global(.text-white\/75) { color:#506679; }
+.dashboardHero :global(.text-secondary) { color:#003763; }
+.dashboardHero :global(.bg-white\/10) { background:#d5e7f3; }
+.dashboardHero button:hover { background:#d6d6d6; color:#003763; }
 .profileIdentity { border:1px solid var(--border); background:var(--journey-soft); color:var(--foreground); box-shadow:none; }
 .profileIdentity p { color:var(--journey-muted); }
 .profileIdentity :global([data-slot='avatar-fallback']) { background:var(--border); color:var(--foreground); }
-.profileIdentity :global([data-slot='badge']) { color:#444444; background:#e8e8e8; }
-.resultCard:nth-child(3) .motif { background:#ededed; color:#555555; }
-.careerCard[data-selected='true'] { border-color:#2375a6; background:#f2f2f2; }
+.profileIdentity :global([data-slot='badge']) { color:#003763; background:#e4f2fa; }
+.resultCard:nth-child(3) .motif { background:#F2E3D5; color:#506679; }
+.careerCard[data-selected='true'] { border-color:#003763; background:#edf6fb; }
 .directionContext { color:var(--journey-ink); }
 .directionContext > span, .compass { background:var(--journey-soft); color:var(--journey-accent); border-color:var(--journey-soft); }
 .steps li[aria-current] .stepNumber { background:var(--foreground); border-color:var(--foreground); color:var(--background); }
 .previewIntro p { color:var(--journey-muted); }
 :global(.dark) .surface, :global(.dark) .dashboard, :global(.dark) .profileSurface, :global(.dark) .studentChrome {
- --journey-ink:#eeeeee; --journey-muted:#bbbbbb; --journey-soft:#303030; --journey-line:#555555; --journey-accent:#61b3e4;
- --background:#1c1c1c; --foreground:#eeeeee; --card:#262626; --card-foreground:#eeeeee; --primary:#eeeeee; --primary-foreground:#252525; --muted:#353535; --muted-foreground:#bbbbbb; --border:#414141; --ring:#61b3e4;
+ background:var(--background); color:var(--foreground);
+ --journey-ink:#eef6fb; --journey-muted:#bdd3e3; --journey-soft:#174763; --journey-line:#506679; --journey-accent:#61b3e4;
+ --background:#082b48; --foreground:#eef6fb; --card:#103854; --card-foreground:#eef6fb; --primary:#61b3e4; --primary-foreground:#082b48; --muted:#174763; --muted-foreground:#bdd3e3; --border:#31556e; --ring:#61b3e4;
 }
-:global(.dark) .dashboardHero { background:#303030; color:#eeeeee; border-color:#454545; }
-:global(.dark) .dashboardHero :global(.text-white), :global(.dark) .dashboardHero :global(.text-white\/70), :global(.dark) .dashboardHero :global(.text-white\/75) { color:#cccccc; }
-:global(.dark) .dashboardHero :global(.bg-white\/10) { background:#454545; }
-:global(.dark) .dashboardHero button:hover { background:#515151; color:#eeeeee; }
-:global(.dark) .careerCard[data-selected='true'] { background:#333333; border-color:#61b3e4; }
+:global(.dark) .dashboardHero { background:#174763; color:#edf6fb; border-color:#31556e; }
+:global(.dark) .dashboardHero :global(.text-white), :global(.dark) .dashboardHero :global(.text-white\/70), :global(.dark) .dashboardHero :global(.text-white\/75) { color:#b6c5cf; }
+:global(.dark) .dashboardHero :global(.bg-white\/10) { background:#31556e; }
+:global(.dark) .dashboardHero button:hover { background:#416a86; color:#edf6fb; }
+:global(.dark) .careerCard[data-selected='true'] { background:#174763; border-color:#61b3e4; }
 :global(.dark) .receiptHeader, :global(.dark) .previewIntro { background:var(--journey-soft); color:var(--journey-ink); }
-:global(.dark) .profileIdentity :global([data-slot='badge']) { color:#dddddd; background:#414141; }
+:global(.dark) .profileIdentity :global([data-slot='badge']) { color:#d5e7f3; background:#31556e; }
 .studentChrome :global([role='combobox']) { background:var(--journey-soft); color:var(--foreground); border-color:var(--border); }
 .studentChrome :global([role='combobox']) svg { color:var(--journey-muted); }
 
 .surface, .dashboard, .profileSurface, .studentChrome { --input:var(--border); --accent:var(--journey-soft); --accent-foreground:var(--foreground); --color-input:var(--input); --color-accent:var(--accent); --color-accent-foreground:var(--accent-foreground); }
 .profileSurface :global([role='combobox']) { background:var(--journey-soft); color:var(--foreground); border-color:var(--border); }
 .profileSurface :global([role='combobox']) svg { color:var(--journey-muted); }
-:global(.dark) .profileSurface :global(.text-emerald-700) { color:#cccccc; }
-:global(body):has(.surface), :global(body):has(.profileSurface) { background:#fafafa; }
-:global(.dark body):has(.surface), :global(.dark body):has(.profileSurface) { background:#1c1c1c; }
+:global(.dark) .profileSurface :global(.text-emerald-700) { color:#b6c5cf; }
+:global(body):has(.surface), :global(body):has(.profileSurface) { background:#ffffff; }
+:global(.dark body):has(.surface), :global(.dark body):has(.profileSurface) { background:#082b48; }
 .profileIdentity :global([data-slot='badge'].text-amber-100) { background:#f3e5c7; color:#71531c; }
 :global(.dark) .profileIdentity :global([data-slot='badge'].text-amber-100) { background:#4c4029; color:#e8ca8c; }
 
@@ -216,3 +212,34 @@
  .dashboardHero > div:not(.directionImage) { grid-column:1; grid-row:1; }
  .dashboardHero:not(:has(.directionImage)) { grid-template-columns:1fr; }
 }
+
+/* Shared Launchpad typography and component geometry. */
+@font-face { font-family:LaunchpadMona; src:url('/fonts/MonaSans-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
+@font-face { font-family:LaunchpadMona; src:url('/fonts/MonaSans-SemiBold.woff2') format('woff2'); font-weight:600 900; font-display:swap; }
+.surface, .dashboard, .profileSurface, .studentChrome { font-family:LaunchpadMona, var(--font-inter), sans-serif; }
+.heading, .profileMain h1 { font-size:clamp(36px,4.8vw,62px); line-height:1.12; font-weight:650; letter-spacing:-.045em; }
+.resultCard, .careerCard { border-color:var(--border); border-radius:10px; box-shadow:none; }
+.resultCard .motif, .careerIcon { background:var(--journey-soft); color:var(--foreground); border-radius:8px; }
+.careerTitle { font-size:23px; line-height:1.25; letter-spacing:-.025em; }
+.careerCard[data-selected='true'] { border-color:var(--foreground); background:var(--journey-soft); }
+.careerCard:hover { box-shadow:none; border-color:var(--journey-line); }
+.cardToolbar .selectButton { min-height:44px; }
+.resultBody > button { background:var(--xtara-navy); color:white; min-height:48px; border-radius:7px; }
+.selectionBar { background:var(--xtara-navy); color:white; border:0; border-radius:10px; padding:20px 24px; }
+.selectionNames { color:#d5e7f3; }
+.selectionBar button { background:var(--xtara-gold); color:var(--xtara-navy); border-radius:7px; }
+.selectionBar button:hover { background:#e8a329; }
+.profileDestinations { margin-top:0; grid-template-columns:1fr; }
+.profileDestination { padding:24px 16px; }
+.profileIdentity { border:0; border-radius:10px; }
+.profileIdentity :global([data-slot='avatar-fallback']) { background:var(--xtara-gold); color:var(--xtara-navy); }
+.profileMain :global([data-slot='card']) { border-radius:10px; }
+.profileMain :global([data-slot='input']), .profileMain :global([role='combobox']) { min-height:48px; border-radius:6px; }
+.surface :global(.text-slate-600), .surface :global(.text-slate-500) { color:var(--muted-foreground); }
+.surface :global(.bg-white) { background:var(--card); }
+.surface :global(.bg-slate-50) { background:var(--muted); }
+.surface :global(.text-slate-700) { color:var(--foreground); }
+:global(.dark) .resultBody > button { background:var(--xtara-gold); color:var(--xtara-navy); }
+:global(.dark) .careerCard[data-selected='true'] { background:var(--journey-soft); border-color:var(--xtara-sky); }
+:global(.dark body):has(.surface), :global(.dark body):has(.profileSurface) { background:#082b48; }
+@media(max-width:600px) { .careerTitle { font-size:21px; }.selectionBar { padding:16px; }.heading { font-size:36px; } }

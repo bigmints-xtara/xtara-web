@@ -12,6 +12,8 @@ import {
   DreamCareerStudentGuideError,
   DreamCareerStudentGuideLoading,
 } from '@/components/careers/DreamCareerStudentGuide';
+import launchpad from '@/components/launchpad/launchpad.module.css';
+import DirectionImage from '@/components/journey/DirectionImage';
 import styles from '@/components/journey/journey.module.css';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
@@ -333,7 +335,7 @@ function DreamCareerContent() {
             <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               <ArrowLeft className="h-4 w-4" />{text.back}
             </Link>
-            <div className={`mt-8 grid gap-8 ${MVP_NAVIGATION_ENABLED ? "" : "lg:grid-cols-[minmax(0,1fr)_18rem]"} lg:items-end lg:gap-16`}>
+            <div className={MVP_NAVIGATION_ENABLED ? launchpad.careerHero : "mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end lg:gap-16"}>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-3">
                   {area ? <Badge variant="secondary">{area.title}</Badge> : null}
@@ -342,9 +344,11 @@ function DreamCareerContent() {
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{hasReviewedGuidance ? text.overview : journeyText.overview}</p>
                 <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-4xl lg:text-5xl">{response.career.title}</h1>
                 <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{response.career.summary}</p>
+                  {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="mt-6 w-fit rounded-lg" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
               </div>
-              {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="w-fit rounded-xl" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
-              {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
+
+              {MVP_NAVIGATION_ENABLED && area ? <DirectionImage directionId={area.id} /> : null}
+                {!MVP_NAVIGATION_ENABLED ? <div className="flex flex-col gap-3 lg:pb-1">
               {returnAreaId && from !== 'explore' && from !== 'dashboard' ? <Button asChild size="lg" className="rounded-full"><Link href={backHref}>{journeyText.continue}</Link></Button> : null}
                 <Button size="lg" className="rounded-full" variant={isSelected ? 'outline' : 'default'} disabled={selectionUpdating} onClick={() => void updateSelection()}>
                   {isSelected ? <X className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}{isSelected ? journeyText.remove : journeyText.add}

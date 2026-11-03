@@ -1,5 +1,6 @@
 "use client";
 
+import styles from '@/components/launchpad/launchpad.module.css';
 import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
 
@@ -91,7 +92,7 @@ export default function AssessmentEngine({
     };
 
     if (!currentQuestion) {
-        return <div className="py-16 text-center text-sm text-slate-600">{labels.noQuestions}</div>;
+        return <div className="py-16 text-center text-sm text-muted-foreground">{labels.noQuestions}</div>;
     }
 
     const currentAnswer = answers[currentQuestion.id];
@@ -108,19 +109,19 @@ export default function AssessmentEngine({
     };
 
     return (
-        <div className="mx-auto max-w-2xl px-4 pb-28 sm:px-6">
+        <div className={styles.engine}>
             <div className="mb-5 sm:mb-7">
-                <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
                     <span>{selectingStage ? labels.chooseGrade : formatLabel(labels.stepOf, { current: safeIndex + 1, total: visibleQuestions.length })}</span>
                     <span>{Math.round(progress)}%</span>
                 </div>
                 <Progress value={progress} className="mt-2 h-2" />
             </div>
 
-            <div className="rounded-2xl border border-primary/10 bg-white p-5 shadow-sm sm:p-7">
+            <div className={styles.question}>
                 <h1 className="text-xl font-semibold leading-tight text-primary sm:text-2xl">{currentQuestion.label}</h1>
                 {currentQuestion.description ? (
-                    <p className="mt-3 text-sm leading-6 text-slate-600">{currentQuestion.description}</p>
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{currentQuestion.description}</p>
                 ) : null}
 
                 <div className="mt-7">
@@ -128,8 +129,8 @@ export default function AssessmentEngine({
                 </div>
             </div>
 
-            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
-                <div className="mx-auto flex max-w-2xl items-center gap-3">
+            <div className="w-full">
+                <div className={styles.engineFooter}>
                     {safeIndex === 0 ? (
                         <Button
                             type="button"
@@ -155,7 +156,7 @@ export default function AssessmentEngine({
                         type="button"
                         onClick={handleNext}
                         disabled={!validateAssessmentAnswer(currentQuestion, currentAnswer)}
-                        className="ml-auto min-h-12 rounded-xl px-5"
+                        className={`${styles.primary} ml-auto min-h-12 rounded-lg px-5`}
                         size="lg"
                     >
                         {safeIndex === visibleQuestions.length - 1 && !selectingStage ? labels.finish : labels.next}
@@ -169,10 +170,10 @@ export default function AssessmentEngine({
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="assessment-exit-title"
-                        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl"
+                        className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl"
                     >
                         <h2 id="assessment-exit-title" className="text-xl font-semibold text-primary">{labels.exitTitle}</h2>
-                        <p className="mt-3 text-sm leading-6 text-slate-600">{labels.exitDescription}</p>
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{labels.exitDescription}</p>
                         <div className="mt-6 flex justify-end gap-3">
                             <Button type="button" variant="ghost" onClick={() => setConfirmingExit(false)}>{labels.stay}</Button>
                             <Button type="button" onClick={onExit}>{labels.exit}</Button>
@@ -231,14 +232,14 @@ function QuestionInput({
                             className={`flex min-h-12 w-full items-start justify-between rounded-xl border px-4 py-3 text-left transition ${
                                 selected
                                     ? "border-primary bg-primary/5 text-primary"
-                                    : "border-slate-200 bg-white text-slate-700 hover:border-primary/40"
+                                    : "border-slate-200 bg-card text-foreground hover:border-primary/40"
                             }`}
                         >
                             <span className="min-w-0 pr-3">
                                 <span className="font-medium">{option.label}</span>
                                 {option.description ? <span className="mt-1 block text-sm opacity-75">{option.description}</span> : null}
                             </span>
-                            <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${selected ? "bg-primary text-white" : "border border-slate-300"}`}>
+                            <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${selected ? "bg-primary text-primary-foreground" : "border border-slate-300"}`}>
                                 {selected ? <Check size={12} /> : null}
                             </span>
                         </button>
@@ -253,7 +254,7 @@ function QuestionInput({
         const max = question.validation?.maxSelect;
         return (
             <div>
-                {max ? <p className="mb-3 text-xs font-medium text-slate-500">{formatLabel(labels.chooseUpTo, { count: max })}</p> : null}
+                {max ? <p className="mb-3 text-xs font-medium text-muted-foreground">{formatLabel(labels.chooseUpTo, { count: max })}</p> : null}
                 <div className="space-y-3" role="group" aria-label={question.label}>
                     {question.options?.map((option) => {
                         const selected = selectedValues.includes(option.id);
@@ -270,14 +271,14 @@ function QuestionInput({
                                 className={`flex min-h-12 w-full items-start justify-between rounded-xl border px-4 py-3 text-left transition disabled:cursor-not-allowed disabled:opacity-45 ${
                                     selected
                                         ? "border-primary bg-primary/5 text-primary"
-                                        : "border-slate-200 bg-white text-slate-700 hover:border-primary/40"
+                                        : "border-slate-200 bg-card text-foreground hover:border-primary/40"
                                 }`}
                             >
                                 <span className="min-w-0 pr-3">
                                     <span className="font-medium">{option.label}</span>
                                     {option.description ? <span className="mt-1 block text-sm opacity-75">{option.description}</span> : null}
                                 </span>
-                                <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded ${selected ? "bg-primary text-white" : "border border-slate-300"}`}>
+                                <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded ${selected ? "bg-primary text-primary-foreground" : "border border-slate-300"}`}>
                                     {selected ? <Check size={12} /> : null}
                                 </span>
                             </button>

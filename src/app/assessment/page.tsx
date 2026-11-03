@@ -4,6 +4,9 @@ import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "re
 import { useRouter } from "next/navigation";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
+import styles from '@/components/journey/journey.module.css';
+import launchpad from '@/components/launchpad/launchpad.module.css';
+import { launchpadCopy } from '@/components/launchpad/copy';
 import Header from "@/components/Header";
 import AssessmentEngine from "@/components/assessment/AssessmentEngine";
 import { Badge } from "@/components/ui/badge";
@@ -143,9 +146,9 @@ function AssessmentJourney() {
 
   if (processingError || definitionFailed) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7fafc] px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
         <h1 className="text-2xl font-semibold text-primary">{ui.errorTitle}</h1>
-        <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-slate-600">{processingError || ui.errorTitle}</p>
+        <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">{processingError || ui.errorTitle}</p>
         <button type="button" onClick={() => { setProcessingError(""); if (definitionFailed) setDefinitionAttempt((attempt) => attempt + 1); }} className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white">
           {ui.retry}
         </button>
@@ -157,18 +160,19 @@ function AssessmentJourney() {
 
   if (processing) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f7fafc] px-6 text-center">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
         <h1 className="mt-6 text-2xl font-semibold text-primary">{ui.processingTitle}</h1>
-        <p className="mt-2 max-w-md text-sm leading-6 text-slate-600">{ui.processingDescription}</p>
+        <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">{ui.processingDescription}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground">
+    <div className={styles.surface}>
       <Header />
-      <main className="py-5 sm:py-10">
+      <main className={launchpad.assessmentLayout}>
+        <aside className={launchpad.assessmentAside}><div className={launchpad.eyebrow}>{catalog.ui.title}</div><h2>{launchpadCopy[locale].assessmentTitle}</h2><p>{launchpadCopy[locale].assessmentHelp}</p></aside>
         <AssessmentEngine
           key={locale}
           questions={questions}
@@ -192,10 +196,10 @@ function AssessmentJourney() {
 
 function AssessmentIntro({ catalog, onStart }: { catalog: ReturnType<typeof getAssessmentV2Catalog>; onStart: () => void }) {
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground">
+    <div className={styles.surface}>
       <Header />
       <main className="mx-auto flex min-h-[calc(100svh-4rem)] max-w-3xl items-center px-4 py-6 sm:py-12">
-        <Card className="w-full overflow-hidden border-primary/10 bg-white shadow-sm">
+        <Card className="w-full overflow-hidden border-primary/10 bg-card shadow-none">
           <CardContent className="p-6 sm:p-10">
             <Badge variant="secondary" className="border border-primary/10 bg-primary/5 text-primary">
               {catalog.ui.eyebrow}
@@ -203,11 +207,11 @@ function AssessmentIntro({ catalog, onStart }: { catalog: ReturnType<typeof getA
             <h1 className="mt-5 text-3xl font-semibold leading-tight tracking-[-0.035em] text-primary sm:text-5xl">
               {catalog.ui.title}
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
               {catalog.ui.description}
             </p>
-            <div className="mt-6 flex items-start gap-3 rounded-2xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
-              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
+            <div className="mt-6 flex items-start gap-3 rounded-2xl bg-muted p-4 text-sm leading-6 text-foreground">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-foreground" />
               <span>{catalog.ui.privacy}</span>
             </div>
             <Button type="button" size="lg" className="mt-7 min-h-12 w-full rounded-xl sm:w-auto" onClick={onStart}>
@@ -234,7 +238,7 @@ function subscribeToAssessmentStage(onChange: () => void) {
 
 function AssessmentLoading() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f7fafc]">
+    <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
     </div>
   );
