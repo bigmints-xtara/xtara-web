@@ -54,7 +54,7 @@ export default function UserDashboard() {
   const { user, userProfile } = useAuth();
   const { locale } = useTranslations();
   const text = dashboardCopy[locale];
-  const [accountLoad, setAccountLoad] = useState<{ owner?: string; error: boolean }>({ error: false });
+  const [accountLoad, setAccountLoad] = useState<{ owner?: string; attempt?: number; error: boolean }>({ error: false });
   const [retryAccount, setRetryAccount] = useState(0);
   const [conversationOpen, setConversationOpen] = useState(false);
   const [rewards, setRewards] = useState<RewardSummary>({ points: 0, medals: 0, level: "Starter" });
@@ -83,10 +83,9 @@ export default function UserDashboard() {
   useEffect(() => {
     if (!userId || isAnonymous) return;
     let active = true;
-    setAccountLoad({ error: false });
     hydrateDiscoveryFromAccount()
-      .then(() => { if (active) setAccountLoad({ owner: userId, error: false }); })
-      .catch(() => { if (active) setAccountLoad({ owner: userId, error: true }); });
+      .then(() => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, error: false }); })
+      .catch(() => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, error: true }); });
     return () => { active = false; };
   }, [userId, isAnonymous, retryAccount]);
 
@@ -121,7 +120,7 @@ export default function UserDashboard() {
     return () => { active = false; };
   }, [isAnonymous, locale, rawPlan, userId]);
 
-  if (userId && !isAnonymous && accountLoad.owner !== userId) return <div className="p-8" role="status">{getAssessmentV2Catalog(locale).ui.loading}</div>;
+  if (userId && !isAnonymous && (accountLoad.owner !== userId || accountLoad.attempt !== retryAccount)) return <div className="p-8" role="status">{getAssessmentV2Catalog(locale).ui.loading}</div>;
   if (accountLoad.error) return <div className="p-8"><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></div>;
 
   if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;

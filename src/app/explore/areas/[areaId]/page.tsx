@@ -147,7 +147,8 @@ export default function CareerDirectionPage() {
 
   useEffect(() => {
     let active = true;
-    currentScope.current.generation += 1;
+    const saveScope = currentScope.current;
+    saveScope.generation += 1;
     setSelectionOverride(null);
     setSaving(false);
     setAccountError(false);
@@ -155,7 +156,7 @@ export default function CareerDirectionPage() {
     if (owner) void hydrateDiscoveryFromAccount()
       .then(() => { if (active) setLoadedOwner(owner); })
       .catch(() => { if (active) setAccountError(true); });
-    return () => { active = false; currentScope.current.generation += 1; };
+    return () => { active = false; saveScope.generation += 1; };
   }, [owner, areaId, reload]);
 
   useEffect(() => {

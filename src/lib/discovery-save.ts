@@ -14,7 +14,6 @@ import {
   buildDiscoverySaveBundle,
   parsePathwayProfile,
   pathwayProfileStorageKey,
-  type DiscoverySaveBundle,
   type PathwayProfile,
 } from "@/lib/pathway-profile";
 import { getFirebaseAuth } from "@/lib/firebase-client";

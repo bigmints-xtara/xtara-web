@@ -31,4 +31,16 @@ describe('career preview dialog', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     await waitFor(() => expect(screen.getByText('Compact career details')).toBeInTheDocument());
   });
+  it('clears the previous guide while loading a different career', async () => {
+    mocks.get.mockResolvedValueOnce({}).mockImplementationOnce(() => new Promise(() => {}));
+    const onClose = vi.fn();
+    const view = render(<CareerPreviewDialog career={{ id: 'aero', title: 'Aeronautical Engineer', summary: 'Aircraft' }} onClose={onClose} />);
+    expect(await screen.findByText('Compact career details')).toBeInTheDocument();
+    const firstSignal = mocks.get.mock.calls[0][1].signal as AbortSignal;
+    view.rerender(<CareerPreviewDialog career={{ id: 'robotics', title: 'Robotics Engineer', summary: 'Robots' }} onClose={onClose} />);
+    expect(firstSignal.aborted).toBe(true);
+    expect(screen.getByRole('dialog', { name: 'Robotics Engineer' })).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading career details');
+    expect(screen.queryByText('Compact career details')).toBeNull();
+  });
 });

@@ -23,12 +23,12 @@ function LoadedConversation({ ids, locale, onClose }: {ids:string;locale:DreamCa
  const [attempt,setAttempt] = useState(0);
  const text = copy[locale];
  useEffect(() => {
-  const controller = new AbortController(); setError(false); setSlides([]);
+  const controller = new AbortController();
   Promise.all(ids.split(',').map((id) => getDreamCareerStudentGuide(id,{locale,signal:controller.signal})))
    .then((guides) => { if (!controller.signal.aborted) setSlides(careerConversationFromGuides(guides,locale)); })
    .catch(() => { if (!controller.signal.aborted) setError(true); });
   return () => controller.abort();
  }, [ids,locale,attempt]);
  const placeholder:CareerSlideData = {type:'meetDreamCareer',title:text.title,subtitle:error ? text.error : text.loading,buttonLabel:text.retry,visualization:'list',slideIcon:'MessagesSquare',content:error ? [{title:text.retry,subtitle:text.help,icon:'Info'}] : []};
- return <SlideshowOverlay isOpen onClose={onClose} slides={slides.length ? slides : [placeholder]} onRetry={error ? () => setAttempt((value) => value+1) : undefined} retryLabel={text.retry} status={error ? 'error' : slides.length ? undefined : 'loading'} />;
+ return <SlideshowOverlay isOpen onClose={onClose} slides={slides.length ? slides : [placeholder]} onRetry={error ? () => { setError(false); setSlides([]); setAttempt((value) => value+1); } : undefined} retryLabel={text.retry} status={error ? 'error' : slides.length ? undefined : 'loading'} />;
 }

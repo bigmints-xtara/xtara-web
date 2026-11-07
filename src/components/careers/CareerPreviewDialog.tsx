@@ -21,6 +21,12 @@ export default function CareerPreviewDialog({ career, onClose }: {
   career: { id: string; title: string; summary: string }; onClose: () => void;
 }) {
   const { locale } = useTranslations();
+  return <CareerPreviewContent key={`${career.id}:${locale}`} career={career} onClose={onClose} locale={locale} />;
+}
+
+function CareerPreviewContent({ career, onClose, locale }: {
+  career: { id: string; title: string; summary: string }; onClose: () => void; locale: keyof typeof copy;
+}) {
   const text = copy[locale];
   const dialog = useRef<HTMLDialogElement>(null);
   const [guide, setGuide] = useState<DreamCareerStudentGuideResponse | null>(null);
@@ -35,13 +41,13 @@ export default function CareerPreviewDialog({ career, onClose }: {
   }, []);
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setError(false); setGuide(null);
     getDreamCareerStudentGuide(career.id, { locale, signal: controller.signal })
       .then((value) => { if (!controller.signal.aborted) setGuide(value); })
       .catch(() => { if (!controller.signal.aborted) setError(true); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [career.id, locale, attempt]);
+  const retry = () => { setLoading(true); setError(false); setGuide(null); setAttempt((n) => n + 1); };
   return <dialog ref={dialog} aria-labelledby="career-preview-title" onCancel={(event) => { event.preventDefault(); onClose(); }}
     onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
     className={`${styles.preview} m-auto max-h-[90dvh] w-[92vw] overflow-y-auto border border-border bg-background p-0 text-foreground backdrop:bg-black/50`}>
@@ -52,7 +58,7 @@ export default function CareerPreviewDialog({ career, onClose }: {
       <p className="mt-4 leading-7 text-muted-foreground">{career.summary}</p>
     </div>
     {loading ? <p role="status" className="px-5 pb-8 sm:px-8">{text.loading}</p> : null}
-    {error ? <div className="px-5 pb-8 sm:px-8"><p role="alert">{text.error}</p><Button variant="outline" className="mt-3" onClick={() => setAttempt((n) => n + 1)}>{text.retry}</Button></div> : null}
-    {guide ? <DreamCareerStudentGuide embedded response={guide} locale={locale} onRetryRelationship={() => setAttempt((n) => n + 1)} /> : null}
+    {error ? <div className="px-5 pb-8 sm:px-8"><p role="alert">{text.error}</p><Button variant="outline" className="mt-3" onClick={retry}>{text.retry}</Button></div> : null}
+    {guide ? <DreamCareerStudentGuide embedded response={guide} locale={locale} onRetryRelationship={retry} /> : null}
   </dialog>;
 }

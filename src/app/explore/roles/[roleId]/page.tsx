@@ -171,17 +171,19 @@ function DreamCareerContent() {
     return () => controller.abort();
   }, [loadGuide]);
 
+  const contextUserId = user?.uid;
+  const contextAnonymous = user?.isAnonymous;
   useEffect(() => {
     selectionGeneration.current += 1;
     setStudentContext(null);
     setRemotePlan(null);
     setSelectionUpdating(false);
     setSelectionError('');
-    if (!user || user.isAnonymous) return;
+    if (!contextUserId || contextAnonymous) return;
     const controller = new AbortController();
     Promise.all([
-      getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: user.uid }),
-      getDirectionFromApi(user.uid),
+      getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId }),
+      getDirectionFromApi(contextUserId),
     ])
       .then(([context, direction]) => {
         if (controller.signal.aborted) return;
@@ -190,7 +192,7 @@ function DreamCareerContent() {
       })
       .catch(() => undefined);
     return () => { controller.abort(); selectionGeneration.current += 1; };
-  }, [roleId, user?.uid, user?.isAnonymous]);
+  }, [roleId, contextUserId, contextAnonymous]);
 
   const careerId = response?.career.id ?? roleId;
   const area = response?.career.primaryFutureDirectionId

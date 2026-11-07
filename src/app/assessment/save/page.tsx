@@ -42,9 +42,10 @@ export default function SaveChoicesPage() {
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let active = true;
-    scope.current.generation += 1;
+    const saveScope = scope.current;
+    saveScope.generation += 1;
     setLoaded(false); setSummary(null); setError(false); setSaveError(false); setSaving(false);
-    if (authLoading) return () => { active = false; scope.current.generation += 1; };
+    if (authLoading) return () => { active = false; saveScope.generation += 1; };
     void (async () => {
       if (owner) await hydrateDiscoveryFromAccount();
       if (!active) return;
@@ -58,7 +59,7 @@ export default function SaveChoicesPage() {
       if (!direction || careers.some((item) => !item)) return;
       setSummary({ plan, direction: (direction.translations[locale] || direction.translations.en).title, careers: careers.map((item) => ({ id: item!.id, title: (item!.translations[locale] || item!.translations.en).title })) });
     })().catch(() => { if (active) setError(true); }).finally(() => { if (active) setLoaded(true); });
-    return () => { active = false; scope.current.generation += 1; };
+    return () => { active = false; saveScope.generation += 1; };
   }, [owner, authLoading, locale, attempt]);
   const save = async () => {
     if (!owner || !summary || saving) return;
