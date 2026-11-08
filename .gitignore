@@ -53,3 +53,7 @@ next-env.d.ts
 
 # Local coding-tool configuration and caches.
 /.serena/
+
+# Ephemeral GitHub cloud credentials and release evidence.
+gha-creds-*.json
+release-evidence.json

@@ -80,3 +80,8 @@ components.json
 pnpm-lock.yaml
 pnpm-workspace.yaml
 yarn.lock
+
+# GitHub authentication files must never enter an image layer.
+gha-creds-*.json
+release-evidence.json
+.github
