@@ -85,3 +85,6 @@ yarn.lock
 gha-creds-*.json
 release-evidence.json
 .github
+
+# Test-only reference data is not part of the production application.
+src/test-fixtures/

@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import exampleProfile from '../../../../../xtara-api/scripts/fixtures/cybersecurity-analyst.detail-profile-v3.json';
+import exampleProfile from '@/test-fixtures/cybersecurity-analyst.detail-profile-v3.json';
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
 import type { DreamCareerDetailProfileReview, DreamCareerDetailProfileV3 } from '@/types/dream-career-detail-profile';
 import type { DreamCareerStudentGuideV1 } from '@/types/dream-career-student-guide';
