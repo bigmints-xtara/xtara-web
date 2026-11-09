@@ -51,6 +51,14 @@ describe("workspace-aware header", () => {
     expect(screen.queryByRole("link", { name: "My Career Path" })).not.toBeInTheDocument();
   });
 
+  it.each([null, { uid: "anonymous-1", isAnonymous: true }])("links visitors to the public Explorer", (user) => {
+    mocks.useAuth.mockReturnValue({ user });
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
+    renderHeader();
+    expect(screen.getByRole("link", { name: "Explore Careers" })).toHaveAttribute("href", "/explore");
+    expect(screen.getByRole("link", { name: "Xtara Logo" })).toHaveAttribute("href", "/");
+  });
+
   it("preserves the personal career path for learners", () => {
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
     renderHeader();

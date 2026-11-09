@@ -2,11 +2,13 @@
 
 import { Suspense, useState } from "react";
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/login-form";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
@@ -14,6 +16,7 @@ import { savePendingAssessmentToAccount, savePendingCareerChoiceToAccount } from
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import { getOrganizationContext } from "@/lib/organization";
 import { friendlyLoginError } from "@/lib/login-error";
+import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from "@/lib/mvp-navigation";
 import { workspaceDestination, WORKSPACE_MANIFESTS } from "@/lib/workspace-manifest";
 
 type LoginMode = "learner" | "educator";
@@ -29,7 +32,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { messages } = useTranslations();
+  const { messages, locale } = useTranslations();
   const { configurationError } = useAuth();
   const mode: LoginMode = searchParams.get("mode") === "educator" ? "educator" : "learner";
   const educatorMode = mode === "educator";
@@ -154,6 +157,11 @@ function LoginContent() {
         onSubmit={handleLogin}
         onGoogleLogin={handleGoogleLogin}
       />
+      {!educatorMode && MVP_NAVIGATION_ENABLED && (
+        <Button asChild variant="ghost" className="mt-4 w-full">
+          <Link href="/explore">{mvpNavigationCopy[locale].exploreCareers}</Link>
+        </Button>
+      )}
     </AuthShell>
   );
 }

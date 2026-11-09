@@ -14,7 +14,8 @@ export default function WorkspaceRouteBoundary({ children }: { children: ReactNo
   const router = useRouter();
   const { user } = useAuth();
   const { isStaff, loading, error, refresh } = useOrganizationWorkspace();
-  const learnerOnly = isWorkspaceRoute("student", pathname);
+  // The Explorer landing page reads the published catalogue without an account.
+  const learnerOnly = pathname !== "/explore" && isWorkspaceRoute("student", pathname);
   const checkingStaffRoute = Boolean(user && learnerOnly && loading);
   const redirectingStaff = Boolean(user && learnerOnly && isStaff);
   const unresolvedWorkspace = Boolean(user && learnerOnly && error);

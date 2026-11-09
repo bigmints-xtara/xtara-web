@@ -29,12 +29,12 @@ const Header = () => {
     const { isStaff, loading: workspaceLoading, error: workspaceError } = useOrganizationWorkspace();
     const { t, locale } = useTranslations();
     const pathname = usePathname();
-    const isLoggedIn = Boolean(user);
+    const isLoggedIn = Boolean(user && !user.isAnonymous);
     const organizationRoute = isWorkspaceRoute("educator", pathname);
     const learnerShell = isLoggedIn && !workspaceLoading && !workspaceError && !isStaff && !organizationRoute;
     const logoHref = isStaff || organizationRoute
         ? WORKSPACE_MANIFESTS.educator.homePath
-        : user ? WORKSPACE_MANIFESTS.student.homePath : "/";
+        : isLoggedIn ? WORKSPACE_MANIFESTS.student.homePath : "/";
     const navItems = isLoggedIn && (workspaceLoading || workspaceError || (organizationRoute && !isStaff))
         ? []
         : isStaff
@@ -57,6 +57,7 @@ const Header = () => {
             { key: "profile", url: WORKSPACE_MANIFESTS.student.profilePath },
         ]
         : [
+            ...(MVP_NAVIGATION_ENABLED ? [{ key: "explore", url: "/explore" }] : []),
             { key: "howItWorks", url: "/#how-it-works" },
             { key: "educators", url: "/educators" },
             { key: "about", url: "/about" },

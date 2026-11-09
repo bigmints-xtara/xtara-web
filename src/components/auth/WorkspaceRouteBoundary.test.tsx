@@ -15,6 +15,7 @@ vi.mock("@/context/OrganizationContext", () => ({ useOrganizationWorkspace: mock
 
 describe("workspace route boundary", () => {
   beforeEach(() => {
+    mocks.replace.mockClear();
     vi.mocked(useRouter).mockReturnValue({ replace: mocks.replace } as unknown as ReturnType<typeof useRouter>);
     mocks.useAuth.mockReturnValue({ user: { uid: "educator-1" } });
   });
@@ -47,5 +48,13 @@ describe("workspace route boundary", () => {
     render(<WorkspaceRouteBoundary><div>Learner profile</div></WorkspaceRouteBoundary>);
     expect(screen.queryByText("Learner profile")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Workspace access could not be verified" })).toBeInTheDocument();
+  });
+
+  it("keeps the public Explorer open when workspace verification fails", () => {
+    vi.mocked(usePathname).mockReturnValue("/explore");
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false, error: new Error("offline") });
+    render(<WorkspaceRouteBoundary><div>Public career map</div></WorkspaceRouteBoundary>);
+    expect(screen.getByText("Public career map")).toBeInTheDocument();
+    expect(mocks.replace).not.toHaveBeenCalled();
   });
 });
