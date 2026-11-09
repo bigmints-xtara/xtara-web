@@ -106,7 +106,7 @@ export async function savePendingAssessmentToAccount(userId: string): Promise<bo
   if (!assessment) return false;
   await ensureApiSession(userId);
   assessment = await currentAssessment(assessment);
-  const assessmentId = await saveAssessment(userId, assessmentAnswers(assessment));
+  const assessmentId = await saveAssessment(userId, assessmentAnswers(assessment), false, discoverySubmissionId(assessment));
   const latest = await getLatestAssessment(userId, assessmentId);
   if (!assessmentMatches(latest, assessment)) {
     throw new Error("Your assessment was not returned by account readback.");
@@ -127,7 +127,7 @@ async function persistCareerChoice(
   if (!isDirectionPlanCompatible(assessment, directionPlan)) {
     throw new Error("Please review your career choices against your updated assessment.");
   }
-  const assessmentId = await saveAssessment(userId, assessmentAnswers(assessment));
+  const assessmentId = await saveAssessment(userId, assessmentAnswers(assessment), false, discoverySubmissionId(assessment));
   await xtaraApi.patch("/me", {
     gradeStage: assessment.stage,
   }, { expectedUserId: userId });
@@ -160,9 +160,15 @@ async function currentAssessment(assessment: DiscoveryResult): Promise<Discovery
   if (current.version !== definition.version || current.stage !== assessment.stage || current.locale !== (assessment.locale ?? "en") || current.definitionId !== assessment.definitionId) {
     throw new Error("Your updated assessment was not returned by the server.");
   }
-  return { ...current, reflection: assessment.reflection };
+  return { ...current, createdAt: assessment.createdAt, reflection: assessment.reflection };
 }
 
+function discoverySubmissionId(assessment: DiscoveryResult): string | undefined {
+  const attempt = assessment.createdAt;
+  // Legacy local results may not contain an API timestamp.
+  if (!/^[0-9T:.Z-]{12,40}$/.test(attempt)) return undefined;
+  return `discovery:${attempt}:${assessment.stage}:${assessment.locale ?? 'en'}:${assessment.version}`;
+}
 function assessmentAnswers(assessment: DiscoveryResult): Record<string, unknown> {
   return { definitionId: assessment.definitionId, version: assessment.version,
     stage: assessment.stage, locale: assessment.locale ?? 'en', answers: assessment.answers };

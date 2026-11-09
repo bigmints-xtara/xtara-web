@@ -165,6 +165,10 @@ describe("staged discovery account sync", () => {
     expect(mocks.saveDirectionToApi).toHaveBeenCalledWith(plan, "learner-1");
     expect(mocks.get).toHaveBeenCalledWith("/assessment/latest", { expectedUserId: "learner-1" });
     expect(mocks.createApiSession).toHaveBeenCalledWith("token");
+    const originalId = mocks.saveAssessment.mock.calls[0][3];
+    expect(originalId).toMatch(/^discovery:/);
+    await expect(savePendingCareerChoiceToAccount("learner-1")).resolves.toBe(true);
+    expect(mocks.saveAssessment.mock.calls[1][3]).toBe(originalId);
   });
 
   it("keeps the learner on the account step when no career choice is pending", async () => {
@@ -189,7 +193,7 @@ describe("staged discovery account sync", () => {
     } } });
     await expect(savePendingCareerChoiceToAccount("learner-1")).resolves.toBe(true);
     expect(mocks.evaluateAssessment).toHaveBeenCalledWith(expect.objectContaining({ version: "3.1.0", stage: "grade8" }));
-    expect(mocks.saveAssessment).toHaveBeenCalledWith("learner-1", expect.objectContaining({ version: "3.1.0" }));
+    expect(mocks.saveAssessment).toHaveBeenCalledWith("learner-1", expect.objectContaining({ version: "3.1.0" }), false, expect.stringMatching(/^discovery:.*:grade8:en:3\.1\.0$/));
     expect(loadDiscoveryResult()).toMatchObject({ version: "3.1.0", syncStatus: "synced" });
   });
 

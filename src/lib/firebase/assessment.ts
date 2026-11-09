@@ -9,10 +9,11 @@ export async function getQuestionnaire(): Promise<Question[]> {
   return Array.isArray(response) ? response : response.steps || [];
 }
 
-export async function saveAssessment(userId: string, data: Record<string, unknown>, isRetake = false): Promise<string> {
+export async function saveAssessment(userId: string, data: Record<string, unknown>, isRetake = false, submissionId?: string): Promise<string> {
   const result = await xtaraApi.post<{ assessmentId: string }>('/assessment', {
     answers: assessmentSubmission(data),
     isRetake,
+    ...(submissionId ? { submissionId } : {}),
   }, { expectedUserId: userId });
   return result.assessmentId;
 }
