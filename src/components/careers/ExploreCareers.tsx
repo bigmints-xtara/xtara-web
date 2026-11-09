@@ -90,6 +90,7 @@ export default function ExploreCareers() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["career-explorer", locale],
     queryFn: ({ signal }) => getCareerExplorer(locale, signal),
+    meta: { authScope: "public" },
     staleTime: 60_000,
     retry: false,
   });

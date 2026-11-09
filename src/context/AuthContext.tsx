@@ -51,7 +51,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           queryFn: () => getUserProfile(authUser.uid),
         });
       } else {
-        queryClient.clear();
+        // Public queries can be in flight when Firebase first reports a guest.
+        queryClient.removeQueries({ predicate: (query) => query.meta?.authScope !== "public" });
+        queryClient.getMutationCache().clear();
       }
     });
 
