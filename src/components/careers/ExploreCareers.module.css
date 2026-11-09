@@ -1,75 +1,60 @@
 .explorer {
-  --paper: #fbfaf7;
-  --ink: #253c38;
-  --muted: #65746e;
-  --line: #dce3dc;
-  --card: #fff;
-  --accent: #236b58;
-  --tint-0: #dbeee3;
-  --tint-1: #f9e8ca;
-  --tint-2: #e7e3f4;
-  --tint-3: #dceaf4;
+  --paper: color-mix(in srgb, var(--xtara-sky) 6%, var(--background));
+  --ink: var(--foreground);
+  --explorer-muted: color-mix(in srgb, var(--foreground) 74%, var(--background));
+  --line: var(--border);
+  --tint-0: color-mix(in srgb, var(--xtara-sky) 19%, var(--card));
+  --tint-1: color-mix(in srgb, var(--xtara-gold) 22%, var(--card));
+  --tint-2: color-mix(in srgb, var(--xtara-coral) 16%, var(--card));
+  --tint-3: color-mix(in srgb, var(--xtara-navy) 13%, var(--card));
   background: var(--paper);
   color: var(--ink);
   min-height: 100dvh;
-  font-family: var(--font-sans), sans-serif;
 }
-.explorer button,
-.explorer a,
-.explorer select,
-.explorer input {
+.main button,
+.main a,
+.main input {
   touch-action: manipulation;
 }
-.explorer button {
+.main button {
   cursor: pointer;
 }
-.explorer button:disabled {
+.main button:disabled {
   opacity: 0.4;
   cursor: default;
 }
-.explorer button:focus-visible,
-.explorer a:focus-visible,
-.explorer select:focus-visible,
-.explorer input:focus-visible,
+.main button:focus-visible,
+.main a:focus-visible,
+.main input:focus-visible,
 .viewport:focus-visible {
-  outline: 3px solid #d59443;
+  outline: 2px solid var(--ring);
   outline-offset: 4px;
 }
-.topbar {
-  height: 76px;
+.toolbar {
+  flex-shrink: 0;
+  background: var(--background);
+  border-bottom: 1px solid var(--line);
+}
+.toolbarInner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 0 32px;
-  border-bottom: 1px solid var(--line);
-  background: var(--paper);
-  position: relative;
-  z-index: 2;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: var(--ink);
-  font-weight: 750;
-  font-size: 26px;
-  letter-spacing: -1px;
-}
-.brandDot {
-  color: #bd7843;
+  gap: 12px 20px;
+  padding-block: 10px;
+  min-height: 64px;
 }
 .viewSwitch {
   display: flex;
-  padding: 4px;
+  padding: 3px;
   background: var(--tint-0);
   border-radius: 100px;
   gap: 3px;
 }
 .viewSwitch button {
   font-size: 13px;
-  padding: 9px 17px;
+  min-height: 38px;
+  padding: 6px 16px;
   border-radius: 100px;
   border: 0;
   background: transparent;
@@ -77,42 +62,37 @@
   font-weight: 600;
 }
 .viewSwitch button[aria-pressed="true"] {
-  background: var(--card);
-  box-shadow: 0 2px 6px #17372a12;
-}
-.topbar select {
-  max-width: 130px;
-  font-size: 13px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--card);
-  color: var(--ink);
-  padding: 8px;
+  color: var(--primary-foreground);
+  background: var(--primary);
 }
 .mapMode {
   height: 100dvh;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.mapMode > header {
+  flex-shrink: 0;
 }
 .main {
   position: relative;
 }
 .mapMode .main {
-  height: calc(100dvh - 76px);
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
 .pathbar {
-  flex-shrink: 0;
-  min-height: 64px;
-  padding: 12px 32px;
+  flex: 1;
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: center;
-  font-size: 12px;
-  color: var(--muted);
+  font-size: 13px;
+  color: var(--ink);
 }
 .pathbar > span {
   flex: 1;
+  font-weight: 650;
 }
 .pathbar button {
   display: flex;
@@ -153,9 +133,9 @@
   width: 560px;
   max-height: 100%;
   border: 1px solid var(--line);
-  border-radius: 25px;
+  border-radius: var(--radius-lg);
   background: var(--card);
-  box-shadow: 0 12px 44px #284e3710;
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--foreground) 7%, transparent);
   cursor: auto;
 }
 .nodeHeader {
@@ -168,7 +148,7 @@
   letter-spacing: 1.7px;
   text-transform: uppercase;
   font-weight: 650;
-  color: var(--accent);
+  color: var(--primary);
   margin-bottom: 8px;
 }
 .nodeHeader h1 {
@@ -182,7 +162,7 @@
 }
 .nodeHeader > p {
   font-size: 13px;
-  color: var(--muted);
+  color: var(--explorer-muted);
   margin: 10px 0 0;
 }
 .nodeBody {
@@ -195,7 +175,7 @@
   line-height: 1.65;
 }
 .intro {
-  color: var(--muted);
+  color: var(--explorer-muted);
   margin: 0 0 20px;
 }
 .choices {
@@ -211,15 +191,12 @@
   border: 1px solid var(--line);
   background: var(--card);
   padding: 14px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   color: var(--ink);
-  transition:
-    border-color 0.16s,
-    transform 0.16s;
+  transition: border-color 0.16s;
 }
 .choice:hover {
-  border-color: var(--accent);
-  transform: translateX(3px);
+  border-color: var(--primary);
 }
 .choice > span:nth-child(2) {
   flex: 1;
@@ -232,7 +209,7 @@
 }
 .choice small {
   font-size: 12px;
-  color: var(--muted);
+  color: var(--explorer-muted);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -258,8 +235,8 @@
 .primary {
   border: 0;
   border-radius: 12px;
-  background: var(--accent);
-  color: #fff !important;
+  background: var(--primary);
+  color: var(--primary-foreground);
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -276,7 +253,7 @@
 .textButton {
   border: 0;
   background: transparent;
-  color: var(--accent);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -291,7 +268,7 @@
   flex: none;
   width: 180px;
   padding: 19px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: var(--tint-0);
   border: 1px solid var(--line);
   text-align: left;
@@ -303,7 +280,7 @@
 }
 .pastNode > span {
   font-size: 10px;
-  color: var(--muted);
+  color: var(--explorer-muted);
 }
 .pastNode strong {
   font-size: 14px;
@@ -331,7 +308,7 @@
   justify-content: space-between;
   gap: 20px;
   font-size: 11px;
-  color: var(--muted);
+  color: var(--explorer-muted);
 }
 .zoomControls {
   display: flex;
@@ -361,7 +338,7 @@
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 16px;
-  color: var(--muted);
+  color: var(--explorer-muted);
 }
 .search input {
   width: 100%;
@@ -395,7 +372,7 @@
   height: 7px;
   left: 2px;
   top: 23px;
-  background: var(--accent);
+  background: var(--primary);
   border-radius: 50%;
 }
 .detailSection {
@@ -421,7 +398,7 @@
 .note,
 .sources {
   font-size: 12px;
-  color: var(--muted);
+  color: var(--explorer-muted);
 }
 .studyRoute {
   border-left: 2px solid var(--tint-0);
@@ -438,7 +415,7 @@
 }
 .sources summary {
   cursor: pointer;
-  color: var(--accent);
+  color: var(--primary);
   font-weight: 600;
 }
 .sources a {
@@ -450,7 +427,7 @@
 }
 .assessment {
   background: var(--tint-0);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 22px;
   margin-top: 18px;
 }
@@ -492,7 +469,7 @@
 .breadcrumbs button {
   border: 0;
   background: transparent;
-  color: var(--muted);
+  color: var(--explorer-muted);
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -502,62 +479,28 @@
 .cardsContent .nodeFooter .primary {
   width: auto;
 }
-:global(.dark) .explorer {
-  --paper: #122320;
-  --ink: #e7efe9;
-  --muted: #a9bbb1;
-  --line: #344d43;
-  --card: #1c302a;
-  --accent: #66b896;
-  --tint-0: #294b3b;
-  --tint-1: #51442b;
-  --tint-2: #403b57;
-  --tint-3: #2d4755;
-}
-:global(.dark) .primary {
-  color: #102b20 !important;
+@media (width < 64rem) {
+  /* The shared header renders this sibling nav for signed-in learners. */
+  .explorer:has(> nav) {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom));
+  }
 }
 @media (max-width: 640px) {
-  .topbar {
-    height: 64px;
-    padding: 0 12px;
-    gap: 7px;
-  }
-  .brand {
-    font-size: 22px;
-  }
-  .brand > svg {
-    display: none;
-  }
-  .viewSwitch {
-    padding: 3px;
-    gap: 0;
-  }
-  .viewSwitch button {
-    padding: 8px 9px;
-    font-size: 11px;
-  }
-  .topbar select {
-    font-size: 11px;
-    max-width: 84px;
-    padding: 7px 4px;
-  }
-  .mapMode .main {
-    height: calc(100dvh - 64px);
+  .toolbarInner {
+    padding-block: 8px;
+    gap: 4px 12px;
   }
   .pathbar {
-    min-height: 52px;
-    padding: 6px 18px;
-    gap: 12px;
-    font-size: 11px;
-  }
-  .pathbar > span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    flex-basis: 100%;
+    gap: 10px;
+    font-size: 12px;
+    flex-wrap: wrap;
   }
   .pathbar button {
     flex-shrink: 0;
+  }
+  .viewSwitch button {
+    padding-inline: 12px;
   }
   .track {
     padding: 12px 20px;
@@ -566,7 +509,6 @@
   }
   .activeNode {
     width: calc(100vw - 40px);
-    border-radius: 20px;
   }
   .nodeHeader {
     padding: 20px 20px 14px;
@@ -625,14 +567,8 @@
   }
 }
 @media (max-height: 520px) and (min-width: 641px) {
-  .topbar {
-    height: 55px;
-  }
-  .mapMode .main {
-    height: calc(100dvh - 55px);
-  }
-  .pathbar {
-    min-height: 40px;
+  .toolbarInner {
+    min-height: 44px;
     padding-block: 3px;
   }
   .mapDock {
@@ -652,8 +588,5 @@
 @media (prefers-reduced-motion: reduce) {
   .choice {
     transition: none;
-  }
-  .choice:hover {
-    transform: none;
   }
 }

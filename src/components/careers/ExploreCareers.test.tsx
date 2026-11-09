@@ -10,8 +10,9 @@ import {
   previousExploreState,
 } from "./explorer/state";
 vi.mock("@/i18n/language-provider", () => ({
-  useTranslations: () => ({ locale: "en", setLocale: vi.fn() }),
+  useTranslations: () => ({ locale: "en" }),
 }));
+vi.mock("@/components/Header", () => ({ default: () => <header /> }));
 vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn() }));
 const fixture: CareerExplorerResponse = {
   schemaVersion: 1,

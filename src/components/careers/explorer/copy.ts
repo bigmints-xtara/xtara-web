@@ -2,7 +2,6 @@ import type { Locale } from "@/i18n/config";
 const en = {
   title: "Explore your possibilities",
   subtitle: "Follow what interests you. You don’t need to decide today.",
-  home: "Leave Explore",
   map: "Mind map",
   cards: "Browse cards",
   view: "Choose how to explore",
@@ -64,7 +63,6 @@ export const explorerCopy: Record<Locale, ExplorerCopy> = {
   ml: {
     title: "നിങ്ങളുടെ സാധ്യതകൾ അറിയൂ",
     subtitle: "താൽപ്പര്യങ്ങളെ പിന്തുടരൂ. ഇന്ന് തന്നെ തീരുമാനിക്കേണ്ടതില്ല.",
-    home: "എക്സ്പ്ലോറിൽ നിന്ന് മടങ്ങുക",
     map: "മൈൻഡ് മാപ്പ്",
     cards: "കാർഡുകൾ",
     view: "അറിയാനുള്ള രീതി തിരഞ്ഞെടുക്കൂ",
@@ -123,7 +121,6 @@ export const explorerCopy: Record<Locale, ExplorerCopy> = {
   hi: {
     title: "अपनी संभावनाएँ जानें",
     subtitle: "अपनी रुचि का साथ दें। आज ही निर्णय लेना ज़रूरी नहीं।",
-    home: "एक्सप्लोर से बाहर जाएँ",
     map: "माइंड मैप",
     cards: "कार्ड देखें",
     view: "देखने का तरीका चुनें",
@@ -181,7 +178,6 @@ export const explorerCopy: Record<Locale, ExplorerCopy> = {
   ta: {
     title: "உங்கள் வாய்ப்புகளை அறியுங்கள்",
     subtitle: "உங்கள் ஆர்வத்தைத் தொடருங்கள். இன்றே முடிவு செய்ய வேண்டியதில்லை.",
-    home: "ஆராய்விலிருந்து வெளியேறு",
     map: "மன வரைபடம்",
     cards: "அட்டைகள்",
     view: "பார்க்கும் முறையைத் தேர்ந்தெடுங்கள்",

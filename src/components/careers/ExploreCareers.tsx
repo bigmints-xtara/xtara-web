@@ -19,8 +19,11 @@ import {
   Search,
 } from "lucide-react";
 import { useTranslations } from "@/i18n/language-provider";
-import type { Locale } from "@/i18n/config";
+import Container from "@/components/Container";
+import Header from "@/components/Header";
+import studentStyles from "@/components/journey/journey.module.css";
 import { getCareerExplorer } from "@/lib/career-explorer-api";
+import { mvpNavigationCopy } from "@/lib/mvp-navigation";
 import { explorerCopy } from "./explorer/copy";
 import {
   exploreUrl,
@@ -81,7 +84,7 @@ function Choice({
 }
 
 export default function ExploreCareers() {
-  const { locale, setLocale } = useTranslations();
+  const { locale } = useTranslations();
   const copy = explorerCopy[locale];
   const search = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
   const { data, isPending, isError, refetch } = useQuery({
@@ -512,56 +515,43 @@ export default function ExploreCareers() {
   );
   return (
     <div
-      className={`${styles.explorer} ${state.view === "map" ? styles.mapMode : styles.cardsMode}`}
+      className={`${styles.explorer} ${studentStyles.studentChrome} ${state.view === "map" ? styles.mapMode : ""}`}
     >
-      <header className={styles.topbar}>
-        <Link href="/" className={styles.brand} aria-label={copy.home}>
-          <Compass size={23} />
-          <span>
-            xtara<span className={styles.brandDot}>.</span>
-          </span>
-        </Link>
-        <div className={styles.viewSwitch} role="group" aria-label={copy.view}>
-          <button
-            aria-pressed={state.view === "map"}
-            onClick={() => navigate({ ...state, view: "map" })}
-          >
-            {copy.map}
-          </button>
-          <button
-            aria-pressed={state.view === "cards"}
-            onClick={() => navigate({ ...state, view: "cards" })}
-          >
-            {copy.cards}
-          </button>
-        </div>
-        <select
-          aria-label="Language"
-          value={locale}
-          onChange={(e) => setLocale(e.target.value as Locale)}
-        >
-          <option value="en">English</option>
-          <option value="ml">മലയാളം</option>
-          <option value="hi">हिन्दी</option>
-          <option value="ta">தமிழ்</option>
-        </select>
-      </header>
+      <Header />
       <main className={styles.main}>
-        <nav className={styles.pathbar} aria-label={copy.path}>
-          {state.step !== "directions" && (
-            <button onClick={() => navigate(previousExploreState(state))}>
-              <ArrowLeft size={16} />
-              {copy.back}
-            </button>
-          )}
-          <span>{copy.title}</span>
-          {state.step !== "directions" && (
-            <button onClick={reset}>
-              <RotateCcw size={15} />
-              <span>{copy.start}</span>
-            </button>
-          )}
-        </nav>
+        <div className={styles.toolbar}>
+          <Container className={`${styles.toolbarInner} !px-4 md:!px-6`}>
+            <nav className={styles.pathbar} aria-label={copy.path}>
+              {state.step !== "directions" && (
+                <button onClick={() => navigate(previousExploreState(state))}>
+                  <ArrowLeft size={16} />
+                  {copy.back}
+                </button>
+              )}
+              <span>{mvpNavigationCopy[locale].exploreCareers}</span>
+              {state.step !== "directions" && (
+                <button onClick={reset}>
+                  <RotateCcw size={15} />
+                  <span>{copy.start}</span>
+                </button>
+              )}
+            </nav>
+            <div className={styles.viewSwitch} role="group" aria-label={copy.view}>
+              <button
+                aria-pressed={state.view === "map"}
+                onClick={() => navigate({ ...state, view: "map" })}
+              >
+                {copy.map}
+              </button>
+              <button
+                aria-pressed={state.view === "cards"}
+                onClick={() => navigate({ ...state, view: "cards" })}
+              >
+                {copy.cards}
+              </button>
+            </div>
+          </Container>
+        </div>
         {state.view === "map" ? (
           <div
             ref={viewport}
