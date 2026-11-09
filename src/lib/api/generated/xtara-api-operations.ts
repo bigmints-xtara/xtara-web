@@ -52,6 +52,7 @@ export const XTARA_API_OPERATIONS = {
   "putAssessmentDraft": { method: "PUT", path: "/api/v1/assessment/draft", authenticated: true },
   "postAssessmentEvaluate": { method: "POST", path: "/api/v1/assessment/evaluate", authenticated: false },
   "getAssessmentLatest": { method: "GET", path: "/api/v1/assessment/latest", authenticated: true },
+  "getCareerExplorer": { method: "GET", path: "/api/v1/career-explorer", authenticated: false },
   "getCareerPathsCareerPathId": { method: "GET", path: "/api/v1/career-paths/{careerPathId}", authenticated: false },
   "getCareerTools": { method: "GET", path: "/api/v1/career-tools", authenticated: false },
   "getChallenges": { method: "GET", path: "/api/v1/challenges", authenticated: false },
