@@ -9,6 +9,9 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    // Bound DOM worker contention; review tests render a full 229-row queue.
+    maxWorkers: 2,
+    testTimeout: 30_000,
     environment: "jsdom",
     setupFiles: "./src/setup-tests.ts",
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],

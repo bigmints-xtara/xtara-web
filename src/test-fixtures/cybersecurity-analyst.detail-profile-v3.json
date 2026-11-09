@@ -1,0 +1,604 @@
+{
+  "schemaVersion": 3,
+  "careerId": "cybersecurity-analyst",
+  "locale": "en",
+  "work": {
+    "summary": "Cybersecurity analysts monitor digital systems, investigate suspicious activity, assess weaknesses, and help organisations reduce risks to information and services.",
+    "whyItMatters": "Their work helps keep essential data and digital operations available, trustworthy, and safer for the people who depend on them.",
+    "activities": [
+      {
+        "id": "monitor-security-events",
+        "title": "Monitor security events",
+        "description": "Review alerts and system activity to identify events that may require investigation or a defensive response.",
+        "frequency": "daily",
+        "sourceIds": ["onet-information-security-analysts"]
+      },
+      {
+        "id": "investigate-incidents",
+        "title": "Investigate incidents",
+        "description": "Collect and analyse technical information to understand what happened, what was affected, and how recurrence can be reduced.",
+        "frequency": "varies",
+        "sourceIds": ["onet-information-security-analysts"]
+      },
+      {
+        "id": "assess-vulnerabilities",
+        "title": "Assess vulnerabilities",
+        "description": "Examine systems and security controls for weaknesses, then document practical steps for improving protection.",
+        "frequency": "periodic",
+        "sourceIds": ["onet-information-security-analysts"]
+      },
+      {
+        "id": "explain-security-risks",
+        "title": "Explain security risks",
+        "description": "Translate technical findings into clear recommendations that colleagues and decision-makers can understand and act on.",
+        "frequency": "weekly",
+        "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+      }
+    ],
+    "settings": [
+      {
+        "id": "digital-operations-teams",
+        "environment": "Technology, security, consulting, finance, public-sector, or other digitally dependent organisations",
+        "workModes": ["on_site", "hybrid", "remote", "varies"],
+        "schedule": "varies",
+        "travel": "varies",
+        "description": "Most work is computer-based and collaborative; incident-response responsibilities can occasionally require work outside standard hours.",
+        "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+      }
+    ]
+  },
+  "educationPathways": [
+    {
+      "id": "iitm-flexible-computing-route",
+      "title": "Flexible school-to-diploma or degree route",
+      "routeType": "school_to_degree",
+      "description": "A flexible example through IIT Madras that accepts learners from any Higher Secondary stream and provides certificate, diploma, degree, postgraduate-diploma, and M.Tech exit points.",
+      "timeline": [
+        {
+          "id": "iitm-grade-10",
+          "order": 1,
+          "stageType": "grade_10",
+          "title": "Grade 10",
+          "description": "Build a sound base in Mathematics and English; IIT Madras says applicants are expected to have studied both subjects in Class 10.",
+          "requirement": "commonly_expected",
+          "streamOptions": [],
+          "qualificationExamples": ["Class 10 or equivalent"],
+          "typicalDurationMonths": {"min": 12, "max": 12},
+          "sourceIds": ["iitm-bs-data-science-admissions"]
+        },
+        {
+          "id": "iitm-higher-secondary",
+          "order": 2,
+          "stageType": "higher_secondary",
+          "title": "Higher Secondary",
+          "description": "Complete Class 12 or equivalent. This route accepts applicants irrespective of academic background, and Class 11 students may apply irrespective of group or stream.",
+          "requirement": "required",
+          "streamOptions": [
+            {
+              "stream": "any_stream",
+              "relevance": "accepted",
+              "subjects": [],
+              "notes": "Science, Commerce, Humanities, and Vocational learners may apply; Mathematics and English at Class 10 are expected.",
+              "sourceIds": ["iitm-bs-data-science-admissions"]
+            }
+          ],
+          "qualificationExamples": ["Class 12 or equivalent"],
+          "typicalDurationMonths": {"min": 24, "max": 24},
+          "sourceIds": ["iitm-bs-data-science-admissions"]
+        },
+        {
+          "id": "iitm-qualifier-preparation",
+          "order": 3,
+          "stageType": "entry_preparation",
+          "title": "Qualifier process or JEE-based entry",
+          "description": "Regular-entry applicants complete four weeks of coursework and the qualifier process; candidates eligible for the latest JEE Advanced may enter the Foundation Level directly.",
+          "requirement": "one_possible_route",
+          "streamOptions": [],
+          "qualificationExamples": ["IITM qualifier process", "JEE-based entry eligibility"],
+          "typicalDurationMonths": {"min": 1, "max": 2},
+          "sourceIds": ["iitm-bs-data-science-admissions"]
+        },
+        {
+          "id": "iitm-foundation-certificate",
+          "order": 4,
+          "stageType": "certificate",
+          "title": "Foundation Level",
+          "description": "Complete the eight Foundation Level courses and 32 credits before moving to Diploma Level courses, or use the foundation certificate as an exit point.",
+          "requirement": "required",
+          "streamOptions": [],
+          "qualificationExamples": ["Foundation Certificate from IITM CODE"],
+          "typicalDurationMonths": {"min": 12, "max": 36},
+          "sourceIds": ["iitm-bs-data-science-fees"]
+        },
+        {
+          "id": "iitm-programming-data-diploma",
+          "order": 5,
+          "stageType": "diploma",
+          "title": "Programming or Data Science Diploma",
+          "description": "Continue through one or both IIT Madras diploma levels, each with courses and projects, or exit with the completed diploma credential.",
+          "requirement": "one_possible_route",
+          "streamOptions": [],
+          "qualificationExamples": ["Diploma in Programming", "Diploma in Data Science"],
+          "typicalDurationMonths": {"min": 12, "max": 48},
+          "sourceIds": ["iitm-bs-data-science-fees"]
+        },
+        {
+          "id": "iitm-bs-degree",
+          "order": 6,
+          "stageType": "undergraduate",
+          "title": "BSc or BS Degree",
+          "description": "After completing the prerequisite levels, continue to the BSc in Programming and Data Science or BS in Data Science and Applications.",
+          "requirement": "one_possible_route",
+          "streamOptions": [],
+          "qualificationExamples": ["BSc in Programming and Data Science", "BS in Data Science and Applications"],
+          "typicalDurationMonths": {"min": 12, "max": 48},
+          "sourceIds": ["iitm-bs-data-science-fees"]
+        },
+        {
+          "id": "iitm-pg-ai-ml",
+          "order": 7,
+          "stageType": "postgraduate",
+          "title": "Optional PG Diploma or M.Tech",
+          "description": "Learners who complete the BS may optionally continue to the PG Diploma and then M.Tech in Artificial Intelligence and Machine Learning.",
+          "requirement": "optional",
+          "streamOptions": [],
+          "qualificationExamples": ["PG Diploma in AI and ML", "M.Tech in AI and ML"],
+          "typicalDurationMonths": {"min": 12, "max": 48},
+          "sourceIds": ["iitm-bs-data-science-fees"]
+        }
+      ],
+      "entranceExams": [
+        {
+          "id": "iitm-qualifier",
+          "name": "IIT Madras BS Qualifier Exam",
+          "requirement": "one_possible_route",
+          "authority": "Indian Institute of Technology Madras",
+          "officialUrl": "https://study.iitm.ac.in/ds/admissions.html",
+          "appliesToStageIds": ["iitm-qualifier-preparation"],
+          "scoreType": "score",
+          "scoreUse": "eligibility",
+          "benchmarks": [],
+          "verifiedAt": "2026-08-02",
+          "sourceIds": ["iitm-bs-data-science-admissions"]
+        },
+        {
+          "id": "iitm-jee-entry",
+          "name": "Eligibility to appear for the latest JEE Advanced",
+          "requirement": "one_possible_route",
+          "authority": "Indian Institute of Technology Madras",
+          "officialUrl": "https://study.iitm.ac.in/ds/admissions.html",
+          "appliesToStageIds": ["iitm-qualifier-preparation"],
+          "scoreType": "qualifying_status",
+          "scoreUse": "institution_access",
+          "benchmarks": [],
+          "verifiedAt": "2026-08-02",
+          "sourceIds": ["iitm-bs-data-science-admissions"]
+        }
+      ],
+      "sourceIds": ["iitm-bs-data-science-admissions", "iitm-bs-data-science-fees"]
+    },
+    {
+      "id": "amrita-btech-cybersecurity-route",
+      "title": "Science stream to a specialised B.Tech",
+      "routeType": "school_to_degree",
+      "description": "A specialised private-university route through Amrita's four-year B.Tech in Computer Science and Engineering with Cyber Security, with optional postgraduate study later.",
+      "timeline": [
+        {
+          "id": "amrita-grade-10",
+          "order": 1,
+          "stageType": "grade_10",
+          "title": "Grade 10",
+          "description": "Complete Grade 10 before the 10+2 science preparation required for this engineering route.",
+          "requirement": "required",
+          "streamOptions": [],
+          "qualificationExamples": ["Class 10 or equivalent"],
+          "typicalDurationMonths": {"min": 12, "max": 12},
+          "sourceIds": ["amrita-btech-cse-cybersecurity"]
+        },
+        {
+          "id": "amrita-higher-secondary-pcm",
+          "order": 2,
+          "stageType": "higher_secondary",
+          "title": "Higher Secondary with Physics, Chemistry, and Mathematics",
+          "description": "Complete Class 12 with the published aggregate and subject-level requirements in Physics, Chemistry, and Mathematics.",
+          "requirement": "required",
+          "streamOptions": [
+            {
+              "stream": "science",
+              "relevance": "required",
+              "subjects": ["Physics", "Chemistry", "Mathematics"],
+              "notes": "This B.Tech route requires the PCM subject combination and the current marks conditions stated by Amrita.",
+              "sourceIds": ["amrita-btech-cse-cybersecurity"]
+            }
+          ],
+          "qualificationExamples": ["Class 12 or equivalent with PCM"],
+          "typicalDurationMonths": {"min": 24, "max": 24},
+          "sourceIds": ["amrita-btech-cse-cybersecurity"]
+        },
+        {
+          "id": "amrita-btech-cybersecurity",
+          "order": 3,
+          "stageType": "undergraduate",
+          "title": "B.Tech CSE with Cyber Security",
+          "description": "Complete the four-year specialised degree covering computing foundations, cyber security, practical work, and related professional preparation.",
+          "requirement": "one_possible_route",
+          "streamOptions": [],
+          "qualificationExamples": ["B.Tech in Computer Science and Engineering Cyber Security"],
+          "typicalDurationMonths": {"min": 48, "max": 48},
+          "sourceIds": ["amrita-btech-cse-cybersecurity"]
+        },
+        {
+          "id": "amrita-cybersecurity-pg",
+          "order": 4,
+          "stageType": "postgraduate",
+          "title": "Optional postgraduate specialisation",
+          "description": "Postgraduate cyber security study is an optional continuation for deeper research or specialist work, not a general entry requirement for analyst roles.",
+          "requirement": "optional",
+          "streamOptions": [],
+          "qualificationExamples": ["M.Tech in Cyber Security", "PhD in a cyber security field"],
+          "typicalDurationMonths": {"min": 24, "max": 60},
+          "sourceIds": ["amrita-btech-cse-cybersecurity"]
+        }
+      ],
+      "entranceExams": [
+        {
+          "id": "aeee-2026",
+          "name": "Amrita Entrance Examination Engineering 2026",
+          "requirement": "one_possible_route",
+          "authority": "Amrita Vishwa Vidyapeetham",
+          "officialUrl": "https://aeee.amrita.edu/",
+          "appliesToStageIds": ["amrita-btech-cybersecurity"],
+          "scoreType": "rank",
+          "scoreUse": "multiple",
+          "benchmarks": [],
+          "verifiedAt": "2026-08-02",
+          "sourceIds": ["amrita-aeee-admissions-scholarships", "amrita-btech-cse-cybersecurity"]
+        },
+        {
+          "id": "jee-main-2026",
+          "name": "JEE Main 2026",
+          "requirement": "one_possible_route",
+          "authority": "National Testing Agency",
+          "officialUrl": "https://aeee.amrita.edu/",
+          "appliesToStageIds": ["amrita-btech-cybersecurity"],
+          "scoreType": "percentile",
+          "scoreUse": "multiple",
+          "benchmarks": [],
+          "verifiedAt": "2026-08-02",
+          "sourceIds": ["amrita-aeee-admissions-scholarships", "amrita-btech-cse-cybersecurity"]
+        }
+      ],
+      "sourceIds": ["amrita-btech-cse-cybersecurity", "amrita-aeee-admissions-scholarships"]
+    }
+  ],
+  "skills": [
+    {
+      "id": "analytical-thinking",
+      "name": "Analytical thinking",
+      "category": "human",
+      "importance": "core",
+      "howUsed": "Break down alerts, system behaviour, and evidence to distinguish likely threats from routine activity.",
+      "sourceIds": ["onet-information-security-analysts"]
+    },
+    {
+      "id": "systems-security",
+      "name": "Systems and network security",
+      "category": "technical",
+      "importance": "core",
+      "howUsed": "Understand how digital systems communicate and where security controls can prevent, detect, or contain misuse.",
+      "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+    },
+    {
+      "id": "incident-investigation",
+      "name": "Incident investigation",
+      "category": "technical",
+      "importance": "core",
+      "howUsed": "Examine logs and other technical evidence, document findings, and support a coordinated response.",
+      "sourceIds": ["onet-information-security-analysts"]
+    },
+    {
+      "id": "risk-communication",
+      "name": "Risk communication",
+      "category": "business",
+      "importance": "important",
+      "howUsed": "Explain technical risks and recommended controls clearly to colleagues with different levels of technical knowledge.",
+      "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+    },
+    {
+      "id": "continuous-learning",
+      "name": "Continuous learning",
+      "category": "human",
+      "importance": "important",
+      "howUsed": "Keep knowledge current as tools, system architectures, vulnerabilities, and defensive practices change.",
+      "sourceIds": ["onet-information-security-analysts"]
+    }
+  ],
+  "careerTimeline": {
+    "model": "illustrative",
+    "summary": "This is an illustrative progression, not a guaranteed ladder. People may remain technical specialists, move into consulting or research, or take a management route depending on their work and organisation.",
+    "stages": [
+      {
+        "id": "analyst-entry-stage",
+        "order": 1,
+        "level": "junior",
+        "track": "individual_contributor",
+        "commonTitles": ["Cybersecurity Analyst", "Security Administrator"],
+        "responsibilities": "Monitor alerts, follow established response procedures, document findings, and build reliable knowledge of systems and security controls.",
+        "progressionSignals": ["Investigations are accurate and well documented", "Routine incidents are handled with decreasing supervision"],
+        "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+      },
+      {
+        "id": "security-engineering-stage",
+        "order": 2,
+        "level": "mid_level",
+        "track": "individual_contributor",
+        "commonTitles": ["Security Engineer", "Incident Responder", "Vulnerability Assessor"],
+        "responsibilities": "Lead more complex investigations, improve detection and protection controls, assess vulnerabilities, and coordinate technical remediation with other teams.",
+        "progressionSignals": ["Owns complex incidents or assessments end to end", "Improves controls and team procedures using evidence"],
+        "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+      },
+      {
+        "id": "security-lead-stage",
+        "order": 3,
+        "level": "lead",
+        "track": "mixed",
+        "commonTitles": ["Security Architect", "Security Consultant", "Cloud Security Architect"],
+        "responsibilities": "Design or review security approaches across systems, guide difficult technical decisions, and help teams balance protection, usability, and operational needs.",
+        "progressionSignals": ["Guides cross-team security design decisions", "Mentors analysts and engineers through difficult cases"],
+        "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+      },
+      {
+        "id": "security-management-stage",
+        "order": 4,
+        "level": "manager",
+        "track": "management",
+        "commonTitles": ["Governance Risk and Compliance Manager", "Security Manager", "Data Privacy Officer"],
+        "responsibilities": "Coordinate people, priorities, risk decisions, and communication while ensuring technical findings lead to accountable organisational action.",
+        "progressionSignals": ["Builds effective security programmes across teams", "Communicates risk and trade-offs to senior decision-makers"],
+        "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+      }
+    ]
+  },
+  "financials": {
+    "educationCosts": [
+      {
+        "id": "iitm-bs-total-2026",
+        "educationPathwayId": "iitm-flexible-computing-route",
+        "educationStageId": "iitm-bs-degree",
+        "institutionName": "Indian Institute of Technology Madras",
+        "programName": "BS in Data Science and Applications",
+        "campus": "Online programme with in-person assessments",
+        "institutionType": "central_government",
+        "feeCategory": "published_variable",
+        "admissionRoute": {
+          "basis": "mixed",
+          "entranceExamIds": ["iitm-qualifier", "iitm-jee-entry"],
+          "selectionBenchmarkIds": [],
+          "seatCategory": "open",
+          "scoreEffects": ["eligibility", "institution_access", "none_on_published_fee"],
+          "publishedFeeChangesWithScore": false,
+          "description": "Qualifier or JEE-based status affects entry. The published programme fee is course-based; documented support depends on category and family income, not the qualifier score."
+        },
+        "geography": "India",
+        "amount": {"currency": "INR", "min": 386000, "max": 450000},
+        "feePeriod": "total_program",
+        "durationMonths": {"min": 48, "max": 96},
+        "basis": "tuition_and_required_fees",
+        "asOf": "2026",
+        "includes": ["Published total fees through the BS degree level"],
+        "excludes": ["Computer and connectivity", "Travel or accommodation for assessments", "Repeated courses or additional exam charges"],
+        "sourceIds": ["iitm-bs-data-science-admissions", "iitm-bs-data-science-fees"]
+      },
+      {
+        "id": "amrita-cybersecurity-scholarship-annual-2026",
+        "educationPathwayId": "amrita-btech-cybersecurity-route",
+        "educationStageId": "amrita-btech-cybersecurity",
+        "institutionName": "Amrita Vishwa Vidyapeetham",
+        "programName": "B.Tech in Computer Science and Engineering Cyber Security",
+        "campus": "Amritapuri",
+        "institutionType": "deemed_university",
+        "feeCategory": "published_scholarship",
+        "admissionRoute": {
+          "basis": "merit_and_counselling",
+          "entranceExamIds": ["aeee-2026", "jee-main-2026"],
+          "selectionBenchmarkIds": [],
+          "seatCategory": "scholarship",
+          "scoreEffects": ["institution_access", "seat_allocation", "scholarship"],
+          "publishedFeeChangesWithScore": true,
+          "description": "Amrita states that entrance rank, branch, seat availability, and applicant numbers determine the scholarship slab; it does not publish one guaranteed rank cutoff."
+        },
+        "geography": "India",
+        "amount": {"currency": "INR", "min": 150000, "max": 450000},
+        "feePeriod": "year",
+        "durationMonths": {"min": 12, "max": 12},
+        "basis": "tuition_only",
+        "asOf": "2026",
+        "includes": ["Published annual tuition in scholarship fee slabs"],
+        "excludes": ["One-time caution deposit", "Hostel and mess", "Travel", "Personal equipment"],
+        "sourceIds": ["amrita-btech-cse-cybersecurity", "amrita-aeee-admissions-scholarships"]
+      },
+      {
+        "id": "amrita-cybersecurity-regular-annual-2026",
+        "educationPathwayId": "amrita-btech-cybersecurity-route",
+        "educationStageId": "amrita-btech-cybersecurity",
+        "institutionName": "Amrita Vishwa Vidyapeetham",
+        "programName": "B.Tech in Computer Science and Engineering Cyber Security",
+        "campus": "Amritapuri",
+        "institutionType": "deemed_university",
+        "feeCategory": "published_regular",
+        "admissionRoute": {
+          "basis": "merit_and_counselling",
+          "entranceExamIds": ["aeee-2026", "jee-main-2026"],
+          "selectionBenchmarkIds": [],
+          "seatCategory": "private_merit",
+          "scoreEffects": ["institution_access", "seat_allocation", "scholarship"],
+          "publishedFeeChangesWithScore": true,
+          "description": "AEEE rank or JEE Main percentile is used in seat allotment and can determine scholarship eligibility; learners without a scholarship pay the published regular or non-scholarship slab."
+        },
+        "geography": "India",
+        "amount": {"currency": "INR", "min": 450000, "max": 600000},
+        "feePeriod": "year",
+        "durationMonths": {"min": 12, "max": 12},
+        "basis": "tuition_only",
+        "asOf": "2026",
+        "includes": ["Published annual regular or non-scholarship tuition"],
+        "excludes": ["One-time caution deposit", "Hostel and mess", "Travel", "Personal equipment"],
+        "sourceIds": ["amrita-btech-cse-cybersecurity", "amrita-aeee-admissions-scholarships"]
+      }
+    ],
+    "earnings": [
+      {
+        "id": "indeed-india-average-2026",
+        "careerStage": "all_levels",
+        "employmentType": "salaried",
+        "geography": "India",
+        "amount": {"currency": "INR", "min": 450473, "max": 450473},
+        "period": "year",
+        "basis": "reported_income",
+        "asOf": "2026-08",
+        "sourceIds": ["indeed-india-cybersecurity-analyst-salary"]
+      }
+    ],
+    "returnOnEducation": [
+      {
+        "id": "iitm-bs-simple-gross-payback",
+        "educationCostId": "iitm-bs-total-2026",
+        "earningsScenarioId": "indeed-india-average-2026",
+        "method": "simple_gross_payback",
+        "paybackMonths": {"min": 10, "max": 12},
+        "includesLivingCosts": false,
+        "includesForegoneEarnings": false,
+        "assumptions": ["Divides the published total programme-fee range by the reported annual gross salary", "Does not predict employment, salary growth, taxes, loan interest, or personal living costs"],
+        "sourceIds": ["iitm-bs-data-science-fees", "indeed-india-cybersecurity-analyst-salary"]
+      }
+    ]
+  },
+  "outlook": [
+    {
+      "geography": "United States",
+      "fromYear": 2024,
+      "toYear": 2034,
+      "trend": "rapid_growth",
+      "summary": "O*NET labels Information Security Analysts a Bright Outlook occupation and reports growth much faster than average. This is U.S. evidence and should not be presented as an India forecast.",
+      "metrics": [
+        {"name": "Projected annual job openings", "value": 16000, "unit": "jobs"}
+      ],
+      "sourceIds": ["onet-information-security-analysts"]
+    }
+  ],
+  "requirements": {
+    "regulation": {
+      "status": "not_verified",
+      "jurisdiction": "India",
+      "authorities": [],
+      "notes": "The seven-source pilot does not include an Indian regulator source establishing a universal occupational licence, so regulation status remains unverified.",
+      "sourceIds": []
+    },
+    "governmentExams": [],
+    "licences": []
+  },
+  "specializations": [
+    {
+      "id": "incident-response",
+      "title": "Incident response",
+      "description": "Investigate security events, contain harm, recover operations, and convert lessons into stronger controls and procedures.",
+      "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+    },
+    {
+      "id": "security-architecture",
+      "title": "Security architecture",
+      "description": "Design and review how systems, networks, identity controls, and defensive technologies work together.",
+      "sourceIds": ["onet-information-security-analysts", "amrita-btech-cse-cybersecurity"]
+    }
+  ],
+  "tradeoffs": [
+    {
+      "id": "ongoing-study",
+      "category": "technology_change",
+      "impact": "high",
+      "description": "Tools, architectures, and threats keep changing, so learning continues well beyond the first qualification.",
+      "sourceIds": ["onet-information-security-analysts"]
+    },
+    {
+      "id": "education-cost-range",
+      "category": "education_cost",
+      "impact": "varies",
+      "description": "Published costs differ sharply between the IIT Madras route and private-university fee slabs, and living or equipment costs may be additional.",
+      "sourceIds": ["iitm-bs-data-science-fees", "amrita-btech-cse-cybersecurity"]
+    },
+    {
+      "id": "incident-schedule-pressure",
+      "category": "schedule",
+      "impact": "varies",
+      "description": "Some roles include urgent investigations or response work, while other security roles follow more predictable project schedules.",
+      "sourceIds": ["onet-information-security-analysts"]
+    }
+  ],
+  "notablePeople": [
+    {
+      "id": "manindra-agrawal",
+      "name": "Manindra Agrawal",
+      "relationship": "researcher",
+      "knownFor": "IIT Kanpur lists his work across computational complexity, security, theoretical computer science, and algorithms.",
+      "whyRelevant": "His profile shows how deep foundations in algorithms and theory can connect to security research and long-term technical leadership.",
+      "country": "India",
+      "profileUrl": "https://www.cse.iitk.ac.in/users/manindra/",
+      "sourceIds": ["iitk-cse-faculty"]
+    },
+    {
+      "id": "angshuman-karmakar",
+      "name": "Angshuman Karmakar",
+      "relationship": "researcher",
+      "knownFor": "IIT Kanpur lists his research in post-quantum cryptography, side-channel attacks, encrypted computation, and cryptology.",
+      "whyRelevant": "His work is a concrete Indian example of a specialist path connecting mathematics, computing, hardware behaviour, and future security systems.",
+      "country": "India",
+      "profileUrl": "https://www.cse.iitk.ac.in/users/angshuman/",
+      "sourceIds": ["iitk-cse-faculty"]
+    },
+    {
+      "id": "urbi-chatterjee",
+      "name": "Urbi Chatterjee",
+      "relationship": "researcher",
+      "knownFor": "IIT Kanpur lists her research in hardware security, physically unclonable functions, hardware reliability, and machine-learning security.",
+      "whyRelevant": "Her profile demonstrates that cyber security includes hardware and machine-learning systems, not only software monitoring or network defence.",
+      "country": "India",
+      "profileUrl": "https://www.cse.iitk.ac.in/users/urbic/",
+      "sourceIds": ["iitk-cse-faculty"]
+    }
+  ],
+  "tryThis": {
+    "title": "Threat-model a fictional school club",
+    "purpose": "Practise identifying digital risks and proposing proportionate safeguards without touching any real account or system.",
+    "durationMinutes": 45,
+    "cost": "free",
+    "materials": ["Paper or notes app", "A fictional club scenario"],
+    "steps": ["List the fictional club's important information, accounts, and devices", "Write down three realistic ways information could be lost, exposed, or misused", "Choose one preventive, one detective, and one recovery safeguard for each risk", "Explain the plan in plain language to a classmate or family member"],
+    "reflectionQuestions": ["Which safeguard reduced the most serious risk without making the club difficult to run?", "What evidence would help you decide whether your safeguards were working?"],
+    "safetyNotes": ["Use only a fictional scenario", "Do not scan, test, or attempt to access another person's device, account, or network"]
+  },
+  "relatedCareerIds": ["software-engineer"],
+  "courseQueries": ["Cyber Security", "Computer Science", "Information Technology"],
+  "sources": [
+    {"id": "onet-information-security-analysts", "sourceType": "government", "title": "Information Security Analysts, O*NET 15-1212.00", "organization": "O*NET, U.S. Department of Labor, Employment and Training Administration", "url": "https://www.onetonline.org/link/summary/15-1212.00", "geography": "United States role evidence reusable with geography labelled", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "054dce749bf38f3d1ece59b37af67eef4ebfb90285e20ac36c3f2a9cc3100385"},
+    {"id": "indeed-india-cybersecurity-analyst-salary", "sourceType": "job_market_data", "title": "Cybersecurity analyst salary in India", "organization": "Indeed India", "url": "https://in.indeed.com/career/cybersecurity-analyst/salaries", "geography": "India", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "592182d581ec268ae52c9cc5ba2f6e165771d97497bb428f9f62f0efc6a78151"},
+    {"id": "iitm-bs-data-science-admissions", "sourceType": "education_provider", "title": "IIT Madras BS in Data Science and Applications admissions", "organization": "Indian Institute of Technology Madras", "url": "https://study.iitm.ac.in/ds/admissions.html", "geography": "India", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "77331e0d0353e3b9dfeb110f4666b545f5827069e8eba7d07a234c517ae98ac6"},
+    {"id": "iitm-bs-data-science-fees", "sourceType": "education_provider", "title": "IIT Madras BS in Data Science and Applications academics and fee structure", "organization": "Indian Institute of Technology Madras", "url": "https://study.iitm.ac.in/ds/academics.html", "geography": "India", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "17133bf6bd7a68f181f31d78ee55a59b76a8068bca96be534f1ef4792c7d4bb2"},
+    {"id": "amrita-btech-cse-cybersecurity", "sourceType": "education_provider", "title": "B.Tech in Computer Science and Engineering Cyber Security", "organization": "Amrita Vishwa Vidyapeetham", "url": "https://www.amrita.edu/program/btech-computer-science-and-engineering-cyber-security/", "geography": "India", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "358817690071d4186bc6f26a4a3b4cf40d8d7ec12472bc0debe263d886eb54e4"},
+    {"id": "amrita-aeee-admissions-scholarships", "sourceType": "education_provider", "title": "AEEE 2026 B.Tech admissions and scholarship policy", "organization": "Amrita Vishwa Vidyapeetham", "url": "https://aeee.amrita.edu/", "geography": "India", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "b97d36798faf5192924b33c6d901930c2e0e728e5a805faf2269369144956589"},
+    {"id": "iitk-cse-faculty", "sourceType": "official_profile", "title": "IIT Kanpur Department of Computer Science and Engineering faculty", "organization": "Indian Institute of Technology Kanpur", "url": "https://www.cse.iitk.ac.in/pages/Faculty.html", "geography": "India", "publishedAt": null, "verifiedAt": "2026-08-02", "contentHash": "748e8f1ab63108624581b3ab1902be2349a0ac9a4745d6f3d3d835634ddaec70"}
+  ],
+  "provenance": {
+    "authorship": {
+      "method": "agent_research",
+      "authorType": "codex_subagent",
+      "curatorId": "cybersecurity-manual",
+      "batchId": "b01b",
+      "authoredAt": "2026-08-02T09:50:00Z"
+    },
+    "processing": {
+      "tool": "xtara-factory",
+      "actions": ["validate", "normalize", "checksum", "package"],
+      "toolVersion": "dream-career-curation-v1"
+    }
+  }
+}
