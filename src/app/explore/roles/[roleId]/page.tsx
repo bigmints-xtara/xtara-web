@@ -214,7 +214,7 @@ function DreamCareerContent() {
     ? activePlan.areaId : null;
   const backHref = from === 'explore' ? '/explore'
     : from === 'dashboard' && signedIn ? '/dashboard'
-    : returnAreaId ? `/explore/areas/${encodeURIComponent(returnAreaId)}` : '/explore';
+    : returnAreaId ? `/assessment/careers/${encodeURIComponent(returnAreaId)}` : '/explore';
   const isSelected = signedIn
     ? Boolean(studentContext?.saved)
     : Boolean(plan?.dreamCareerIds.includes(careerId));

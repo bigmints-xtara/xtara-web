@@ -78,7 +78,7 @@ export default function SaveChoicesPage() {
       : error ? <div><p role="alert">{text.error}</p><Button className="mt-4" onClick={() => setAttempt((n) => n + 1)}>{text.retry}</Button></div>
       : !summary ? <div><h1 className="text-2xl font-semibold">{text.empty}</h1><Button asChild className="mt-5"><Link href="/assessment/discovery">{text.results}</Link></Button></div>
       : <>
-        <Link href={`/explore/areas/${encodeURIComponent(summary.plan.areaId)}`} className="inline-flex items-center gap-2 text-sm font-medium"><ArrowLeft className="h-4 w-4" />{text.back}</Link>
+        <Link href={`/assessment/careers/${encodeURIComponent(summary.plan.areaId)}`} className="inline-flex items-center gap-2 text-sm font-medium"><ArrowLeft className="h-4 w-4" />{text.back}</Link>
         <div className={styles.summaryLayout}>
         <div><h1 className={styles.heading}>{text.title}</h1><p className={styles.intro}>{text.description}</p>
         </div>

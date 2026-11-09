@@ -335,7 +335,7 @@ export default function PathwayPersonalizationPage() {
                 ) : (
                   <Button asChild className="rounded-full"><Link href="/signup?saveDiscovery=1&next=%2Fassessment%2Fpathway"><LockKeyhole className="mr-2 h-4 w-4" />{text.signup}</Link></Button>
                 )}
-                <Button asChild variant="outline" className="rounded-full"><Link href={`/explore/areas/${directionPlan.areaId}`}><ArrowLeft className="mr-2 h-4 w-4" />{text.back}</Link></Button>
+                <Button asChild variant="outline" className="rounded-full"><Link href={`/assessment/careers/${directionPlan.areaId}`}><ArrowLeft className="mr-2 h-4 w-4" />{text.back}</Link></Button>
               </div>
               {saveError ? <p role="alert" className="mt-4 text-sm text-red-700">{saveError}</p> : null}
             </CardContent>

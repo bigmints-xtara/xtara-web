@@ -72,7 +72,7 @@ export default function DiscoveryResultPage() {
     setSaveError(false);
     try {
       saveDirectionPlan(user && !user.isAnonymous ? await saveDirectionToApi(plan) : plan);
-      router.push(`/explore/areas/${areaId}`);
+      router.push(`/assessment/careers/${areaId}`);
     } catch {
       setSaveError(true);
     }

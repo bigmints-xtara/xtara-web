@@ -25,7 +25,7 @@ describe('save choices summary', () => {
     expect(screen.getByText('Aeronautical Engineer')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Save my choices' })).toHaveAttribute('href', '/signup?saveDiscovery=1&next=%2Fdashboard');
     expect(screen.getByRole('link', { name: /Already/ })).toHaveAttribute('href', '/login?saveDiscovery=1&next=%2Fdashboard');
-    expect(screen.getByRole('link', { name: 'Back to careers' })).toHaveAttribute('href', '/explore/areas/engineering');
+    expect(screen.getByRole('link', { name: 'Back to careers' })).toHaveAttribute('href', '/assessment/careers/engineering');
     expect(mocks.save).not.toHaveBeenCalled();
   });
   it('saves signed-in choices then goes directly to My Direction', async () => {

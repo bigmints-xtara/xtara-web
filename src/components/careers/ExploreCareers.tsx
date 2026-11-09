@@ -500,7 +500,7 @@ export default function ExploreCareers() {
         <h1 ref={heading} tabIndex={-1} id="explore-step-title">
           {stepTitle}
         </h1>
-        {state.step === "roles" && (industry || direction) && (
+        {(state.step === "industries" || state.step === "roles") && (industry || direction) && (
           <p>{industry?.title || direction?.title}</p>
         )}
       </header>

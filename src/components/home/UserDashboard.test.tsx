@@ -195,7 +195,7 @@ describe('pursued-area learner dashboard', () => {
     expect(careerLink?.textContent).toContain('UX Designer');
     expect(careerLink?.textContent).not.toContain('Open');
     expect(hero?.querySelector('a[href="/assessment/discovery"]')).toBeNull();
-    expect(hero?.querySelector('a[href="/explore/areas/design"]')).toBeNull();
+    expect(hero?.querySelector('a[href="/assessment/careers/design"]')).toBeNull();
     expect(container.textContent).not.toContain('Studies how people use a product or service');
   });
 

@@ -200,7 +200,7 @@ export default function UserDashboard() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={`/explore/areas/${focusedDirection.id}`} className="flex items-start gap-3 py-3">
+                  <Link href={`/assessment/careers/${focusedDirection.id}`} className="flex items-start gap-3 py-3">
                     <BriefcaseBusiness className="mt-0.5 h-4 w-4 shrink-0" />
                     <span className="whitespace-normal leading-5">{selectedCareers.length ? text.editDreamCareers : text.chooseDreamCareers}</span>
                   </Link>
@@ -235,7 +235,7 @@ export default function UserDashboard() {
             ))}
           </ol>
         ) : (
-          <Button asChild className="mt-4 rounded-full"><Link href={`/explore/areas/${focusedDirection.id}`}>{text.chooseDreamCareers}</Link></Button>
+          <Button asChild className="mt-4 rounded-full"><Link href={`/assessment/careers/${focusedDirection.id}`}>{text.chooseDreamCareers}</Link></Button>
         )}
       </section>
 

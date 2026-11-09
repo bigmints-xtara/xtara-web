@@ -157,7 +157,7 @@ describe('Dream Career Student Guide page', () => {
     saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('custom-api-direction'), 'data-engineer'));
     render(<DreamCareerPage />);
     await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
-    expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/explore/areas/custom-api-direction');
+    expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/assessment/careers/custom-api-direction');
     expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
   });
 

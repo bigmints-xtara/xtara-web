@@ -189,7 +189,7 @@ function stubCompactLayout() {
 
 describe('DreamCareerStudentGuide', () => {
   it('keeps embedded previews compact and leaves the chooser history untouched', () => {
-    window.history.replaceState({ xtaraCareerPreview: 'data-engineer' }, '', '/explore/areas/technology?career=data-engineer');
+    window.history.replaceState({ xtaraCareerPreview: 'data-engineer' }, '', '/assessment/careers/technology?career=data-engineer');
     const push = vi.spyOn(window.history, 'pushState');
     render(<DreamCareerStudentGuide response={response()} locale="en" embedded />);
     expect(screen.getByTestId('compact-question-reader')).toBeInTheDocument();
