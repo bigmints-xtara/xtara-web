@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import DirectionImage from "@/components/journey/DirectionImage";
+import DirectionMark from "@/components/journey/DirectionMark";
 import styles from '@/components/journey/journey.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
@@ -95,7 +96,10 @@ export default function DiscoveryResultPage() {
               {result.areas.map((area) => (
                 <Card key={area.id} className={styles.resultCard}><DirectionImage directionId={area.id} sizes="(max-width: 1023px) 100vw, 400px" /><CardContent className={styles.resultBody}>
 
-                  <h3 className="text-2xl font-semibold text-primary">{area.title}</h3>
+                  <div className="flex items-center gap-3">
+                    <DirectionMark directionId={area.id} />
+                    <h3 className="min-w-0 break-words text-2xl font-semibold text-primary">{area.title}</h3>
+                  </div>
                   <p className="mt-3 leading-7 text-muted-foreground">{area.description}</p>
                   {area.roles.length ? (
                     <ul className="mt-5 space-y-2" aria-label={`${area.title} careers`}>

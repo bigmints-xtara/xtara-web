@@ -21,6 +21,7 @@ import {
 import { useTranslations } from "@/i18n/language-provider";
 import Container from "@/components/Container";
 import Header from "@/components/Header";
+import DirectionMark from "@/components/journey/DirectionMark";
 import studentStyles from "@/components/journey/journey.module.css";
 import { getCareerExplorer } from "@/lib/career-explorer-api";
 import { mvpNavigationCopy } from "@/lib/mvp-navigation";
@@ -59,11 +60,13 @@ function Choice({
   description,
   onClick,
   index = 0,
+  directionId,
 }: {
   title: string;
   description: string;
   onClick: () => void;
   index?: number;
+  directionId?: string;
 }) {
   return (
     <button
@@ -73,7 +76,11 @@ function Choice({
       }
       onClick={onClick}
     >
-      <span className={styles.choiceDot} aria-hidden="true" />
+      {directionId ? (
+        <DirectionMark directionId={directionId} />
+      ) : (
+        <span className={styles.choiceDot} aria-hidden="true" />
+      )}
       <span>
         <strong>{title}</strong>
         {description && <small>{description}</small>}
@@ -221,6 +228,7 @@ export default function ExploreCareers() {
             <Choice
               key={d.id}
               title={d.title}
+              directionId={d.id}
               description={d.summary}
               onClick={() =>
                 navigate({

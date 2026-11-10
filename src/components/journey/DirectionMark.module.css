@@ -1,0 +1,20 @@
+.mark {
+  --direction-accent: var(--xtara-sky);
+  display: inline-grid;
+  place-items: center;
+  inline-size: 46px;
+  block-size: 46px;
+  flex: none;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--direction-accent) 25%, transparent);
+  background: color-mix(in srgb, var(--direction-accent) 16%, var(--card));
+  color: var(--card-foreground);
+}
+
+.mark[data-tone="gold"] {
+  --direction-accent: var(--xtara-gold);
+}
+
+.mark[data-tone="teal"] {
+  --direction-accent: var(--xtara-teal);
+}

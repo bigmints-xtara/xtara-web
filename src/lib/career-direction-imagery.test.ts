@@ -21,6 +21,7 @@ describe('career direction imagery', () => {
 
   it('does not guess imagery for an unknown direction', () => {
     expect(getCareerDirectionImage('unknown-direction')).toBeNull();
+    expect(getCareerDirectionImage('__proto__')).toBeNull();
     expect(getCareerDirectionImage(null)).toBeNull();
   });
 });

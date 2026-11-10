@@ -26,10 +26,19 @@ export const supportedCareerDirectionIds = [
   ...Object.keys(legacyDirectionAliases),
 ].sort();
 
-export function getCareerDirectionImage(directionId: string | null | undefined): string | null {
+export function canonicalCareerDirectionId(
+  directionId: string | null | undefined,
+): keyof typeof canonicalDirectionImages | null {
   if (!directionId) return null;
-  const canonicalId = directionId in canonicalDirectionImages
-    ? directionId as keyof typeof canonicalDirectionImages
-    : legacyDirectionAliases[directionId];
+  if (Object.prototype.hasOwnProperty.call(canonicalDirectionImages, directionId)) {
+    return directionId as keyof typeof canonicalDirectionImages;
+  }
+  return Object.prototype.hasOwnProperty.call(legacyDirectionAliases, directionId)
+    ? legacyDirectionAliases[directionId]
+    : null;
+}
+
+export function getCareerDirectionImage(directionId: string | null | undefined): string | null {
+  const canonicalId = canonicalCareerDirectionId(directionId);
   return canonicalId ? canonicalDirectionImages[canonicalId] : null;
 }
