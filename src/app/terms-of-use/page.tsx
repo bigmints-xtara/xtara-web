@@ -4,37 +4,10 @@ import { defaultMessages, getMessages } from "@/i18n/messages";
 import { getLocaleFromCookie } from "@/i18n/server";
 import { translate } from "@/i18n/translate";
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocaleFromCookie();
-  const messages = getMessages(locale);
-  const title = translate(messages, "terms.metadata.title", undefined, defaultMessages);
-  const description = translate(messages, "terms.metadata.description", undefined, defaultMessages);
-  const keywords = translate(messages, "terms.metadata.keywords", undefined, defaultMessages);
-  const ogImage = translate(messages, "terms.metadata.ogImage", undefined, defaultMessages);
-  const canonicalUrl = translate(messages, "terms.metadata.canonicalUrl", undefined, defaultMessages);
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-      title,
-      description,
-      images: [ogImage],
-      url: canonicalUrl,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogImage],
-    },
-    alternates: {
-      canonical: canonicalUrl,
-    },
-  };
+  return buildPageMetadata({ ...defaultMessages.terms.metadata, path: "/terms-of-use", locale: "en" });
 }
 
 const TermsOfUsePage = async () => {

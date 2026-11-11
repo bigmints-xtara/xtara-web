@@ -1,32 +1,19 @@
 import type { Metadata } from "next";
-import { newsPageData } from "@/data/newsPageData";
+import { getLocaleFromCookie } from "@/i18n/server";
+import { getMessages } from "@/i18n/messages";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
-export const metadata: Metadata = {
-  title: newsPageData.metadata.title,
-  description: newsPageData.metadata.description,
-  keywords: newsPageData.metadata.keywords,
-  openGraph: {
-    title: newsPageData.metadata.title,
-    description: newsPageData.metadata.description,
-    images: [newsPageData.metadata.ogImage],
-    url: newsPageData.metadata.canonicalUrl,
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: newsPageData.metadata.title,
-    description: newsPageData.metadata.description,
-    images: [newsPageData.metadata.ogImage],
-  },
-  alternates: {
-    canonical: newsPageData.metadata.canonicalUrl,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocaleFromCookie();
+  const { fallbackTitle, fallbackDescription } = getMessages(locale).news.metadata;
+  return buildPageMetadata({
+    path: "/news",
+    locale,
+    title: fallbackTitle,
+    description: fallbackDescription,
+  });
+}
 
-export default function NewsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function NewsLayout({ children }: { children: React.ReactNode }) {
   return children;
-} 
+}

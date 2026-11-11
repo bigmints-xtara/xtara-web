@@ -4,37 +4,12 @@ import { defaultMessages, getMessages } from "@/i18n/messages";
 import { getLocaleFromCookie } from "@/i18n/server";
 import { translate } from "@/i18n/translate";
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleFromCookie();
-  const messages = getMessages(locale);
-  const title = translate(messages, "privacy.metadata.title", undefined, defaultMessages);
-  const description = translate(messages, "privacy.metadata.description", undefined, defaultMessages);
-  const keywords = translate(messages, "privacy.metadata.keywords", undefined, defaultMessages);
-  const ogImage = translate(messages, "privacy.metadata.ogImage", undefined, defaultMessages);
-  const canonicalUrl = translate(messages, "privacy.metadata.canonicalUrl", undefined, defaultMessages);
-
-  return {
-    title,
-    description,
-    keywords,
-    openGraph: {
-      title,
-      description,
-      images: [ogImage],
-      url: canonicalUrl,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogImage],
-    },
-    alternates: {
-      canonical: canonicalUrl,
-    },
-  };
+  const metadata = getMessages(locale).privacy.metadata;
+  return buildPageMetadata({ ...metadata, path: "/privacy-policy", locale });
 }
 
 const PrivacyPolicyPage = async () => {

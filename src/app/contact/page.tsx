@@ -5,20 +5,12 @@ import MarketingLayout from "@/components/MarketingLayout";
 import { getLocaleFromCookie } from "@/i18n/server";
 import { getMessages } from "@/i18n/messages";
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleFromCookie();
-  const messages = getMessages(locale);
-  return {
-    title: messages.contact.metadata.title,
-    description: messages.contact.metadata.description,
-    keywords: messages.contact.metadata.keywords,
-    openGraph: {
-      title: messages.contact.metadata.title,
-      description: messages.contact.metadata.description,
-      images: [messages.contact.metadata.ogImage],
-    },
-  };
+  const metadata = getMessages(locale).contact.metadata;
+  return buildPageMetadata({ ...metadata, path: "/contact", locale });
 }
 
 const ContactPage = async () => {

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -29,17 +30,8 @@ import { getLocaleFromCookie } from "@/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleFromCookie();
-  const messages = getMessages(locale);
-  return {
-    title: messages.about.metadata.title,
-    description: messages.about.metadata.description,
-    keywords: messages.about.metadata.keywords,
-    openGraph: {
-      title: messages.about.metadata.title,
-      description: messages.about.metadata.description,
-      images: [messages.about.metadata.ogImage],
-    },
-  };
+  const metadata = getMessages(locale).about.metadata;
+  return buildPageMetadata({ ...metadata, path: "/about", locale });
 }
 
 const missionIcons = [UserRoundSearch, MessageCircleMore, Waypoints];

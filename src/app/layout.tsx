@@ -8,7 +8,8 @@ import { LanguageProvider } from "@/i18n/language-provider";
 import ReactQueryProvider from "@/lib/query/query-client";
 import { getLocaleFromCookie } from "@/i18n/server";
 import { getMessages } from "@/i18n/messages";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SITE_URL } from "@/lib/seo/page-metadata";
 import WaitlistScript from "@/components/WaitlistScript";
 import { OrganizationProvider } from "@/context/OrganizationContext";
 import WorkspaceRouteBoundary from "@/components/auth/WorkspaceRouteBoundary";
@@ -16,11 +17,19 @@ import MvpRouteBoundary from "@/components/MvpRouteBoundary";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#12192e" },
+  ],
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleFromCookie();
   const messages = getMessages(locale);
 
   return {
+    metadataBase: new URL(SITE_URL),
     title: messages.metadata.title,
     description: messages.metadata.description,
   };

@@ -4,9 +4,9 @@ import ml from "@/content/ml.json";
 import ta from "@/content/ta.json";
 import type { Locale } from "./config";
 
-export type Messages = typeof en;
+export type Messages = Omit<typeof en, "terms"> & Partial<Pick<typeof en, "terms">>;
 
-export const defaultMessages: Messages = en;
+export const defaultMessages = en;
 
 const messagesByLocale: Record<Locale, Messages> = {
   en,

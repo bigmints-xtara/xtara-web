@@ -1041,5 +1041,13 @@
     "featureFallback": "this feature",
     "ios": "Download for iOS",
     "android": "Download for Android"
+  },
+  "terms": {
+    "metadata": {
+      "title": "Terms of Use - Xtara",
+      "description": "Terms and conditions for using the Xtara career guidance platform. Understand your rights and responsibilities.",
+      "keywords": "terms of use, terms and conditions, Xtara terms, career guidance terms"
+    },
+    "contentHtml": "<h1>Terms of Use</h1><p>These Terms of Use govern your use of the Xtara platform.</p>"
   }
 }

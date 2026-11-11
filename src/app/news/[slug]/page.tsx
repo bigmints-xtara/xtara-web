@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Container from "@/components/Container";
 import Breadcrumb from "@/components/Breadcrumb";
+import JsonLd from "@/components/JsonLd";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
+import { breadcrumbStructuredData } from "@/lib/seo/structured-data";
 import MarketingLayout from "@/components/MarketingLayout";
 import { notFound } from "next/navigation";
 import { getAllNews, getNewsBySlug, markdownToHtml } from "@/data/newsData";
@@ -18,48 +21,32 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const resolvedParams = await params;
-  const locale = await getLocaleFromCookie();
-  const messages = getMessages(locale);
-  if (!resolvedParams?.slug) {
-    return {
-      title: messages.news.metadata.fallbackTitle,
-      description: messages.news.metadata.fallbackDescription,
-    };
-  }
-  const article = getNewsBySlug(resolvedParams.slug);
-  return {
+  const { slug } = await params;
+  const article = getNewsBySlug(slug);
+  if (!article) notFound();
+
+  return buildPageMetadata({
+    path: `/news/${article.slug}`,
+    locale: "en",
     title: `${article.title} - Xtara`,
     description: article.description,
-    keywords: "career guidance, educational news, career insights, Xtara",
-    openGraph: {
-      title: `${article.title} - Xtara`,
-      description: article.description,
-      images: article.image ? [article.image] : ["/images/og-news.jpg"],
-      url: `https://xtara.com/news/${resolvedParams.slug}`,
-      type: "article",
-      publishedTime: article.date,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `${article.title} - Xtara`,
-      description: article.description,
-      images: article.image ? [article.image] : ["/images/og-news.jpg"],
-    },
-    alternates: {
-      canonical: `https://xtara.com/news/${resolvedParams.slug}`,
-    },
-  };
+    image: article.image,
+    publishedTime: article.date,
+  });
 }
 
 const NewsDetailPage = async ({ params }: Params) => {
-  const resolvedParams = await params;
-  if (!resolvedParams?.slug) {
-    notFound();
-  }
+  const { slug } = await params;
+  const article = getNewsBySlug(slug);
+  if (!article) notFound();
+
   const locale = await getLocaleFromCookie();
   const messages = getMessages(locale);
-  const article = getNewsBySlug(resolvedParams.slug);
+  const breadcrumbs = [
+    { label: messages.common.breadcrumb.home, href: "/" },
+    { label: messages.common.breadcrumb.news, href: "/news" },
+    { label: article.title },
+  ];
   const html = markdownToHtml(article.content);
 
   return (
@@ -67,13 +54,8 @@ const NewsDetailPage = async ({ params }: Params) => {
       <Container>
         <div className="py-4 px-6 md:py-6 md:px-8">
           <div className="mb-8">
-            <Breadcrumb
-              items={[
-                { label: messages.common.breadcrumb.home, href: "/" },
-                { label: messages.common.breadcrumb.news, href: "/news" },
-                { label: article.title },
-              ]}
-            />
+            <JsonLd data={breadcrumbStructuredData(breadcrumbs)} />
+            <Breadcrumb items={breadcrumbs} />
           </div>
 
           {article.image && (

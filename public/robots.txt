@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /api/
+Disallow: /xtara-service/
+
+Sitemap: https://xtara.ai/sitemap.xml

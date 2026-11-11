@@ -65,11 +65,9 @@ export const getAllNews = (): INewsMeta[] => {
     return newsData;
 };
 
-export const getNewsBySlug = (slug: string): INewsArticle => {
+export const getNewsBySlug = (slug: string): INewsArticle | undefined => {
     const article = newsData.find(item => item.slug === slug);
-    if (!article) {
-        throw new Error(`News article with slug "${slug}" not found`);
-    }
+    if (!article) return undefined;
     
     return {
         ...article,

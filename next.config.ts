@@ -3,12 +3,24 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PRODUCTION_API_PROXY_TARGET = "https://xtara-api-h7awati5ja-uc.a.run.app";
+const nonIndexableRoutes = [
+  "/admin", "/dashboard", "/profile", "/notifications", "/achievements",
+  "/learn", "/play", "/organization", "/assessment-data", "/login",
+  "/signup", "/join", "/direction", "/careers", "/colleges",
+];
+
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   output: "standalone",
   turbopack: {
     root: projectRoot,
+  },
+  async headers() {
+    return [...nonIndexableRoutes.map((route) => `${route}/:path*`), "/assessment/:step/:path*"].map((source) => ({
+      source,
+      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+    }));
   },
   async rewrites() {
     const proxyTarget = (

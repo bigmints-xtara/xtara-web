@@ -7,20 +7,12 @@ import Image from "next/image";
 import { getLocaleFromCookie } from "@/i18n/server";
 import { getMessages } from "@/i18n/messages";
 import type { Metadata } from "next";
+import { buildPageMetadata } from "@/lib/seo/page-metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleFromCookie();
-  const messages = getMessages(locale);
-  return {
-    title: messages.download.metadata.title,
-    description: messages.download.metadata.description,
-    keywords: messages.download.metadata.keywords,
-    openGraph: {
-      title: messages.download.metadata.title,
-      description: messages.download.metadata.description,
-      images: [messages.download.metadata.ogImage],
-    },
-  };
+  const metadata = getMessages(locale).download.metadata;
+  return buildPageMetadata({ ...metadata, path: "/download", locale });
 }
 
 const DownloadPage = async () => {
