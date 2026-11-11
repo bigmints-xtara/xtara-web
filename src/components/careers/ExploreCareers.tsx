@@ -294,7 +294,7 @@ export default function ExploreCareers() {
           ? industry.careerIds.includes(c.id)
           : direction
             ? direction.careerIds.includes(c.id)
-            : true) &&
+            : !c.parentCareerId) &&
         `${c.title} ${c.summary}`
           .toLocaleLowerCase(locale)
           .includes(state.q.trim().toLocaleLowerCase(locale)),
@@ -422,6 +422,10 @@ export default function ExploreCareers() {
       const related = data.careers.filter((c) =>
         career.relatedCareerIds.includes(c.id),
       );
+      const groups = [
+        { title: copy.specializations, items: data.careers.filter((c) => career.specializationIds?.includes(c.id)) },
+        { title: copy.relatedCareers, items: related },
+      ].filter((group) => group.items.length);
       content = (
         <>
           {places.length > 0 && (
@@ -453,11 +457,11 @@ export default function ExploreCareers() {
               </div>
             </section>
           )}
-          {related.length > 0 && (
-            <section className={styles.detailSection}>
-              <h3>{copy.relatedCareers}</h3>
+          {groups.map((group) => (
+            <section key={group.title} className={styles.detailSection}>
+              <h3>{group.title}</h3>
               <div className={styles.choices}>
-                {related.map((c, index) => (
+                {group.items.map((c, index) => (
                   <Choice
                     key={c.id}
                     title={c.title}
@@ -477,8 +481,8 @@ export default function ExploreCareers() {
                 ))}
               </div>
             </section>
-          )}
-          {!places.length && !related.length && <p>{copy.noRelated}</p>}
+          ))}
+          {!places.length && !groups.length && <p>{copy.noRelated}</p>}
           <section className={styles.assessment}>
             <Compass size={26} aria-hidden="true" />
             <h3>{copy.assessmentTitle}</h3>

@@ -32,6 +32,8 @@ export interface ExplorerCareer {
     sourceIds: string[];
   }>;
   relatedCareerIds: string[];
+  parentCareerId?: string;
+  specializationIds?: string[];
   sources: Array<{ id: string; label: string; url: string }>;
   translationFallback: boolean;
 }

@@ -32,6 +32,7 @@ export default function MvpReadinessPage() {
   const records = report?.records.filter((record) => `${record.title} ${record.id}`.toLowerCase().includes(query.trim().toLowerCase())) || [];
   return <main className="mx-auto max-w-6xl space-y-6 p-4 text-foreground sm:p-8">
     <header><h1 className="text-2xl font-semibold">MVP catalogue readiness</h1>
+      <Link className="text-sm underline" href="/admin/career-basics">Career catalogue replacement</Link>
       <p className="mt-2 text-sm text-muted-foreground">Grades 8–12 · English, Malayalam, Hindi and Tamil · All Indian states and union territories</p>
     </header>
     <div className="rounded-xl border bg-card p-4 text-sm">

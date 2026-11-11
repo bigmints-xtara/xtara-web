@@ -42,6 +42,7 @@ const en = {
     "Some information is shown in English while this translation is being prepared.",
   otherIndustries: "Other places for this career",
   relatedCareers: "Related careers to explore",
+    specializations: 'Specializations',
   noRelated: "More connections will appear when they are available.",
   assessmentTitle: "What could be right for you?",
   assessmentDescription:
@@ -103,6 +104,7 @@ export const explorerCopy: Record<Locale, ExplorerCopy> = {
     fallback: "പരിഭാഷ തയ്യാറാകുന്നതുവരെ ചില വിവരങ്ങൾ ഇംഗ്ലീഷിലാണ്.",
     otherIndustries: "ഈ കരിയറിന് മറ്റു ജോലിസ്ഥലങ്ങൾ",
     relatedCareers: "ബന്ധപ്പെട്ട കരിയറുകൾ",
+    specializations: 'സ്പെഷ്യലൈസേഷനുകൾ',
     noRelated: "വിവരങ്ങൾ ലഭ്യമാകുമ്പോൾ കൂടുതൽ ബന്ധങ്ങൾ കാണിക്കും.",
     assessmentTitle: "നിങ്ങൾക്ക് എന്തായിരിക്കും ഇണങ്ങുക?",
     assessmentDescription:
@@ -161,6 +163,7 @@ export const explorerCopy: Record<Locale, ExplorerCopy> = {
     fallback: "अनुवाद तैयार होने तक कुछ जानकारी अंग्रेज़ी में दिखाई जा रही है।",
     otherIndustries: "इस करियर के अन्य कार्यस्थल",
     relatedCareers: "संबंधित करियर जानें",
+    specializations: 'विशेषज्ञताएँ',
     noRelated: "जानकारी मिलने पर और विकल्प दिखेंगे।",
     assessmentTitle: "आपके लिए क्या सही हो सकता है?",
     assessmentDescription:
@@ -219,6 +222,7 @@ export const explorerCopy: Record<Locale, ExplorerCopy> = {
       "மொழிபெயர்ப்பு தயாராகும் வரை சில தகவல்கள் ஆங்கிலத்தில் காட்டப்படுகின்றன.",
     otherIndustries: "இந்தத் தொழிலுக்கான பிற பணியிடங்கள்",
     relatedCareers: "தொடர்புடைய தொழில்களை அறியுங்கள்",
+    specializations: 'சிறப்புப் பிரிவுகள்',
     noRelated: "தகவல் கிடைக்கும்போது மேலும் தொடர்புகள் காட்டப்படும்.",
     assessmentTitle: "உங்களுக்கு எது பொருத்தமாக இருக்கலாம்?",
     assessmentDescription:
