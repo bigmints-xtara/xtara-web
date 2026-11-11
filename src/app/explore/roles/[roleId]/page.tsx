@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExt
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
-import { ArrowLeft, CheckCircle2, MessageCircleMore, Plus, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, GraduationCap, MessageCircleMore, Plus, X } from 'lucide-react';
 
 import SlideshowOverlay from '@/components/career-path/SlideshowOverlay';
 import {
@@ -19,6 +19,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { studyOptionsCopy } from '@/components/careers/study-options-copy';
 import { useAuth } from '@/context/AuthContext';
 import { useTranslations } from '@/i18n/language-provider';
 import { XtaraApiError } from '@/lib/api/client';
@@ -41,6 +42,7 @@ import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
 import { loadDiscoveryResult } from '@/lib/assessment-v2';
 import { MVP_NAVIGATION_ENABLED } from '@/lib/mvp-navigation';
 import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
+import { isStudyOptionsCareer, studyOptionsHref } from '@/lib/study-options';
 import type {
   CareerIdentityView,
   CareerGuideQuestionId,
@@ -195,6 +197,19 @@ function DreamCareerContent() {
   }, [roleId, contextUserId, contextAnonymous]);
 
   const careerId = response?.career.id ?? roleId;
+  const studyLink = isStudyOptionsCareer(careerId) && (
+    <Button asChild size="lg" variant="outline" className="w-fit rounded-lg">
+      <Link href={studyOptionsHref(
+        careerId,
+        from === 'dashboard'
+          ? `/dream-careers/${encodeURIComponent(careerId)}?from=dashboard`
+          : `/explore/roles/${encodeURIComponent(careerId)}${from === 'explore' ? '?from=explore' : ''}`,
+      )}>
+        <GraduationCap aria-hidden="true" />
+        {studyOptionsCopy[locale].action}
+      </Link>
+    </Button>
+  );
   const area = response?.career.primaryFutureDirectionId
     ? getCareerArea(locale, response.career.primaryFutureDirectionId)
     : null;
@@ -308,6 +323,7 @@ function DreamCareerContent() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{text.overview}</p>
             <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-primary sm:text-4xl">{missingGuideCareer.title}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
+            {studyLink && <div className="mt-6">{studyLink}</div>}
             <p className="mt-8 max-w-2xl rounded-2xl bg-muted/55 px-5 py-4 text-foreground sm:px-6">{stateText.guideUnavailable}</p>
           </div>
         </section>
@@ -346,7 +362,10 @@ function DreamCareerContent() {
                 <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">{hasReviewedGuidance ? text.overview : journeyText.overview}</p>
                 <h1 className="mt-3 max-w-5xl text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-primary sm:text-4xl lg:text-5xl">{response.career.title}</h1>
                 <p className="mt-5 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{response.career.summary}</p>
-                  {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="mt-6 w-fit rounded-lg" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
+                {((MVP_NAVIGATION_ENABLED && hasReviewedGuidance) || studyLink) && <div className="mt-6 flex flex-wrap gap-3">
+                  {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="w-fit rounded-lg" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
+                  {studyLink}
+                </div>}
               </div>
 
               {MVP_NAVIGATION_ENABLED && area ? <DirectionImage directionId={area.id} /> : null}
@@ -376,7 +395,7 @@ function DreamCareerContent() {
             ) : null}
           </figure>
         ) : null}
-        <DreamCareerStudentGuide response={response} locale={guideLocale} onRetryRelationship={(subsection) => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
+        <DreamCareerStudentGuide response={response} locale={guideLocale} showCourseOptions={!studyLink} onRetryRelationship={(subsection) => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
       </main>
       <Footer />
       <SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={conversationSlides} />

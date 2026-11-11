@@ -251,8 +251,10 @@ export function DreamCareerStudentGuide({
   onRetryRelationship,
   retryingRelationships = {},
   embedded = false,
+  showCourseOptions = true,
 }: {
   embedded?: boolean;
+  showCourseOptions?: boolean;
   response: DreamCareerStudentGuideResponse;
   locale: DreamCareerGuideLocale;
   onRetryRelationship?: (subsection: CareerGuideRelationshipSubsection) => void;
@@ -427,7 +429,7 @@ export function DreamCareerStudentGuide({
     });
   }
 
-  if ((current('coursesAndColleges') && resolved.courseOptions.items.length) || relationshipError('courseOptions')) {
+  if (showCourseOptions && ((current('coursesAndColleges') && resolved.courseOptions.items.length) || relationshipError('courseOptions'))) {
     pathQuestions.push({
       id: 'courses-and-colleges',
       title: text.coursesAndColleges,

@@ -1,6 +1,8 @@
-import { xtaraApi } from '@/lib/api/client';
+import { XtaraApiError, xtaraApi } from '@/lib/api/client';
+import { xtaraApiOperationPath } from '@/lib/api/generated/xtara-api-operations';
 
 export interface CollegeCourse {
+  id?: string;
   course?: string;
   name: string;
   level?: string;
@@ -50,9 +52,16 @@ export class CollegeService {
     return itemsFrom(response);
   }
 
-  static async getCollegeById(id: string): Promise<CollegeInfo | null> {
-    const college = await xtaraApi.get<CollegeInfo>(`/colleges/${id}`).catch(() => null);
-    return college ? { ...college, courses: college.courses || [] } : null;
+  static async getCollegeById(id: string, options: { offeringId?: string; signal?: AbortSignal } = {}): Promise<CollegeInfo | null> {
+    const path = xtaraApiOperationPath('getCollegesCollegeId', { collegeId: id });
+    const query = options.offeringId ? `?${new URLSearchParams({ offeringId: options.offeringId })}` : '';
+    try {
+      const college = await xtaraApi.get<CollegeInfo>(`${path}${query}`, { signal: options.signal });
+      return { ...college, courses: college.courses || [] };
+    } catch (error) {
+      if (error instanceof XtaraApiError && error.status === 404) return null;
+      throw error;
+    }
   }
 
   static async searchCollegesByLocationHierarchy(

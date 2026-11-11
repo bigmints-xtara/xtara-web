@@ -25,7 +25,9 @@ import DirectionMark from "@/components/journey/DirectionMark";
 import studentStyles from "@/components/journey/journey.module.css";
 import { getCareerExplorer } from "@/lib/career-explorer-api";
 import { mvpNavigationCopy } from "@/lib/mvp-navigation";
+import { isStudyOptionsCareer, studyOptionsHref } from "@/lib/study-options";
 import { explorerCopy } from "./explorer/copy";
+import { studyOptionsCopy } from "./study-options-copy";
 import {
   exploreUrl,
   initialExploreState,
@@ -142,7 +144,7 @@ export default function ExploreCareers() {
       caption: copy.title,
       state: { ...initialExploreState, view: state.view },
     });
-  if (direction && state.step !== "industries")
+  if (direction && (state.step === "industries" || industry || career))
     history.push({
       label: direction.title,
       caption: copy.directions,
@@ -150,11 +152,11 @@ export default function ExploreCareers() {
         ...state,
         industry: null,
         career: null,
-        step: "industries",
+        step: "roles",
         q: "",
       },
     });
-  if (career)
+  if (career && (industry || !direction))
     history.push({
       label: industry?.title || copy.roles,
       caption: copy.industries,
@@ -236,7 +238,7 @@ export default function ExploreCareers() {
                   direction: d.id,
                   industry: null,
                   career: null,
-                  step: "industries",
+                  step: "roles",
                   q: "",
                 })
               }
@@ -330,11 +332,29 @@ export default function ExploreCareers() {
         {!roles.length && <p role="status">{copy.noMatches}</p>}
       </>
     );
+    if (direction && !industry && data.industries.some((item) => direction.industryIds.includes(item.id))) {
+      footer = (
+        <button className={styles.textButton} onClick={() => navigate({ ...state, step: "industries", q: "" })}>
+          {copy.industries}
+          <ArrowRight size={16} />
+        </button>
+      );
+    }
   } else if (career) {
     const fallback = career.translationFallback && (
       <p className={styles.notice}>{copy.fallback}</p>
     );
+    const studyLink = isStudyOptionsCareer(career.id) && (
+      <Link className={styles.primary} href={studyOptionsHref(career.id, exploreUrl(state))}>
+        {studyOptionsCopy[locale].action}
+        <ArrowRight size={18} aria-hidden="true" />
+      </Link>
+    );
     if (state.step === "work") {
+      const specializations = data.careers.filter((item) => career.specializationIds?.includes(item.id));
+      const parent = data.careers.find((item) => item.id === career.parentCareerId);
+      const hasStudyGuidance = career.subjects.length > 0 || career.studyRoutes.length > 0
+        || career.sources.some((source) => safeSourceUrl(source.url));
       content = (
         <>
           {fallback}
@@ -346,22 +366,55 @@ export default function ExploreCareers() {
               ))}
             </ul>
           )}
+          {parent && (
+            <button className={styles.textButton} onClick={() => selectCareer(parent.id)}>
+              <ArrowLeft size={16} aria-hidden="true" />
+              {parent.title}
+            </button>
+          )}
+          {specializations.length > 0 && (
+            <section className={styles.detailSection}>
+              <h3>{copy.specializations}</h3>
+              <div className={styles.choices}>
+                {specializations.map((item, index) => (
+                  <Choice
+                    key={item.id}
+                    title={item.title}
+                    description={item.summary}
+                    onClick={() => selectCareer(item.id)}
+                    index={index}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </>
       );
       footer = (
-        <button
-          className={styles.primary}
-          onClick={() => navigate({ ...state, step: "study" })}
-        >
-          {copy.seeStudy}
-          <ArrowRight size={18} />
-        </button>
+        <>
+          {studyLink}
+          {(!studyLink || hasStudyGuidance) && (
+            <button
+              className={studyLink ? styles.textButton : styles.primary}
+              onClick={() => navigate({ ...state, step: "study" })}
+            >
+              {copy.seeStudy}
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+          )}
+          {studyLink && !hasStudyGuidance && (career.relatedCareerIds.length > 0 || career.industryIds.length > 0) && (
+            <button className={styles.textButton} onClick={() => navigate({ ...state, step: "related" })}>
+              {copy.seeRelated}
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+          )}
+        </>
       );
     } else if (state.step === "study") {
       content = (
         <>
           {fallback}
-          {!career.subjects.length && !career.studyRoutes.length && (
+          {!studyLink && !career.subjects.length && !career.studyRoutes.length && (
             <p>{copy.studyEmpty}</p>
           )}
           {career.subjects.length > 0 && (
@@ -407,13 +460,16 @@ export default function ExploreCareers() {
         </>
       );
       footer = (
-        <button
-          className={styles.primary}
-          onClick={() => navigate({ ...state, step: "related" })}
-        >
-          {copy.seeRelated}
-          <ArrowRight size={18} />
-        </button>
+        <>
+          {studyLink}
+          <button
+            className={studyLink ? styles.textButton : styles.primary}
+            onClick={() => navigate({ ...state, step: "related" })}
+          >
+            {copy.seeRelated}
+            <ArrowRight size={18} aria-hidden="true" />
+          </button>
+        </>
       );
     } else {
       const places = data.industries.filter(
@@ -423,7 +479,6 @@ export default function ExploreCareers() {
         career.relatedCareerIds.includes(c.id),
       );
       const groups = [
-        { title: copy.specializations, items: data.careers.filter((c) => career.specializationIds?.includes(c.id)) },
         { title: copy.relatedCareers, items: related },
       ].filter((group) => group.items.length);
       content = (

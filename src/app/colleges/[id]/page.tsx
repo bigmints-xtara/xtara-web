@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   BookOpen,
@@ -18,11 +19,14 @@ import {
 
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { studyOptionsCopy } from "@/components/careers/study-options-copy";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslations } from "@/i18n/language-provider";
-import { CollegeService, type CollegeCourse, type CollegeInfo } from "@/lib/firebase/college-service";
+import { XtaraApiError } from "@/lib/api/client";
+import { CollegeService, type CollegeCourse } from "@/lib/firebase/college-service";
+import { studyOptionsReturn } from "@/lib/study-options";
 
 const copy = {
   "en": {
@@ -132,28 +136,54 @@ const copy = {
 } as const;
 
 export default function CollegeDetailPage() {
+  return <Suspense fallback={<div className="min-h-screen bg-background" aria-busy="true" />}><CollegeDetailContent /></Suspense>;
+}
+
+function CollegeDetailContent() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const search = useSearchParams();
+  const offeringId = search.get("offeringId") ?? undefined;
+  const returnTo = studyOptionsReturn(search.get("returnTo"));
   const { locale } = useTranslations();
   const text = copy[locale];
-  const [college, setCollege] = useState<CollegeInfo | null>(null);
-  const [loading, setLoading] = useState(true);
+  const study = studyOptionsCopy[locale];
+  const detail = useQuery({
+    queryKey: ["college-detail", id, offeringId ?? null],
+    queryFn: ({ signal }) => CollegeService.getCollegeById(id, { offeringId, signal }),
+    meta: { authScope: "public" },
+    retry: false,
+  });
+  const college = detail.data;
+  const selectedCourse = offeringId ? college?.courses.find((course) => course.id === offeringId) : undefined;
+  const backClass = "inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring";
+  const back = (className: string) => returnTo
+    ? <Link href={returnTo} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{study.backResults}</Link>
+    : <button type="button" onClick={() => router.back()} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{text.back}</button>;
 
-  useEffect(() => {
-    let active = true;
-    CollegeService.getCollegeById(id)
-      .then((data) => { if (active) setCollege(data); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [id]);
-
-  if (loading) {
-    return <div className="flex min-h-screen items-center justify-center bg-background"><Loader2 className="h-7 w-7 animate-spin text-primary" /><span className="sr-only">{text.loading}</span></div>;
+  if (detail.isPending) {
+    return <div className="flex min-h-screen items-center justify-center bg-background" role="status"><Loader2 className="h-7 w-7 animate-spin text-primary" aria-hidden="true" /><span className="sr-only">{text.loading}</span></div>;
   }
 
-  if (!college) {
-    return <div className="min-h-screen bg-background"><Header /><main className="mx-auto max-w-xl px-5 py-20 text-center"><Building2 className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{text.notFound}</h1><p className="mt-3 leading-7 text-muted-foreground">{text.notFoundHelp}</p><Button type="button" className="mt-7 rounded-full" onClick={() => router.back()}><ArrowLeft className="mr-2 h-4 w-4" />{text.back}</Button></main></div>;
+  if (detail.isError || !college || (offeringId && !selectedCourse)) {
+    const unavailable = detail.error instanceof XtaraApiError && detail.error.status === 503;
+    const heading = detail.isError
+      ? unavailable ? study.collegeUnavailable : study.collegeError
+      : offeringId ? study.missingOffering : text.notFound;
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <Header />
+        <main className="mx-auto max-w-xl px-5 py-12 sm:py-20">
+          {back("text-primary")}
+          <h1 className="mt-5 text-3xl font-semibold text-primary" role={detail.isError ? "alert" : undefined}>{heading}</h1>
+          {!detail.isError && !offeringId && <p className="mt-3 leading-7 text-muted-foreground">{text.notFoundHelp}</p>}
+          {detail.isError && <Button variant="outline" className="mt-5 min-h-11" onClick={() => void detail.refetch()}>{study.retry}</Button>}
+        </main>
+        <Footer />
+      </div>
+    );
   }
+  const courses = selectedCourse ? [selectedCourse] : college.courses;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -161,7 +191,7 @@ export default function CollegeDetailPage() {
       <main>
         <section className="bg-primary px-5 py-10 text-white sm:py-14">
           <div className="mx-auto max-w-6xl">
-            <button type="button" onClick={() => router.back()} className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white/75 transition hover:text-white"><ArrowLeft className="h-4 w-4" />{text.back}</button>
+            {back("text-primary-foreground")}
             <div className="mt-6 flex flex-wrap gap-2"><Badge className="border-white/15 bg-white/10 text-white hover:bg-white/10">{college.type || text.college}</Badge>{college.shortName ? <Badge variant="secondary">{college.shortName}</Badge> : null}</div>
             <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-[-0.035em] sm:text-5xl">{college.name}</h1>
             <div className="mt-5 flex flex-col gap-3 text-sm text-white/75 sm:flex-row sm:flex-wrap sm:gap-6">
@@ -177,7 +207,21 @@ export default function CollegeDetailPage() {
             <Card className="border-secondary/50 bg-secondary/15 shadow-none"><CardContent className="p-6"><h2 className="text-lg font-semibold text-primary">{text.checkTitle}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{college.releaseId ? text.catalogNotice : text.checkHelp}</p>{college.website ? <Button asChild className="mt-5 w-full rounded-xl"><a href={college.website} target="_blank" rel="noreferrer">{text.officialSite}<ExternalLink className="ml-2 h-4 w-4" /></a></Button> : <Button asChild className="mt-5 w-full rounded-xl"><Link href="/contact">{text.contact}</Link></Button>}</CardContent></Card>
           </div>
 
-          <Card className="min-w-0 border-primary/10 shadow-none"><CardContent className="min-w-0 p-6 sm:p-8"><div className="flex flex-wrap items-center justify-between gap-3"><SectionTitle icon={GraduationCap} title={text.courses} /><Badge variant="secondary">{college.courses.length} {college.courses.length === 1 ? text.course : text.coursesCount}</Badge></div>{college.courses.length ? <div className="mt-6 min-w-0 space-y-4">{college.courses.map((course, index) => <CourseCard key={`${course.course || course.name}-${index}`} course={course} text={text} />)}</div> : <div className="mt-6 rounded-2xl border border-dashed border-primary/15 bg-muted/30 p-8 text-center text-sm text-muted-foreground">{text.noCourses}</div>}</CardContent></Card>
+          <Card className="min-w-0 border-primary/10 shadow-none">
+            <CardContent className="min-w-0 p-6 sm:p-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <SectionTitle icon={GraduationCap} title={selectedCourse ? study.selectedOffering : text.courses} />
+                {!selectedCourse && <Badge variant="secondary">{courses.length} {courses.length === 1 ? text.course : text.coursesCount}</Badge>}
+              </div>
+              {courses.length ? (
+                <div className="mt-6 min-w-0 space-y-4">
+                  {courses.map((course, index) => <CourseCard key={course.id ?? `${course.course || course.name}-${index}`} course={course} text={text} />)}
+                </div>
+              ) : (
+                <div className="mt-6 rounded-2xl border border-dashed border-primary/15 bg-muted/30 p-8 text-center text-sm text-muted-foreground">{text.noCourses}</div>
+              )}
+            </CardContent>
+          </Card>
         </section>
       </main>
       <Footer />

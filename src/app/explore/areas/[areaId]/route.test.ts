@@ -9,7 +9,7 @@ it("redirects an area link to its direction in the shared mind map", async () =>
 
   expect(response.status).toBe(307);
   expect(response.headers.get("location")).toBe(
-    "/explore?view=map&direction=science-and-discovery&step=industries",
+    "/explore?view=map&direction=science-and-discovery&step=roles",
   );
 });
 

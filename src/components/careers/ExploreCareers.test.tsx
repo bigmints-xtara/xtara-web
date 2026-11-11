@@ -114,6 +114,7 @@ describe("career exploration", () => {
     fireEvent.click(
       await screen.findByRole("button", { name: /Build things.*Make places/ }),
     );
+    fireEvent.click(screen.getByRole("button", { name: "Industries & workplaces" }));
     fireEvent.click(screen.getByRole("button", { name: "Hospitals" }));
     expect(
       screen.getByRole("button", { name: /Doctor.*Care for patients/ }),
@@ -164,18 +165,35 @@ describe("career exploration", () => {
     fireEvent.click(
       await screen.findByRole("button", { name: /Build things.*Make places/ }),
     );
-    expect(
-      screen.getByText(/Places to work are still being connected/),
-    ).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: "See all careers in this direction" }),
-    );
+    expect(screen.queryByRole("button", { name: "Industries & workplaces" })).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Civil Engineer.*Design safe/ }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Doctor.*Care/ }),
     ).not.toBeInTheDocument();
+  });
+  it("opens a specialization under its parent and preserves its Study options link", async () => {
+    const graph = structuredClone(fixture);
+    graph.careers[0].specializationIds = ["ux-designer"];
+    graph.careers.push({
+      ...graph.careers[0],
+      id: "ux-designer",
+      title: "Digital Experience and Interface Design",
+      parentCareerId: "civil",
+      specializationIds: [],
+    });
+    vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    mount();
+    fireEvent.click(await screen.findByRole("button", { name: /Build things.*Make places/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Civil Engineer.*Design safe/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Digital Experience and Interface Design/ }));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Digital Experience and Interface Design");
+    const link = screen.getByRole("link", { name: "Find courses and colleges" });
+    const url = new URL(link.getAttribute("href")!, window.location.origin);
+    expect(url.pathname).toBe("/explore/roles/ux-designer/study-options");
+    expect(url.searchParams.get("returnTo")).toContain("direction=build&career=ux-designer&step=work");
+    expect(screen.getByRole("button", { name: "Civil Engineer" })).toBeInTheDocument();
   });
   it("restores a shared link and responds to browser navigation", async () => {
     window.history.replaceState(

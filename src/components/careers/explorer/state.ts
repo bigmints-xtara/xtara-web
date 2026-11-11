@@ -1,4 +1,4 @@
-import type { CareerExplorerResponse } from "@/types/career-explorer";
+import type { CareerExplorerResponse, ExplorerCareer } from "@/types/career-explorer";
 export type ExploreStep =
   | "directions"
   | "industries"
@@ -48,12 +48,12 @@ export function readExploreState(
   const career = data.careers.find(
     (c) =>
       c.id === state.career &&
-      (i ? i.careerIds.includes(c.id) : d ? d.careerIds.includes(c.id) : true),
+      (i ? includesCareerOrParent(i.careerIds, c) : d ? includesCareerOrParent(d.careerIds, c) : true),
   );
   if (!career) state.career = null;
   if (career && !state.direction)
     state.direction =
-      data.directions.find((d) => d.careerIds.includes(career.id))?.id ?? null;
+      data.directions.find((d) => includesCareerOrParent(d.careerIds, career))?.id ?? null;
   if (career)
     state.step =
       p.get("step") === "study"
@@ -61,9 +61,14 @@ export function readExploreState(
         : p.get("step") === "related"
           ? "related"
           : "work";
-  else if (i || p.get("step") === "roles" || state.q) state.step = "roles";
-  else if (state.direction) state.step = "industries";
+  else if (d && p.get("step") === "industries" && data.industries.some((industry) => d.industryIds.includes(industry.id)))
+    state.step = "industries";
+  else if (i || d || p.get("step") === "roles" || state.q) state.step = "roles";
   return state;
+}
+
+function includesCareerOrParent(ids: string[], career: ExplorerCareer) {
+  return ids.includes(career.id) || Boolean(career.parentCareerId && ids.includes(career.parentCareerId));
 }
 export function exploreUrl(state: ExploreState): string {
   const p = new URLSearchParams({ view: state.view });
@@ -77,7 +82,8 @@ export function previousExploreState(s: ExploreState): ExploreState {
   if (s.step === "related") return { ...s, step: "study" };
   if (s.step === "study") return { ...s, step: "work" };
   if (s.career) return { ...s, career: null, step: "roles", q: "" };
-  if (s.industry || (s.direction && s.step === "roles"))
+  if (s.industry)
     return { ...s, industry: null, career: null, step: "industries", q: "" };
+  if (s.step === "industries") return { ...s, step: "roles", q: "" };
   return { ...initialExploreState, view: s.view };
 }

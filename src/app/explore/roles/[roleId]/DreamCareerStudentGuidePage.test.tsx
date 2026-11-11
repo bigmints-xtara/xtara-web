@@ -360,6 +360,30 @@ describe('Dream Career Student Guide page', () => {
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument();
   });
 
+  it('links a saved pilot career to Study options even without a Student Guide', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'learner-1', isAnonymous: false };
+    vi.mocked(useParams).mockReturnValue({ roleId: 'software-developer' });
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams({ from: 'dashboard' }) as ReturnType<typeof useSearchParams>);
+    mocks.getGuide.mockRejectedValue(new XtaraApiError(
+      'Published Student Guide not found',
+      404,
+      undefined,
+      { career: {
+        id: 'software-developer',
+        title: 'Software Engineering',
+        summary: 'Build dependable software.',
+        primaryFutureDirectionId: 'technology',
+        futureDirectionIds: ['technology'],
+      } },
+    ));
+    render(<DreamCareerPage />);
+    const link = await screen.findByRole('link', { name: 'Find courses and colleges' });
+    const url = new URL(link.getAttribute('href')!, window.location.origin);
+    expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
+    expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard');
+  });
+
   it('retries and replaces only the failed relationship subsection', async () => {
     const initial = guideResponse();
     initial.relationshipErrors = [{ subsection: 'opportunities', code: 'temporarily_unavailable', retryable: true }];

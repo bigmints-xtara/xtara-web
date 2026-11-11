@@ -9,7 +9,7 @@ export async function GET(request: Request, { params }: {
     ...initialExploreState,
     direction: areaId,
     career,
-    step: career ? "work" : "industries",
+    step: career ? "work" : "roles",
   });
   return new Response(null, { status: 307, headers: { Location: location } });
 }

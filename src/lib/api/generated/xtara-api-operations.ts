@@ -147,6 +147,7 @@ export const XTARA_API_OPERATIONS = {
   "getStories": { method: "GET", path: "/api/v1/stories", authenticated: false },
   "getStoriesStoryId": { method: "GET", path: "/api/v1/stories/{storyId}", authenticated: false },
   "postStoriesStoryIdWatched": { method: "POST", path: "/api/v1/stories/{storyId}/watched", authenticated: true },
+  "getStudyOptionsCareerId": { method: "GET", path: "/api/v1/study-options/{careerId}", authenticated: false },
   "getVersion": { method: "GET", path: "/api/v1/version", authenticated: false },
   "postWebhooksProvider": { method: "POST", path: "/api/v1/webhooks/{provider}", authenticated: false },
   "postV1ChatCompletions": { method: "POST", path: "/v1/chat/completions", authenticated: true },
