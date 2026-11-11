@@ -140,7 +140,8 @@ export default function CollegeDetailPage() {
 }
 
 function CollegeDetailContent() {
-  const { id } = useParams<{ id: string }>();
+  const { id: routeId } = useParams<{ id: string }>();
+  const id = collegeIdFromRoute(routeId);
   const router = useRouter();
   const search = useSearchParams();
   const offeringId = search.get("offeringId") ?? undefined;
@@ -227,6 +228,14 @@ function CollegeDetailContent() {
       <Footer />
     </div>
   );
+}
+
+function collegeIdFromRoute(id: string) {
+  try {
+    return decodeURIComponent(id);
+  } catch {
+    return id;
+  }
 }
 
 function CourseCard({ course, text }: { course: CollegeCourse; text: { fees: string; streams: string } }) {

@@ -31,7 +31,8 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("College offering detail", () => {
-  it("retries a temporary catalogue outage and shows the exact offering with a return to the results", async () => {
+  it("decodes the route ID before retrying the exact offering and keeps the return link", async () => {
+    vi.mocked(useParams).mockReturnValue({ id: "college%3Aone" });
     vi.mocked(xtaraApi.get)
       .mockRejectedValueOnce(new XtaraApiError("Catalogue unavailable", 503))
       .mockResolvedValueOnce({
@@ -57,5 +58,6 @@ describe("College offering detail", () => {
     expect(await screen.findByRole("heading", { name: "This programme listing is no longer available." })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Try again" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to study options" })).toHaveAttribute("href", returnTo);
+    expect(xtaraApi.get).toHaveBeenCalledWith("/api/v1/colleges/college%3Aone?offeringId=offering-1", expect.any(Object));
   });
 });
