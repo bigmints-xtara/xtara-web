@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { homeMetadata } from "@/lib/seo/marketing-copy";
 import { buildPageMetadata } from "@/lib/seo/page-metadata";
 import Hero from "@/components/Hero";
 import FAQ from "@/components/FAQ";
@@ -13,7 +14,8 @@ import { getMessages } from "@/i18n/messages";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleFromCookie();
-  return buildPageMetadata({ ...getMessages(locale).metadata, path: "/", locale });
+  const metadata = locale === "en" ? homeMetadata : getMessages(locale).metadata;
+  return buildPageMetadata({ ...metadata, path: "/", locale });
 }
 
 export default function Home() {

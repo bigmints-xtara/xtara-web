@@ -2,6 +2,11 @@ import type { Locale } from "@/i18n/config";
 
 type MarketingMetadata = Record<Locale, { title: string; description: string }>;
 
+export const homeMetadata = {
+  title: "Career Guidance for Students in India | Xtara",
+  description: "Explore Career Directions, discover Dream Careers, and build a practical plan with Xtara. Career guidance for students in India from Grade 8 onward.",
+};
+
 export const explorerMetadata: MarketingMetadata = {
   en: {
     title: "Explore Career Directions and Dream Careers | Xtara",
