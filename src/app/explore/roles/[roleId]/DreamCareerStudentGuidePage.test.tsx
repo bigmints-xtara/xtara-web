@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -18,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   getGuide: vi.fn(),
   getContext: vi.fn(),
   getDirection: vi.fn(),
+  getExplorer: vi.fn(),
   saveDirection: vi.fn(),
   generateSlides: vi.fn(() => []),
   user: null as null | { uid: string; isAnonymous: boolean },
@@ -37,6 +39,7 @@ vi.mock('@/lib/direction-api', () => ({
   getDirectionFromApi: mocks.getDirection,
   saveDirectionToApi: mocks.saveDirection,
 }));
+vi.mock('@/lib/career-explorer-api', () => ({ getCareerExplorer: mocks.getExplorer }));
 vi.mock('@/lib/career-conversation-data', () => ({
   careerConversationFromGuides: mocks.generateSlides,
 }));
@@ -134,6 +137,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.getGuide.mockReset();
     mocks.getContext.mockReset();
     mocks.getDirection.mockReset();
+    mocks.getExplorer.mockReset();
     mocks.saveDirection.mockReset();
     mocks.generateSlides.mockReset();
     mocks.generateSlides.mockReturnValue([]);
@@ -382,6 +386,37 @@ describe('Dream Career Student Guide page', () => {
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
     expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard');
+  });
+
+  it('opens the published design specialization from its saved parent career', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'learner-1', isAnonymous: false };
+    vi.mocked(useParams).mockReturnValue({ roleId: 'designer' });
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams({ from: 'dashboard' }) as ReturnType<typeof useSearchParams>);
+    mocks.getGuide.mockRejectedValue(new XtaraApiError(
+      'Published Student Guide not found',
+      404,
+      undefined,
+      { career: {
+        id: 'designer',
+        title: 'Design',
+        summary: 'Design experiences and products.',
+        primaryFutureDirectionId: 'technology',
+        futureDirectionIds: ['technology'],
+      } },
+    ));
+    mocks.getExplorer.mockResolvedValue({
+      careers: [
+        { id: 'designer', specializationIds: ['ux-designer'] },
+        { id: 'ux-designer', title: 'Digital Experience and Interface Design' },
+      ],
+    });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+    render(<QueryClientProvider client={client}><DreamCareerPage /></QueryClientProvider>);
+    const link = await screen.findByRole('link', { name: /Digital Experience and Interface Design/ });
+    const url = new URL(link.getAttribute('href')!, window.location.origin);
+    expect(url.pathname).toBe('/explore/roles/ux-designer/study-options');
+    expect(url.searchParams.get('returnTo')).toBe('/dream-careers/designer?from=dashboard');
   });
 
   it('retries and replaces only the failed relationship subsection', async () => {

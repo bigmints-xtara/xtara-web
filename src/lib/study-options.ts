@@ -13,7 +13,7 @@ export function studyOptionsHref(careerId: string, returnTo: string) {
 
 export function studyOptionsCareerReturn(careerId: string, returnTo: string | null) {
   const path = returnTo?.split(/[?#]/, 1)[0];
-  if (returnTo && (path === "/explore" || path === `/dream-careers/${careerId}` || path === `/explore/roles/${careerId}`)) {
+  if (returnTo && path && (path === "/explore" || /^\/(?:dream-careers|explore\/roles)\/[\w-]+$/.test(path))) {
     return returnTo;
   }
   return `/explore?${new URLSearchParams({ career: careerId, step: "work" })}`;

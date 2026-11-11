@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, GraduationCap, MessageCircleMore, Plus, X } from 'lucide-react';
 
 import SlideshowOverlay from '@/components/career-path/SlideshowOverlay';
+import PilotCareerSpecializations from '@/components/careers/PilotCareerSpecializations';
 import {
   DreamCareerStudentGuide,
   DreamCareerStudentGuideError,
@@ -214,6 +215,9 @@ function DreamCareerContent() {
     ? getCareerArea(locale, response.career.primaryFutureDirectionId)
     : null;
   const signedIn = Boolean(user && !user.isAnonymous);
+  const pilotSpecializations = signedIn && from === 'dashboard' && !studyLink
+    ? <PilotCareerSpecializations careerId={careerId} locale={locale} />
+    : null;
   const activePlan = signedIn ? remotePlan : plan;
   const careerIdentity = response?.career ?? missingGuideCareer;
   const compatibleWithActiveDirection = Boolean(activePlan && (
@@ -324,6 +328,7 @@ function DreamCareerContent() {
             <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-[-0.04em] text-primary sm:text-4xl">{missingGuideCareer.title}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{missingGuideCareer.summary}</p>
             {studyLink && <div className="mt-6">{studyLink}</div>}
+            {pilotSpecializations}
             <p className="mt-8 max-w-2xl rounded-2xl bg-muted/55 px-5 py-4 text-foreground sm:px-6">{stateText.guideUnavailable}</p>
           </div>
         </section>
@@ -366,6 +371,7 @@ function DreamCareerContent() {
                   {MVP_NAVIGATION_ENABLED && hasReviewedGuidance ? <Button size="lg" className="w-fit rounded-lg" onClick={() => setConversationOpen(true)}><MessageCircleMore className="mr-2 h-4 w-4" />{text.conversation}</Button> : null}
                   {studyLink}
                 </div>}
+                {pilotSpecializations}
               </div>
 
               {MVP_NAVIGATION_ENABLED && area ? <DirectionImage directionId={area.id} /> : null}
