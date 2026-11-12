@@ -6,6 +6,7 @@ export const XTARA_API_OPERATIONS = {
   "postAdminAiReviewContent": { method: "POST", path: "/api/v1/admin/ai/review-content", authenticated: true },
   "postAdminAiReviewContentBatch": { method: "POST", path: "/api/v1/admin/ai/review-content/batch", authenticated: true },
   "postAdminCareerCatalogBasicsRelease": { method: "POST", path: "/api/v1/admin/career-catalog/basics-release", authenticated: true },
+  "postAdminCareerCatalogCoreEnglishRelease": { method: "POST", path: "/api/v1/admin/career-catalog/core-english-release", authenticated: true },
   "getAdminCareerCatalogMvpReadiness": { method: "GET", path: "/api/v1/admin/career-catalog/mvp-readiness", authenticated: true },
   "getAdminCatalogColleges": { method: "GET", path: "/api/v1/admin/catalog/colleges", authenticated: true },
   "getAdminCatalogCollegesActiveRelease": { method: "GET", path: "/api/v1/admin/catalog/colleges/active-release", authenticated: true },
