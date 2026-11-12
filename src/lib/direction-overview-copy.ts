@@ -1,0 +1,38 @@
+export const directionOverviewCopy = {
+  en: {
+    intro: "Your interests can take you in many directions. Start with the one you’re curious about today.",
+    why: "What pointed you here",
+    whyHelp: "These are answers you gave that helped Xtara suggest this direction.",
+    guidance: "Small steps to try",
+    reflection: "A question to think about",
+    conversation: "Talk it through",
+    explore: "See what else is possible",
+  },
+  ml: {
+    intro: "നിങ്ങളുടെ താൽപര്യങ്ങൾ പല വഴികൾ തുറക്കും. ഇപ്പോൾ കൗതുകം തോന്നുന്ന വഴിയിൽ നിന്ന് തുടങ്ങാം.",
+    why: "ഈ ദിശ നിർദേശിച്ചത് എന്തുകൊണ്ട്?",
+    whyHelp: "നിങ്ങൾ നൽകിയ ഈ ഉത്തരങ്ങളാണ് ഈ ദിശ നിർദേശിക്കാൻ Xtaraയെ സഹായിച്ചത്.",
+    guidance: "പരീക്ഷിക്കാവുന്ന ചെറിയ ചുവടുകൾ",
+    reflection: "ചിന്തിക്കാനുള്ള ഒരു ചോദ്യം",
+    conversation: "ഒരാളുമായി സംസാരിക്കാം",
+    explore: "മറ്റ് സാധ്യതകൾ കണ്ടെത്താം",
+  },
+  hi: {
+    intro: "आपकी रुचियाँ कई रास्ते खोल सकती हैं। आज जिस रास्ते के बारे में जानने की उत्सुकता है, उससे शुरू करें।",
+    why: "यह दिशा क्यों सुझाई गई?",
+    whyHelp: "आपके इन जवाबों ने Xtara को यह दिशा सुझाने में मदद की।",
+    guidance: "आज़माने के लिए छोटे कदम",
+    reflection: "सोचने के लिए एक सवाल",
+    conversation: "किसी से बात करें",
+    explore: "दूसरी संभावनाएँ देखें",
+  },
+  ta: {
+    intro: "உங்கள் ஆர்வங்கள் பல பாதைகளைத் திறக்கலாம். இன்று உங்களுக்கு ஆர்வமூட்டும் பாதையில் தொடங்குங்கள்.",
+    why: "இந்தத் திசை ஏன் பரிந்துரைக்கப்பட்டது?",
+    whyHelp: "இந்தத் திசையைப் பரிந்துரைக்க உங்கள் இந்தப் பதில்கள் Xtaraவுக்கு உதவின.",
+    guidance: "முயன்று பார்க்கச் சிறு படிகள்",
+    reflection: "சிந்திக்க ஒரு கேள்வி",
+    conversation: "ஒருவருடன் பேசிப் பாருங்கள்",
+    explore: "மற்ற வாய்ப்புகளைப் பாருங்கள்",
+  },
+} as const;

@@ -10,6 +10,7 @@ import { createAreaDirectionPlan, directionStorageKey, selectDirectionRole, setD
 const mocks = vi.hoisted(() => ({
   mvpEnabled: false,
   hydrate: vi.fn(),
+  hydrateDirection: vi.fn(),
   getPoints: vi.fn(),
   getMedals: vi.fn(),
   getTier: vi.fn(),
@@ -30,7 +31,10 @@ vi.mock('@/i18n/language-provider', () => ({
   useTranslations: () => ({ locale: 'en' }),
 }));
 
-vi.mock('@/lib/discovery-save', () => ({ hydrateDiscoveryFromAccount: mocks.hydrate }));
+vi.mock('@/lib/discovery-save', () => ({
+  hydrateDiscoveryFromAccount: mocks.hydrate,
+  hydrateDirectionDashboard: mocks.hydrateDirection,
+}));
 
 vi.mock('@/lib/firebase/achievements-service', () => ({
   AchievementsService: class {
@@ -96,6 +100,7 @@ describe('pursued-area learner dashboard', () => {
     mocks.mvpEnabled = false;
     localStorage.clear();
     mocks.hydrate.mockReset().mockResolvedValue(null);
+    mocks.hydrateDirection.mockReset().mockResolvedValue(undefined);
     mocks.getPoints.mockReset().mockResolvedValue(120);
     mocks.getMedals.mockReset().mockResolvedValue({ total: 3 });
     mocks.getTier.mockReset().mockResolvedValue({ name: 'Explorer' });
@@ -152,6 +157,45 @@ describe('pursued-area learner dashboard', () => {
     expect(mocks.getPoints).not.toHaveBeenCalled();
     expect(mocks.getExperience).not.toHaveBeenCalled();
     expect(localStorage.getItem(directionStorageKey)).toBe(before);
+  });
+
+  it('shows current published details and the saved career even without a compatible local assessment', async () => {
+    mocks.mvpEnabled = true;
+    localStorage.clear();
+    mocks.hydrateDirection.mockResolvedValue({
+      id: 'digital-and-computing',
+      title: 'Digital and Computing',
+      summary: 'Build useful tools and solve problems with technology.',
+      reasons: ['Finding out why something works'],
+      guidance: ['Try sketching a tool for a problem at school.'],
+      reflectionPrompt: 'What would you like to build?',
+      careers: [{ id: 'software-developer', title: 'Software Engineering', summary: 'Design and build software.' }],
+    });
+
+    await act(async () => { root.render(<UserDashboard />); });
+
+    expect(mocks.hydrateDirection).toHaveBeenCalledWith('en', 'student-1');
+    const page = container.textContent;
+    expect(page).toContain('Build useful tools and solve problems with technology.');
+    expect(page).toContain('Finding out why something works');
+    expect(page).toContain('Try sketching a tool for a problem at school.');
+    expect(page).toContain('What would you like to build?');
+    expect(container.querySelector('a[href="/dream-careers/software-developer?from=dashboard"]')?.textContent).toContain('Design and build software.');
+    expect(container.querySelector('a[href="/assessment/careers/digital-and-computing"]')).toBeNull();
+  });
+
+  it('keeps the direction and career picker visible when no careers are saved', async () => {
+    mocks.mvpEnabled = true;
+    mocks.hydrateDirection.mockResolvedValue({
+      id: 'design', title: 'Design and Media', summary: 'Make ideas visible.',
+      reasons: [], guidance: [], reflectionPrompt: '', careers: [],
+    });
+
+    await act(async () => { root.render(<UserDashboard />); });
+
+    expect(container.textContent).toContain('Make ideas visible.');
+    expect(container.querySelector('a[href="/assessment/careers/design"]')).not.toBeNull();
+    expect(container.querySelector('#direction-reasons, #direction-guidance, #next-steps')).toBeNull();
   });
 
   it('focuses Career on direction, Dream Careers, next steps, and an achievements snapshot', async () => {

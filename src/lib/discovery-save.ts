@@ -24,8 +24,9 @@ import {
   saveDirectionPlan,
   type DirectionPlan,
 } from "@/lib/direction";
-import { getDirectionFromApi, saveDirectionToApi } from "@/lib/direction-api";
+import { getDirectionFromApi, getDirectionOverview, saveDirectionToApi } from "@/lib/direction-api";
 import { isDirectionPlanCompatible } from "@/lib/exploration-access";
+import type { Locale } from "@/i18n/config";
 
 type LatestAssessmentResponse = {
   assessment?: { id?: string; answers?: Record<string, unknown> };
@@ -231,12 +232,26 @@ function assertOwner(userId: string): void {
   if (getFirebaseAuth().currentUser?.uid !== userId) throw new Error('Your sign-in account changed. Please retry from your own account.');
 }
 
-export async function hydrateDiscoveryFromAccount(): Promise<{ assessment: DiscoveryResult; pathwayProfile: PathwayProfile | null; directionPlan: DirectionPlan | null } | null> {
+export async function hydrateDirectionDashboard(locale: Locale, userId: string) {
+  const readback = await getDirectionOverview(locale, userId);
+  try {
+    await hydrateDiscoveryFromAccount({ userId, direction: readback.direction });
+  } catch (error) {
+    // The saved overview is still useful when assessment or profile data is unavailable.
+    if (!readback.overview) throw error;
+  }
+  assertOwner(userId);
+  return readback.overview;
+}
+
+export async function hydrateDiscoveryFromAccount(
+  readback?: { userId: string; direction: DirectionPlan | null },
+): Promise<{ assessment: DiscoveryResult; pathwayProfile: PathwayProfile | null; directionPlan: DirectionPlan | null } | null> {
   const userId = getFirebaseAuth().currentUser?.uid;
   if (!userId) return null;
   const [response, remoteDirection, userProfile] = await Promise.all([
     xtaraApi.get<LatestAssessmentResponse>("/assessment/latest", { expectedUserId: userId }),
-    getDirectionFromApi(userId),
+    readback?.userId === userId ? readback.direction : getDirectionFromApi(userId),
     xtaraApi.get<UserProfileResponse>("/me", { expectedUserId: userId }),
   ]);
   assertOwner(userId);

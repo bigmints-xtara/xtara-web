@@ -1,7 +1,19 @@
 import { xtaraApi } from "@/lib/api/client";
+import type { Locale } from "@/i18n/config";
 import type { DirectionPlan } from "@/lib/direction";
 
-type DirectionResponse = { direction: DirectionPlan | null };
+export type DirectionCareerPreview = { id: string; title: string; summary: string };
+export type DirectionOverview = DirectionCareerPreview & {
+  reasons: string[];
+  guidance: string[];
+  reflectionPrompt: string;
+  careers: DirectionCareerPreview[];
+};
+type DirectionResponse = { direction: DirectionPlan | null; overview?: DirectionOverview | null };
+
+export function getDirectionOverview(locale: Locale, expectedUserId: string): Promise<DirectionResponse> {
+  return xtaraApi.get<DirectionResponse>(`/me/direction?locale=${locale}`, { expectedUserId });
+}
 
 export async function getDirectionFromApi(expectedUserId?: string): Promise<DirectionPlan | null> {
   const response = await (expectedUserId ? xtaraApi.get<DirectionResponse>("/me/direction", { expectedUserId }) : xtaraApi.get<DirectionResponse>("/me/direction"));

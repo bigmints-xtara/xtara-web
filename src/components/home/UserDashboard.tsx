@@ -28,7 +28,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { getAssessmentV2Catalog, assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
 import { dashboardCopy } from "@/lib/dashboard-copy";
-import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
+import MyDirectionOverview from "./MyDirectionOverview";
+import { hydrateDirectionDashboard, hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 import {
   getDirectionSnapshot,
   parseDirectionPlan,
@@ -37,7 +38,7 @@ import {
   toggleDirectionAction,
   type DirectionActionId,
 } from "@/lib/direction";
-import { saveDirectionToApi } from "@/lib/direction-api";
+import { saveDirectionToApi, type DirectionOverview } from "@/lib/direction-api";
 import {
   getMyCareerPathExperience,
   recommendationHref,
@@ -54,19 +55,26 @@ export default function UserDashboard() {
   const { user, userProfile } = useAuth();
   const { locale } = useTranslations();
   const text = dashboardCopy[locale];
-  const [accountLoad, setAccountLoad] = useState<{ owner?: string; attempt?: number; error: boolean }>({ error: false });
+  const [accountLoad, setAccountLoad] = useState<{ owner?: string; attempt?: number; locale?: typeof locale; error: boolean; overview?: DirectionOverview | null }>({ error: false });
   const [retryAccount, setRetryAccount] = useState(0);
   const [conversationOpen, setConversationOpen] = useState(false);
   const [rewards, setRewards] = useState<RewardSummary>({ points: 0, medals: 0, level: "Starter" });
   const [experience, setExperience] = useState<MyCareerPathExperience | null>(null);
   const impressedRecommendations = useRef(new Set<string>());
+  const userId = user?.uid;
+  const isAnonymous = user?.isAnonymous;
+  const isAccount = Boolean(userId && !isAnonymous);
+  const currentReadback = accountLoad.owner === userId && accountLoad.attempt === retryAccount && accountLoad.locale === locale;
+  const serverOverview = isAccount && currentReadback ? accountLoad.overview : undefined;
+  const useCachedPresentation = !MVP_NAVIGATION_ENABLED || !isAccount || (currentReadback && serverOverview === undefined);
   const rawResult = useSyncExternalStore(subscribeToDiscovery, () => localStorage.getItem(assessmentV2StorageKey), () => null);
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, () => null);
   const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
-  const result = useMemo(() => storedResult ? localizeDiscoveryResult(storedResult, locale) : null, [locale, storedResult]);
+  const result = useMemo(() => storedResult && useCachedPresentation ? localizeDiscoveryResult(storedResult, locale) : null, [locale, storedResult, useCachedPresentation]);
   const plan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
   const focusedDirection = result?.areas.find((area) => area.id === plan?.areaId) ?? null;
   const selectedCareers = useMemo(() => {
+    if (!useCachedPresentation) return [];
     const graph = storedResult?.catalogSnapshot;
     if (!graph) return focusedDirection?.roles.filter((career) => plan?.dreamCareerIds.includes(career.id)) ?? [];
     const direction = graph.directions.find((item) => item.id === plan?.areaId);
@@ -76,18 +84,17 @@ export default function UserDashboard() {
       const translation = career.translations[locale] || career.translations.en;
       return [{ id, title: translation.title, summary: translation.summary }];
     });
-  }, [storedResult, focusedDirection, plan, locale]);
-  const userId = user?.uid;
-  const isAnonymous = user?.isAnonymous;
+  }, [storedResult, focusedDirection, plan, locale, useCachedPresentation]);
 
   useEffect(() => {
     if (!userId || isAnonymous) return;
     let active = true;
-    hydrateDiscoveryFromAccount()
-      .then(() => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, error: false }); })
-      .catch(() => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, error: true }); });
+    const load = MVP_NAVIGATION_ENABLED ? hydrateDirectionDashboard(locale, userId) : hydrateDiscoveryFromAccount().then(() => undefined);
+    load
+      .then((overview) => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, locale, error: false, overview }); })
+      .catch(() => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, locale, error: true }); });
     return () => { active = false; };
-  }, [userId, isAnonymous, retryAccount]);
+  }, [userId, isAnonymous, locale, retryAccount]);
 
   useEffect(() => {
     if (MVP_NAVIGATION_ENABLED || !userId || isAnonymous) return;
@@ -120,14 +127,35 @@ export default function UserDashboard() {
     return () => { active = false; };
   }, [isAnonymous, locale, rawPlan, userId]);
 
-  if (userId && !isAnonymous && (accountLoad.owner !== userId || accountLoad.attempt !== retryAccount)) return <div className="p-8" role="status">{getAssessmentV2Catalog(locale).ui.loading}</div>;
-  if (accountLoad.error) return <div className="p-8"><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></div>;
+  if (isAccount && !currentReadback) return <div className="p-8" role="status">{getAssessmentV2Catalog(locale).ui.loading}</div>;
+  if (isAccount && accountLoad.error) return <div className="p-8"><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></div>;
+
+  const name = userProfile?.fullName || user?.displayName || "Student";
+  const greeting = text.greeting.replace("{name}", name.split(" ")[0]);
+  if (MVP_NAVIGATION_ENABLED) {
+    const published = storedResult?.catalogSnapshot?.directions.find((item) => item.id === focusedDirection?.id);
+    const fallback = focusedDirection && {
+      id: focusedDirection.id,
+      title: focusedDirection.title,
+      summary: focusedDirection.description,
+      reasons: isAccount ? [] : Array.from(new Set(focusedDirection.reasons)).slice(0, 3),
+      guidance: (result && (published?.gradeGuidance?.[locale]?.[result.stage]
+        ?? published?.gradeGuidance?.en?.[result.stage])) ?? [],
+      reflectionPrompt: published?.translations[locale]?.reflectionPrompt ?? published?.translations.en.reflectionPrompt ?? "",
+      careers: selectedCareers,
+    };
+    const direction = serverOverview === undefined ? fallback : serverOverview;
+    if (direction) return <MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
+      hasAssessment={Boolean(storedResult)} canEditCareers={plan?.areaId === direction.id
+        && Boolean(storedResult?.areas.some((area) => area.id === direction.id))} />;
+    return storedResult
+      ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />
+      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
+  }
 
   if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
   if (!focusedDirection) return <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />;
 
-  const name = userProfile?.fullName || user?.displayName || "Student";
-  const greeting = text.greeting.replace("{name}", name.split(" ")[0]);
   const fallbackGoals = ([
     ["learn", text.learnStep], ["try", text.tryStep], ["discuss", text.discussStep],
   ] as Array<[DirectionActionId, string]>).map(([id, title]) => ({
