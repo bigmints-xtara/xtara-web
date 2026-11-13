@@ -22,6 +22,7 @@ export interface ExplorerIndustry {
   translationFallback: boolean;
 }
 export interface ExplorerCareer {
+  cardSummary?: string;
   illustration?: ExplorerIllustration;
   skills?: string[];
   workplaces?: string[];
