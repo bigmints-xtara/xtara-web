@@ -4,6 +4,7 @@ export interface ExplorerIllustration { url: string; alt: string; width?: number
 
 // Mirrors CareerExplorerResponse in the API OpenAPI contract.
 export interface ExplorerDirection {
+  presentation?: { accent: string; tint: string; wash: string; washEnd: string };
   illustration?: ExplorerIllustration;
   id: string;
   title: string;

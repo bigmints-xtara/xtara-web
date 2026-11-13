@@ -1,4 +1,21 @@
 import type { Locale } from '@/i18n/config';
+const invitationEnglish = {
+  yourDream:'Your Dream Career', headingLead:'Make it your', headingAccent:'Dream Career.', choice:'Your choice', change:'Change choice',
+  benefitsTitle:'With your Xtara account', saveDetail:'Keep your choices together in My Direction.', guideDetail:'Add your study details to see relevant guidance.', returnDetail:'Return to your direction and update your choices.',
+  create:'Create an account', already:'Already have an account?', signin:'Sign in',
+};
+export const invitationCopy: Record<Locale, typeof invitationEnglish> = {
+  en:invitationEnglish,
+  ml:{yourDream:'നിങ്ങളുടെ സ്വപ്ന കരിയർ',headingLead:'ഇതാകട്ടെ നിങ്ങളുടെ',headingAccent:'സ്വപ്ന കരിയർ.',choice:'നിങ്ങളുടെ തിരഞ്ഞെടുപ്പ്',change:'തിരഞ്ഞെടുപ്പ് മാറ്റൂ',benefitsTitle:'നിങ്ങളുടെ Xtara അക്കൗണ്ടിലൂടെ',saveDetail:'എന്റെ ദിശയിൽ തിരഞ്ഞെടുപ്പുകൾ ഒരുമിച്ച് സൂക്ഷിക്കൂ.',guideDetail:'പ്രസക്തമായ മാർഗനിർദേശത്തിനായി പഠനവിവരങ്ങൾ ചേർക്കൂ.',returnDetail:'നിങ്ങളുടെ ദിശയിലേക്ക് മടങ്ങി തിരഞ്ഞെടുപ്പുകൾ പുതുക്കൂ.',create:'അക്കൗണ്ട് സൃഷ്ടിക്കൂ',already:'അക്കൗണ്ട് ഉണ്ടോ?',signin:'സൈൻ ഇൻ ചെയ്യൂ'},
+  hi:{yourDream:'आपका ड्रीम करियर',headingLead:'इसे अपना बनाएं',headingAccent:'ड्रीम करियर।',choice:'आपकी पसंद',change:'पसंद बदलें',benefitsTitle:'आपके Xtara खाते के साथ',saveDetail:'अपनी पसंद को मेरी दिशा में साथ रखें।',guideDetail:'प्रासंगिक मार्गदर्शन के लिए पढ़ाई की जानकारी जोड़ें।',returnDetail:'अपनी दिशा पर लौटें और अपनी पसंद बदलें।',create:'खाता बनाएं',already:'पहले से खाता है?',signin:'साइन इन करें'},
+  ta:{yourDream:'உங்கள் கனவுத் தொழில்',headingLead:'இதை உங்கள்',headingAccent:'கனவுத் தொழிலாக்குங்கள்.',choice:'உங்கள் தேர்வு',change:'தேர்வை மாற்று',benefitsTitle:'உங்கள் Xtara கணக்குடன்',saveDetail:'எனது திசையில் உங்கள் தேர்வுகளை ஒன்றாகச் சேமியுங்கள்.',guideDetail:'பொருத்தமான வழிகாட்டுதலுக்குப் படிப்பு விவரங்களைச் சேருங்கள்.',returnDetail:'உங்கள் திசைக்குத் திரும்பித் தேர்வுகளைப் புதுப்பியுங்கள்.',create:'கணக்கை உருவாக்கு',already:'ஏற்கனவே கணக்கு உள்ளதா?',signin:'உள்நுழைக'},
+};
+export const explorerHeadings = {
+  en: { homeLead:'What interests ', homeAccent:'you?', dreamLead:'Who could you ', dreamAccent:'become?', specialtyLead:'Find your kind of ', specialtyAccent:'possibility.', homeHint:'Follow your curiosity. See where it could take you.', skillsTitle:'Skills that come into play', placesTitle:'Picture yourself here' },
+  ml: { homeLead:'നിങ്ങളുടെ ', homeAccent:'താൽപ്പര്യം എന്താണ്?', dreamLead:'നിങ്ങൾക്ക് ', dreamAccent:'ആരാകാം?', specialtyLead:'നിങ്ങളുടെ ', specialtyAccent:'സാധ്യത കണ്ടെത്തൂ.', homeHint:'കൗതുകത്തെ പിന്തുടരൂ. അത് നിങ്ങളെ എവിടെ എത്തിക്കുമെന്ന് അറിയൂ.', skillsTitle:'ഉപയോഗപ്രദമായ കഴിവുകൾ', placesTitle:'ഇവിടെ നിങ്ങളെ സങ്കൽപ്പിക്കൂ' },
+  hi: { homeLead:'आपकी रुचि ', homeAccent:'किसमें है?', dreamLead:'आप क्या ', dreamAccent:'बन सकते हैं?', specialtyLead:'अपनी ', specialtyAccent:'संभावनाएँ खोजें।', homeHint:'अपनी जिज्ञासा के साथ चलें। देखें यह आपको कहाँ ले जा सकती है।', skillsTitle:'काम आने वाले कौशल', placesTitle:'यहाँ खुद की कल्पना करें' },
+  ta: { homeLead:'உங்கள் ஆர்வம் ', homeAccent:'எதில்?', dreamLead:'நீங்கள் ', dreamAccent:'யாராகலாம்?', specialtyLead:'உங்கள் ', specialtyAccent:'வாய்ப்பைக் கண்டறியுங்கள்.', homeHint:'உங்கள் ஆர்வத்தைப் பின்தொடருங்கள். அது எங்கு அழைத்துச் செல்லும் என்று பாருங்கள்.', skillsTitle:'பயன்படும் திறன்கள்', placesTitle:'இங்கே உங்களைக் கற்பனை செய்யுங்கள்' },
+} satisfies Record<Locale, { homeLead:string; homeAccent:string; dreamLead:string; dreamAccent:string; specialtyLead:string; specialtyAccent:string; homeHint:string; skillsTitle:string; placesTitle:string }>;
 const en = {
   dreams: 'Who could you become?', specialties: 'Find your kind of possibility.',
   meet: 'Meet this career', explore: 'Explore this direction', specialize: 'Explore specializations',

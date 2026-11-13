@@ -6,6 +6,9 @@ The API supplies catalogue identities, relationships, localized facts, and
 illustration URLs with alternative text. Missing artwork and unpublished facts
 have explicit placeholders; the browser does not contain a fallback catalogue.
 The presentation uses the existing Xtara theme, fonts, and native web controls.
+The compact Explorer header and Mona typography follow the approved prototype.
+Direction accents and illustration washes come from API-owned presentation
+tokens, with separate dark-surface blending in the client.
 
 Only the focused choice exposes its opening action. Neighboring choices can be
 focused by tapping, dragging, arrows, pagination, or keyboard navigation.
@@ -21,6 +24,8 @@ show an honest empty state. Carousel preview summaries are shortened visually;
 the opened overview retains the full published summary. Public study planning
 is not exposed by this presentation. Motion can be paused and follows the
 system's reduced-motion preference.
+On compact screens, the assessment and pursuit actions remain visible in a
+bottom bar with safe-area padding. The overview reserves room for that bar.
 
 ## Save and authentication continuity
 
@@ -30,7 +35,10 @@ selection limits, parent/specialization resolution, and persistence. The client
 checks `GET /api/v1/me/career-pursuit` and the returned saved Direction before
 showing success. The operation stays bound to the initiating account.
 
-Guests carry both selected IDs through signup and login in the URL. After an
+Guests first see an invitation showing their selected career, optional
+specialization, account benefits, and a way to change the choice. Its signup
+and login links carry both selected IDs in the URL. Signed-in learners save
+directly from the career overview. After an
 account is created, a failed session or pursuit save can be retried using that
 account instead of attempting signup again. Navigation to My Direction happens
 only after verified readback. The existing assessment continuation remains a
@@ -59,3 +67,10 @@ the frontend-boundary check, and the repository ESLint regression gate alongside
 them. Browser verification must include compact and desktop layouts, API artwork,
 published facts, and retained career intent at signup/login. A local preview is
 not evidence of production deployment or a production authenticated journey.
+
+For design changes, compare the current screens against
+`features/xtara-mvp/prototypes/career-explorer.html` in the workspace at identical
+viewport sizes. The approved layout includes a 58-pixel compact header,
+visible carousel controls, three connected overview bubbles, a compact fixed
+action bar, and the guest invitation. Passing functional tests alone does not
+establish visual fidelity.

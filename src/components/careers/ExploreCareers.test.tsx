@@ -10,7 +10,7 @@ import {
   previousExploreState,
 } from "./explorer/state";
 vi.mock("@/i18n/language-provider", () => ({
-  useTranslations: () => ({ locale: "en" }),
+  useTranslations: () => ({ locale: "en", setLocale: vi.fn(), t: (key: string) => key }),
 }));
 vi.mock("@/components/Header", () => ({ default: () => <header /> }));
 vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn() }));
@@ -156,6 +156,20 @@ describe("career exploration", () => {
     fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Structural Engineering');
     expect(window.location.search).toContain('career=structures');
+  });
+  it('invites guests to save their selected career before signup and preserves their choice in both auth links', async () => {
+    window.history.replaceState({}, '', '/explore?direction=build&career=civil&step=work');
+    mount();
+    fireEvent.click(await screen.findByRole('button',{name:'Pursue this career'}));
+    expect(window.location.search).toContain('step=pursuit');
+    expect(screen.getByRole('heading',{level:1})).toHaveTextContent('Make it yourDream Career.');
+    expect(screen.getByRole('heading',{name:'Civil Engineer'})).toBeInTheDocument();
+    expect(screen.getByRole('link',{name:'Create an account'})).toHaveAttribute('href','/signup?pursueCareer=civil&directionId=build&next=%2Fdashboard');
+    expect(screen.getByRole('link',{name:'Sign in'})).toHaveAttribute('href','/login?pursueCareer=civil&directionId=build&next=%2Fdashboard');
+    fireEvent.click(screen.getByRole('button',{name:'Change choice'}));
+    expect(window.location.search).toContain('direction=build');
+    expect(window.location.search).not.toContain('career=civil');
+    expect(screen.getByRole('button',{name:'Meet this career'})).toBeInTheDocument();
   });
   it("offers retry and an honest empty catalogue", async () => {
     vi.mocked(getCareerExplorer).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ ...fixture, careers: [], directions: [], industries: [] });
