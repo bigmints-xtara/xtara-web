@@ -3,6 +3,29 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import VisualCarousel, { swipeIndex } from './VisualCarousel';
 afterEach(cleanup);
 describe('touch carousel', () => {
+  it.each([320, 700, 980])('keeps one complete fact readable at %ipx, including the middle slide', (width) => {
+    const measure = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width);
+    try {
+      const { container } = render(<VisualCarousel variant="fact" items={[{id:'a',title:'One'},{id:'b',title:'Two'},{id:'c',title:'Three'}]} label="Work" previous="Previous" next="Next" hint="" renderItem={i => <p>Complete fact {i}</p>} />);
+      const slides = Array.from(container.querySelectorAll('article'));
+      const check = (index: number) => {
+        expect(screen.getAllByRole('article')).toHaveLength(1);
+        slides.forEach((slide, i) => {
+          expect(parseFloat(slide.style.width)).toBeLessThanOrEqual(width - 32);
+          expect(slide.style.opacity).toBe(i === index ? '1' : '0');
+          if (i !== index) expect(slide).toHaveAttribute('inert');
+        });
+      };
+      check(0);
+      fireEvent.click(screen.getByRole('button', {name:'Next'}));
+      check(1);
+      expect(screen.getByRole('article')).toHaveTextContent('Complete fact 1');
+      fireEvent.keyDown(container.querySelector('[tabindex="0"]')!, {key:'ArrowRight'});
+      check(2);
+      expect(screen.getByRole('button', {name:'Next'})).toBeDisabled();
+    } finally { measure.mockRestore(); }
+  });
+
   it('snaps horizontal drags one slide and clamps first/last boundaries', () => {
     expect(swipeIndex(0, -100, 3)).toBe(1);
     expect(swipeIndex(1, 100, 3)).toBe(0);

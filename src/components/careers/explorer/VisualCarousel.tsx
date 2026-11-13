@@ -44,7 +44,8 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
     slides.forEach(slide => observer?.observe(slide));
     return () => observer?.disconnect();
   }, [variant, items]);
-  const cardWidth = variant === 'fact' ? Math.min(items.length === 1 ? 550 : 380, width * (items.length === 1 ? .9 : .74)) : variant === 'bubble' ? Math.min(compact ? 320 : 370, width - 88) : compact ? Math.min(400, width - 64) : Math.max(260, Math.min(360, width * .24));
+  // Facts are reading panels, not previews: keep the entire paragraph in view.
+  const cardWidth = variant === 'fact' ? Math.min(550, Math.max(0, width - 32)) : variant === 'bubble' ? Math.min(compact ? 320 : 370, width - 88) : compact ? Math.min(400, width - 64) : Math.max(260, Math.min(360, width * .24));
   const spacing = variant === 'direction' ? compact ? cardWidth + 14 : cardWidth * .98 : cardWidth + (compact ? 12 : 54);
   const finish = (cancel = false) => {
     const current = drag.current;
@@ -71,9 +72,11 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
         const relative = distance + offset / spacing, depth = Math.abs(relative), active = i === index;
         const yaw = variant === 'direction' && !compact ? Math.max(-26, Math.min(26, relative * -12)) : 0;
         const rotation = variant === 'direction' && !compact ? Math.max(-6, Math.min(6, relative * 2)) : 0;
-        const transform = `translate(-50%, -50%) translate3d(${relative * spacing}px, ${variant === 'direction' && !compact ? Math.min(depth * depth * 7, 65) : 0}px, 0) rotateY(${yaw}deg) rotateZ(${rotation}deg) scale(${variant === 'direction' && !compact ? Math.max(.7375, 1 - depth * .075) : 1})`;
-        return <article key={item.id} className={`${styles.slide} ${active ? styles.active : ''}`} data-active={active} aria-roledescription="slide" aria-label={`${i + 1} / ${items.length}: ${item.title}`}
-          style={{ width: cardWidth, transform, zIndex: 20 - Math.min(19, Math.round(depth)), opacity: depth > 4 ? 0 : variant === 'fact' && !active ? .42 : 1, pointerEvents: depth > 4 ? 'none' : undefined } as CSSProperties}
+        const translation = variant === 'fact' ? Math.max(-12, Math.min(12, relative * spacing)) : relative * spacing;
+        const hiddenFact = variant === 'fact' && !active;
+        const transform = `translate(-50%, -50%) translate3d(${translation}px, ${variant === 'direction' && !compact ? Math.min(depth * depth * 7, 65) : 0}px, 0) rotateY(${yaw}deg) rotateZ(${rotation}deg) scale(${variant === 'direction' && !compact ? Math.max(.7375, 1 - depth * .075) : 1})`;
+        return <article key={item.id} className={`${styles.slide} ${active ? styles.active : ''}`} data-active={active} aria-hidden={hiddenFact || undefined} inert={hiddenFact || undefined} aria-roledescription="slide" aria-label={`${i + 1} / ${items.length}: ${item.title}`}
+          style={{ width: cardWidth, transform, zIndex: 20 - Math.min(19, Math.round(depth)), opacity: depth > 4 || hiddenFact ? 0 : 1, pointerEvents: depth > 4 || hiddenFact ? 'none' : undefined } as CSSProperties}
           onClick={() => { if (!active) focus(i); }}>
           {!active && <button className={styles.focusTarget} aria-label={`${label}: ${item.title}`} tabIndex={-1} onClick={() => focus(i)} />}
           {renderItem(i, active)}
