@@ -214,6 +214,11 @@
 }
 .topline .motion:hover { background: var(--muted); color: var(--foreground); }
 
+/* The direction orb is a navigation target in the original journey. */
+.connectionLink { position:absolute; z-index:1; display:block; padding:0; border:0; background:none; color:inherit; font:inherit; text-align:center; }
+.connectionLink > span { position:absolute; left:-12px; right:-12px; top:calc(100% + 6px); font-size:11px; font-weight:600; line-height:1.3; }
+@media (max-width:700px) { .connectionLink > span { font-size:9px; left:-7px; right:-7px; } }
+
 @media (min-width: 701px) and (max-width: 1279px) {
   .topline[data-inner] { padding-inline: 24px; }
 }

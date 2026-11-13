@@ -123,7 +123,7 @@ export default function ExploreCareers() {
       </section> : overview && career ? <>
         <div className={styles.connection} aria-label={`${direction?.title || ''}, ${parent?.title || career.title}, ${parent ? career.title : text.nextStep}`}>
           <span className={styles.orbit} /><span className={styles.orbitTwo} />
-          <div className={styles.satellite}><Illustration illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></div>
+          <button className={`${styles.satellite} ${styles.connectionLink}`} aria-label={direction?.title} disabled={!direction} onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}><Illustration illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></button>
           <div className={styles.central}><Illustration illustration={(parent || career).illustration} placeholder={text.illustration} bubble /><span>{parent?.title || career.title}</span></div>
           <div className={styles.satellite}>{parent ? <Illustration illustration={career.illustration} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
         </div>
