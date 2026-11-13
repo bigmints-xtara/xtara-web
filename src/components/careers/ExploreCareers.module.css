@@ -18,7 +18,6 @@
 
 /* Explorer layout below the shared Xtara site header. */
 .page { --learner-nav-space: 0px; }
-.explorerActions { margin-inline-start: auto; display: flex; flex-wrap: wrap; justify-content: end; gap: 4px 12px; }
 @media (max-width: 1023px) {
   .page:has(> [data-learner-navigation]) {
     --learner-nav-space: calc(4.5rem + env(safe-area-inset-bottom));
@@ -30,12 +29,10 @@
     bottom: var(--learner-nav-space);
     padding-bottom: 12px;
   }
-  .topline { flex-wrap: wrap; }
 }
 @font-face{font-family:ExplorerMona;src:url('/fonts/MonaSans-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:ExplorerMona;src:url('/fonts/MonaSans-SemiBold.woff2') format('woff2');font-weight:600 900;font-display:swap}
 .explorer{--scene-accent:#315ad2;--scene-tint:#e3efff;--scene-wash:#d9e9ff;--scene-wash-end:#e7e0ff;--scene-color:var(--scene-accent);--wash:var(--scene-tint);--ink:#17324b;--soft-ink:#56697c;font-family:ExplorerMona,var(--font-inter),sans-serif;background:#f8fbff;color:var(--ink)}
-.allDirections{font-weight:650;min-height:42px;cursor:pointer;white-space:nowrap}
 .motion{min-height:42px;padding:8px;font-size:13px;color:var(--soft-ink);white-space:nowrap}
 .main{background:radial-gradient(ellipse at 50% 57%,var(--scene-wash) 0,transparent 56%),linear-gradient(#f8fbff,#f5f8fc)}
 .home{background:radial-gradient(ellipse at 8% 65%,#d8f1e4 0,transparent 43%),radial-gradient(ellipse at 90% 60%,#eee3ff 0,transparent 47%),linear-gradient(#f8fbff,#edf3ff)}
@@ -143,7 +140,7 @@
  .decision{padding:0 18px}.decisionBar{position:fixed;z-index:60;bottom:0;left:0;right:0;margin:0;padding:12px 18px calc(12px + env(safe-area-inset-bottom));background:#f8faffed;backdrop-filter:blur(16px);box-shadow:0 -8px 30px #17324b08;gap:8px}.decisionCopy{display:none}.decisionActions{width:100%;max-width:480px;gap:8px;margin:auto;flex-wrap:nowrap}.decisionActions>*{flex:1;width:auto;white-space:normal;font-size:10px;padding:12px 10px;gap:6px}.decisionBar>p{font-size:11px;margin:0}.benefits{font-size:11px;margin-top:22px}.decision .quiet{margin-top:20px}.primary,.secondary{min-height:44px}.decision .quiet{min-height:28px}
  :global(.dark) .decisionBar{background:color-mix(in srgb,var(--background) 94%,transparent)}
 }
-@media(max-width:360px){.allDirections,.motion{font-size:11px}.intro h1{font-size:26px}.bubble .cardCopy h2{font-size:19px}.bubble .cardCopy p{font-size:12px}.bubble .cardAction{font-size:11px;padding-inline:14px}.controls{gap:7px}.controls>button{width:44px;height:44px}.decisionActions{flex-wrap:nowrap}}
+@media(max-width:360px){.motion{font-size:11px}.intro h1{font-size:26px}.bubble .cardCopy h2{font-size:19px}.bubble .cardCopy p{font-size:12px}.bubble .cardAction{font-size:11px;padding-inline:14px}.controls{gap:7px}.controls>button{width:44px;height:44px}.decisionActions{flex-wrap:nowrap}}
 @media(max-width:700px) and (max-height:660px){.bubble{padding-top:2px}.bubble .viewport{flex-basis:330px}.bubble .cardCopy{padding-top:10px}.bubble .cardCopy p{font-size:12px;line-height:1.4}.bubble .cardCopy h2{font-size:19px}.bubble .cardAction{margin-top:10px;min-height:44px}.intro>p:not(.eyebrow){font-size:11px}}
 @media(max-width:700px) and (max-height:500px){.journey,.home.journey{height:auto;min-height:calc(100svh - 80px - var(--learner-nav-space));overflow:visible}.journey>.carousel{height:420px}.bubble .viewport{flex:none;height:330px}}
 @media(max-width:700px){.home .intro .eyebrow{font-size:11px;line-height:1.55;margin-bottom:7px}.direction .choiceBody{padding:12px;border:1px solid #ffffffb3}.direction .cardCopy{height:180px;padding:14px 7px 7px}}
@@ -175,3 +172,33 @@
 @media(max-width:440px){.home .intro>p:not(.eyebrow){font-size:12px;max-width:none}}
 
 .position{min-width:64px;text-align:center;font-size:12px;font-variant-numeric:tabular-nums;color:var(--soft-ink)}
+
+/* Keep the Explorer path aligned with the shared site navigation. */
+.topline[data-inner] {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-block: 6px;
+  gap: 8px 20px;
+}
+.topline > nav { min-width: 0; }
+.breadcrumbs li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.breadcrumbs li > svg { width: 12px; height: 12px; flex: none; }
+.breadcrumbs li > :is(button, span) { min-width: 0; overflow-wrap: anywhere; text-align: start; }
+.topline .motion {
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
+  margin-inline-start: auto;
+  padding-inline: 12px;
+  border-radius: 999px;
+}
+.topline .motion:hover { background: var(--muted); color: var(--foreground); }
+
+@media (min-width: 701px) and (max-width: 1279px) {
+  .topline[data-inner] { padding-inline: 24px; }
+}
+@media (max-width: 700px) {
+  .topline[data-inner] { padding-inline: 20px; gap: 8px; }
+  .topline[data-inner] .motion span { display: none; }
+  .breadcrumbs li { gap: 4px; }
+}

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties }
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, ArrowUpRight, ImageIcon, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, ImageIcon, Sparkles } from 'lucide-react';
 import Header from '@/components/Header';
 import { useTranslations } from '@/i18n/language-provider';
 import { useAuth } from '@/context/AuthContext';
@@ -78,11 +78,23 @@ export default function ExploreCareers() {
     try { await pursueCareer(career.id, direction.id, uid); if (owner.current !== uid || saveGeneration.current !== generation) return; await queryClient.invalidateQueries({ predicate: query => query.meta?.authScope !== 'public' }); setSaveState('saved'); }
     catch { if (owner.current === uid && saveGeneration.current === generation) setSaveState('error'); }
   };
-  const breadcrumbs = <nav className={styles.breadcrumbs} aria-label={copy.path}>
-    <button onClick={() => navigate(initialExploreState)}>{copy.directions}</button>
-    {direction && <><span aria-hidden="true">›</span><button onClick={() => navigate({ ...state, career: null, step: 'roles', q: '' })}>{direction.title}</button></>}
-    {parent && <><span aria-hidden="true">›</span><button onClick={() => goCareer(parent.id)}>{parent.title}</button></>}
-    {career && <><span aria-hidden="true">›</span><span aria-current="page">{invitation ? invite.yourDream : specialization ? copy.specializations : career.title}</span></>}
+  const motionLabel = paused ? text.resume : text.pause;
+  const MotionIcon = paused ? CirclePlay : CirclePause;
+  const directionIsCurrent = state.step === 'roles' && !state.industry;
+  const breadcrumbs = <nav aria-label={copy.path}>
+    <ol className={styles.breadcrumbs}>
+      <li><button onClick={() => navigate({ ...initialExploreState, view: state.view })}>{copy.directions}</button></li>
+      {direction && <li>
+        <ChevronRight aria-hidden="true" />
+        {directionIsCurrent ? <span aria-current="page">{direction.title}</span> :
+          <button onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}>{direction.title}</button>}
+      </li>}
+      {parent && <li><ChevronRight aria-hidden="true" /><button onClick={() => goCareer(parent.id)}>{parent.title}</button></li>}
+      {career && <li>
+        <ChevronRight aria-hidden="true" />
+        <span aria-current="page">{invitation ? invite.yourDream : specialization ? copy.specializations : career.title}</span>
+      </li>}
+    </ol>
   </nav>;
   const common = { previous: text.previous, next: text.next, hint: text.swipe };
   const choices = !data ? [] : home ? data.directions : specialization ? data.careers.filter(c => career?.specializationIds?.includes(c.id)) : state.step === 'industries' ? data.industries.filter(i => direction?.industryIds.includes(i.id)).map(i => ({ ...i, summary: i.description })) : data.careers.filter(c => !c.parentCareerId && (state.industry ? data.industries.find(i => i.id === state.industry)?.careerIds.includes(c.id) : direction ? direction.careerIds.includes(c.id) : true) && `${c.title} ${c.summary}`.toLocaleLowerCase(locale).includes(state.q.toLocaleLowerCase(locale)));
@@ -92,12 +104,12 @@ export default function ExploreCareers() {
     <Header />
     <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={tone(direction?.presentation)}>
       <main className={`${styles.main} ${home ? styles.home : ''} ${invitation ? styles.invitation : overview ? styles.overview : styles.journey}`}>
-        <div className={styles.topline}>
+        <div className={styles.topline} data-inner={!home || undefined}>
           {!home && breadcrumbs}
-          <div className={styles.explorerActions}>
-            {!home && <button className={styles.allDirections} onClick={() => navigate(initialExploreState)}>{text.all}</button>}
-            <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused}>{paused ? text.resume : text.pause}</button>
-          </div>
+          <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>
+            <MotionIcon size={17} aria-hidden="true" />
+            <span>{motionLabel}</span>
+          </button>
         </div>
       {isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
         <div className={styles.invitationBubble}><Illustration illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>

@@ -204,6 +204,8 @@ const Header = () => {
                                     <DropdownMenuItem key={item.key} asChild>
                                         <Link
                                             href={item.url}
+                                            aria-current={isActive(item.url) ? "page" : undefined}
+                                            className="aria-[current=page]:bg-muted aria-[current=page]:font-semibold"
                                             onClick={() =>
                                                 trackEvent({
                                                     action: "nav_click",
