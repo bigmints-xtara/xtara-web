@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { usePathname } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -48,32 +48,17 @@ describe("workspace-aware header", () => {
     renderHeader();
     expect(screen.getByRole("link", { name: "Xtara Logo" })).toHaveAttribute("href", "/organization");
     expect(screen.getByRole("link", { name: "Workspace" })).toHaveAttribute("href", "/organization");
+    expect(screen.getByRole("link", { name: "Learners" })).toHaveAttribute("href", "/organization/learners");
+    expect(screen.getByRole("link", { name: "Classes" })).toHaveAttribute("href", "/organization/classes");
     expect(screen.getByRole("link", { name: "My profile" })).toHaveAttribute("href", "/organization/profile");
     expect(screen.queryByRole("link", { name: "My Career Path" })).not.toBeInTheDocument();
   });
 
-  it("follows educator section changes and browser history on the same page", () => {
-    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: true, loading: false });
-    vi.mocked(usePathname).mockReturnValue("/organization");
-    window.history.replaceState(null, "", "/organization#classes");
-    renderHeader();
-    expect(screen.getByRole("link", { name: "Classes", current: "location" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Workspace" })).not.toHaveAttribute("aria-current");
-
-    window.history.replaceState(null, "", "/organization#learners");
-    fireEvent(window, new HashChangeEvent("hashchange"));
-    expect(screen.getByRole("link", { name: "Learners", current: "location" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Classes" })).not.toHaveAttribute("aria-current");
-
-    window.history.replaceState(null, "", "/organization");
-    fireEvent.popState(window);
-    expect(screen.getByRole("link", { name: "Workspace", current: "page" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Learners" })).not.toHaveAttribute("aria-current");
-  });
-
   it.each([
     ["/organization/profile/", "My profile", "page"],
-    ["/organization/students/learner-1", "Learners", "location"],
+    ["/organization/students/learner-1", "Learners", "page"],
+    ["/organization/learners", "Learners", "page"],
+    ["/organization/classes", "Classes", "page"],
   ] as const)("selects only the matching educator destination at %s", (pathname, name, current) => {
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: true, loading: false });
     vi.mocked(usePathname).mockReturnValue(pathname);

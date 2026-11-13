@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import NavigationPending from '@/components/organization/NavigationPending';
 import { usePathname } from 'next/navigation';
 import { useSyncExternalStore } from 'react';
 import { Bell, BookOpen, Compass, Gamepad2, Menu, Route, Trophy, UserRound } from 'lucide-react';
@@ -42,8 +43,8 @@ function currentNavigationUrl(urls: string[], pathname: string, fragment: string
     const sectionUrl = pathname + fragment;
     if (fragment && urls.includes(sectionUrl)) return sectionUrl;
 
-    if (pathname.startsWith("/organization/students/") && urls.includes("/organization#learners")) {
-        return "/organization#learners";
+    if (pathname.startsWith("/organization/students/") && urls.includes("/organization/learners")) {
+        return "/organization/learners";
     }
     if (pathname.startsWith("/dream-careers/") && urls.includes("/explore")) return "/explore";
 
@@ -70,8 +71,8 @@ const Header = () => {
         : isStaff
         ? [
             { key: "organization", url: WORKSPACE_MANIFESTS.educator.homePath },
-            { key: "learners", url: `${WORKSPACE_MANIFESTS.educator.homePath}#learners` },
-            { key: "classes", url: `${WORKSPACE_MANIFESTS.educator.homePath}#classes` },
+            { key: "learners", url: `${WORKSPACE_MANIFESTS.educator.homePath}/learners` },
+            { key: "classes", url: `${WORKSPACE_MANIFESTS.educator.homePath}/classes` },
             { key: "educatorProfile", url: WORKSPACE_MANIFESTS.educator.profilePath },
         ]
         : isLoggedIn
@@ -156,6 +157,7 @@ const Header = () => {
                                         }
                                     >
                                         {navLabel(item.key)}
+                                        {isStaff && NavLink !== "a" ? <NavigationPending /> : null}
                                     </NavLink>
                                 </li>
                             );
@@ -235,6 +237,7 @@ const Header = () => {
                                                 }
                                             >
                                                 {navLabel(item.key)}
+                                                {isStaff && NavLink !== "a" ? <NavigationPending /> : null}
                                             </NavLink>
                                         </DropdownMenuItem>
                                     );

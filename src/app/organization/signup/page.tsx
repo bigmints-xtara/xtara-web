@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building2, Loader2, ShieldCheck } from "lucide-react";
 
-import Header from "@/components/Header";
+import { OrganizationLoading } from "@/components/organization/OrganizationPageState";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/AuthContext";
+import { useOrganizationWorkspace } from "@/context/OrganizationContext";
 import { createOrganization, getOrganizationContext, type OrganizationContext } from "@/lib/organization";
 
 export default function OrganizationSignupPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { refresh } = useOrganizationWorkspace();
   const [name, setName] = useState("");
   const [kind, setKind] = useState<OrganizationContext["organization"]["kind"]>("school");
   const [academicYear, setAcademicYear] = useState("");
@@ -23,7 +25,7 @@ export default function OrganizationSignupPage() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) {
+    if (!user || user.isAnonymous) {
       router.replace("/login?mode=educator&next=%2Forganization%2Fsignup");
       return;
     }
@@ -38,6 +40,7 @@ export default function OrganizationSignupPage() {
     setError("");
     try {
       await createOrganization({ name, kind, academicYear: academicYear || undefined });
+      await refresh();
       router.push("/organization");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not create the institution workspace.");
@@ -45,11 +48,10 @@ export default function OrganizationSignupPage() {
     }
   };
 
-  if (authLoading || !user) return <LoadingPage />;
+  if (authLoading || !user || user.isAnonymous) return <OrganizationLoading />;
 
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground">
-      <Header />
+    <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/5 text-primary"><Building2 /></div>
         <h1 className="mt-5 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">Create your institution workspace</h1>
@@ -70,8 +72,4 @@ export default function OrganizationSignupPage() {
       </main>
     </div>
   );
-}
-
-function LoadingPage() {
-  return <div className="flex min-h-screen items-center justify-center bg-[#f7fafc]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 }

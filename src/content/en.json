@@ -1049,5 +1049,11 @@
       "keywords": "terms of use, terms and conditions, Xtara terms, career guidance terms"
     },
     "contentHtml": "<h1>Terms of Use</h1><p>These Terms of Use govern your use of the Xtara platform.</p>"
+  },
+  "organizationNavigation": {
+    "loading": "Loading workspace…",
+    "error": "Could not load this page",
+    "retry": "Try again",
+    "opening": "Opening page…"
   }
 }

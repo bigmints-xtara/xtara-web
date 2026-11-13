@@ -1041,5 +1041,11 @@
     "featureFallback": "ഈ സൗകര്യം",
     "ios": "iOS ആപ്പ്",
     "android": "Android ആപ്പ്"
+  },
+  "organizationNavigation": {
+    "loading": "വർക്ക്‌സ്‌പേസ് ലോഡ് ചെയ്യുന്നു…",
+    "error": "ഈ പേജ് ലോഡ് ചെയ്യാനായില്ല",
+    "retry": "വീണ്ടും ശ്രമിക്കുക",
+    "opening": "പേജ് തുറക്കുന്നു…"
   }
 }

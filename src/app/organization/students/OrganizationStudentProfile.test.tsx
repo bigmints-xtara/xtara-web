@@ -1,4 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { useRouter } from "next/navigation";
+import { LanguageProvider } from "@/i18n/language-provider";
+import { render as renderUI, fireEvent, screen } from "@testing-library/react";
 import { useParams } from "next/navigation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -21,6 +23,8 @@ vi.mock("@/lib/organization", () => ({
 
 describe("scoped learner guidance profile", () => {
   beforeEach(() => {
+    vi.mocked(useRouter).mockReturnValue({ push: vi.fn(), replace: vi.fn(), back: vi.fn(), forward: vi.fn(), prefetch: vi.fn(), refresh: vi.fn() });
+    Object.defineProperty(globalThis, "localStorage", { configurable: true, value: { getItem: () => null } });
     vi.mocked(useParams).mockReturnValue({ membershipId: "school-1_student-1" });
     mocks.useAuth.mockReturnValue({ user: { uid: "educator-1" }, loading: false });
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: true, loading: false });
@@ -42,6 +46,15 @@ describe("scoped learner guidance profile", () => {
     });
   });
 
+  it("recovers from learner load errors", async () => {
+    mocks.getOrganizationStudentProfile.mockRejectedValueOnce(new Error("Learner unavailable"));
+    render(<OrganizationStudentProfilePage />);
+    expect(await screen.findByRole("alert")).toHaveTextContent("Learner unavailable");
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(await screen.findByRole("heading", { name: "Asha Student" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to learners" })).toHaveAttribute("href", "/organization/learners");
+  });
+
   it("shows only the learner guidance data shared with the educator", async () => {
     render(<OrganizationStudentProfilePage />);
     expect(await screen.findByRole("heading", { name: "Asha Student" })).toBeInTheDocument();
@@ -51,3 +64,5 @@ describe("scoped learner guidance profile", () => {
     expect(screen.getByText(/private answers and family context are not shown/i)).toBeInTheDocument();
   });
 });
+
+function render(ui: React.ReactNode) { return renderUI(<LanguageProvider initialLocale="en">{ui}</LanguageProvider>); }

@@ -5,7 +5,7 @@ import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Building2, Check, Loader2, LogOut, ShieldCheck, UserRound } from "lucide-react";
 
-import Header from "@/components/Header";
+import { OrganizationLoading, OrganizationError } from "@/components/organization/OrganizationPageState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,7 +30,7 @@ import {
 
 export default function EducatorProfilePage() {
   const { user, userProfile, loading: authLoading } = useAuth();
-  const { context, isStaff, loading: workspaceLoading, refresh } = useOrganizationWorkspace();
+  const { context, isStaff, loading: workspaceLoading, error: workspaceError, refresh } = useOrganizationWorkspace();
   const router = useRouter();
   const [staff, setStaff] = useState<OrganizationStaffProfile | null>(null);
   const [units, setUnits] = useState<OrganizationUnit[]>([]);
@@ -46,21 +46,30 @@ export default function EducatorProfilePage() {
   const [switching, setSwitching] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (authLoading || workspaceLoading) return;
-    if (!user) {
+    if (!user || user.isAnonymous) {
       router.replace("/login?mode=educator&next=%2Forganization%2Fprofile");
       return;
     }
+    if (workspaceError) return;
     if (!isStaff) {
       router.replace("/profile");
       return;
     }
     let active = true;
-    Promise.all([getOrganizationStaffProfile(), getOrganizationUnits(), listOrganizationWorkspaces()])
-      .then(([profile, unitItems, workspaceItems]) => {
-        if (!active) return;
+    Promise.resolve().then(() => {
+      if (!active) return null;
+      setLoading(true);
+      setStaff(null);
+      setError("");
+      return Promise.all([getOrganizationStaffProfile(), getOrganizationUnits(), listOrganizationWorkspaces()]);
+    })
+      .then((result) => {
+        if (!active || !result) return;
+        const [profile, unitItems, workspaceItems] = result;
         setStaff(profile);
         setUnits(unitItems);
         setWorkspaces(workspaceItems);
@@ -72,7 +81,7 @@ export default function EducatorProfilePage() {
       .catch((reason) => active && setError(reason instanceof Error ? reason.message : "Could not load your educator profile."))
       .finally(() => active && setLoading(false));
     return () => { active = false; };
-  }, [authLoading, isStaff, router, user, workspaceLoading]);
+  }, [authLoading, isStaff, router, user, workspaceLoading, workspaceError, attempt, context?.organization.id]);
 
   useEffect(() => {
     setFullName(userProfile?.fullName || user?.displayName || "");
@@ -131,11 +140,12 @@ export default function EducatorProfilePage() {
     router.push("/");
   };
 
-  if (authLoading || workspaceLoading || loading || !user || !isStaff || !staff) return <LoadingPage />;
+  if (workspaceError) return <OrganizationError message={workspaceError.message} onRetry={() => void refresh()} />;
+  if (authLoading || workspaceLoading || loading || !user || !isStaff) return <OrganizationLoading />;
+  if (!staff) return <OrganizationError message={error || "Could not load your educator profile."} onRetry={() => setAttempt((value) => value + 1)} />;
 
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground">
-      <Header />
+    <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-5xl px-5 py-8 pb-20 sm:py-12">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div><Badge variant="secondary">Educator account</Badge><h1 className="mt-4 text-3xl font-semibold tracking-tight text-primary sm:text-4xl">My educator profile</h1><p className="mt-2 max-w-2xl leading-7 text-slate-600">Your professional details, assigned classes, institution access, and account security.</p></div>
@@ -170,10 +180,6 @@ export default function EducatorProfilePage() {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block space-y-2"><span className="text-sm font-medium text-slate-700">{label}</span>{children}</label>;
-}
-
-function LoadingPage() {
-  return <div className="flex min-h-svh items-center justify-center bg-[#f7fafc]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 }
 
 function formatLabel(value: string) {

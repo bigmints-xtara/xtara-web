@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, BookOpenCheck, Building2, CheckCircle2, Compass, Loader2, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowLeft, BookOpenCheck, CheckCircle2, Compass, ShieldCheck, UserRound } from "lucide-react";
 
-import Header from "@/components/Header";
+import { OrganizationLoading, OrganizationError } from "@/components/organization/OrganizationPageState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,46 +23,59 @@ export default function OrganizationStudentProfilePage() {
   const membershipId = decodeURIComponent(String(params.membershipId || ""));
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { isStaff, loading: workspaceLoading } = useOrganizationWorkspace();
+  const { context, isStaff, loading: workspaceLoading, error: workspaceError, refresh } = useOrganizationWorkspace();
   const [student, setStudent] = useState<OrganizationMember | null>(null);
   const [units, setUnits] = useState<OrganizationUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (authLoading || workspaceLoading) return;
-    if (!user) {
+    if (!user || user.isAnonymous) {
       router.replace(`/login?mode=educator&next=${encodeURIComponent(`/organization/students/${membershipId}`)}`);
       return;
     }
+    if (workspaceError) return;
     if (!isStaff) {
       router.replace("/dashboard");
       return;
     }
     let active = true;
-    Promise.all([getOrganizationStudentProfile(membershipId), getOrganizationUnits()])
-      .then(([profile, unitItems]) => { if (active) { setStudent(profile); setUnits(unitItems); } })
+    Promise.resolve().then(() => {
+      if (!active) return null;
+      setLoading(true);
+      setStudent(null);
+      setError("");
+      return Promise.all([getOrganizationStudentProfile(membershipId), getOrganizationUnits()]);
+    })
+      .then((result) => {
+        if (!active || !result) return;
+        const [profile, unitItems] = result;
+        setStudent(profile);
+        setUnits(unitItems);
+      })
       .catch((reason) => active && setError(reason instanceof Error ? reason.message : "Could not load this learner profile."))
       .finally(() => active && setLoading(false));
     return () => { active = false; };
-  }, [authLoading, isStaff, membershipId, router, user, workspaceLoading]);
+  }, [authLoading, isStaff, membershipId, router, user, workspaceLoading, workspaceError, attempt, context?.organization.id]);
 
   const unitNames = useMemo(() => {
     const names = new Map(units.map((unit) => [unit.id, unit.name]));
     return student?.unitIds.map((id) => names.get(id)).filter((name): name is string => Boolean(name)) || [];
   }, [student, units]);
 
-  if (authLoading || workspaceLoading || loading || !user || !isStaff) return <LoadingPage />;
-  if (!student) return <EmptyState error={error} />;
+  if (workspaceError) return <OrganizationError message={workspaceError.message} onRetry={() => void refresh()} />;
+  if (authLoading || workspaceLoading || loading || !user || !isStaff) return <OrganizationLoading />;
+  if (!student) return <OrganizationError message={error || "Learner profile unavailable."} onRetry={() => setAttempt((value) => value + 1)} />;
 
   const summary = student.assessmentSummary;
   const progress = student.directionProgress;
 
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground">
-      <Header />
+    <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-5xl px-5 py-8 pb-20 sm:py-12">
-        <Button asChild variant="ghost" className="-ml-3"><Link href="/organization#learners"><ArrowLeft className="mr-2 h-4 w-4" />Back to learners</Link></Button>
+        <Button asChild variant="ghost" className="-ml-3"><Link href="/organization/learners"><ArrowLeft className="mr-2 h-4 w-4" />Back to learners</Link></Button>
 
         <section className="mt-5 overflow-hidden rounded-3xl bg-primary p-6 text-white sm:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-4"><span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10"><UserRound className="h-7 w-7" /></span><div><p className="text-sm text-white/60">Learner guidance profile</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">{student.displayName}</h1></div></div><div className="flex flex-wrap gap-2">{unitNames.map((name) => <Badge key={name} className="border-white/20 bg-white/10 text-white" variant="outline">{name}</Badge>)}</div></div>
@@ -91,10 +104,5 @@ function Metric({ label, value }: { label: string; value: string }) {
   return <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3"><span className="text-sm text-slate-600">{label}</span><span className="font-semibold text-primary">{value}</span></div>;
 }
 
-function EmptyState({ error }: { error: string }) {
-  return <div className="min-h-screen bg-[#f7fafc]"><Header /><main className="mx-auto max-w-lg px-5 py-24 text-center"><Building2 className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-5 text-2xl font-semibold text-primary">Learner profile unavailable</h1><p className="mt-3 leading-7 text-slate-600">{error || "This learner is outside your assigned institution scope."}</p><Button asChild className="mt-6"><Link href="/organization">Return to workspace</Link></Button></main></div>;
-}
-
-function LoadingPage() { return <div className="flex min-h-svh items-center justify-center bg-[#f7fafc]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>; }
 function formatLabel(value: string) { return value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase()); }
 function formatDate(value: string) { return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(value)); }
