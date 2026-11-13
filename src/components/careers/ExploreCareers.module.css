@@ -250,3 +250,6 @@
   from { opacity: .4; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Assessment is a quiet text-and-arrow action, not an underlined heading. */
+.home .intro .quiet { text-decoration: none; font-weight: 500; }
