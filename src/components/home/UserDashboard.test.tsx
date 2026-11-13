@@ -101,6 +101,7 @@ describe('pursued-area learner dashboard', () => {
     mocks.mvpEnabled = false;
     localStorage.clear();
     invalidateDashboardCache();
+    localStorage.setItem('xtara_discovery_cache_owner_v1','student-1');
     mocks.hydrate.mockReset().mockResolvedValue(null);
     mocks.hydrateDirection.mockReset().mockResolvedValue(undefined);
     mocks.getPoints.mockReset().mockResolvedValue(120);
@@ -142,6 +143,16 @@ describe('pursued-area learner dashboard', () => {
     await act(async () => { (container.querySelector('[role="status"] button') as HTMLButtonElement).click(); });
     expect(container.textContent).not.toContain(saved.title);
     expect(container.textContent).not.toContain('Showing your saved view');
+  });
+
+  it('does not expose anonymous draft editing while secondary account hydration is pending', async () => {
+    mocks.mvpEnabled = true;
+    localStorage.removeItem('xtara_discovery_cache_owner_v1');
+    mocks.hydrateDirection.mockResolvedValue({id:'design', title:'Account direction', summary:'Saved on the server', reasons:[], guidance:[], reflectionPrompt:'', careers:[]});
+    await act(async () => { root.render(<UserDashboard />); });
+    expect(container.textContent).toContain('Account direction');
+    expect(container.querySelector('a[href="/assessment/careers/design"]')).toBeNull();
+    expect(container.querySelector('a[href="/assessment/discovery"]')).toBeNull();
   });
 
   it('shows a selected reciprocal career outside the result preview', async () => {

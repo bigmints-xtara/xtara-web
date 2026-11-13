@@ -32,6 +32,7 @@ import MyDirectionOverview from "./MyDirectionOverview";
 import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
 import loadingStyles from '@/components/skeletons/DashboardSkeleton.module.css';
 import { readDashboardCache, refreshDashboardCache } from '@/lib/dashboard-cache';
+import { discoveryCacheOwnerKey } from '@/lib/discovery-cache-owner';
 import { hydrateDirectionDashboard, hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 import {
   getDirectionSnapshot,
@@ -151,8 +152,9 @@ export default function UserDashboard() {
       careers: selectedCareers,
     };
     const direction = serverOverview === undefined ? fallback : serverOverview;
+    const hasAccountAssessment = Boolean(storedResult) && (!isAccount || localStorage.getItem(discoveryCacheOwnerKey) === userId);
     if (direction) return <>{refreshNotice}<MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
-      hasAssessment={Boolean(storedResult)} canEditCareers={plan?.areaId === direction.id
+      hasAssessment={hasAccountAssessment} canEditCareers={hasAccountAssessment && plan?.areaId === direction.id
         && Boolean(storedResult?.areas.some((area) => area.id === direction.id))} /></>;
     return <>{refreshNotice}{storedResult
       ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />
