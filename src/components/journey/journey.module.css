@@ -183,7 +183,8 @@
 :global(.dark) .careerCard[data-selected='true'] { background:#174763; border-color:#61b3e4; }
 :global(.dark) .receiptHeader, :global(.dark) .previewIntro { background:var(--journey-soft); color:var(--journey-ink); }
 :global(.dark) .profileIdentity :global([data-slot='badge']) { color:#d5e7f3; background:#31556e; }
-.studentChrome :global([role='combobox']) { background:var(--journey-soft); color:var(--foreground); border-color:var(--border); }
+.studentChrome :global([role='combobox']) { background:transparent; color:var(--foreground); border-color:transparent; }
+.studentChrome :global([role='combobox']:hover) { background:var(--journey-soft); }
 .studentChrome :global([role='combobox']) svg { color:var(--journey-muted); }
 
 .surface, .dashboard, .profileSurface, .studentChrome { --input:var(--border); --accent:var(--journey-soft); --accent-foreground:var(--foreground); --color-input:var(--input); --color-accent:var(--accent); --color-accent-foreground:var(--accent-foreground); }

@@ -19,13 +19,13 @@ export default function LanguageSwitcher() {
       <Select value={locale} onValueChange={(value) => setLocale(value as Locale)}>
         <SelectTrigger
           id={selectId}
-          size="sm"
+          size="default"
           aria-label={label}
-          className="h-10 w-[78px] rounded-full border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 shadow-none transition-colors hover:border-slate-300 hover:bg-slate-100 focus-visible:ring-primary/30 sm:w-[84px]"
+          className="h-11 w-auto min-w-24 gap-2 rounded-full border-transparent bg-transparent px-3 text-sm font-medium text-foreground shadow-none transition-colors hover:border-border hover:bg-muted focus-visible:ring-primary/30"
         >
-          <Languages aria-hidden="true" className="size-4 text-slate-500" />
+          <Languages aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
           <span aria-hidden="true">{shortLocale}</span>
-          <SelectValue className="sr-only" />
+          <span className="sr-only"><SelectValue /></span>
         </SelectTrigger>
         <SelectContent>
           {locales.map((loc) => (

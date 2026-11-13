@@ -9,6 +9,7 @@ import { useOrganizationWorkspace } from "@/context/OrganizationContext";
 
 import studentStyles from '@/components/journey/journey.module.css';
 import Container from './Container';
+import headerStyles from './Header.module.css';
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -101,25 +102,25 @@ const Header = () => {
     };
 
     return <>
-        <header className={`${!isStaff && !organizationRoute ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border bg-background/95 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur-xl`}>
+        <header className={`${!isStaff && !organizationRoute ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl`}>
             <Container className="!px-0">
-                <nav className="flex min-h-20 items-center gap-4 px-4 md:px-6">
+                <nav className={headerStyles.navigation}>
                     {/* Logo */}
                     <Link
                         href={logoHref}
-                        className="flex w-fit items-center rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                        className="flex w-fit shrink-0 items-center rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     >
                         <Image
                             src="/images/logo-color.svg"
                             alt={t("header.logoAlt")}
-                            width={84}
-                            height={31}
+                            width={88}
+                            height={33}
                             priority
                         />
                     </Link>
 
                     {/* Desktop Menu */}
-                    <ul className="ml-auto hidden items-center justify-end gap-1 lg:flex">
+                    <ul className={headerStyles.links}>
                         {navItems.map(item => {
                             const active = isActive(item.url);
                             return (
@@ -127,10 +128,7 @@ const Header = () => {
                                     <Link
                                         href={item.url}
                                         aria-current={active ? "page" : undefined}
-                                        className={`rounded-md px-4 py-3 text-sm font-medium transition-colors ${active
-                                            ? 'bg-primary/8 text-primary underline decoration-2 underline-offset-8'
-                                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                                            }`}
+                                        className={headerStyles.navLink}
                                         onClick={() =>
                                             trackEvent({
                                                 action: "nav_click",
@@ -144,11 +142,15 @@ const Header = () => {
                                 </li>
                             );
                         })}
+                    </ul>
+
+                    <div className={headerStyles.actions}>
+                        <LanguageSwitcher />
                         {!isLoggedIn && (
-                            <li className="ml-2">
+                            <div>
                                 <Link
                                     href="/login"
-                                    className="inline-flex h-10 items-center rounded-full px-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                                    className={headerStyles.login}
                                     onClick={() =>
                                         trackEvent({
                                             action: "login_click",
@@ -159,10 +161,10 @@ const Header = () => {
                                 >
                                     {t("header.cta.login")}
                                 </Link>
-                            </li>
+                            </div>
                         )}
                         {learnerShell && !MVP_NAVIGATION_ENABLED ? (
-                            <li className="ml-1">
+                            <div>
                                 <Link
                                     href="/notifications"
                                     aria-label={t("header.nav.notifications")}
@@ -170,15 +172,12 @@ const Header = () => {
                                 >
                                     <Bell className="h-5 w-5" />
                                 </Link>
-                            </li>
+                            </div>
                         ) : null}
-                        <li className="ml-1">
-                            <LanguageSwitcher />
-                        </li>
-                    </ul>
+                    </div>
 
                     {/* Mobile Menu */}
-                    <div className="ml-auto flex items-center justify-end gap-1.5 lg:hidden">
+                    <div className={headerStyles.compactActions}>
                         {learnerShell && !MVP_NAVIGATION_ENABLED ? (
                             <Link
                                 href="/notifications"
@@ -194,7 +193,7 @@ const Header = () => {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-10 w-10 rounded-full text-slate-700 hover:bg-slate-100"
+                                    className="h-11 w-11 rounded-full text-foreground hover:bg-muted"
                                 >
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">{t("header.menu.open")}</span>

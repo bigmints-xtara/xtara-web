@@ -1,0 +1,70 @@
+.navigation {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  gap: 16px;
+  padding-inline: 20px;
+}
+
+.links, .actions { display: none; }
+.compactActions { display: flex; margin-left: auto; align-items: center; gap: 4px; }
+
+.navLink {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  transition: color 150ms, background-color 150ms;
+}
+.navLink:hover { color: var(--foreground); background: var(--muted); }
+.navLink[aria-current='page'] {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  font-weight: 650;
+}
+.navLink:focus-visible, .login:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+.login {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 150ms;
+}
+.login:hover { background: color-mix(in srgb, var(--primary) 85%, var(--foreground)); }
+
+/* Keep translated labels and enlarged text clear of the utility controls. */
+@media (min-width: 1024px) {
+  .navigation {
+    display: grid;
+    grid-template-columns: minmax(88px, 1fr) minmax(0, auto) auto;
+    min-height: 72px;
+    gap: 16px;
+    padding-inline: 24px;
+  }
+  .links { display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+  .compactActions { display: none; }
+}
+@media (min-width: 1280px) {
+  .navigation { grid-template-columns: minmax(100px, 1fr) auto minmax(200px, 1fr); gap: 24px; padding-inline: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navLink, .login { transition: none; }
+}
