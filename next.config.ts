@@ -27,9 +27,13 @@ const nextConfig: NextConfig = {
       process.env.XTARA_API_PROXY_TARGET
       || (process.env.NODE_ENV === "production" ? PRODUCTION_API_PROXY_TARGET : "")
     ).replace(/\/$/, "");
-    return proxyTarget
-      ? [{ source: "/xtara-service/:path*", destination: `${proxyTarget}/:path*` }]
-      : [];
+    if (!proxyTarget) return [];
+    return [
+      ...(process.env.NODE_ENV === "development"
+        ? [{ source: "/xtara-service/api/v1/auth/session", destination: "/api/local-auth/session" }]
+        : []),
+      { source: "/xtara-service/:path*", destination: `${proxyTarget}/:path*` },
+    ];
   },
   env: {
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
