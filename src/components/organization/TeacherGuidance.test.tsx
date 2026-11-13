@@ -14,6 +14,12 @@ function show(ui: React.ReactNode, locale: 'en' | 'ml' | 'hi' | 'ta' = 'en') { r
 beforeEach(() => Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => null } }));
 
 describe('teacher guidance', () => {
+  it('explains an empty teacher roster with a concrete next step', () => {
+    show(<TeacherStudentList students={[]} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Ask your school administrator');
+    expect(screen.queryByText(/No outstanding/)).not.toBeInTheDocument();
+  });
+
   it('finds students by name and filters attention using the server decision', () => {
     show(<TeacherStudentList students={[student, { ...student, id: 'ben', displayName: 'Ben', guidance: { code: 'sharing_limited', needsAttention: false } }]} />);
     fireEvent.click(screen.getByRole('button', { name: 'Needs a next step' }));
