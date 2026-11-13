@@ -23,7 +23,6 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
   const loop = variant === 'direction' && !compact && items.length > 1;
   const [factHeight, setFactHeight] = useState(180);
   const viewport = useRef<HTMLDivElement>(null);
-  const pagination = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: number; x: number; y: number; distance: number; horizontal: boolean } | null>(null);
   const suppressClick = useRef(0);
   const focus = (value: number) => { const bounded = loop ? ((value % items.length) + items.length) % items.length : Math.max(0, Math.min(items.length - 1, value)); setIndex(bounded); onFocus?.(bounded); };
@@ -45,11 +44,6 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
     slides.forEach(slide => observer?.observe(slide));
     return () => observer?.disconnect();
   }, [variant, items]);
-  useEffect(() => {
-    const dots = pagination.current;
-    const activeDot = dots?.children[index] as HTMLElement | undefined;
-    if (dots && activeDot) dots.scrollTo?.({ left: activeDot.offsetLeft - dots.offsetLeft - (dots.clientWidth - activeDot.clientWidth) / 2, behavior: 'instant' });
-  }, [index]);
   const cardWidth = variant === 'fact' ? Math.min(items.length === 1 ? 550 : 380, width * (items.length === 1 ? .9 : .74)) : variant === 'bubble' ? Math.min(compact ? 320 : 370, width - 88) : compact ? Math.min(400, width - 64) : Math.max(260, Math.min(360, width * .24));
   const spacing = variant === 'direction' ? compact ? cardWidth + 14 : cardWidth * .98 : cardWidth + (compact ? 12 : 54);
   const finish = (cancel = false) => {
@@ -88,9 +82,9 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
     </div>
     {items.length > 1 && <div className={styles.controls}>
       <button aria-label={previous} disabled={!loop && index === 0} onClick={() => focus(index - 1)}><ArrowLeft size={20} /></button>
-      <div ref={pagination} className={styles.dots}>{items.map((item, i) => <button key={item.id} aria-label={`${item.title}: ${i + 1} / ${items.length}`} aria-current={i === index ? 'true' : undefined} onClick={() => focus(i)}><span /></button>)}</div>
+      <span className={styles.position} aria-live="polite" aria-atomic="true">{index + 1} / {items.length}</span>
       <button aria-label={next} disabled={!loop && index === items.length - 1} onClick={() => focus(index + 1)}><ArrowRight size={20} /></button>
     </div>}
-    {items.length > 1 && <p className={styles.hint} aria-live="polite">{hint ? `${hint} · ` : ''}{index + 1} / {items.length}</p>}
+    {items.length > 1 && hint && <p className={styles.hint}>{hint}</p>}
   </section>;
 }
