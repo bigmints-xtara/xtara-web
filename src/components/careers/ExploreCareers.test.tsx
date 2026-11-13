@@ -13,7 +13,18 @@ const { setLocale } = vi.hoisted(() => ({ setLocale: vi.fn() }));
 vi.mock("@/i18n/language-provider", () => ({
   useTranslations: () => ({ locale: "en", setLocale, t: (key: string) => key }),
 }));
-vi.mock("@/components/Header", () => ({ default: () => <header /> }));
+vi.mock("@/components/Header", () => ({
+  default: function SharedHeader() {
+    return (
+      <header>
+        <select aria-label="languageSwitcher.label" onChange={event => setLocale(event.target.value)}>
+          <option value="en">English</option>
+          <option value="ml">Malayalam</option>
+        </select>
+      </header>
+    );
+  },
+}));
 vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn() }));
 const fixture: CareerExplorerResponse = {
   schemaVersion: 1,

@@ -245,6 +245,7 @@ const Header = () => {
         {learnerShell ? (
             <nav
                 className={`${studentStyles.studentChrome} fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden`}
+                data-learner-navigation=""
                 aria-label={t("header.nav.learnerNavigation")}
             >
                 <ul className={`mx-auto grid max-w-lg ${MVP_NAVIGATION_ENABLED ? "grid-cols-3" : "grid-cols-5"} px-1`}>

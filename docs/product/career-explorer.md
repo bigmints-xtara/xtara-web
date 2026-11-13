@@ -6,7 +6,8 @@ The API supplies catalogue identities, relationships, localized facts, and
 illustration URLs with alternative text. Missing artwork and unpublished facts
 have explicit placeholders; the browser does not contain a fallback catalogue.
 The presentation uses the existing Xtara theme, fonts, and native web controls.
-The compact Explorer header and Mona typography follow the approved prototype.
+Explorer uses the shared Xtara site header and Mona typography. Direction
+and motion controls sit within the Explorer, below site navigation.
 Direction accents and illustration washes come from API-owned presentation
 tokens, with separate dark-surface blending in the client.
 
@@ -70,7 +71,6 @@ not evidence of production deployment or a production authenticated journey.
 
 For design changes, compare the current screens against
 `features/xtara-mvp/prototypes/career-explorer.html` in the workspace at identical
-viewport sizes. The approved layout includes a 58-pixel compact header,
-visible carousel controls, three connected overview bubbles, a compact fixed
+viewport sizes. The layout includes the shared site header, visible carousel controls, three connected overview bubbles, a compact fixed
 action bar, and the guest invitation. Passing functional tests alone does not
 establish visual fidelity.

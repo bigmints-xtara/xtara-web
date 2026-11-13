@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, ArrowUpRight, ImageIcon, Sparkles } from 'lucide-react';
-import { locales, type Locale } from '@/i18n/config';
+import Header from '@/components/Header';
 import { useTranslations } from '@/i18n/language-provider';
 import { useAuth } from '@/context/AuthContext';
 import { getCareerExplorer } from '@/lib/career-explorer-api';
@@ -33,7 +33,7 @@ function Illustration({ illustration, placeholder, bubble = false }: { illustrat
 const tone = (presentation?: { accent: string; tint: string; wash: string; washEnd: string }) => presentation ? ({ '--scene-accent': presentation.accent, '--scene-tint': presentation.tint, '--scene-wash': presentation.wash, '--scene-wash-end': presentation.washEnd } as CSSProperties) : undefined;
 
 export default function ExploreCareers() {
-  const { locale, setLocale, t } = useTranslations();
+  const { locale } = useTranslations();
   const copy = explorerCopy[locale], text = journeyCopy[locale];
   const headings = explorerHeadings[locale];
   const invite = invitationCopy[locale];
@@ -88,17 +88,17 @@ export default function ExploreCareers() {
   const choices = !data ? [] : home ? data.directions : specialization ? data.careers.filter(c => career?.specializationIds?.includes(c.id)) : state.step === 'industries' ? data.industries.filter(i => direction?.industryIds.includes(i.id)).map(i => ({ ...i, summary: i.description })) : data.careers.filter(c => !c.parentCareerId && (state.industry ? data.industries.find(i => i.id === state.industry)?.careerIds.includes(c.id) : direction ? direction.careerIds.includes(c.id) : true) && `${c.title} ${c.summary}`.toLocaleLowerCase(locale).includes(state.q.toLocaleLowerCase(locale)));
   const chapters = [{ id: 'work', label: text.work, values: career?.activities || [] }, { id: 'skills', label: text.skills, values: career?.skills || [] }, { id: 'workplaces', label: text.workplaces, values: career?.workplaces || [] }, { id: 'good', label: text.good, values: career?.tradeoffs || [] }];
   const currentChapter = chapters.find(c => c.id === chapter)!;
-  return <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={tone(direction?.presentation)}>
-    <header className={styles.header}>
-      <Link className={styles.brand} href={user && !user.isAnonymous ? '/dashboard' : '/'} aria-label={t('header.logoAlt')}>xtara<span aria-hidden="true">✦</span></Link>
-      <div className={styles.headerActions}>
-        {!home && <button className={styles.allDirections} onClick={() => navigate(initialExploreState)}>{text.all}</button>}
-        <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused}>{paused ? text.resume : text.pause}</button>
-        <select className={styles.locale} aria-label={t('languageSwitcher.label')} value={locale} onChange={event => setLocale(event.target.value as Locale)}>{locales.map(value => <option key={value} value={value}>{value.toUpperCase()}</option>)}</select>
-      </div>
-    </header>
-    <main className={`${styles.main} ${home ? styles.home : ''} ${invitation ? styles.invitation : overview ? styles.overview : styles.journey}`}>
-      {!home && <div className={styles.topline}>{breadcrumbs}</div>}
+  return <div className={styles.page}>
+    <Header />
+    <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={tone(direction?.presentation)}>
+      <main className={`${styles.main} ${home ? styles.home : ''} ${invitation ? styles.invitation : overview ? styles.overview : styles.journey}`}>
+        <div className={styles.topline}>
+          {!home && breadcrumbs}
+          <div className={styles.explorerActions}>
+            {!home && <button className={styles.allDirections} onClick={() => navigate(initialExploreState)}>{text.all}</button>}
+            <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused}>{paused ? text.resume : text.pause}</button>
+          </div>
+        </div>
       {isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
         <div className={styles.invitationBubble}><Illustration illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>
         <p className={styles.eyebrow}>{text.nextStep}</p>
@@ -140,5 +140,6 @@ export default function ExploreCareers() {
         {specialization && <button className={styles.quiet} onClick={() => goCareer(career!.id, true)}>{text.meet}: {career?.title}<ArrowRight size={14} /></button>}
       </>}
     </main>
+    </div>
   </div>;
 }
