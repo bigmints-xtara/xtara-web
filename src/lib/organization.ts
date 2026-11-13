@@ -170,12 +170,12 @@ export async function getOrganizationStudentProfile(membershipId: string) {
   return xtaraApi.get<OrganizationMember>(`/organizations/students/${encodeURIComponent(membershipId)}`);
 }
 
-export async function getOrganizationStaffProfile() {
-  return xtaraApi.get<OrganizationStaffProfile>("/organizations/profile");
+export async function getOrganizationStaffProfile(expectedUserId?: string) {
+  return xtaraApi.get<OrganizationStaffProfile>("/organizations/profile", expectedUserId ? { expectedUserId, cache: "no-store" } : undefined);
 }
 
-export async function updateOrganizationStaffProfile(input: OrganizationStaffProfile["profile"]) {
-  return xtaraApi.patch<OrganizationStaffProfile>("/organizations/profile", input);
+export async function updateOrganizationStaffProfile(input: OrganizationStaffProfile["profile"], expectedUserId?: string) {
+  return xtaraApi.patch<OrganizationStaffProfile>("/organizations/profile", input, expectedUserId ? { expectedUserId } : undefined);
 }
 
 export async function listOrganizationWorkspaces() {
