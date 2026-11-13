@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSyncExternalStore } from 'react';
 import { Bell, BookOpen, Compass, Gamepad2, Menu, Route, Trophy, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from "@/context/AuthContext";
@@ -25,11 +26,39 @@ import { isWorkspaceRoute, WORKSPACE_MANIFESTS } from "@/lib/workspace-manifest"
 
 import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from "@/lib/mvp-navigation";
 
+function subscribeToFragment(onChange: () => void) {
+    window.addEventListener("hashchange", onChange);
+    window.addEventListener("popstate", onChange);
+    return () => {
+        window.removeEventListener("hashchange", onChange);
+        window.removeEventListener("popstate", onChange);
+    };
+}
+
+const readFragment = () => window.location.hash;
+const serverFragment = () => "";
+
+function currentNavigationUrl(urls: string[], pathname: string, fragment: string) {
+    const sectionUrl = pathname + fragment;
+    if (fragment && urls.includes(sectionUrl)) return sectionUrl;
+
+    if (pathname.startsWith("/organization/students/") && urls.includes("/organization#learners")) {
+        return "/organization#learners";
+    }
+    if (pathname.startsWith("/dream-careers/") && urls.includes("/explore")) return "/explore";
+
+    return urls.reduce<string | undefined>((best, url) => {
+        if (url.includes("#") || (url !== pathname && !pathname.startsWith(`${url}/`))) return best;
+        return !best || url.length > best.length ? url : best;
+    }, undefined);
+}
+
 const Header = () => {
     const { user } = useAuth();
     const { isStaff, loading: workspaceLoading, error: workspaceError } = useOrganizationWorkspace();
     const { t, locale } = useTranslations();
-    const pathname = usePathname();
+    const pathname = usePathname().replace(/\/+$/, "") || "/";
+    const fragment = useSyncExternalStore(subscribeToFragment, readFragment, serverFragment);
     const isLoggedIn = Boolean(user && !user.isAnonymous);
     const organizationRoute = isWorkspaceRoute("educator", pathname);
     const learnerShell = isLoggedIn && !workspaceLoading && !workspaceError && !isStaff && !organizationRoute;
@@ -71,26 +100,15 @@ const Header = () => {
         if (MVP_NAVIGATION_ENABLED && key === "profile") return copy.profile;
         return t(`header.nav.${key}`);
     };
-    const isActive = (url: string) => {
-        if (url === "/explore" && pathname.startsWith("/dream-careers/")) return true;
-        // Normalize pathname by removing trailing slash
-        const normalizedPathname = pathname.endsWith('/') && pathname !== '/'
-            ? pathname.slice(0, -1)
-            : pathname;
-
-        if (url === '/') {
-            return normalizedPathname === '/';
-        }
-        // For exact matches like /news, /about, /contact
-        if (normalizedPathname === url) {
-            return true;
-        }
-        // For nested routes like /news/[slug]
-        if (url !== '/' && normalizedPathname.startsWith(url)) {
-            return true;
-        }
-        return false;
+    const currentUrl = currentNavigationUrl(navItems.map(({ url }) => url), pathname, fragment);
+    const current = (url: string) => url === currentUrl ? (url.includes("#") ? "location" : "page") : undefined;
+    const navigationLink = (url: string) => {
+        const [path, hash] = url.split("#");
+        // Native same-page anchors emit hashchange, including when clearing the fragment.
+        const samePageAnchor = path === pathname && Boolean(hash || fragment);
+        return { NavLink: samePageAnchor ? "a" as const : Link, href: samePageAnchor && !hash ? `${url}#` : url };
     };
+    const { NavLink: LogoLink, href: logoTarget } = navigationLink(logoHref);
 
     const learnerIcon = (key: string) => {
         if (key === "explore") return Compass;
@@ -106,8 +124,8 @@ const Header = () => {
             <Container className="!px-0">
                 <nav className={headerStyles.navigation}>
                     {/* Logo */}
-                    <Link
-                        href={logoHref}
+                    <LogoLink
+                        href={logoTarget}
                         className="flex w-fit shrink-0 items-center rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     >
                         <Image
@@ -117,17 +135,17 @@ const Header = () => {
                             height={33}
                             priority
                         />
-                    </Link>
+                    </LogoLink>
 
                     {/* Desktop Menu */}
                     <ul className={headerStyles.links}>
                         {navItems.map(item => {
-                            const active = isActive(item.url);
+                            const { NavLink, href } = navigationLink(item.url);
                             return (
                                 <li key={item.key}>
-                                    <Link
-                                        href={item.url}
-                                        aria-current={active ? "page" : undefined}
+                                    <NavLink
+                                        href={href}
+                                        aria-current={current(item.url)}
                                         className={headerStyles.navLink}
                                         onClick={() =>
                                             trackEvent({
@@ -138,7 +156,7 @@ const Header = () => {
                                         }
                                     >
                                         {navLabel(item.key)}
-                                    </Link>
+                                    </NavLink>
                                 </li>
                             );
                         })}
@@ -200,24 +218,27 @@ const Header = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56">
-                                {navItems.map(item => (
-                                    <DropdownMenuItem key={item.key} asChild>
-                                        <Link
-                                            href={item.url}
-                                            aria-current={isActive(item.url) ? "page" : undefined}
-                                            className="aria-[current=page]:bg-muted aria-[current=page]:font-semibold"
-                                            onClick={() =>
-                                                trackEvent({
-                                                    action: "nav_click",
-                                                    category: "navigation",
-                                                    label: `header_mobile_${item.key}`,
-                                                })
-                                            }
-                                        >
-                                            {navLabel(item.key)}
-                                        </Link>
-                                    </DropdownMenuItem>
-                                ))}
+                                {navItems.map(item => {
+                                    const { NavLink, href } = navigationLink(item.url);
+                                    return (
+                                        <DropdownMenuItem key={item.key} asChild>
+                                            <NavLink
+                                                href={href}
+                                                aria-current={current(item.url)}
+                                                className={headerStyles.menuLink}
+                                                onClick={() =>
+                                                    trackEvent({
+                                                        action: "nav_click",
+                                                        category: "navigation",
+                                                        label: `header_mobile_${item.key}`,
+                                                    })
+                                                }
+                                            >
+                                                {navLabel(item.key)}
+                                            </NavLink>
+                                        </DropdownMenuItem>
+                                    );
+                                })}
                                 {!isLoggedIn && (
                                     <>
                                         <DropdownMenuSeparator />
@@ -252,15 +273,15 @@ const Header = () => {
                 <ul className={`mx-auto grid max-w-lg ${MVP_NAVIGATION_ENABLED ? "grid-cols-3" : "grid-cols-5"} px-1`}>
                     {navItems.map((item) => {
                         const Icon = learnerIcon(item.key);
-                        const active = isActive(item.url);
+                        const active = current(item.url);
                         return (
                             <li key={`learner-tab-${item.key}`}>
                                 <Link
                                     href={item.url}
-                                    aria-current={active ? "page" : undefined}
+                                    aria-current={active}
                                     className={`flex min-h-16 flex-col items-center justify-center gap-1 px-1 py-2 text-[11px] font-semibold transition-colors ${active ? "text-primary" : "text-muted-foreground hover:text-foreground"}`}
                                 >
-                                    <Icon className="h-5 w-5" />
+                                    <span className={headerStyles.tabIcon}><Icon className="h-5 w-5" aria-hidden="true" /></span>
                                     <span className="max-w-full text-center leading-tight">{navLabel(item.key)}</span>
                                 </Link>
                             </li>

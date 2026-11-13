@@ -24,11 +24,20 @@
   transition: color 150ms, background-color 150ms;
 }
 .navLink:hover { color: var(--foreground); background: var(--muted); }
-.navLink[aria-current='page'] {
+.navLink[aria-current], .menuLink[aria-current] {
   color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  background: var(--muted);
   font-weight: 650;
 }
+.menuLink[aria-current] { box-shadow: inset 2px 0 var(--primary); }
+.tabIcon {
+  display: grid;
+  min-width: 44px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+}
+[aria-current] > .tabIcon { background: var(--muted); }
 .navLink:focus-visible, .login:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
