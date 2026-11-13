@@ -1,4 +1,5 @@
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';
+import { invalidateDashboardCache, refreshDashboardCache } from '@/lib/dashboard-cache';
 import { createEmptyFutureDirection } from '@/lib/admin/configs/futureDirectionsConfig';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -99,6 +100,7 @@ describe('pursued-area learner dashboard', () => {
     Object.defineProperty(window, 'localStorage', { configurable: true, value: storage });
     mocks.mvpEnabled = false;
     localStorage.clear();
+    invalidateDashboardCache();
     mocks.hydrate.mockReset().mockResolvedValue(null);
     mocks.hydrateDirection.mockReset().mockResolvedValue(undefined);
     mocks.getPoints.mockReset().mockResolvedValue(120);
@@ -117,6 +119,29 @@ describe('pursued-area learner dashboard', () => {
   afterEach(() => {
     if (root) act(() => root.unmount());
     container?.remove();
+  });
+
+  it('shows a page-shaped skeleton on a first visit while the account loads', async () => {
+    mocks.mvpEnabled = true;
+    mocks.hydrateDirection.mockReturnValue(new Promise(() => {}));
+    await act(async () => { root.render(<UserDashboard />); });
+    expect(container.querySelector('main[aria-busy="true"]')).not.toBeNull();
+    expect(container.querySelector('[role="status"]')).not.toBeNull();
+  });
+
+  it('renders a verified cached overview immediately and keeps it readable on refresh failure', async () => {
+    mocks.mvpEnabled = true;
+    const saved = {id:'health', title:'My saved health direction', summary:'Care for people', reasons:[], guidance:[], reflectionPrompt:'', careers:[]};
+    await refreshDashboardCache('student-1','en',async()=>saved);
+    mocks.hydrateDirection.mockRejectedValue(new Error('offline'));
+    await act(async () => { root.render(<UserDashboard />); });
+    expect(container.textContent).toContain(saved.title);
+    expect(container.textContent).toContain('Showing your saved view');
+    expect(container.querySelector('main[aria-busy="true"]')).toBeNull();
+    mocks.hydrateDirection.mockResolvedValue(null);
+    await act(async () => { (container.querySelector('[role="status"] button') as HTMLButtonElement).click(); });
+    expect(container.textContent).not.toContain(saved.title);
+    expect(container.textContent).not.toContain('Showing your saved view');
   });
 
   it('shows a selected reciprocal career outside the result preview', async () => {

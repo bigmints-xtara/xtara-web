@@ -1,4 +1,5 @@
 import { xtaraApi } from "@/lib/api/client";
+import { invalidateDashboardCache } from './dashboard-cache';
 import type { Locale } from "@/i18n/config";
 import type { DirectionPlan } from "@/lib/direction";
 
@@ -21,6 +22,7 @@ export async function getDirectionFromApi(expectedUserId?: string): Promise<Dire
 }
 
 export async function saveDirectionToApi(plan: DirectionPlan, expectedUserId?: string): Promise<DirectionPlan> {
+  invalidateDashboardCache();
   const response = await (expectedUserId ? xtaraApi.put<DirectionResponse>("/me/direction", plan, { expectedUserId }) : xtaraApi.put<DirectionResponse>("/me/direction", plan));
   if (!response.direction) throw new Error("The direction API returned no saved direction");
   const saved = await getDirectionFromApi(expectedUserId);
@@ -29,6 +31,7 @@ export async function saveDirectionToApi(plan: DirectionPlan, expectedUserId?: s
     || (["learn", "try", "discuss"] as const).some((action) => saved.actions[action] !== plan.actions[action])) {
     throw new Error("Your Career Direction was not returned by account readback.");
   }
+  invalidateDashboardCache();
   return saved;
 }
 

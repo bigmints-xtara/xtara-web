@@ -1,5 +1,6 @@
 // Provenance for the shared offline cache. Unowned data is an anonymous draft;
 // account-owned data must never become another account's or a guest's draft.
+import { reconcileDashboardCacheOwner } from './dashboard-cache';
 export const discoveryCacheOwnerKey = 'xtara_discovery_cache_owner_v1';
 const keys = ['xtara_assessment_v2', 'xtara_assessment_stage_v1', 'xtara_my_direction_v1', 'xtara_pathway_profile_v1'];
 export function preserveAnonymousDiscoveryDraft(): void {
@@ -14,6 +15,7 @@ export function markDiscoveryCacheOwner(uid: string): void {
   localStorage.setItem(discoveryCacheOwnerKey, uid);
 }
 export function reconcileDiscoveryCacheOwner(uid: string | null): void {
+  reconcileDashboardCacheOwner(uid);
   const owner = localStorage.getItem(discoveryCacheOwnerKey);
   if (owner && owner !== uid) {
     for (const key of keys) localStorage.removeItem(key);

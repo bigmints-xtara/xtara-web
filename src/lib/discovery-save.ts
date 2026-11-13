@@ -1,4 +1,5 @@
 import { markDiscoveryCacheOwner, preserveAnonymousDiscoveryDraft } from "@/lib/discovery-cache-owner";
+import { invalidateDashboardCache } from './dashboard-cache';
 import { xtaraApi } from "@/lib/api/client";
 import { createApiSession } from "@/lib/api/auth";
 import { evaluateAssessmentOnServer, getActiveAssessmentDefinition } from "@/lib/assessment-api";
@@ -103,6 +104,7 @@ export async function savePendingDiscoveryToAccount(userId: string): Promise<boo
 }
 
 export async function savePendingAssessmentToAccount(userId: string): Promise<boolean> {
+  invalidateDashboardCache();
   let assessment = parseDiscoveryResult(localStorage.getItem(assessmentV2StorageKey));
   if (!assessment) return false;
   await ensureApiSession(userId);
@@ -115,6 +117,7 @@ export async function savePendingAssessmentToAccount(userId: string): Promise<bo
   assertOwner(userId);
   markDiscoveryCacheOwner(userId);
   saveDiscoveryResult({ ...assessment, syncStatus: "synced" });
+  invalidateDashboardCache();
   return true;
 }
 
@@ -234,6 +237,12 @@ function assertOwner(userId: string): void {
 
 export async function hydrateDirectionDashboard(locale: Locale, userId: string) {
   const readback = await getDirectionOverview(locale, userId);
+  assertOwner(userId);
+  if (readback.overview) {
+    // Secondary assessment/profile hydration must not block the verified overview.
+    void hydrateDiscoveryFromAccount({ userId, direction: readback.direction }).catch(() => undefined);
+    return readback.overview;
+  }
   try {
     await hydrateDiscoveryFromAccount({ userId, direction: readback.direction });
   } catch (error) {

@@ -29,6 +29,9 @@ import { useTranslations } from "@/i18n/language-provider";
 import { getAssessmentV2Catalog, assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
 import { dashboardCopy } from "@/lib/dashboard-copy";
 import MyDirectionOverview from "./MyDirectionOverview";
+import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
+import loadingStyles from '@/components/skeletons/DashboardSkeleton.module.css';
+import { readDashboardCache, refreshDashboardCache } from '@/lib/dashboard-cache';
 import { hydrateDirectionDashboard, hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 import {
   getDirectionSnapshot,
@@ -65,7 +68,8 @@ export default function UserDashboard() {
   const isAnonymous = user?.isAnonymous;
   const isAccount = Boolean(userId && !isAnonymous);
   const currentReadback = accountLoad.owner === userId && accountLoad.attempt === retryAccount && accountLoad.locale === locale;
-  const serverOverview = isAccount && currentReadback ? accountLoad.overview : undefined;
+  const cachedReadback = isAccount && MVP_NAVIGATION_ENABLED ? readDashboardCache(userId!, locale) : null;
+  const serverOverview = isAccount ? currentReadback && !accountLoad.error ? accountLoad.overview : cachedReadback?.overview : undefined;
   const useCachedPresentation = !MVP_NAVIGATION_ENABLED || !isAccount || (currentReadback && serverOverview === undefined);
   const rawResult = useSyncExternalStore(subscribeToDiscovery, () => localStorage.getItem(assessmentV2StorageKey), () => null);
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, () => null);
@@ -89,7 +93,7 @@ export default function UserDashboard() {
   useEffect(() => {
     if (!userId || isAnonymous) return;
     let active = true;
-    const load = MVP_NAVIGATION_ENABLED ? hydrateDirectionDashboard(locale, userId) : hydrateDiscoveryFromAccount().then(() => undefined);
+    const load = MVP_NAVIGATION_ENABLED ? refreshDashboardCache(userId, locale, () => hydrateDirectionDashboard(locale, userId)) : hydrateDiscoveryFromAccount().then(() => undefined);
     load
       .then((overview) => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, locale, error: false, overview }); })
       .catch(() => { if (active) setAccountLoad({ owner: userId, attempt: retryAccount, locale, error: true }); });
@@ -127,8 +131,10 @@ export default function UserDashboard() {
     return () => { active = false; };
   }, [isAnonymous, locale, rawPlan, userId]);
 
-  if (isAccount && !currentReadback) return <div className="p-8" role="status">{getAssessmentV2Catalog(locale).ui.loading}</div>;
-  if (isAccount && accountLoad.error) return <div className="p-8"><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></div>;
+  if (isAccount && !currentReadback && !cachedReadback) return <DashboardSkeleton />;
+  if (isAccount && currentReadback && accountLoad.error && !cachedReadback) return <main className={loadingStyles.shell}><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></main>;
+  const refreshNotice = isAccount && currentReadback && accountLoad.error && cachedReadback
+    ? <div className={loadingStyles.notice} role="status"><span>{({en:'Showing your saved view. We couldn’t refresh it.',ml:'സംരക്ഷിച്ച കാഴ്ചയാണ് കാണിക്കുന്നത്. പുതുക്കാനായില്ല.',hi:'आपका सहेजा हुआ दृश्य दिखाया जा रहा है। अभी अपडेट नहीं हो पाया।',ta:'சேமித்த காட்சி காட்டப்படுகிறது. புதுப்பிக்க முடியவில்லை.'})[locale]}</span><button onClick={() => setRetryAccount(value => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</button></div> : null;
 
   const name = userProfile?.fullName || user?.displayName || "Student";
   const greeting = text.greeting.replace("{name}", name.split(" ")[0]);
@@ -145,12 +151,12 @@ export default function UserDashboard() {
       careers: selectedCareers,
     };
     const direction = serverOverview === undefined ? fallback : serverOverview;
-    if (direction) return <MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
+    if (direction) return <>{refreshNotice}<MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
       hasAssessment={Boolean(storedResult)} canEditCareers={plan?.areaId === direction.id
-        && Boolean(storedResult?.areas.some((area) => area.id === direction.id))} />;
-    return storedResult
+        && Boolean(storedResult?.areas.some((area) => area.id === direction.id))} /></>;
+    return <>{refreshNotice}{storedResult
       ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />
-      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
+      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />}</>;
   }
 
   if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
