@@ -97,8 +97,8 @@ describe("organization dashboard role views", () => {
   it("shows an overview with links to dedicated destinations", async () => {
     mocks.getOrganizationContext.mockResolvedValue({ organization, membership: { role: "owner" }, effectiveStatus: "active", accessMode: "full", permissions: [] });
     render(<OrganizationDashboardPage />);
-    expect(await screen.findByRole("link", { name: "Learners" })).toHaveAttribute("href", "/organization/learners");
-    expect(screen.getByRole("link", { name: "Classes" })).toHaveAttribute("href", "/organization/classes");
+    expect(await screen.findByRole("link", { name: "View all students" })).toHaveAttribute("href", "/organization/learners");
+    expect(screen.getByText("Where to focus next")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
     expect(mocks.getOrganizationUnits).not.toHaveBeenCalled();
   });

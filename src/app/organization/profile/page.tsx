@@ -206,7 +206,6 @@ export default function EducatorProfilePage() {
                 <fieldset disabled={saving || Boolean(switching)} className="space-y-5 disabled:opacity-70">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label={copy.fullName}><Input autoComplete="name" required maxLength={200} value={fullName} onChange={(event) => { setFullName(event.target.value); setStatus(""); }} /></Field>
-                    <Field label={copy.preferredName}><Input autoComplete="nickname" maxLength={200} value={displayName} onChange={(event) => { setDisplayName(event.target.value); setStatus(""); }} /></Field>
                     <Field label={copy.title}><Input autoComplete="organization-title" maxLength={100} value={title} onChange={(event) => { setTitle(event.target.value); setStatus(""); }} placeholder={copy.titleExample} /></Field>
                     <Field label={copy.phone}><Input type="tel" autoComplete="tel" maxLength={40} value={phone} onChange={(event) => { setPhone(event.target.value); setStatus(""); }} /></Field>
                   </div>

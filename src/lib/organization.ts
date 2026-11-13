@@ -64,6 +64,8 @@ export type ConsentScope =
   | "next_actions"
   | "educator_follow_up";
 
+export type GuidanceCode = "assessment_pending" | "sharing_limited" | "choose_direction" | "choose_careers" | "review_due" | "try_activity" | "on_track";
+export type AssessmentInsight = { id: string; title: string; evidence?: "early" | "developing" | "noticed" | "repeated" | null };
 export type OrganizationMember = {
   id: string;
   userId: string;
@@ -74,15 +76,19 @@ export type OrganizationMember = {
   joinedAt?: string | null;
   consentStatus: string;
   assessmentStatus: "completed" | "pending";
+  sharing?: { assessment: boolean; direction: boolean; actions: boolean };
+  guidance?: { code: GuidanceCode; needsAttention: boolean };
   assessmentSummary?: {
     stage?: string | null;
-    areas?: Array<{ id: string; title: string }>;
-    signals?: Array<{ id: string; title: string }>;
+    completedAt?: string | null;
+    locale?: string;
+    areas?: AssessmentInsight[];
+    signals?: AssessmentInsight[];
   } | null;
   directionProgress?: {
     areaId?: string | null;
     selectedCareerCount: number;
-    completedActions: number;
+    completedActions: number | null;
     reviewOn?: string | null;
   } | null;
 };

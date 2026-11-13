@@ -4,21 +4,19 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  BarChart3,
   Building2,
-  CalendarClock,
+  UserRoundCheck,
   CheckCircle2,
-  ClipboardList,
+  CalendarClock,
   Copy,
   GraduationCap,
   Loader2,
   Plus,
   ShieldCheck,
-  UserRoundCheck,
-  Users,
 } from "lucide-react";
 
 import { OrganizationLoading, OrganizationError } from "@/components/organization/OrganizationPageState";
+import { TeacherOverview, TeacherStudentList } from "./TeacherGuidance";
 import NavigationPending from "@/components/organization/NavigationPending";
 import { useTranslations } from "@/i18n/language-provider";
 import { Badge } from "@/components/ui/badge";
@@ -121,15 +119,11 @@ export default function OrganizationWorkspacePage({ section = "overview" }: { se
         {section !== "overview" ? <h2 className="mt-7 text-2xl font-semibold">{t(`header.nav.${section}`)}</h2> : null}
         {context.accessMode !== "none" ? <>
           {section === "overview" && dashboard ? <>
-            <SummaryGrid dashboard={dashboard} />
-            <div className="mt-7 grid gap-6 md:grid-cols-2">
-              <Card><CardHeader><CardTitle>{t("header.nav.learners")}</CardTitle></CardHeader><CardContent><Button asChild><Link href="/organization/learners">{t("header.nav.learners")}<NavigationPending /></Link></Button></CardContent></Card>
-              <Card><CardHeader><CardTitle>{t("header.nav.classes")}</CardTitle></CardHeader><CardContent><Button asChild><Link href="/organization/classes">{t("header.nav.classes")}<NavigationPending /></Link></Button></CardContent></Card>
-              <CohortInsights dashboard={dashboard} />
-            </div>
+            <TeacherOverview dashboard={dashboard} />
           </> : null}
           {section === "learners" && dashboard ? <div className="mt-6 space-y-6">
-            <LearnerRoster dashboard={dashboard} units={units} canManage={context.accessMode === "full" && context.permissions.includes("members.manage")} onRemoved={refresh} />
+            <TeacherStudentList students={dashboard.students} />
+            {context.permissions.includes("members.manage") ? <LearnerRoster dashboard={dashboard} units={units} canManage={context.accessMode === "full" && context.permissions.includes("members.manage")} onRemoved={refresh} /> : null}
             {context.accessMode === "full" && context.permissions.includes("invitations.manage") ? <CreateInvitationCard role={context.membership.role} units={units} onCreated={setNewCode} /> : null}
           </div> : null}
           {section === "classes" ? <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -142,16 +136,6 @@ export default function OrganizationWorkspacePage({ section = "overview" }: { se
       </main>
     </div>
   );
-}
-
-function SummaryGrid({ dashboard }: { dashboard: OrganizationDashboard }) {
-  const items = [
-    { label: "Active learners", value: dashboard.summary.activeStudents, icon: Users },
-    { label: "Assessment complete", value: dashboard.summary.assessmentCompleted, icon: CheckCircle2 },
-    { label: "Awaiting assessment", value: dashboard.summary.awaitingAssessment, icon: ClipboardList },
-    { label: "Needs follow-up", value: dashboard.summary.followUpNeeded, icon: UserRoundCheck },
-  ];
-  return <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Guidance summary">{items.map(({ label, value, icon: Icon }) => <Card key={label} className="border-primary/10 shadow-none"><CardContent className="flex items-center gap-4 p-5"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/5 text-primary"><Icon className="h-5 w-5" /></div><div><p className="text-2xl font-semibold text-primary">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></CardContent></Card>)}</section>;
 }
 
 function LearnerRoster({ dashboard, units, canManage, onRemoved }: {
@@ -176,16 +160,12 @@ function LearnerRoster({ dashboard, units, canManage, onRemoved }: {
       setRemoving("");
     }
   };
-  return <Card id="learners" className="scroll-mt-24 border-primary/10 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 text-xl"><GraduationCap className="h-5 w-5 text-primary" />Learner guidance</CardTitle><p className="text-sm text-muted-foreground">Only learners inside your authorized class or institution scope are shown.</p></CardHeader><CardContent className="p-0">{removeError ? <p role="alert" className="px-6 py-3 text-destructive">{removeError}</p> : null}<div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead className="border-y bg-muted text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Learner</th><th className="px-4 py-3 font-medium">Class or group</th><th className="px-4 py-3 font-medium">Assessment</th><th className="px-4 py-3 font-medium">Direction</th>{canManage ? <th className="px-4 py-3 font-medium"><span className="sr-only">Actions</span></th> : null}</tr></thead><tbody>{dashboard.students.map((student) => <tr key={student.id} className="border-b last:border-0"><td className="px-6 py-4"><Link href={`/organization/students/${encodeURIComponent(student.id)}`} className="font-medium text-primary underline-offset-4 hover:underline">{student.displayName}<NavigationPending /></Link><p className="mt-1 text-xs text-muted-foreground">Sharing: {formatLabel(student.consentStatus)}</p></td><td className="px-4 py-4 text-muted-foreground">{student.unitIds.map((id) => unitNames.get(id)).filter(Boolean).join(", ") || "—"}</td><td className="px-4 py-4"><Badge variant={student.assessmentStatus === "completed" ? "secondary" : "outline"}>{formatLabel(student.assessmentStatus)}</Badge></td><td className="px-4 py-4 text-muted-foreground">{student.directionProgress ? `${student.directionProgress.completedActions} actions complete` : "Follow-up needed"}</td>{canManage ? <td className="px-4 py-4 text-right"><Button type="button" size="sm" variant="ghost" className="text-muted-foreground" disabled={Boolean(removing)} onClick={() => void remove(student.id, student.displayName)}>{removing === student.id ? <Loader2 aria-label="Removing learner" className="mr-2 h-4 w-4 animate-spin" /> : null}Remove</Button></td> : null}</tr>)}{!dashboard.students.length ? <tr><td colSpan={canManage ? 5 : 4} className="px-6 py-12 text-center text-muted-foreground">Invite learners to a class to begin the guidance workspace.</td></tr> : null}</tbody></table></div></CardContent></Card>;
+  return <Card id="learners" className="scroll-mt-24 border-primary/10 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 text-xl"><GraduationCap className="h-5 w-5 text-primary" />Learner guidance</CardTitle><p className="text-sm text-muted-foreground">Only learners inside your authorized class or institution scope are shown.</p></CardHeader><CardContent className="p-0">{removeError ? <p role="alert" className="px-6 py-3 text-destructive">{removeError}</p> : null}<div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead className="border-y bg-muted text-xs uppercase tracking-wide text-muted-foreground"><tr><th className="px-6 py-3 font-medium">Learner</th><th className="px-4 py-3 font-medium">Class or group</th><th className="px-4 py-3 font-medium">Assessment</th><th className="px-4 py-3 font-medium">Direction</th>{canManage ? <th className="px-4 py-3 font-medium"><span className="sr-only">Actions</span></th> : null}</tr></thead><tbody>{dashboard.students.map((student) => <tr key={student.id} className="border-b last:border-0"><td className="px-6 py-4"><Link href={`/organization/students/${encodeURIComponent(student.id)}`} className="font-medium text-primary underline-offset-4 hover:underline">{student.displayName}<NavigationPending /></Link><p className="mt-1 text-xs text-muted-foreground">Sharing: {formatLabel(student.consentStatus)}</p></td><td className="px-4 py-4 text-muted-foreground">{student.unitIds.map((id) => unitNames.get(id)).filter(Boolean).join(", ") || "—"}</td><td className="px-4 py-4"><Badge variant={student.assessmentStatus === "completed" ? "secondary" : "outline"}>{formatLabel(student.assessmentStatus)}</Badge></td><td className="px-4 py-4 text-muted-foreground">{student.directionProgress ? `${student.directionProgress.completedActions} actions complete` : "Not shared"}</td>{canManage ? <td className="px-4 py-4 text-right"><Button type="button" size="sm" variant="ghost" className="text-muted-foreground" disabled={Boolean(removing)} onClick={() => void remove(student.id, student.displayName)}>{removing === student.id ? <Loader2 aria-label="Removing learner" className="mr-2 h-4 w-4 animate-spin" /> : null}Remove</Button></td> : null}</tr>)}{!dashboard.students.length ? <tr><td colSpan={canManage ? 5 : 4} className="px-6 py-12 text-center text-muted-foreground">Invite learners to a class to begin the guidance workspace.</td></tr> : null}</tbody></table></div></CardContent></Card>;
 }
 
 function UnitScope({ units, role }: { units: OrganizationUnit[]; role: OrganizationRole }) {
   const institutionWide = role === "owner" || role === "admin";
   return <Card id="classes" className="scroll-mt-24 border-primary/10 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Building2 className="h-5 w-5 text-primary" />{institutionWide ? "Institution scope" : "Assigned classes"}</CardTitle><p className="text-sm text-muted-foreground">{institutionWide ? "Your role can work across the institution." : "Learners and insights are limited to these classes and their child groups."}</p></CardHeader><CardContent><div className="flex flex-wrap gap-2">{units.length ? units.map((unit) => <Badge key={unit.id} variant="outline">{unit.name}</Badge>) : <Badge variant="secondary">Institution-wide</Badge>}</div></CardContent></Card>;
-}
-
-function CohortInsights({ dashboard }: { dashboard: OrganizationDashboard }) {
-  return <Card className="border-primary/10 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 text-lg"><BarChart3 className="h-5 w-5 text-primary" />Cohort signals</CardTitle><p className="text-sm text-muted-foreground">Areas appear only when at least {dashboard.privacyThreshold} learners contribute.</p></CardHeader><CardContent className="space-y-3">{dashboard.cohortInsights.map((insight) => <div key={insight.id} className="flex items-center justify-between gap-3 rounded-xl bg-muted px-4 py-3"><span className="text-sm font-medium text-primary">{insight.title}</span><Badge variant="outline">{insight.count} learners</Badge></div>)}{!dashboard.cohortInsights.length ? <p className="text-sm leading-6 text-muted-foreground">No cohort area has reached the privacy threshold yet. Individual rankings are never shown.</p> : null}</CardContent></Card>;
 }
 
 function CreateUnitCard({ units, onCreated }: { units: OrganizationUnit[]; onCreated: () => Promise<void> }) {
