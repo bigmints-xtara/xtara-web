@@ -108,11 +108,9 @@ export default function OrganizationWorkspacePage({ section = "overview" }: { se
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="mx-auto max-w-7xl px-5 py-8 pb-20 sm:py-10">
-        <section className="overflow-hidden rounded-3xl bg-primary p-6 text-white sm:p-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div><div className="flex flex-wrap items-center gap-2"><Badge className="border-white/20 bg-white/10 text-white" variant="outline">{formatRole(context.membership.role)}</Badge><Badge className="border-white/20 bg-white/10 text-white" variant="outline">{formatLabel(context.effectiveStatus)}</Badge></div><h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl">{context.organization.name}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-white/70">Help learners understand their options, identify where support is needed, and follow through on practical next actions.</p></div>
-            <div className="rounded-2xl bg-white/10 px-4 py-3 text-sm"><p className="text-white/60">Access until</p><p className="mt-1 font-medium">{formatDate(context.organization.accessEndsAt)}</p></div>
-          </div>
+        <section className="flex flex-wrap items-center justify-between gap-3 border-b pb-5">
+          <h1 className="text-xl font-semibold tracking-tight">{context.organization.name}</h1>
+          <div className="flex flex-wrap gap-2"><Badge variant="secondary">{formatRole(context.membership.role)}</Badge><Badge variant="outline">{formatLabel(context.effectiveStatus)}</Badge></div>
         </section>
 
         {context.accessMode !== "full" ? <LifecycleNotice context={context} /> : null}
