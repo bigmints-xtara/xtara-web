@@ -89,6 +89,8 @@ export const XTARA_API_OPERATIONS = {
   "deleteMeAcademicExamsId": { method: "DELETE", path: "/api/v1/me/academic-exams/{id}", authenticated: true },
   "getMeAcademicPeriod": { method: "GET", path: "/api/v1/me/academic-period", authenticated: true },
   "putMeAcademicPeriod": { method: "PUT", path: "/api/v1/me/academic-period", authenticated: true },
+  "getMeCareerPursuit": { method: "GET", path: "/api/v1/me/career-pursuit", authenticated: true },
+  "putMeCareerPursuit": { method: "PUT", path: "/api/v1/me/career-pursuit", authenticated: true },
   "getMeCurrentCareer": { method: "GET", path: "/api/v1/me/current-career", authenticated: true },
   "putMeCurrentCareer": { method: "PUT", path: "/api/v1/me/current-career", authenticated: true },
   "deleteMeDeviceInstallationsInstallationId": { method: "DELETE", path: "/api/v1/me/device-installations/{installationId}", authenticated: true },

@@ -13,6 +13,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
 import { savePendingAssessmentToAccount, savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
+import PursuitContext from "@/components/careers/explorer/PursuitContext";
+import { pursueCareer } from "@/lib/career-pursuit-api";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import { getOrganizationContext } from "@/lib/organization";
 import { friendlyLoginError } from "@/lib/login-error";
@@ -48,6 +50,13 @@ function LoginContent() {
 
   async function finishLogin(userId: string, idToken: string) {
     await createApiSession(idToken);
+    const pursuitId = searchParams.get("pursueCareer");
+    const pursuitDirection = searchParams.get("directionId");
+    if (pursuitId && pursuitDirection) {
+      await pursueCareer(pursuitId, pursuitDirection, userId);
+      router.push("/dashboard");
+      return;
+    }
     if (searchParams.get("saveDiscovery") === "1") {
       const didSave = await savePendingCareerChoiceToAccount(userId);
       if (!didSave) throw new Error("Choose your Career Direction and Dream Careers before signing in.");
@@ -119,6 +128,7 @@ function LoginContent() {
       description={modeCopy.sideDescription}
       proofs={modeCopy.sideProofs}
     >
+      <PursuitContext careerId={searchParams.get("pursueCareer")} directionId={searchParams.get("directionId")} />
       <LoginForm
         mode={mode}
         copy={{

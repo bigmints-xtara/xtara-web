@@ -11,10 +11,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { SignupForm } from "@/components/signup-form";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { createApiSession, getPostAuthDestination } from "@/lib/api/auth";
 import { savePendingAssessmentToAccount, savePendingCareerChoiceToAccount } from "@/lib/discovery-save";
+import PursuitContext from "@/components/careers/explorer/PursuitContext";
+import { pursueCareer } from "@/lib/career-pursuit-api";
+import { journeyCopy } from "@/components/careers/explorer/journey-copy";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 
 function SignupContent() {
@@ -23,10 +27,12 @@ function SignupContent() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pursuitUserId, setPursuitUserId] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const { configurationError } = useAuth();
-  const { messages } = useTranslations();
+  const { messages, locale } = useTranslations();
+  const pursuitCopy = journeyCopy[locale];
   const careerPathId = searchParams.get("careerPathId");
   const shouldSaveDiscovery = searchParams.get("saveDiscovery") === "1";
   const shouldSaveAssessment = searchParams.get("saveAssessment") === "1";
@@ -42,7 +48,11 @@ function SignupContent() {
         ? "educator"
         : "default";
   const variantCopy = signupCopy.variants[variantKey];
-  const loginHref = shouldSaveDiscovery
+  const pursuitId = searchParams.get("pursueCareer");
+  const pursuitDirection = searchParams.get("directionId");
+  const loginHref = pursuitId && pursuitDirection
+    ? `/login?${new URLSearchParams({ pursueCareer: pursuitId, directionId: pursuitDirection, next: "/dashboard" })}`
+    : shouldSaveDiscovery
     ? "/login?saveDiscovery=1&next=%2Fdashboard"
     : shouldSaveAssessment && requestedNext
       ? `/login?saveAssessment=1&next=${encodeURIComponent(requestedNext)}`
@@ -63,11 +73,21 @@ function SignupContent() {
           ? await linkWithCredential(currentUser, EmailAuthProvider.credential(email, password))
           : await createUserWithEmailAndPassword(auth, email, password);
 
+      // Account creation is complete even if the session or career save fails.
+      // Retrying must continue with this account, never create it a second time.
+      if (pursuitId && pursuitDirection) setPursuitUserId(credential.user.uid);
+
       if (name.trim()) {
         await updateProfile(credential.user, { displayName: name.trim() });
       }
 
       await createApiSession(await credential.user.getIdToken(true));
+
+      if (pursuitId && pursuitDirection) {
+        await pursueCareer(pursuitId, pursuitDirection, credential.user.uid);
+        router.push("/dashboard");
+        return;
+      }
 
       if (shouldSaveDiscovery) {
         const didSave = await savePendingCareerChoiceToAccount(credential.user.uid);
@@ -95,6 +115,23 @@ function SignupContent() {
     }
   };
 
+  const retryPursuit = async () => {
+    if (!pursuitUserId || !pursuitId || !pursuitDirection) return;
+    setLoading(true);
+    setError("");
+    try {
+      const account = getFirebaseAuth().currentUser;
+      if (!account || account.uid !== pursuitUserId) throw new Error("Account changed");
+      if (name.trim()) await updateProfile(account, { displayName: name.trim() });
+      await createApiSession(await account.getIdToken(true));
+      await pursueCareer(pursuitId, pursuitDirection, pursuitUserId);
+      router.push("/dashboard");
+    } catch {
+      setError(pursuitCopy.saveError);
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthShell
       backLabel={commonCopy.backHome}
@@ -105,7 +142,13 @@ function SignupContent() {
       description={variantCopy.sideDescription}
       proofs={variantCopy.sideProofs}
     >
-      <SignupForm
+      <PursuitContext careerId={searchParams.get("pursueCareer")} directionId={searchParams.get("directionId")} />
+      {pursuitUserId ? <div className="space-y-4 text-center" aria-live="polite">
+        {error && <p role="alert">{pursuitCopy.saveError}</p>}
+        <Button className="w-full" disabled={loading} onClick={() => void retryPursuit()}>
+          {loading ? pursuitCopy.saving : pursuitCopy.pursue}
+        </Button>
+      </div> : <SignupForm
         copy={{
           title: variantCopy.title,
           description: variantCopy.description,
@@ -135,7 +178,7 @@ function SignupContent() {
         onEmailChange={setEmail}
         onPasswordChange={setPassword}
         onSubmit={handleSignup}
-      />
+      />}
     </AuthShell>
   );
 }

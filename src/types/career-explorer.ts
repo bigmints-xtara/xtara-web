@@ -1,7 +1,10 @@
 import type { Locale } from "@/i18n/config";
 
+export interface ExplorerIllustration { url: string; alt: string; width?: number; height?: number }
+
 // Mirrors CareerExplorerResponse in the API OpenAPI contract.
 export interface ExplorerDirection {
+  illustration?: ExplorerIllustration;
   id: string;
   title: string;
   summary: string;
@@ -18,6 +21,10 @@ export interface ExplorerIndustry {
   translationFallback: boolean;
 }
 export interface ExplorerCareer {
+  illustration?: ExplorerIllustration;
+  skills?: string[];
+  workplaces?: string[];
+  tradeoffs?: string[];
   id: string;
   title: string;
   summary: string;

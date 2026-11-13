@@ -103,169 +103,87 @@ function mount() {
 }
 afterEach(cleanup);
 beforeEach(() => {
+  window.scrollTo = vi.fn();
   vi.mocked(getCareerExplorer)
     .mockReset()
     .mockResolvedValue(structuredClone(fixture));
   window.history.replaceState({}, "", "/explore");
 });
 describe("career exploration", () => {
-  it("follows workplaces across directions and keeps the study step when switching views", async () => {
+  it("focuses a neighboring direction before opening it and keeps one primary action", async () => {
     mount();
-    fireEvent.click(
-      await screen.findByRole("button", { name: /Build things.*Make places/ }),
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Industries & workplaces" }));
-    fireEvent.click(screen.getByRole("button", { name: "Hospitals" }));
-    expect(
-      screen.getByRole("button", { name: /Doctor.*Care for patients/ }),
-    ).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: /Civil Engineer.*Design safe/ }),
-    );
-    expect(screen.getByText("Plan structures")).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: "See what you could study" }),
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Browse cards" }));
-    expect(screen.getByText("Civil engineering degree")).toBeInTheDocument();
-    expect(window.location.search).toContain("view=cards");
-    expect(window.location.search).toContain("career=civil");
-    fireEvent.click(screen.getByRole("button", { name: "Mind map" }));
-    fireEvent.click(
-      screen.getByRole("button", { name: "See where else this could lead" }),
-    );
-    expect(
-      screen.getByRole("link", { name: "Take the assessment" }),
-    ).toHaveAttribute("href", "/assessment");
-    fireEvent.click(
-      screen.getByRole("button", { name: /Doctor.*Care for patients/ }),
-    );
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Doctor",
-    );
-    expect(window.location.search).toContain("direction=health");
-    expect(
-      screen.getByText(/Some information is shown in English/),
-    ).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: "See what you could study" }),
-    );
-    expect(
-      screen.getByText(
-        "Study information for this career is not available yet.",
-      ),
-    ).toBeInTheDocument();
+    await screen.findByRole('heading', { name: 'What interests you?' });
+    expect(screen.getAllByRole('button', { name: 'Explore this direction' })).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Career directions: Help people' }));
+    expect(window.location.search).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: 'Explore this direction' }));
+    expect(window.location.search).toContain('direction=health');
+    expect(screen.getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Doctor');
+    expect(screen.getByText(/Some information is shown in English/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Take the assessment' })).toHaveAttribute('href', '/assessment');
   });
-  it("keeps careers reachable without approved workplace links", async () => {
-    const partial = structuredClone(fixture);
-    partial.industries = [];
-    partial.directions[0].industryIds = [];
-    vi.mocked(getCareerExplorer).mockResolvedValue(partial);
-    mount();
-    fireEvent.click(
-      await screen.findByRole("button", { name: /Build things.*Make places/ }),
-    );
-    expect(screen.queryByRole("button", { name: "Industries & workplaces" })).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Civil Engineer.*Design safe/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: /Doctor.*Care/ }),
-    ).not.toBeInTheDocument();
-  });
-  it("opens a specialization under its parent and preserves its Study options link", async () => {
+  it("shows API artwork and career chapters without exposing public study routes", async () => {
     const graph = structuredClone(fixture);
-    graph.careers[0].specializationIds = ["ux-designer"];
-    graph.careers.push({
-      ...graph.careers[0],
-      id: "ux-designer",
-      title: "Digital Experience and Interface Design",
-      parentCareerId: "civil",
-      specializationIds: [],
-    });
+    graph.careers[0].illustration = { url: 'https://example.org/civil.webp', alt: 'A civil engineer' };
+    graph.careers[0].skills = ['Listening'];
+    graph.careers[0].workplaces = ['Building sites'];
+    graph.careers[0].tradeoffs = ['Work can happen outdoors'];
     vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    window.history.replaceState({}, '', '/explore?direction=build&career=civil&step=study');
     mount();
-    fireEvent.click(await screen.findByRole("button", { name: /Build things.*Make places/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Civil Engineer.*Design safe/ }));
-    fireEvent.click(screen.getByRole("button", { name: /Digital Experience and Interface Design/ }));
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Digital Experience and Interface Design");
-    const link = screen.getByRole("link", { name: "Find courses and colleges" });
-    const url = new URL(link.getAttribute("href")!, window.location.origin);
-    expect(url.pathname).toBe("/explore/roles/ux-designer/study-options");
-    expect(url.searchParams.get("returnTo")).toContain("direction=build&career=ux-designer&step=work");
-    expect(screen.getByRole("button", { name: "Civil Engineer" })).toBeInTheDocument();
+    expect(await screen.findByText('Plan structures')).toBeInTheDocument();
+    expect(screen.getByAltText('A civil engineer')).toHaveAttribute('src', 'https://example.org/civil.webp');
+    expect(screen.queryByText('Civil engineering degree')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: /Skills you’ll use/ }));
+    expect(screen.getByText('Listening')).toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole('tab', { name: /Skills you’ll use/ }), { key: 'ArrowRight' });
+    expect(screen.getByText('Building sites')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: /Good to know/ }));
+    expect(screen.getByText('Work can happen outdoors')).toBeInTheDocument();
   });
-  it("restores a shared link and responds to browser navigation", async () => {
-    window.history.replaceState(
-      {},
-      "",
-      "/explore?direction=build&industry=hospital&career=civil&step=study",
-    );
+  it("opens an optional specialization with its three connected contexts", async () => {
+    const graph = structuredClone(fixture);
+    graph.careers[0].specializationIds = ['structures'];
+    graph.careers.push({ ...graph.careers[0], id: 'structures', title: 'Structural Engineering', parentCareerId: 'civil', specializationIds: [] });
+    vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    window.history.replaceState({}, '', '/explore?direction=build&step=roles');
     mount();
-    expect(
-      await screen.findByText("Civil engineering degree"),
-    ).toBeInTheDocument();
-    window.history.replaceState(
-      {},
-      "",
-      "/explore?view=cards&direction=health&step=roles",
-    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Explore specializations' }));
+    expect(window.location.search).toContain('step=specializations');
+    expect(screen.getByRole('heading', { name: 'Structural Engineering' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Structural Engineering');
+    expect(window.location.search).toContain('career=structures');
+  });
+  it("offers retry and an honest empty catalogue", async () => {
+    vi.mocked(getCareerExplorer).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ ...fixture, careers: [], directions: [], industries: [] });
+    mount();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading careers');
+    await screen.findByRole('alert');
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('No careers are available yet. Please check again later.')).toBeInTheDocument();
+  });
+  it("restores published career links and responds to browser navigation", async () => {
+    window.history.replaceState({}, '', '/explore?direction=build&career=civil&step=work');
+    mount();
+    expect(await screen.findByText('Plan structures')).toBeInTheDocument();
+    window.history.replaceState({}, '', '/explore?direction=health&step=roles');
     fireEvent.popState(window);
-    expect(
-      screen.getByRole("button", { name: /Doctor.*Care/ }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText("Civil engineering degree"),
-    ).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole("searchbox"), {
-      target: { value: "missing" },
-    });
-    expect(screen.getByRole("status")).toHaveTextContent("No careers match");
-  });
-  it("offers retry and shows an honest empty catalogue", async () => {
-    vi.mocked(getCareerExplorer)
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockResolvedValueOnce({
-        ...fixture,
-        careers: [],
-        directions: [],
-        industries: [],
-      });
-    mount();
-    expect(screen.getByRole("status")).toHaveTextContent("Loading careers");
-    await screen.findByRole("alert");
-    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    expect(
-      await screen.findByText(
-        "No careers are available yet. Please check again later.",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
+    expect(screen.queryByText('Plan structures')).not.toBeInTheDocument();
   });
   it("normalizes invalid links without losing valid cross-direction roles", () => {
-    expect(
-      readExploreState(
-        "?direction=build&industry=hospital&career=doctor&step=study",
-        fixture,
-      ).career,
-    ).toBe("doctor");
-    expect(
-      readExploreState("?direction=build&career=doctor&step=study", fixture)
-        .career,
-    ).toBeNull();
-    const state = readExploreState(
-      "?direction=build&career=civil&step=study&view=cards",
-      fixture,
-    );
-    expect(readExploreState(exploreUrl(state).split("?")[1], fixture)).toEqual(
-      state,
-    );
-    expect(previousExploreState(state).step).toBe("work");
-    expect(
-      readExploreState("?direction=bogus&industry=bogus", fixture).step,
-    ).toBe("directions");
+    expect(readExploreState('?direction=build&industry=hospital&career=doctor&step=study', fixture).career).toBe('doctor');
+    expect(readExploreState('?direction=build&career=doctor&step=study', fixture).career).toBeNull();
+    const state = readExploreState('?direction=build&career=civil&step=study&view=cards', fixture);
+    expect(readExploreState(exploreUrl(state).split('?')[1], fixture)).toEqual(state);
+    expect(previousExploreState(state).step).toBe('work');
+    expect(readExploreState('?direction=bogus&industry=bogus', fixture).step).toBe('directions');
   });
-  it("only renders safe web source URLs", () => {
-    expect(safeSourceUrl("javascript:alert(1)")).toBeNull();
-    expect(safeSourceUrl("https://example.org")).toBe("https://example.org/");
+  it('only renders safe web artwork URLs', () => {
+    expect(safeSourceUrl('javascript:alert(1)')).toBeNull();
+    expect(safeSourceUrl('https://example.org')).toBe('https://example.org/');
   });
 });

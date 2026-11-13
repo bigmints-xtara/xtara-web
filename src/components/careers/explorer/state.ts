@@ -3,6 +3,7 @@ export type ExploreStep =
   | "directions"
   | "industries"
   | "roles"
+  | "specializations"
   | "work"
   | "study"
   | "related";
@@ -56,7 +57,9 @@ export function readExploreState(
       data.directions.find((d) => includesCareerOrParent(d.careerIds, career))?.id ?? null;
   if (career)
     state.step =
-      p.get("step") === "study"
+      p.get("step") === "specializations" && career.specializationIds?.length
+        ? "specializations"
+        : p.get("step") === "study"
         ? "study"
         : p.get("step") === "related"
           ? "related"
