@@ -227,3 +227,26 @@
   .topline[data-inner] .motion span { display: none; }
   .breadcrumbs li { gap: 4px; }
 }
+
+/* Finite entrances replay on selection; settled text stays still. */
+.stage { display: contents; }
+.stage > :not(.decision) { animation: explorer-page-enter 320ms cubic-bezier(.22,1,.36,1) both; }
+.choiceBody .bubbleMedia { animation: none; }
+.active .choiceBody > .media,
+.active .cardCopy > h2,
+.active .cardCopy > p,
+.active .cardCopy > .cardAction {
+  animation: explorer-card-enter 360ms cubic-bezier(.22,1,.36,1) both;
+}
+.active .choiceBody > .media { animation-delay: 80ms; }
+.active .cardCopy > h2 { animation-delay: 140ms; }
+.active .cardCopy > p { animation-delay: 200ms; }
+.active .cardCopy > .cardAction { animation-delay: 260ms; }
+@keyframes explorer-card-enter {
+  from { opacity: .4; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes explorer-page-enter {
+  from { opacity: .4; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}

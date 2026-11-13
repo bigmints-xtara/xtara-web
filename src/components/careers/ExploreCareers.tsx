@@ -111,7 +111,8 @@ export default function ExploreCareers() {
             <span>{motionLabel}</span>
           </button>
         </div>
-      {isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
+      <div key={`${groupKey}:${locale}`} className={styles.stage}>
+        {isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
         <div className={styles.invitationBubble}><Illustration illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>
         <p className={styles.eyebrow}>{text.nextStep}</p>
         <h1 ref={heading} tabIndex={-1}>{invite.headingLead}<br /><span>{invite.headingAccent}</span></h1>
@@ -151,7 +152,8 @@ export default function ExploreCareers() {
         }} />}
         {specialization && <button className={styles.quiet} onClick={() => goCareer(career!.id, true)}>{text.meet}: {career?.title}<ArrowRight size={14} /></button>}
       </>}
-    </main>
+    </div>
+      </main>
     </div>
   </div>;
 }
