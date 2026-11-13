@@ -53,7 +53,9 @@ export default function ExploreCareers() {
   const saveGeneration = useRef(0);
   const heading = useRef<HTMLHeadingElement>(null);
   const [focusedPositions, setFocusedPositions] = useState<Record<string, number>>({});
-  const navigate = (next: ExploreState) => { saveGeneration.current += 1; window.history.pushState(window.history.state, '', exploreUrl(next)); window.dispatchEvent(new Event(navigationEvent)); setChapter('work'); setSaveState('idle'); requestAnimationFrame(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo?.({ top: 0, behavior: 'instant' }); }); };
+  // Let Next copy its own history state and synchronize the canonical URL.
+  // Reusing its __NA-marked state skips that hook, so locale refresh loses the route.
+  const navigate = (next: ExploreState) => { saveGeneration.current += 1; window.history.pushState(null, '', exploreUrl(next)); window.dispatchEvent(new Event(navigationEvent)); setChapter('work'); setSaveState('idle'); requestAnimationFrame(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo?.({ top: 0, behavior: 'instant' }); }); };
   const direction = data?.directions.find(d => d.id === state.direction);
   const career = data?.careers.find(c => c.id === state.career);
   const parent = data?.careers.find(c => c.id === career?.parentCareerId);

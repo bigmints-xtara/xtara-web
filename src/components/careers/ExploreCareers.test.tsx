@@ -9,8 +9,9 @@ import {
   exploreUrl,
   previousExploreState,
 } from "./explorer/state";
+const { setLocale } = vi.hoisted(() => ({ setLocale: vi.fn() }));
 vi.mock("@/i18n/language-provider", () => ({
-  useTranslations: () => ({ locale: "en", setLocale: vi.fn(), t: (key: string) => key }),
+  useTranslations: () => ({ locale: "en", setLocale, t: (key: string) => key }),
 }));
 vi.mock("@/components/Header", () => ({ default: () => <header /> }));
 vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn() }));
@@ -101,8 +102,9 @@ function mount() {
     </QueryClientProvider>,
   );
 }
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 beforeEach(() => {
+  setLocale.mockReset();
   window.scrollTo = vi.fn();
   vi.mocked(getCareerExplorer)
     .mockReset()
@@ -170,6 +172,31 @@ describe("career exploration", () => {
     expect(window.location.search).toContain('direction=build');
     expect(window.location.search).not.toContain('career=civil');
     expect(screen.getByRole('button',{name:'Meet this career'})).toBeInTheDocument();
+  });
+  it.each(['work', 'pursuit'])('retains the selected career and %s step when a locale change refreshes the router', async step => {
+    // Next's native-history integration ignores writes already marked as internal.
+    // A refresh uses the last URL synchronized through that integration.
+    let routerLocation = '/explore';
+    const nativePush = window.history.pushState.bind(window.history);
+    window.history.replaceState({__NA:true}, '', routerLocation);
+    vi.spyOn(window.history, 'pushState').mockImplementation((state, unused, url) => {
+      if (!state?.__NA && !state?._N) routerLocation = String(url);
+      nativePush({ ...state, __NA:true }, unused, url);
+    });
+    setLocale.mockImplementation(() => {
+      window.history.replaceState({__NA:true}, '', routerLocation);
+      fireEvent.popState(window);
+    });
+    mount();
+    fireEvent.click(await screen.findByRole('button',{name:'Explore this direction'}));
+    fireEvent.click(screen.getByRole('button',{name:'Meet this career'}));
+    if (step === 'pursuit') fireEvent.click(screen.getByRole('button',{name:'Pursue this career'}));
+    fireEvent.change(screen.getByRole('combobox',{name:'languageSwitcher.label'}),{target:{value:'ml'}});
+    expect(setLocale).toHaveBeenCalledWith('ml');
+    expect(new URLSearchParams(window.location.search).get('direction')).toBe('build');
+    expect(new URLSearchParams(window.location.search).get('career')).toBe('civil');
+    expect(new URLSearchParams(window.location.search).get('step')).toBe(step);
+    expect(screen.getByRole('heading',{level:1})).toHaveTextContent(step === 'pursuit' ? 'Make it yourDream Career.' : 'Civil Engineer');
   });
   it("offers retry and an honest empty catalogue", async () => {
     vi.mocked(getCareerExplorer).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ ...fixture, careers: [], directions: [], industries: [] });
