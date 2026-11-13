@@ -45,7 +45,6 @@ export default function ExploreCareers() {
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ['career-explorer', locale], queryFn: ({ signal }) => getCareerExplorer(locale, signal), meta: { authScope: 'public' }, staleTime: 60_000, retry: false });
   const state = readExploreState(search, data);
   const [paused, setPaused] = useState(false);
-  const [chapter, setChapter] = useState('work');
   const [saveResult, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [saveOwner, setSaveOwner] = useState<string>();
   const [saveLocation, setSaveLocation] = useState<string>();
@@ -55,7 +54,7 @@ export default function ExploreCareers() {
   const [focusedPositions, setFocusedPositions] = useState<Record<string, number>>({});
   // Let Next copy its own history state and synchronize the canonical URL.
   // Reusing its __NA-marked state skips that hook, so locale refresh loses the route.
-  const navigate = (next: ExploreState) => { saveGeneration.current += 1; window.history.pushState(null, '', exploreUrl(next)); window.dispatchEvent(new Event(navigationEvent)); setChapter('work'); setSaveState('idle'); requestAnimationFrame(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo?.({ top: 0, behavior: 'instant' }); }); };
+  const navigate = (next: ExploreState) => { saveGeneration.current += 1; window.history.pushState(null, '', exploreUrl(next)); window.dispatchEvent(new Event(navigationEvent)); setSaveState('idle'); requestAnimationFrame(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo?.({ top: 0, behavior: 'instant' }); }); };
   const direction = data?.directions.find(d => d.id === state.direction);
   const career = data?.careers.find(c => c.id === state.career);
   const parent = data?.careers.find(c => c.id === career?.parentCareerId);
@@ -99,7 +98,6 @@ export default function ExploreCareers() {
   const common = { previous: text.previous, next: text.next, hint: text.swipe };
   const choices = !data ? [] : home ? data.directions : specialization ? data.careers.filter(c => career?.specializationIds?.includes(c.id)) : state.step === 'industries' ? data.industries.filter(i => direction?.industryIds.includes(i.id)).map(i => ({ ...i, summary: i.description })) : data.careers.filter(c => !c.parentCareerId && (state.industry ? data.industries.find(i => i.id === state.industry)?.careerIds.includes(c.id) : direction ? direction.careerIds.includes(c.id) : true) && `${c.title} ${c.summary}`.toLocaleLowerCase(locale).includes(state.q.toLocaleLowerCase(locale)));
   const chapters = [{ id: 'work', label: text.work, values: career?.activities || [] }, { id: 'skills', label: text.skills, values: career?.skills || [] }, { id: 'workplaces', label: text.workplaces, values: career?.workplaces || [] }, { id: 'good', label: text.good, values: career?.tradeoffs || [] }];
-  const currentChapter = chapters.find(c => c.id === chapter)!;
   return <div className={styles.page}>
     <Header />
     <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={tone(direction?.presentation)}>
@@ -130,11 +128,14 @@ export default function ExploreCareers() {
         </div>
         <header className={styles.intro}><p className={styles.eyebrow}>{text.future}</p><h1 ref={heading} tabIndex={-1}>{text.closer}<br /><span>{career.title}.</span></h1><p>{career.summary}</p></header>
         {career.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
-        <div className={styles.chapters} role="tablist" aria-label={career.title}>{chapters.map((item, i) => <button key={item.id} role="tab" id={`chapter-${item.id}`} aria-controls={`panel-${item.id}`} aria-selected={chapter === item.id} tabIndex={chapter === item.id ? 0 : -1} onClick={() => setChapter(item.id)} onKeyDown={event => { if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); const target = chapters[(i + (event.key === 'ArrowRight' ? 1 : 3)) % 4]; setChapter(target.id); document.getElementById(`chapter-${target.id}`)?.focus(); } }}><span>{String(i + 1).padStart(2, '0')}</span>{item.label}</button>)}</div>
-        <section className={styles.chapterPanel} id={`panel-${chapter}`} role="tabpanel" aria-labelledby={`chapter-${chapter}`}>
-          {(chapter === 'skills' || chapter === 'workplaces') && currentChapter.values.length > 0 && <h2 className={styles.chapterTitle}>{chapter === 'skills' ? headings.skillsTitle : headings.placesTitle}</h2>}
-          {!currentChapter.values.length ? <p className={styles.missing}>{text.missing}</p> : chapter === 'skills' || chapter === 'workplaces' ? <div className={`${styles.wordBubbles} ${chapter === 'workplaces' ? styles.places : ''}`}>{currentChapter.values.map((value, i) => <span key={`${i}:${value}`} style={{ '--bubble-delay': `${i * -.8}s` } as CSSProperties}>{value}</span>)}</div> : <VisualCarousel key={`${career.id}:${chapter}`} {...common} hint="" variant="fact" label={currentChapter.label} items={currentChapter.values.map((value, i) => ({ id: String(i), title: `${i + 1}` }))} renderItem={(i) => <div className={styles.factBubble}><p>{currentChapter.values[i]}</p></div>} />}
-        </section>
+        <div className={styles.careerSections}>
+          {chapters.map((item, i) => <section className={styles.careerSection} key={item.id} aria-labelledby={`section-${item.id}`}>
+            <header><span className={styles.sectionNumber} aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><h2 id={`section-${item.id}`}>{item.label}</h2></header>
+            {!item.values.length ? <p className={styles.sectionEmpty}>{text.missing}</p> : item.id === 'skills' ?
+              <ul className={styles.skillList}>{item.values.map((value, index) => <li key={`${index}:${value}`}>{value}</li>)}</ul> :
+              <ul className={styles.factList}>{item.values.map((value, index) => <li key={`${index}:${value}`}>{value}</li>)}</ul>}
+          </section>)}
+        </div>
         <section className={styles.decision}><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href="/assessment">{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
           {saveState === 'error' && <p role="alert">{text.saveError}</p>}{saveState === 'saved' && <p role="status">{text.saved}</p>}
           </div>

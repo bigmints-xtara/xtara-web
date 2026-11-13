@@ -127,10 +127,9 @@ describe("career exploration", () => {
     window.history.replaceState({}, '', '/explore?direction=health&career=doctor&step=work');
     mount();
     await screen.findByRole('heading', { level: 1 });
-    expect(screen.getAllByRole('tab')).toHaveLength(4);
-    for (const tab of screen.getAllByRole('tab')) {
-      fireEvent.click(tab);
-      expect(screen.getByRole('tabpanel')).toHaveTextContent('More about this part of the career is coming soon.');
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    for (const name of ['What you’ll do', 'Skills you’ll use', 'Where you’ll work', 'Good to know']) {
+      expect(screen.getByRole('region', { name })).toHaveTextContent('More about this part of the career is coming soon.');
     }
     fireEvent.click(screen.getAllByRole('button', { name: 'Help people' }).at(-1)!);
     expect(window.location.search).toContain('step=roles');
@@ -163,11 +162,8 @@ describe("career exploration", () => {
     expect(await screen.findByText('Plan structures')).toBeInTheDocument();
     expect(screen.getByAltText('A civil engineer')).toHaveAttribute('src', 'https://example.org/civil.webp');
     expect(screen.queryByText('Civil engineering degree')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: /Skills you’ll use/ }));
     expect(screen.getByText('Listening')).toBeInTheDocument();
-    fireEvent.keyDown(screen.getByRole('tab', { name: /Skills you’ll use/ }), { key: 'ArrowRight' });
     expect(screen.getByText('Building sites')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('tab', { name: /Good to know/ }));
     expect(screen.getByText('Work can happen outdoors')).toBeInTheDocument();
   });
   it("opens an optional specialization with its three connected contexts", async () => {
