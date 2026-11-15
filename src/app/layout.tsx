@@ -14,6 +14,7 @@ import WaitlistScript from "@/components/WaitlistScript";
 import { OrganizationProvider } from "@/context/OrganizationContext";
 import WorkspaceRouteBoundary from "@/components/auth/WorkspaceRouteBoundary";
 import MvpRouteBoundary from "@/components/MvpRouteBoundary";
+import AppearanceBootstrap from "@/components/AppearanceBootstrap";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -61,6 +62,7 @@ gtag('config', '${gaMeasurementId}');`}
         <WaitlistScript />
         <ReactQueryProvider>
         <AuthProvider>
+          <AppearanceBootstrap />
           <OrganizationProvider>
             <LanguageProvider initialLocale={locale}>
               <Suspense fallback={null}>

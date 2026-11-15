@@ -30,6 +30,7 @@ import { useTranslations } from "@/i18n/language-provider";
 import type { AcademicGrade } from "@/lib/academic-progress-api";
 import { defaultAcademicYear } from "@/lib/academic-progress-api";
 import { xtaraApi } from "@/lib/api/client";
+import { applyTheme } from "@/lib/appearance";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import { getStateDetails, getStates } from "@/lib/firebase/location";
 import { updatePersonalInfo } from "@/lib/firebase/profile-service";
@@ -621,11 +622,6 @@ function ProfilePreferences({ locale }: { locale: keyof typeof structureCopy }) 
 
 function ProfileLink({ href, icon: Icon, label }: { href: string; icon: typeof User; label: string }) {
   return <Link href={href} className="flex min-h-14 items-center gap-3 px-4 py-3 text-sm font-semibold text-primary transition-colors hover:bg-muted/40"><Icon className="h-5 w-5" /><span className="flex-1">{label}</span><span aria-hidden="true">›</span></Link>;
-}
-
-function applyTheme(theme: string) {
-  const useDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  document.documentElement.classList.toggle("dark", useDark);
 }
 
 function DescriptionGrid({ items }: { items: Array<[string, string]> }) { return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{items.map(([label, value]) => <InfoBox key={label} label={label} value={value} />)}</div>; }
