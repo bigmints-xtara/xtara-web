@@ -6,6 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ShieldCheck, UserRound } from "lucide-react";
 
 import { OrganizationLoading, OrganizationError } from "@/components/organization/OrganizationPageState";
+import { ConversationJournal } from '@/components/guidance/ConversationJournal';
+import styles from '@/components/guidance/guidance.module.css';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StudentAssessmentVisuals } from "@/components/organization/TeacherGuidance";
@@ -75,16 +77,17 @@ export default function OrganizationStudentProfilePage() {
 
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={`${styles.garden} ${styles.canvas}`}>
       <main className="mx-auto max-w-5xl px-5 py-8 pb-20 sm:py-12">
         <Button asChild variant="ghost" className="-ml-3"><Link href="/organization/learners"><ArrowLeft className="mr-2 h-4 w-4" />{copy.back}</Link></Button>
 
-        <section className="mt-5 overflow-hidden rounded-3xl bg-primary p-6 text-white sm:p-8">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-4"><span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10"><UserRound className="h-7 w-7" /></span><div><p className="text-sm text-white/60">{copy.profile}</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">{student.displayName}</h1></div></div><div className="flex flex-wrap gap-2">{unitNames.map((name) => <Badge key={name} className="border-white/20 bg-white/10 text-white" variant="outline">{name}</Badge>)}</div></div>
+        <section className={styles.hero}>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-4"><span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10"><UserRound className="h-7 w-7" /></span><div><p className="text-sm text-[var(--muted)]">{copy.profile}</p><h1 className="mt-1 text-3xl font-semibold tracking-tight">{student.displayName}</h1></div></div><div className="flex flex-wrap gap-2">{unitNames.map((name) => <Badge key={name} className="border-[var(--line)] bg-[var(--mint)] text-[var(--ink)]" variant="outline">{name}</Badge>)}</div></div>
         </section>
 
         <div className="mt-6 flex gap-3 rounded-2xl border bg-muted/50 p-4 text-sm leading-6 text-muted-foreground"><ShieldCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0" /><p>{copy.privacyNote}</p></div>
         <StudentAssessmentVisuals student={student} />
+        <ConversationJournal membershipId={membershipId} studentName={student.displayName} />
 
       </main>
     </div>

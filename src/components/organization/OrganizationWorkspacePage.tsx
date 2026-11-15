@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { OrganizationLoading, OrganizationError } from "@/components/organization/OrganizationPageState";
+import guidanceStyles from '@/components/guidance/guidance.module.css';
 import { TeacherOverview, TeacherStudentList } from "./TeacherGuidance";
 import NavigationPending from "@/components/organization/NavigationPending";
 import { useTranslations } from "@/i18n/language-provider";
@@ -106,7 +107,7 @@ export default function OrganizationWorkspacePage({ section = "overview" }: { se
   if (!context) return <NoWorkspace />;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={`${guidanceStyles.garden} ${guidanceStyles.canvas}`}>
       <main className="mx-auto max-w-7xl px-5 py-8 pb-20 sm:py-10">
         <section className="flex flex-wrap items-center justify-between gap-3 border-b pb-5">
           <h1 className="text-xl font-semibold tracking-tight">{context.organization.name}</h1>

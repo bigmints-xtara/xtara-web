@@ -76,7 +76,7 @@ export type OrganizationMember = {
   joinedAt?: string | null;
   consentStatus: string;
   assessmentStatus: "completed" | "pending";
-  sharing?: { assessment: boolean; direction: boolean; actions: boolean };
+  sharing?: { assessment: boolean; direction: boolean; actions: boolean; followUp?: boolean };
   guidance?: { code: GuidanceCode; needsAttention: boolean };
   assessmentSummary?: {
     stage?: string | null;

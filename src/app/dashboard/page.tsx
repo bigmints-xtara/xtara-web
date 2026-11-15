@@ -1,4 +1,5 @@
 "use client";
+import { StudentGuidanceEntry } from "@/components/guidance/ConversationJournal";
 
 import { useAuth } from "@/context/AuthContext";
 import styles from "@/components/journey/journey.module.css";
@@ -35,7 +36,8 @@ export default function DashboardPage() {
         <div className={styles.surface}>
             <Navbar />
             <OrganizationMembershipCard />
-            <UserDashboard />
+            <StudentGuidanceEntry />
+        <UserDashboard />
             <Footer />
         </div>
     );
