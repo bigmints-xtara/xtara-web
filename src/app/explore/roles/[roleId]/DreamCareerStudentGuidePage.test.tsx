@@ -26,6 +26,8 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/mvp-navigation', () => ({ get MVP_NAVIGATION_ENABLED() { return mocks.mvp; } }));
+// Artwork transport is covered by CareerDirectionArtwork.test.tsx.
+vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
 vi.mock('@/components/Header', () => ({ default: () => <header>Header</header> }));
 vi.mock('@/components/Footer', () => ({ default: () => <footer>Footer</footer> }));
 vi.mock('@/components/career-path/SlideshowOverlay', () => ({ default: ({ isOpen }: { isOpen: boolean }) => isOpen ? <div>Career conversation</div> : null }));

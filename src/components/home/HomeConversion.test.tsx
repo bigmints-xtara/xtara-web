@@ -14,6 +14,9 @@ vi.mock("@/context/AuthContext", () => ({
   useAuth: () => ({ user: null, userProfile: null, loading: false }),
 }));
 
+// Artwork transport is covered by CareerDirectionArtwork.test.tsx.
+vi.mock("@/components/journey/CareerDirectionArtwork", () => ({ default: () => null }));
+
 vi.mock("@/lib/analytics", () => ({ trackEvent: vi.fn() }));
 
 import Benefits from "@/components/Benefits/Benefits";
