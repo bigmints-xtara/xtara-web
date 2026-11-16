@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from "next/navigation";
 import { LanguageProvider } from "@/i18n/language-provider";
 import { render as renderUI, fireEvent, screen, waitFor } from "@testing-library/react";
@@ -137,4 +138,4 @@ describe("organization dashboard role views", () => {
   });
 });
 
-function render(ui: React.ReactNode) { return renderUI(<LanguageProvider initialLocale="en">{ui}</LanguageProvider>); }
+function render(ui: React.ReactNode) { return renderUI(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { enabled: false } } })}><LanguageProvider initialLocale="en">{ui}</LanguageProvider></QueryClientProvider>); }

@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { assessmentV2StorageKey, type DiscoveryResult } from "@/lib/assessment-v2";
 
+vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
+
 const mocks = vi.hoisted(() => ({
   push: vi.fn(),
 }));

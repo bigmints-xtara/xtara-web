@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { LanguageProvider } from '@/i18n/language-provider';
@@ -8,9 +9,13 @@ import { StudentAssessmentVisuals, TeacherStudentList } from './TeacherGuidance'
 const student: OrganizationMember = {
   id: 'school_asha', userId: 'asha', role: 'student', unitIds: ['8a'], displayName: 'Asha', consentStatus: 'active', assessmentStatus: 'completed',
   sharing: { assessment: true, direction: true, actions: true }, guidance: { code: 'choose_direction', needsAttention: true },
-  assessmentSummary: { completedAt: '2026-11-01', areas: [{ id: 'tech', title: 'Technology', evidence: 'developing' }], signals: [{ id: 'making', title: 'Making', evidence: 'noticed' }] }, directionProgress: null,
+  assessmentSummary: { completedAt: '2026-11-01', areas: [{ id: 'technology', title: 'Technology', evidence: 'developing' }], signals: [{ id: 'making', title: 'Making', evidence: 'noticed' }] }, directionProgress: null,
 };
-function show(ui: React.ReactNode, locale: 'en' | 'ml' | 'hi' | 'ta' = 'en') { return render(<LanguageProvider initialLocale={locale}>{ui}</LanguageProvider>); }
+function show(ui: React.ReactNode, locale: 'en' | 'ml' | 'hi' | 'ta' = 'en') {
+  const client = new QueryClient({ defaultOptions: { queries: { enabled: false } } });
+  client.setQueryData(['career-explorer', locale], { directions: [{ id: 'digital-and-computing', illustration: { url: 'https://xtara.ai/canonical-digital.hash.webp', alt: 'Digital' } }] });
+  return render(<QueryClientProvider client={client}><LanguageProvider initialLocale={locale}>{ui}</LanguageProvider></QueryClientProvider>);
+}
 beforeEach(() => Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: () => null } }));
 
 describe('teacher guidance', () => {
@@ -37,9 +42,10 @@ describe('teacher guidance', () => {
     expect(screen.getByText('Noticed')).toBeInTheDocument();
     expect(screen.getByText('Which of these directions makes you curious, and why?')).toBeInTheDocument();
     expect(screen.queryByText(/\d+%/)).not.toBeInTheDocument();
+    expect(document.querySelector('img')).toHaveAttribute('src', 'https://xtara.ai/canonical-digital.hash.webp');
   });
   it('keeps hidden progress unknown and supports missing evidence and invalid dates', () => {
-    show(<StudentAssessmentVisuals student={{ ...student, assessmentSummary: { areas: [{ id: 'tech', title: 'Technology' }] }, sharing: { assessment: true, direction: true, actions: false }, directionProgress: { selectedCareerCount: 1, completedActions: null, reviewOn: 'invalid' } }} />);
+    show(<StudentAssessmentVisuals student={{ ...student, assessmentSummary: { areas: [{ id: 'technology', title: 'Technology' }] }, sharing: { assessment: true, direction: true, actions: false }, directionProgress: { selectedCareerCount: 1, completedActions: null, reviewOn: 'invalid' } }} />);
     expect(screen.getByText('No strength rating provided')).toBeInTheDocument();
     expect(screen.getAllByText('Not shared').length).toBeGreaterThan(0);
   });

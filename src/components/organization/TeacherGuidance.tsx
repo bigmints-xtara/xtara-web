@@ -10,8 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import NavigationPending from './NavigationPending';
-import Image from 'next/image';
-import { getCareerDirectionImage } from '@/lib/career-direction-imagery';
+import CareerDirectionArtwork from '@/components/journey/CareerDirectionArtwork';
 import { TeacherConversationFeed, useConversationCopy } from '@/components/guidance/ConversationJournal';
 import styles from '@/components/guidance/guidance.module.css';
 
@@ -46,7 +45,7 @@ export function TeacherOverview({ dashboard }: { dashboard: OrganizationDashboar
     <header className={styles.hero}><div><p className={styles.eyebrow}><Sprout size={18} />{journal.connected}</p><h2>{journal.classGarden}</h2><p>{journal.classGardenIntro}</p></div><div className={styles.sun}><strong>{total}</strong><span>{c.students}</span></div></header>
     <div className={styles.statLine}>{[[c.assessed, dashboard.summary.assessmentCompleted], [c.pending, dashboard.summary.awaitingAssessment], [c.followUp, dashboard.summary.followUpNeeded]].map(([label, value]) => <p key={label}><strong>{value}</strong>{label}</p>)}</div>
     <div className={styles.overviewGrid}><TeacherStudentList students={dashboard.students} attentionOnly /><TeacherConversationFeed /></div>
-    <section aria-labelledby="class-interests"><h2 id="class-interests" className={styles.sectionHeading}>{c.classInterests}</h2><p className={styles.intro}>{c.classNote}</p><div className={styles.classIslands}>{dashboard.cohortInsights.map(item => { const image = getCareerDirectionImage(item.id); return <article key={item.id} className={styles.classIsland}>{image ? <Image src={image} alt="" width={220} height={150} /> : <Compass aria-hidden="true" size={60} className="mx-auto my-6" />}<p>{item.title}</p><div aria-hidden="true" className={styles.track}><span style={{ width: `${total ? Math.min(100, item.count / total * 100) : 0}%` }} /></div><small>{item.count} / {total} {c.students}</small></article>; })}</div>{!dashboard.cohortInsights.length && <p className={styles.intro}>{c.noCohort}</p>}<p className={`${styles.intro} mt-5 text-xs`}>{c.privacy.replace('{count}', String(dashboard.privacyThreshold))}</p></section>
+    <section aria-labelledby="class-interests"><h2 id="class-interests" className={styles.sectionHeading}>{c.classInterests}</h2><p className={styles.intro}>{c.classNote}</p><div className={styles.classIslands}>{dashboard.cohortInsights.map(item => { return <article key={item.id} className={styles.classIsland}><CareerDirectionArtwork directionId={item.id} width={220} height={150} fallback={<Compass aria-hidden="true" size={60} className="mx-auto my-6" />} /><p>{item.title}</p><div aria-hidden="true" className={styles.track}><span style={{ width: `${total ? Math.min(100, item.count / total * 100) : 0}%` }} /></div><small>{item.count} / {total} {c.students}</small></article>; })}</div>{!dashboard.cohortInsights.length && <p className={styles.intro}>{c.noCohort}</p>}<p className={`${styles.intro} mt-5 text-xs`}>{c.privacy.replace('{count}', String(dashboard.privacyThreshold))}</p></section>
   </section>;
 }
 
@@ -56,8 +55,7 @@ function EvidenceChart({ title, items, kind }: { title: string; items: Assessmen
   return <section><h3 className={styles.sectionHeading}>{title}</h3><div className={kind === 'areas' ? styles.islands : styles.strengths}>{items.map(item => {
     const known = kind === 'areas' ? item.evidence === 'early' || item.evidence === 'developing' : item.evidence === 'noticed' || item.evidence === 'repeated';
     const strong = item.evidence === 'developing' || item.evidence === 'repeated';
-    const image = kind === 'areas' ? getCareerDirectionImage(item.id) : null;
-    return <article key={item.id} className={kind === 'areas' ? styles.island : styles.strength}>{image ? <Image src={image} alt="" width={240} height={180} /> : <Sparkles aria-hidden="true" size={kind === 'areas' ? 48 : 20} className="mx-auto" />}<div><h3>{item.title}</h3><p className={styles.evidence}>{known && <><i data-filled /><i data-filled={strong} /></>}{known && item.evidence ? c[item.evidence] : c.unknown}</p></div></article>;
+    return <article key={item.id} className={kind === 'areas' ? styles.island : styles.strength}>{kind === 'areas' ? <CareerDirectionArtwork directionId={item.id} width={240} height={180} /> : <Sparkles aria-hidden="true" size={20} className="mx-auto" />}<div><h3>{item.title}</h3><p className={styles.evidence}>{known && <><i data-filled /><i data-filled={strong} /></>}{known && item.evidence ? c[item.evidence] : c.unknown}</p></div></article>;
   })}</div>{!items.length && <p className={styles.intro}>{c.noEvidence}</p>}</section>;
 }
 

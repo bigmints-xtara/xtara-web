@@ -32,7 +32,7 @@
 .island { position:relative; text-align:center; padding:20px 16px 24px; border-radius:48% 48% 24px 24px; background:var(--mint); border:1px solid transparent; }
 .island:nth-child(3n+2) { background:var(--lilac); }
 .island:nth-child(3n) { background:color-mix(in srgb,var(--sun) 28%,var(--paper)); }
-.island img { width:100%; height:168px; object-fit:contain; mix-blend-mode:multiply; }
+.island img { width:100%; height:168px; object-fit:contain; }
 :global(.dark) .island img { mix-blend-mode:normal; border-radius:32px; }
 .island h3 { font-size:17px; line-height:1.45; font-weight:500; margin-top:12px; }
 .evidence { display:flex; gap:5px; justify-content:center; align-items:center; margin-top:12px; font-size:11px; color:var(--muted); }
@@ -102,7 +102,7 @@
 @media(max-width:480px) {
   .islands { grid-template-columns:1fr; }
   .island { display:grid; grid-template-columns:96px minmax(0,1fr); align-items:center; gap:16px; padding:16px; border-radius:28px; text-align:left; }
-  .island img { height:96px; object-fit:cover; border-radius:20px; }
+  .island img { height:96px; object-fit:contain; border-radius:20px; }
   .island h3 { margin-top:0; }
   .island .evidence { justify-content:flex-start; }
 }

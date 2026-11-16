@@ -1,27 +1,29 @@
 import { describe, expect, it } from 'vitest';
-
-import { getCareerDirectionImage, supportedCareerDirectionIds } from './career-direction-imagery';
-
-describe('career direction imagery', () => {
-  it('covers every canonical and legacy Career Direction with a reusable local image', () => {
+import type { ExplorerDirection } from '@/types/career-explorer';
+import { canonicalCareerDirectionId, getCareerDirectionIllustration, supportedCareerDirectionIds } from './career-direction-imagery';
+const direction = (id: string, url = 'https://xtara.ai/xtara-service/media/direction.hash.webp'): ExplorerDirection => ({
+  id, title: 'Digital', summary: '', careerIds: [], industryIds: [], translationFallback: false,
+  illustration: { url, alt: 'Localized published description', width: 960, height: 960 },
+});
+describe('canonical Career Direction imagery', () => {
+  it('resolves canonical and legacy identities without owning image paths', () => {
     expect(supportedCareerDirectionIds).toHaveLength(17);
-    for (const directionId of supportedCareerDirectionIds) {
-      expect(getCareerDirectionImage(directionId)).toMatch(/^\/images\/career-directions\/[a-z-]+\.webp$/);
-    }
+    expect(canonicalCareerDirectionId('technology')).toBe('digital-and-computing');
+    const published = direction('digital-and-computing');
+    expect(getCareerDirectionIllustration([published], 'technology')).toBe(published.illustration);
+    expect(getCareerDirectionIllustration([published], published.id)).toBe(published.illustration);
   });
-
-  it('maps legacy directions to the canonical shared asset', () => {
-    expect(getCareerDirectionImage('technology')).toBe(getCareerDirectionImage('digital-and-computing'));
-    expect(getCareerDirectionImage('health')).toBe(getCareerDirectionImage('health-and-wellbeing'));
-    expect(getCareerDirectionImage('science')).toBe(getCareerDirectionImage('science-and-discovery'));
-    expect(getCareerDirectionImage('business')).toBe(getCareerDirectionImage('business-finance-and-entrepreneurship'));
-    expect(getCareerDirectionImage('design')).toBe(getCareerDirectionImage('arts-design-and-creative-media'));
-    expect(getCareerDirectionImage('society')).toBe(getCareerDirectionImage('education-and-human-development'));
+  it('follows changed published artwork and preserves localized metadata', () => {
+    const updated = direction('digital-and-computing', 'https://example.com/new-immutable-art.webp');
+    expect(getCareerDirectionIllustration([updated], 'technology')).toEqual(updated.illustration);
+    expect(getCareerDirectionIllustration([direction('technology')], 'digital-and-computing')).not.toBeNull();
   });
-
-  it('does not guess imagery for an unknown direction', () => {
-    expect(getCareerDirectionImage('unknown-direction')).toBeNull();
-    expect(getCareerDirectionImage('__proto__')).toBeNull();
-    expect(getCareerDirectionImage(null)).toBeNull();
+  it('does not invent an asset on missing content, unknown IDs or unsafe URLs', () => {
+    expect(getCareerDirectionIllustration(undefined, 'technology')).toBeNull();
+    expect(getCareerDirectionIllustration([direction('digital-and-computing')], 'unknown')).toBeNull();
+    expect(getCareerDirectionIllustration([], '__proto__')).toBeNull();
+    expect(canonicalCareerDirectionId('__proto__')).toBeNull();
+    expect(getCareerDirectionIllustration([{ ...direction('digital-and-computing'), illustration: undefined }], 'technology')).toBeNull();
+    expect(getCareerDirectionIllustration([direction('digital-and-computing', 'javascript:alert(1)')], 'technology')).toBeNull();
   });
 });

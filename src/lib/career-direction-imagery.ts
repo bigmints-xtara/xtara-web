@@ -1,18 +1,21 @@
-const canonicalDirectionImages = {
-  'arts-design-and-creative-media': '/images/career-directions/arts-design-and-creative-media.webp',
-  'business-finance-and-entrepreneurship': '/images/career-directions/business-finance-and-entrepreneurship.webp',
-  'communication-culture-and-society': '/images/career-directions/communication-culture-and-society.webp',
-  'digital-and-computing': '/images/career-directions/digital-and-computing.webp',
-  'education-and-human-development': '/images/career-directions/education-and-human-development.webp',
-  'engineering-and-built-world': '/images/career-directions/engineering-and-built-world.webp',
-  'environment-agriculture-and-sustainability': '/images/career-directions/environment-agriculture-and-sustainability.webp',
-  'government-law-and-public-safety': '/images/career-directions/government-law-and-public-safety.webp',
-  'health-and-wellbeing': '/images/career-directions/health-and-wellbeing.webp',
-  'science-and-discovery': '/images/career-directions/science-and-discovery.webp',
-  'travel-hospitality-sports-and-experiences': '/images/career-directions/travel-hospitality-sports-and-experiences.webp',
-} as const;
+import type { ExplorerDirection, ExplorerIllustration } from '@/types/career-explorer';
 
-const legacyDirectionAliases: Record<string, keyof typeof canonicalDirectionImages> = {
+const canonicalDirectionIds = [
+  'arts-design-and-creative-media',
+  'business-finance-and-entrepreneurship',
+  'communication-culture-and-society',
+  'digital-and-computing',
+  'education-and-human-development',
+  'engineering-and-built-world',
+  'environment-agriculture-and-sustainability',
+  'government-law-and-public-safety',
+  'health-and-wellbeing',
+  'science-and-discovery',
+  'travel-hospitality-sports-and-experiences',
+] as const;
+type CanonicalDirectionId = typeof canonicalDirectionIds[number];
+
+const legacyDirectionAliases: Record<string, CanonicalDirectionId> = {
   business: 'business-finance-and-entrepreneurship',
   design: 'arts-design-and-creative-media',
   health: 'health-and-wellbeing',
@@ -22,23 +25,35 @@ const legacyDirectionAliases: Record<string, keyof typeof canonicalDirectionImag
 };
 
 export const supportedCareerDirectionIds = [
-  ...Object.keys(canonicalDirectionImages),
+  ...canonicalDirectionIds,
   ...Object.keys(legacyDirectionAliases),
 ].sort();
 
 export function canonicalCareerDirectionId(
   directionId: string | null | undefined,
-): keyof typeof canonicalDirectionImages | null {
+): CanonicalDirectionId | null {
   if (!directionId) return null;
-  if (Object.prototype.hasOwnProperty.call(canonicalDirectionImages, directionId)) {
-    return directionId as keyof typeof canonicalDirectionImages;
+  if (canonicalDirectionIds.includes(directionId as CanonicalDirectionId)) {
+    return directionId as CanonicalDirectionId;
   }
   return Object.prototype.hasOwnProperty.call(legacyDirectionAliases, directionId)
     ? legacyDirectionAliases[directionId]
     : null;
 }
 
-export function getCareerDirectionImage(directionId: string | null | undefined): string | null {
+/** Resolve artwork from the same published catalogue as Explorer, never a local substitute. */
+export function getCareerDirectionIllustration(
+  directions: readonly ExplorerDirection[] | undefined,
+  directionId: string | null | undefined,
+): ExplorerIllustration | null {
   const canonicalId = canonicalCareerDirectionId(directionId);
-  return canonicalId ? canonicalDirectionImages[canonicalId] : null;
+  if (!directionId || !directions) return null;
+  const direction = directions.find(item => item.id === directionId)
+    ?? (canonicalId ? directions.find(item => canonicalCareerDirectionId(item.id) === canonicalId) : undefined);
+  const illustration = direction?.illustration;
+  if (!illustration) return null;
+  try {
+    const url = new URL(illustration.url);
+    return ['http:', 'https:'].includes(url.protocol) ? illustration : null;
+  } catch { return null; }
 }

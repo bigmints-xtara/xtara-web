@@ -8,6 +8,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assessmentV2StorageKey, type DiscoveryResult } from '@/lib/assessment-v2';
 import { createAreaDirectionPlan, directionStorageKey, selectDirectionRole, setDreamCareers } from '@/lib/direction';
 
+vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
+
 const mocks = vi.hoisted(() => ({
   mvpEnabled: false,
   hydrate: vi.fn(),
