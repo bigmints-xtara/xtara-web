@@ -30,7 +30,7 @@ import { useTranslations } from "@/i18n/language-provider";
 import type { AcademicGrade } from "@/lib/academic-progress-api";
 import { defaultAcademicYear } from "@/lib/academic-progress-api";
 import { xtaraApi } from "@/lib/api/client";
-import { applyTheme } from "@/lib/appearance";
+import { applyTheme, appearanceSelectionEnabled } from "@/lib/appearance";
 import { getFirebaseAuth } from "@/lib/firebase-client";
 import { getStateDetails, getStates } from "@/lib/firebase/location";
 import { updatePersonalInfo } from "@/lib/firebase/profile-service";
@@ -612,7 +612,7 @@ function ProfilePreferences({ locale }: { locale: keyof typeof structureCopy }) 
 
   return <ProfileCard id="preferences" icon={Palette} title={text.preferences} description={text.preferencesHelp}>
     <div className="divide-y divide-primary/10 rounded-2xl border border-primary/10">
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><Palette className="h-5 w-5 text-primary" /><span className="text-sm font-semibold text-primary">{text.appearance}</span></div><div className="w-full sm:w-48"><Choice value={theme} options={["system", "light", "dark"]} placeholder={text.system} getLabel={(value) => value === "light" ? text.light : value === "dark" ? text.dark : text.system} onChange={changeTheme} disabled={loading || saving} /></div></div>
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><Palette className="h-5 w-5 text-primary" /><span className="text-sm font-semibold text-primary">{text.appearance}</span></div><div className="w-full sm:w-48">{appearanceSelectionEnabled ? <Choice value={theme} options={["system", "light", "dark"]} placeholder={text.system} getLabel={(value) => value === "light" ? text.light : value === "dark" ? text.dark : text.system} onChange={changeTheme} disabled={loading || saving} /> : <span className="text-sm text-muted-foreground">{text.light}</span>}</div></div>
       <div className="flex items-center justify-between gap-4 p-4"><div className="flex items-center gap-3"><Languages className="h-5 w-5 text-primary" /><span className="text-sm font-semibold text-primary">Language</span></div><LanguageSwitcher /></div>
     </div>
     {saving ? <p role="status" className="mt-3 text-sm text-muted-foreground">Saving…</p> : null}

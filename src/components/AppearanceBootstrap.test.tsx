@@ -1,4 +1,4 @@
-import { act, cleanup, render, waitFor } from "@testing-library/react";
+import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AppearanceBootstrap from "@/components/AppearanceBootstrap";
 import { applyTheme } from "@/lib/appearance";
@@ -45,16 +45,18 @@ describe("global appearance", () => {
     act(() => { listeners.forEach((listener) => listener()); });
   }
 
-  it("restores the saved preference on a fresh page mount using the signed-in account", async () => {
+  it("keeps light appearance when a signed-in account restores a saved dark preference", async () => {
     mocks.get.mockResolvedValue({ preferences: { theme: "dark" } });
     const first = render(<AppearanceBootstrap />);
-    await waitFor(() => expect(document.documentElement).toHaveClass("dark"));
+    await act(async () => {});
+    expect(document.documentElement).not.toHaveClass("dark");
     expect(mocks.get).toHaveBeenCalledWith("/me/preferences", { expectedUserId: "learner-1" });
-    expect(document.documentElement.style.colorScheme).toBe("dark");
+    expect(document.documentElement.style.colorScheme).toBe("light");
     first.unmount();
     applyTheme("light");
     render(<AppearanceBootstrap />);
-    await waitFor(() => expect(document.documentElement).toHaveClass("dark"));
+    await act(async () => {});
+    expect(document.documentElement).not.toHaveClass("dark");
     expect(mocks.get).toHaveBeenCalledTimes(2);
   });
 
@@ -85,43 +87,43 @@ describe("global appearance", () => {
     await act(async () => request.resolve({ preferences: { theme: "dark" } }));
     expect(document.documentElement).not.toHaveClass("dark");
     changeSystem(true);
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
   });
 
-  it("tracks OS changes for system mode and respects subsequent profile selections", async () => {
+  it("keeps light appearance across OS changes and subsequent preference updates", async () => {
     mocks.get.mockResolvedValue({ preferences: { theme: "system" } });
     render(<AppearanceBootstrap />);
     await act(async () => {});
     changeSystem(true);
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
     applyTheme("light");
     changeSystem(false);
     changeSystem(true);
     expect(document.documentElement).not.toHaveClass("dark");
     applyTheme("dark");
     changeSystem(false);
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
     applyTheme("system");
     expect(document.documentElement).not.toHaveClass("dark");
   });
 
-  it("does not replace a newer settings selection with an older bootstrap read", async () => {
+  it("keeps light appearance during a stale preference read", async () => {
     const request = deferred();
     mocks.get.mockReturnValue(request.promise);
     render(<AppearanceBootstrap />);
     applyTheme("dark");
     await act(async () => request.resolve({ preferences: { theme: "light" } }));
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
     changeSystem(false);
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
   });
 
-  it("uses the system setting when preferences cannot be loaded", async () => {
+  it("keeps light appearance when preferences cannot be loaded", async () => {
     systemDark = true;
     mocks.get.mockRejectedValue(new Error("offline"));
     render(<AppearanceBootstrap />);
     await act(async () => {});
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
     changeSystem(false);
     expect(document.documentElement).not.toHaveClass("dark");
   });
@@ -131,7 +133,7 @@ describe("global appearance", () => {
     systemDark = true;
     const view = render(<AppearanceBootstrap />);
     expect(mocks.get).not.toHaveBeenCalled();
-    expect(document.documentElement).toHaveClass("dark");
+    expect(document.documentElement).not.toHaveClass("dark");
     expect(listeners.size).toBe(1);
     view.unmount();
     expect(listeners.size).toBe(0);

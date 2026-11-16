@@ -19,10 +19,8 @@ import AppearanceBootstrap from "@/components/AppearanceBootstrap";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#12192e" },
-  ],
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,7 +43,7 @@ export default async function RootLayout({
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_ID?.trim();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} style={{ colorScheme: "light" }}>
       <body className={`${inter.variable} font-sans antialiased`}>
         {gaMeasurementId ? <>
           <Script
