@@ -6,15 +6,18 @@ import Image from 'next/image';
 
 import { getPlatformIconByName } from '@/utils';
 import { useTranslations } from '@/i18n/language-provider';
+import { resolveAdminRole } from "@/lib/admin-access";
+import { adminNavigationCopy } from "@/lib/admin-navigation";
 import { useAuth } from '@/context/AuthContext';
 import { useOrganizationWorkspace } from '@/context/OrganizationContext';
 import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from '@/lib/mvp-navigation';
 
 const Footer = () => {
     const { t, messages, locale } = useTranslations();
-    const { user } = useAuth();
+    const { user, userProfile, loading: authLoading } = useAuth();
     const { isStaff, loading, error } = useOrganizationWorkspace();
-    const studentMvp = MVP_NAVIGATION_ENABLED && Boolean(user) && !isStaff;
+    const isAdmin = Boolean(user && !user.isAnonymous && resolveAdminRole(userProfile));
+    const studentMvp = MVP_NAVIGATION_ENABLED && Boolean(user && !user.isAnonymous) && !authLoading && !isAdmin && !isStaff;
     const studentLinksReady = studentMvp && !loading && !error;
     const copy = mvpNavigationCopy[locale];
     const year = new Date().getFullYear();
@@ -24,7 +27,7 @@ const Footer = () => {
         <footer className="bg-muted text-foreground py-10">
             <div className="max-w-7xl w-full mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div>
-                    <Link href={studentMvp ? '/dashboard' : '/'} className="flex items-center gap-2">
+                    <Link href={isAdmin ? '/admin' : studentMvp ? '/dashboard' : '/'} className="flex items-center gap-2">
                         <Image
                             src="/images/logo-dark.svg"
                             alt={t("header.logoAlt")}
@@ -45,6 +48,7 @@ const Footer = () => {
                             { href: '/explore', label: copy.exploreCareers },
                             { href: '/profile', label: copy.profile },
                         ].map(({ href, label }) => <li key={href} className="mb-2"><Link href={href} className="hover:text-foreground transition-colors">{label}</Link></li>)}
+                        {isAdmin ? <li><Link href="/admin">{adminNavigationCopy[locale].administration}</Link></li> : null}
                         {!studentMvp && <>
                         <li className="mb-2">
                             <Link href="/about" className="hover:text-foreground transition-colors">{t("footer.links.about")}</Link>

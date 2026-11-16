@@ -25,6 +25,13 @@ describe.each([['marketing', MarketingFooter], ['dashboard', DashboardFooter]] a
     expect(paths).not.toContain('/about');
     expect(paths).toEqual(expect.arrayContaining(['/contact', '/privacy-policy', '/terms-of-use']));
   });
+  it.each(['super_admin', 'admin', 'editor'])('avoids student links for %s', (adminRole) => {
+    mocks.auth.mockReturnValue({ user: { uid: 'admin' }, userProfile: { adminRole }, loading: false });
+    render(<LanguageProvider initialLocale="en"><Footer /></LanguageProvider>);
+    expect(screen.getByRole('link', { name: 'Administration' })).toHaveAttribute('href', '/admin');
+    expect(document.querySelector('a[href="/dashboard"]')).toBeNull();
+    expect(document.querySelector('a[href="/profile"]')).toBeNull();
+  });
   it('preserves public marketing links', () => {
     mocks.auth.mockReturnValue({ user: null });
     render(<LanguageProvider initialLocale="en"><Footer /></LanguageProvider>);

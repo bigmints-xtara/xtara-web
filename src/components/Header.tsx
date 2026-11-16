@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useSyncExternalStore } from 'react';
 import { Bell, BookOpen, Compass, Gamepad2, Menu, Route, Trophy, UserRound } from 'lucide-react';
 import Image from 'next/image';
+import { resolveAdminRole } from "@/lib/admin-access";
+import { adminNavigationCopy } from "@/lib/admin-navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useOrganizationWorkspace } from "@/context/OrganizationContext";
 
@@ -55,20 +57,23 @@ function currentNavigationUrl(urls: string[], pathname: string, fragment: string
 }
 
 const Header = () => {
-    const { user } = useAuth();
+    const { user, userProfile, loading: authLoading } = useAuth();
     const { isStaff, loading: workspaceLoading, error: workspaceError } = useOrganizationWorkspace();
     const { t, locale } = useTranslations();
     const pathname = usePathname().replace(/\/+$/, "") || "/";
     const fragment = useSyncExternalStore(subscribeToFragment, readFragment, serverFragment);
     const isLoggedIn = Boolean(user && !user.isAnonymous);
     const organizationRoute = isWorkspaceRoute("educator", pathname);
-    const learnerShell = isLoggedIn && !workspaceLoading && !workspaceError && !isStaff && !organizationRoute;
-    const logoHref = isStaff || organizationRoute
+    const adminShell = isLoggedIn && Boolean(resolveAdminRole(userProfile)) && !organizationRoute;
+    const learnerShell = isLoggedIn && !authLoading && !adminShell && !workspaceLoading && !workspaceError && !isStaff && !organizationRoute;
+    const logoHref = authLoading ? "/" : adminShell ? WORKSPACE_MANIFESTS.admin.homePath : isStaff || organizationRoute
         ? WORKSPACE_MANIFESTS.educator.homePath
         : isLoggedIn ? WORKSPACE_MANIFESTS.student.homePath : "/";
-    const navItems = isLoggedIn && (workspaceLoading || workspaceError || (organizationRoute && !isStaff))
+    const navItems = isLoggedIn && (authLoading || (!adminShell && (workspaceLoading || workspaceError || (organizationRoute && !isStaff))))
         ? []
-        : isStaff
+        : adminShell
+            ? [{ key: "admin", url: WORKSPACE_MANIFESTS.admin.homePath }, { key: "explore", url: "/explore" }]
+            : isStaff
         ? [
             { key: "organization", url: WORKSPACE_MANIFESTS.educator.homePath },
             { key: "learners", url: `${WORKSPACE_MANIFESTS.educator.homePath}/learners` },
@@ -96,6 +101,7 @@ const Header = () => {
 
     const navLabel = (key: string) => {
         const copy = mvpNavigationCopy[locale];
+        if (key === "admin") return adminNavigationCopy[locale].administration;
         if (MVP_NAVIGATION_ENABLED && key === "career") return copy.myDirection;
         if (MVP_NAVIGATION_ENABLED && key === "explore") return copy.exploreCareers;
         if (MVP_NAVIGATION_ENABLED && key === "profile") return copy.profile;
@@ -121,7 +127,7 @@ const Header = () => {
     };
 
     return <>
-        <header className={`${!isStaff && !organizationRoute ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl`}>
+        <header className={`${!isStaff && !organizationRoute && !adminShell ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl`}>
             <Container className="!px-0">
                 <nav className={headerStyles.navigation}>
                     {/* Logo */}

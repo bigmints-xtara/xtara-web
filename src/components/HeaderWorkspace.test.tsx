@@ -43,6 +43,25 @@ describe("workspace-aware header", () => {
     ]);
   });
 
+  it.each(["super_admin", "admin", "editor"])("uses administration navigation for %s accounts", (adminRole) => {
+    mocks.useAuth.mockReturnValue({ user: { uid: "admin-1" }, userProfile: { uid: "admin-1", adminRole }, loading: false });
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
+    vi.mocked(usePathname).mockReturnValue("/profile");
+    renderHeader();
+    expect(screen.getByRole("link", { name: "Administration" })).toHaveAttribute("href", "/admin");
+    expect(screen.getByRole("link", { name: "Xtara Logo" })).toHaveAttribute("href", "/admin");
+    expect(document.querySelector('a[href="/dashboard"]')).toBeNull();
+    expect(document.querySelector('a[href="/profile"]')).toBeNull();
+    expect(document.querySelector('nav.fixed')).toBeNull();
+  });
+  it("waits for the account role before showing learner links", () => {
+    mocks.useAuth.mockReturnValue({ user: { uid: "admin-1" }, userProfile: null, loading: true });
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
+    renderHeader();
+    expect(document.querySelector('a[href="/dashboard"]')).toBeNull();
+    expect(document.querySelector('a[href="/profile"]')).toBeNull();
+    expect(document.querySelector('nav.fixed')).toBeNull();
+  });
   it("keeps organization staff inside the educator workspace", () => {
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: true, loading: false });
     renderHeader();

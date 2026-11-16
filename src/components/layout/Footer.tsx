@@ -2,15 +2,18 @@
 
 import Link from "next/link";
 import { useTranslations } from "@/i18n/language-provider";
+import { resolveAdminRole } from "@/lib/admin-access";
+import { adminNavigationCopy } from "@/lib/admin-navigation";
 import { useAuth } from '@/context/AuthContext';
 import { useOrganizationWorkspace } from '@/context/OrganizationContext';
 import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from '@/lib/mvp-navigation';
 
 export default function Footer() {
     const { t, locale } = useTranslations();
-    const { user } = useAuth();
+    const { user, userProfile, loading: authLoading } = useAuth();
     const { isStaff, loading, error } = useOrganizationWorkspace();
-    const studentMvp = MVP_NAVIGATION_ENABLED && Boolean(user) && !isStaff;
+    const isAdmin = Boolean(user && !user.isAnonymous && resolveAdminRole(userProfile));
+    const studentMvp = MVP_NAVIGATION_ENABLED && Boolean(user && !user.isAnonymous) && !authLoading && !isAdmin && !isStaff;
     const copy = mvpNavigationCopy[locale];
     const year = new Date().getFullYear();
 
@@ -35,6 +38,7 @@ export default function Footer() {
                                 { href: '/explore', label: copy.exploreCareers },
                                 { href: '/profile', label: copy.profile },
                             ].map(({ href, label }) => <li key={href}><Link href={href} className="text-gray-400 hover:text-white text-sm transition-colors">{label}</Link></li>)}
+                            {isAdmin ? <li><Link href="/admin">{adminNavigationCopy[locale].administration}</Link></li> : null}
                             {!studentMvp && <>
                             <li>
                                 <Link href="/about" className="text-gray-400 hover:text-white text-sm transition-colors">
