@@ -13,8 +13,10 @@ import { canPublishContent, resolveAdminRole } from '@/lib/admin-access';
 import { adminContentApprovalApi } from '@/lib/admin-content-approval';
 import {
   careerContentVersionsApi,
+  isEnglishCatalogueGuideCandidate,
   type CareerContentVersion,
   type CareerContentVersionHistory,
+  type CareerVersionAction,
 } from '@/lib/career-content-versions';
 import { AdminService } from '@/lib/services/adminService';
 import type { AdminEntity } from '@/types/admin';
@@ -179,12 +181,16 @@ const [versionAction, setVersionAction] = useState<string | null>(null);
     setSavedAt(new Date());
   };
 
-  const runVersionAction = async (action: 'create' | 'submit' | 'approve' | 'return-to-draft' | 'promote') => {
+  const runVersionAction = async (action: 'create' | CareerVersionAction) => {
     if (!versionedCollection || !persistedId) return;
-    if ((action === 'approve' || action === 'promote') && !mayApprove) return;
+    const approving = action === 'approve' || action === 'approve-english-guide';
+    const promoting = action === 'promote' || action === 'promote-english-guide';
+    if ((approving || promoting) && !mayApprove) return;
     const confirmations: Partial<Record<typeof action, string>> = {
       approve: 'Approve this version? Your Admin identity will be recorded as the reviewer.',
       promote: 'Promote this approved version to live? Learners will receive it immediately after the persisted write succeeds.',
+      'approve-english-guide': 'Approve only the English guide? Your Admin identity will be recorded as the reviewer.',
+      'promote-english-guide': 'Publish this English guide? Existing translations will be preserved.',
       'return-to-draft': 'Return this version to draft for more editing?',
     };
     if (confirmations[action] && !await requestConfirmation(confirmations[action]!)) return;
@@ -195,7 +201,7 @@ const [versionAction, setVersionAction] = useState<string | null>(null);
       const result = action === 'create'
         ? await careerContentVersionsApi.createDraft(versionedCollection, persistedId)
         : await careerContentVersionsApi.action(versionedCollection, persistedId, activeVersion!, action);
-      if (action === 'promote') {
+      if (promoting) {
         let canonical: AdminEntity | null;
         try {
           canonical = await service.getById(persistedId);
@@ -215,7 +221,7 @@ const [versionAction, setVersionAction] = useState<string | null>(null);
           ? `Version ${result.revision} is ready to edit. The live item is unchanged.`
           : action === 'submit'
             ? `Version ${result.revision} is ready for review.`
-            : action === 'approve'
+            : approving
               ? `Version ${result.revision} is approved and ready to promote.`
               : `Version ${result.revision} is back in draft.`);
       }
@@ -350,20 +356,23 @@ function VersionActions({ active, busy, mayApprove, onAction }: {
   active: CareerContentVersion | null;
   busy: string | null;
   mayApprove: boolean;
-  onAction: (action: 'create' | 'submit' | 'approve' | 'return-to-draft' | 'promote') => Promise<void>;
+  onAction: (action: 'create' | CareerVersionAction) => Promise<void>;
 }) {
   if (!active) return <Button disabled={Boolean(busy)} onClick={() => void onAction('create')} type="button"><GitBranch />{busy === 'create' ? 'Creating…' : 'Create draft'}</Button>;
   if (active.status === 'draft') return <Button disabled={Boolean(busy)} onClick={() => void onAction('submit')} type="button"><Send />{busy === 'submit' ? 'Submitting…' : 'Submit for review'}</Button>;
+  const englishGuide = isEnglishCatalogueGuideCandidate(active);
+  const approveAction = englishGuide ? 'approve-english-guide' : 'approve';
+  const promoteAction = englishGuide ? 'promote-english-guide' : 'promote';
   if (active.status === 'inReview') return (
     <div className="flex flex-wrap gap-2">
       <Button disabled={Boolean(busy)} onClick={() => void onAction('return-to-draft')} type="button" variant="outline"><RotateCcw />Back to draft</Button>
-      <Button disabled={Boolean(busy) || !mayApprove} onClick={() => void onAction('approve')} type="button"><ShieldCheck />{busy === 'approve' ? 'Approving…' : 'Approve version'}</Button>
+      <Button disabled={Boolean(busy) || !mayApprove} onClick={() => void onAction(approveAction)} type="button"><ShieldCheck />{busy === approveAction ? 'Approving…' : englishGuide ? 'Approve English guide' : 'Approve version'}</Button>
     </div>
   );
   if (active.status === 'approved') return (
     <div className="flex flex-wrap gap-2">
       <Button disabled={Boolean(busy)} onClick={() => void onAction('return-to-draft')} type="button" variant="outline"><RotateCcw />Back to draft</Button>
-      <Button disabled={Boolean(busy) || !mayApprove} onClick={() => void onAction('promote')} type="button"><Rocket />{busy === 'promote' ? 'Promoting…' : 'Promote to live'}</Button>
+      <Button disabled={Boolean(busy) || !mayApprove} onClick={() => void onAction(promoteAction)} type="button"><Rocket />{busy === promoteAction ? 'Promoting…' : englishGuide ? 'Publish English guide' : 'Promote to live'}</Button>
     </div>
   );
   return null;

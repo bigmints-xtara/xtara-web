@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import type { CareerContentVersion } from '@/lib/career-content-versions';
+import { isEnglishCatalogueGuideCandidate, type CareerContentVersion } from '@/lib/career-content-versions';
 import { getReviewSnapshot, recordReviewEvidence, revokeReviewEvidence, type ReviewKind, type ReviewScope, type ReviewSnapshot, type ReviewTarget } from '@/lib/career-review-evidence';
 
 const lines = (value: string) => [...new Set(value.split('\n').map((item) => item.trim()).filter(Boolean))];
@@ -10,6 +10,7 @@ export default function CareerReviewEvidencePanel({ collection, recordId, versio
   collection: string; recordId: string; versions: CareerContentVersion[]; mayRecord: boolean; onSnapshotMutation?: (snapshot: ReviewSnapshot) => void;
 }) {
   const [versionId, setVersionId] = useState('');
+  const englishGuide = isEnglishCatalogueGuideCandidate(versions.find(version => version.id === versionId));
   return <section className="h-full space-y-5 overflow-y-auto p-4 sm:p-6" role="tabpanel">
     <h2 className="text-lg font-semibold">Human review evidence</h2>
     <p className="text-sm text-muted-foreground">Record what you actually reviewed against an exact saved content revision. Evidence does not approve or publish content. English fallback previews, machine translations and completeness labels are not proof of human review.</p>
@@ -20,7 +21,8 @@ export default function CareerReviewEvidencePanel({ collection, recordId, versio
       </select>
     </label>
     {!versions.length ? <p>No saved versions are available. Create a content draft first.</p> : null}
-    {versionId ? <VersionEvidence key={versionId} target={{ collection, recordId, versionId }} mayRecord={mayRecord} onSnapshotMutation={onSnapshotMutation} /> : null}
+    {englishGuide ? <p className="text-sm text-muted-foreground">This release publishes the English guide only. Existing translations are preserved.</p> : null}
+    {versionId ? <VersionEvidence key={versionId} target={{ collection, recordId, versionId, ...(englishGuide ? { scope: 'english-guide' } : {}) }} mayRecord={mayRecord} onSnapshotMutation={onSnapshotMutation} /> : null}
   </section>;
 }
 function VersionEvidence({ target, mayRecord, onSnapshotMutation }: { target: ReviewTarget; mayRecord: boolean; onSnapshotMutation?: (snapshot: ReviewSnapshot) => void }) {
@@ -39,13 +41,13 @@ function VersionEvidence({ target, mayRecord, onSnapshotMutation }: { target: Re
   const [readSnapshot, setReadSnapshot] = useState(false);
   const [reasons, setReasons] = useState<Record<string, string>>({});
   const requests = useRef(new Map<string, string>());
-  const { collection, recordId, versionId } = target;
+  const { collection, recordId, versionId, scope: releaseScope } = target;
   useEffect(() => {
     let cancelled = false;
-    getReviewSnapshot({ collection, recordId, versionId }).then((next) => { if (!cancelled) setSnapshot(next); })
+    getReviewSnapshot({ collection, recordId, versionId, ...(releaseScope ? { scope: releaseScope } : {}) }).then((next) => { if (!cancelled) setSnapshot(next); })
       .catch((caught) => { if (!cancelled) setLoadError(caught instanceof Error ? caught.message : 'Unable to load review evidence.'); });
     return () => { cancelled = true; };
-  }, [collection, recordId, versionId, attempt]); // target identity is the immutable route boundary
+  }, [collection, recordId, versionId, releaseScope, attempt]); // target identity is the immutable route boundary
   const reload = () => { setSnapshot(null); setLoadError(''); setError(''); setMessage(''); setReadSnapshot(false); setAttempt((value) => value + 1); };
   const requestKey = (payload: unknown) => {
     const signature = JSON.stringify(payload);

@@ -29,6 +29,15 @@ export interface CareerContentVersionHistory {
   active: CareerContentVersion | null;
   versions: CareerContentVersion[];
 }
+export type CareerVersionAction = 'submit' | 'approve' | 'return-to-draft' | 'promote' | 'approve-english-guide' | 'promote-english-guide';
+
+export function isEnglishCatalogueGuideCandidate(version?: CareerContentVersion | null) {
+  const guide = version?.content?.studentGuide as { provenance?: { sourceVersion?: string } } | undefined;
+  const translated = version?.content?.studentGuideTranslations;
+  return version?.collectionName === 'dream_careers'
+    && /^xtara-catalog:[a-f0-9]{40}:[a-f0-9]{64}$/.test(guide?.provenance?.sourceVersion ?? '')
+    && (!translated || (typeof translated === 'object' && Object.keys(translated).length === 0));
+}
 
 function basePath(contentType: string, recordId: string): string {
   return `/admin/content/${encodeURIComponent(contentType)}/${encodeURIComponent(recordId)}/versions`;
@@ -44,7 +53,7 @@ export const careerContentVersionsApi = {
       `${basePath(contentType, recordId)}/${encodeURIComponent(version.id)}`,
       { content, lockVersion: version.lockVersion },
     ),
-  action: (contentType: string, recordId: string, version: CareerContentVersion, action: 'submit' | 'approve' | 'return-to-draft' | 'promote') =>
+  action: (contentType: string, recordId: string, version: CareerContentVersion, action: CareerVersionAction) =>
     xtaraApi.post<CareerContentVersion>(
       `${basePath(contentType, recordId)}/${encodeURIComponent(version.id)}/${action}`,
       { lockVersion: version.lockVersion },

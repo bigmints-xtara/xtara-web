@@ -53,6 +53,7 @@ type GuideLabels = {
   closes: string;
   minutes: string;
   sparseGuide: string;
+  englishFallback: string;
 };
 
 type GuideQuestion = {
@@ -110,12 +111,14 @@ const english: GuideLabels = {
   closes: 'Closes',
   minutes: 'minutes',
   sparseGuide: 'More reviewed guidance for this career is being prepared.',
+  englishFallback: 'This guide is currently available in English.',
 };
 
 const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
   en: english,
   ml: {
     ...english,
+    englishFallback: 'ഈ ഗൈഡ് ഇപ്പോൾ ഇംഗ്ലീഷിൽ ലഭ്യമാണ്.',
     chapterNavigation: 'കരിയർ ഗൈഡ് അധ്യായങ്ങൾ',
     aboutCareer: 'ഈ കരിയറിനെക്കുറിച്ച്',
     aboutCareerIntro: 'ജോലി എന്താണ്, ആരെ സഹായിക്കുന്നു, ഒരു സാധാരണ ദിവസം എങ്ങനെയായിരിക്കും എന്നിവ മനസ്സിലാക്കൂ.',
@@ -159,6 +162,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
   },
   hi: {
     ...english,
+    englishFallback: 'यह गाइड अभी अंग्रेज़ी में उपलब्ध है।',
     chapterNavigation: 'करियर गाइड के अध्याय',
     aboutCareer: 'इस करियर के बारे में',
     aboutCareerIntro: 'काम, उससे लाभ पाने वाले लोगों और एक सामान्य कार्यदिवस को समझें।',
@@ -202,6 +206,7 @@ const labels: Record<DreamCareerGuideLocale, GuideLabels> = {
   },
   ta: {
     ...english,
+    englishFallback: 'இந்த வழிகாட்டி தற்போது ஆங்கிலத்தில் கிடைக்கிறது.',
     chapterNavigation: 'தொழில் வழிகாட்டி அத்தியாயங்கள்',
     aboutCareer: 'இந்தத் தொழிலைப் பற்றி',
     aboutCareerIntro: 'வேலை, அது உதவும் மக்கள், ஒரு வழக்கமான வேலைநாள் ஆகியவற்றைப் புரிந்துகொள்ளுங்கள்.',
@@ -423,7 +428,12 @@ export function DreamCareerStudentGuide({
         <ProgressiveList
           items={guide.howToGetThere.educationRoutes}
           labels={text}
-          renderItem={(route) => <GuideItem title={route.title} meta={enumLabel(route.routeType, locale)}>{route.description}</GuideItem>}
+          renderItem={(route) => (
+            <GuideItem title={route.title} meta={enumLabel(route.routeType, locale)}>
+              <p>{route.description}</p>
+              <GuideEvidenceLinks ids={route.sourceIds} sources={guide.sources} label={text.sources} />
+            </GuideItem>
+          )}
         />
       ),
     });
@@ -596,7 +606,7 @@ export function DreamCareerStudentGuide({
     { id: 'what-you-can-do-now', number: '03', title: text.whatYouCanDoNow, intro: text.whatYouCanDoNowIntro, questions: nowQuestions },
   ].filter((chapter) => chapter.questions.length > 0);
 
-  const reviewedSources = guide.sources.filter((source) => source.reviewStatus === 'reviewed');
+  const reviewedSources = guide.sources.filter(isReviewedHttpsSource);
   const questionEntries = chapters.flatMap((chapter) => chapter.questions.map((question) => ({ chapter, question })));
   const questionSignature = questionEntries.map(({ question }) => question.id).join('|');
   const [selectedQuestionId, setSelectedQuestionId] = useState('');
@@ -658,6 +668,11 @@ export function DreamCareerStudentGuide({
 
   return (
     <div data-testid="dream-career-student-guide" className="min-w-0 scroll-smooth bg-background text-foreground motion-reduce:scroll-auto dark:bg-background">
+      {locale !== 'en' && guide.locale === 'en' ? (
+        <p role="status" className="mx-auto max-w-7xl px-4 pt-6 text-sm text-muted-foreground sm:px-6 lg:px-8">
+          {text.englishFallback}
+        </p>
+      ) : null}
       {compactLayout ? (
         <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14" data-testid="compact-question-reader">
           <div className="min-w-0 space-y-14 sm:space-y-18">
@@ -933,10 +948,42 @@ function appendAdditionalTopics(
         <>
           {topic.summary.trim() ? <p>{topic.summary}</p> : null}
           {blocks.length ? <div className="mt-4 space-y-4">{blocks}</div> : null}
+          <GuideEvidenceLinks ids={topic.sourceIds} sources={response.guide.sources} label={text.sources} />
         </>
       ),
     });
   }
+}
+
+type GuideSource = DreamCareerStudentGuideResponse['guide']['sources'][number];
+
+function isReviewedHttpsSource(source: GuideSource) {
+  if (source.reviewStatus !== 'reviewed') return false;
+  try {
+    const url = new URL(source.url);
+    return url.protocol === 'https:' && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+function GuideEvidenceLinks({ ids, sources, label }: { ids: string[]; sources: GuideSource[]; label: string }) {
+  const linked = sources.filter((source) => ids.includes(source.id) && isReviewedHttpsSource(source));
+  if (!linked.length) return null;
+  return (
+    <details className="mt-3 text-sm text-muted-foreground">
+      <summary className="cursor-pointer font-semibold">{label}</summary>
+      <ul className="mt-2 list-disc space-y-2 pl-5">
+        {linked.map((source) => (
+          <li key={source.id}>
+            <a className="break-words text-primary underline" href={source.url} target="_blank" rel="noreferrer">
+              {source.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
 }
 
 function displayTopicTitle(value: string) {

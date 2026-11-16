@@ -31,7 +31,7 @@ export interface ReviewSnapshot {
   coverage: { complete: boolean; blockers: string[] };
   allowedScopes: ReviewScope;
 }
-export interface ReviewTarget { collection: string; recordId: string; versionId: string }
+export interface ReviewTarget { collection: string; recordId: string; versionId: string; scope?: 'english-guide' }
 function path(target: ReviewTarget) {
   return `/admin/content/${encodeURIComponent(target.collection)}/${encodeURIComponent(target.recordId)}/versions/${encodeURIComponent(target.versionId)}/review-evidence`;
 }
@@ -41,7 +41,7 @@ function sameRevision(snapshot: ReviewSnapshot, target: ReviewTarget, expected: 
   }
 }
 export async function getReviewSnapshot(target: ReviewTarget): Promise<ReviewSnapshot> {
-  const snapshot = await xtaraApi.get<ReviewSnapshot>(path(target));
+  const snapshot = await xtaraApi.get<ReviewSnapshot>(path(target) + (target.scope ? '?scope=english-guide' : ''));
   if (snapshot.versionId !== target.versionId) throw new Error('The server returned a different content version.');
   return snapshot;
 }

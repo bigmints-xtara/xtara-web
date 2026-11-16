@@ -25,7 +25,10 @@ vi.mock('@/lib/services/adminService', () => ({
   },
 }));
 vi.mock('@/lib/admin-content-approval', () => ({ adminContentApprovalApi: approval }));
-vi.mock('@/lib/career-content-versions', () => ({ careerContentVersionsApi: versions }));
+vi.mock('@/lib/career-content-versions', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@/lib/career-content-versions')>(),
+  careerContentVersionsApi: versions,
+}));
 vi.mock('@/context/AuthContext', () => ({ useAuth: auth.useAuth }));
 
 import { createEmptyDreamCareer } from '@/lib/admin/configs/curatedDreamCareersConfig';

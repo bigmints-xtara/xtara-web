@@ -313,6 +313,9 @@ describe('DreamCareerStudentGuide', () => {
     expect(screen.getByText('Reliable information can help communities plan.')).toBeInTheDocument();
     expect(screen.getByText('Compare course content')).toBeInTheDocument();
     expect(screen.getByText('Ask about practical projects')).toBeInTheDocument();
+    const route = screen.getByRole('region', { name: 'How can I compare study routes?' });
+    fireEvent.click(within(route).getByText('Sources and evidence'));
+    expect(within(route).getByRole('link', { name: 'Reviewed career source' })).toHaveAttribute('href', 'https://example.com/source');
     expect(screen.getAllByRole('link', { name: 'SQL for beginners' }).some((link) => link.getAttribute('href') === 'https://example.com/sql')).toBe(true);
   });
 
