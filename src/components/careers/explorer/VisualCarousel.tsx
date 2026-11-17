@@ -22,6 +22,7 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
   const compact = width <= 700;
   const loop = variant === 'direction' && !compact && items.length > 1;
   const [factHeight, setFactHeight] = useState(180);
+  const [contentHeight, setContentHeight] = useState(360);
   const viewport = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: number; x: number; y: number; distance: number; horizontal: boolean } | null>(null);
   const suppressClick = useRef(0);
@@ -44,6 +45,16 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
     slides.forEach(slide => observer?.observe(slide));
     return () => observer?.disconnect();
   }, [variant, items]);
+  useEffect(() => {
+    if (variant === 'fact' || !viewport.current) return;
+    const content = viewport.current.querySelector('[data-active="true"] > div:last-child');
+    if (!(content instanceof HTMLElement)) return;
+    const measure = () => setContentHeight(Math.ceil(content.scrollHeight + 36));
+    measure();
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    observer?.observe(content);
+    return () => observer?.disconnect();
+  }, [variant, index, items, width]);
   // Facts are reading panels, not previews: keep the entire paragraph in view.
   const cardWidth = variant === 'fact' ? Math.min(550, Math.max(0, width - 32)) : variant === 'bubble' ? Math.min(compact ? 320 : 370, width - 88) : compact ? Math.min(400, width - 64) : Math.max(260, Math.min(360, width * .24));
   const spacing = variant === 'direction' ? compact ? cardWidth + 14 : cardWidth * .98 : cardWidth + (compact ? 12 : 54);
@@ -55,7 +66,7 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
   };
   if (!items.length) return null;
   return <section className={`${styles.carousel} ${styles[variant]}`} aria-roledescription="carousel" aria-label={label}>
-    <div ref={viewport} className={styles.viewport} style={variant === 'fact' ? { height: factHeight + 24, flex: 'none' } : undefined} data-dragging={offset !== 0 || undefined} tabIndex={0}
+    <div ref={viewport} className={styles.viewport} style={{ height: variant === 'fact' ? factHeight + 24 : contentHeight, flex: 'none' }} data-dragging={offset !== 0 || undefined} tabIndex={0}
       onKeyDown={(event) => { if (event.target !== event.currentTarget) return; if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); focus(index + (event.key === 'ArrowRight' ? 1 : -1)); } }}
       onPointerDown={(event) => { if (!event.isPrimary || event.button !== 0) return; drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, distance: 0, horizontal: false }; }}
       onPointerMove={(event) => {

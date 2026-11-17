@@ -86,3 +86,16 @@ describe('touch carousel', () => {
     expect(viewport).not.toHaveAttribute('data-dragging');
   });
 });
+
+it.each([1366, 1280, 1024, 390, 360, 640])('grows to long selected content while bounding card width at %ipx', (width) => {
+  const measureWidth = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width);
+  const measureHeight = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(900);
+  try {
+    const { container } = render(<VisualCarousel variant="direction" label="Directions" previous="Previous" next="Next" hint="Swipe" items={[{ id: 'long', title: 'A long career direction title' }, { id: 'next', title: 'Next direction' }]} renderItem={(i, active) => <div><h2>{i ? 'Next direction' : 'A long career direction title'}</h2><p>Full description remains in the card.</p><button tabIndex={active ? 0 : -1}>Explore {i}</button></div>} />);
+    const viewport = container.querySelector('[tabindex="0"]') as HTMLElement;
+    expect(parseFloat(viewport.style.height)).toBeGreaterThanOrEqual(900);
+    for (const slide of container.querySelectorAll('article')) expect(parseFloat(slide.style.width)).toBeLessThan(width);
+    fireEvent.keyDown(viewport, { key: 'ArrowRight' });
+    expect(screen.getByRole('button', { name: 'Explore 1' })).toHaveAttribute('tabindex', '0');
+  } finally { measureWidth.mockRestore(); measureHeight.mockRestore(); }
+});

@@ -36,13 +36,15 @@ const profile: DreamCareerDetailProfileV3 = {
 };
 
 describe('DreamCareerProfileCards', () => {
-  it('renders work, pathways, ROI, prominent people, activity and evidence', () => {
+  it('renders work, pathways, education costs and qualitative pay availability', () => {
     render(<DreamCareerProfileCards profile={profile} locale="en" />);
     expect(screen.getByText('What the work is really like')).toBeInTheDocument();
     expect(screen.getByText('Degree and projects')).toBeInTheDocument();
+    expect(screen.getByText('Reviewed qualitative pay guidance is not available yet.')).toBeInTheDocument();
+    expect(screen.queryByText(/₹4,00,000/)).not.toBeInTheDocument();
     expect(screen.getByText('Example Government College · ₹1,00,000–₹2,00,000 Total Program')).toBeInTheDocument();
-    expect(screen.getByText('6–12 months')).toBeInTheDocument();
-    expect(screen.getByText(/Based on 120 reports across experience levels/)).toBeInTheDocument();
+    expect(screen.queryByText('6–12 months')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Based on 120 reports across experience levels/)).not.toBeInTheDocument();
     expect(screen.getByText('A. Leader')).toBeInTheDocument();
     expect(screen.getByText('Try a small investigation')).toBeInTheDocument();
     expect(screen.getByText('Official evidence')).toBeInTheDocument();

@@ -14,6 +14,8 @@ import { explorerCopy } from './explorer/copy';
 import { journeyCopy, explorerHeadings, invitationCopy } from './explorer/journey-copy';
 import { exploreUrl, initialExploreState, readExploreState, type ExploreState } from './explorer/state';
 import VisualCarousel from './explorer/VisualCarousel';
+import CareerOverviewSections from './explorer/CareerOverviewSections';
+import ExplorerAccountContext from './explorer/ExplorerAccountContext';
 import type { ExplorerIllustration } from '@/types/career-explorer';
 import styles from './ExploreCareers.module.css';
 
@@ -44,6 +46,7 @@ export default function ExploreCareers() {
   const search = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
   const { data, isPending, isError, refetch } = useQuery({ queryKey: ['career-explorer', locale], queryFn: ({ signal }) => getCareerExplorer(locale, signal), meta: { authScope: 'public' }, staleTime: 60_000, retry: false });
   const state = readExploreState(search, data);
+  const [listQuery, setListQuery] = useState('');
   const [paused, setPaused] = useState(false);
   const [saveResult, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [saveOwner, setSaveOwner] = useState<string>();
@@ -54,7 +57,7 @@ export default function ExploreCareers() {
   const [focusedPositions, setFocusedPositions] = useState<Record<string, number>>({});
   // Let Next copy its own history state and synchronize the canonical URL.
   // Reusing its __NA-marked state skips that hook, so locale refresh loses the route.
-  const navigate = (next: ExploreState) => { saveGeneration.current += 1; window.history.pushState(null, '', exploreUrl(next)); window.dispatchEvent(new Event(navigationEvent)); setSaveState('idle'); requestAnimationFrame(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo?.({ top: 0, behavior: 'instant' }); }); };
+  const navigate = (next: ExploreState) => { setListQuery(''); saveGeneration.current += 1; window.history.pushState(null, '', exploreUrl(next)); window.dispatchEvent(new Event(navigationEvent)); setSaveState('idle'); requestAnimationFrame(() => { heading.current?.focus({ preventScroll: true }); window.scrollTo?.({ top: 0, behavior: 'instant' }); }); };
   const direction = data?.directions.find(d => d.id === state.direction);
   const career = data?.careers.find(c => c.id === state.career);
   const parent = data?.careers.find(c => c.id === career?.parentCareerId);
@@ -96,8 +99,8 @@ export default function ExploreCareers() {
     </ol>
   </nav>;
   const common = { previous: text.previous, next: text.next, hint: text.swipe };
-  const choices = !data ? [] : home ? data.directions : specialization ? data.careers.filter(c => career?.specializationIds?.includes(c.id)) : state.step === 'industries' ? data.industries.filter(i => direction?.industryIds.includes(i.id)).map(i => ({ ...i, summary: i.description })) : data.careers.filter(c => !c.parentCareerId && (state.industry ? data.industries.find(i => i.id === state.industry)?.careerIds.includes(c.id) : direction ? direction.careerIds.includes(c.id) : true) && `${c.title} ${c.summary}`.toLocaleLowerCase(locale).includes(state.q.toLocaleLowerCase(locale)));
-  const chapters = [{ id: 'work', label: text.work, values: career?.activities || [] }, { id: 'skills', label: text.skills, values: career?.skills || [] }, { id: 'workplaces', label: text.workplaces, values: career?.workplaces || [] }, { id: 'good', label: text.good, values: career?.tradeoffs || [] }];
+  const choices = !data ? [] : home ? data.directions : specialization ? (career?.specializationIds || []).flatMap(id => data.careers.find(c => c.id === id) ?? []) : state.step === 'industries' ? data.industries.filter(i => direction?.industryIds.includes(i.id)).map(i => ({ ...i, summary: i.description })) : (state.industry ? data.industries.find(i => i.id === state.industry)?.careerIds || [] : direction?.careerIds || data.careers.map(c => c.id)).flatMap(id => data.careers.find(c => c.id === id) ?? []).filter((c, i, all) => all.findIndex(item => item.id === c.id) === i && (!c.parentCareerId || !all.some(item => item.id === c.parentCareerId)));
+
   return <div className={styles.page}>
     <Header />
     <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={tone(direction?.presentation)}>
@@ -118,6 +121,7 @@ export default function ExploreCareers() {
         <section className={styles.accountBenefits} aria-labelledby="account-benefits-title"><h2 id="account-benefits-title">{invite.benefitsTitle}</h2><ul>{[
           [text.benefitSave, invite.saveDetail], [text.benefitGuide, invite.guideDetail], [text.benefitReturn, invite.returnDetail],
         ].map(([title, detail]) => <li key={title}><span aria-hidden="true">✓</span><div><strong>{title}</strong><p>{detail}</p></div></li>)}</ul></section>
+        <ExplorerAccountContext />
         <div className={styles.invitationActions}><Link className={styles.primary} href={`/signup?${new URLSearchParams({pursueCareer:career.id,directionId:direction.id,next:'/dashboard'})}`}>{invite.create}<ArrowUpRight size={16} /></Link><p>{invite.already} <Link href={`/login?${new URLSearchParams({pursueCareer:career.id,directionId:direction.id,next:'/dashboard'})}`}>{invite.signin}</Link></p></div>
       </section> : overview && career ? <>
         <div className={styles.connection} aria-label={`${direction?.title || ''}, ${parent?.title || career.title}, ${parent ? career.title : text.nextStep}`}>
@@ -128,29 +132,31 @@ export default function ExploreCareers() {
         </div>
         <header className={styles.intro}><p className={styles.eyebrow}>{text.future}</p><h1 ref={heading} tabIndex={-1}>{text.closer}<br /><span>{career.title}.</span></h1><p>{career.summary}</p></header>
         {career.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
-        <div className={styles.careerSections}>
-          {chapters.map((item, i) => <section className={styles.careerSection} key={item.id} aria-labelledby={`section-${item.id}`}>
-            <header><span className={styles.sectionNumber} aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><h2 id={`section-${item.id}`}>{item.label}</h2></header>
-            {!item.values.length ? <p className={styles.sectionEmpty}>{text.missing}</p> : item.id === 'skills' ?
-              <ul className={styles.skillList}>{item.values.map((value, index) => <li key={`${index}:${value}`}>{value}</li>)}</ul> :
-              <ul className={styles.factList}>{item.values.map((value, index) => <li key={`${index}:${value}`}>{value}</li>)}</ul>}
-          </section>)}
-        </div>
-        <section className={styles.decision}><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href="/assessment">{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
+        {locale !== 'en' && <p className={styles.notice}>Career guidance below is currently in English.</p>}
+        <CareerOverviewSections career={career} />
+        <section className={styles.decision}><ExplorerAccountContext /><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href="/assessment">{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
           {saveState === 'error' && <p role="alert">{text.saveError}</p>}{saveState === 'saved' && <p role="status">{text.saved}</p>}
           </div>
           {(!user || user.isAnonymous) && <details className={styles.benefits}><summary>{text.benefits}</summary><ul><li>{text.benefitSave}</li><li>{text.benefitGuide}</li><li>{text.benefitReturn}</li></ul></details>}
           <button className={styles.quiet} onClick={() => navigate(initialExploreState)}>{copy.keepExploring} <ArrowRight size={14} /></button>
         </section>
       </> : <>
-        <header className={styles.intro}><p className={styles.eyebrow}>{home ? copy.directions : specialization ? career?.title : direction?.title || copy.roles}</p><h1 ref={heading} tabIndex={-1}>{home ? <>{headings.homeLead}<span>{headings.homeAccent}</span></> : specialization ? <>{headings.specialtyLead}<span>{headings.specialtyAccent}</span></> : state.step === 'industries' ? copy.chooseIndustry : <>{headings.dreamLead}<span>{headings.dreamAccent}</span></>}</h1><p>{home ? headings.homeHint : specialization ? career?.summary : direction?.summary}</p>{home && <Link className={styles.quiet} href="/assessment">{copy.assessment}<ArrowUpRight size={14} /></Link>}</header>
+        {!home && <div className={styles.contextArtwork}><Illustration illustration={(specialization ? career : direction)?.illustration} placeholder={text.illustration} bubble /></div>}
+        <header className={styles.intro}>{!home && <p className={styles.eyebrow}>{specialization ? career?.title : direction?.title || copy.roles}</p>}<h1 ref={heading} tabIndex={-1}>{home ? <>{headings.homeLead}<span>{headings.homeAccent}</span></> : specialization ? <>{headings.specialtyLead}<span>{headings.specialtyAccent}</span></> : state.step === 'industries' ? copy.chooseIndustry : <>{headings.dreamLead}<span>{headings.dreamAccent}</span></>}</h1>{!home && <p>{specialization ? career?.summary : direction?.summary}</p>}{home && <Link className={styles.quiet} href="/assessment">{copy.assessment}<ArrowUpRight size={14} /></Link>}</header>
         {direction?.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
         {!choices.length ? <p className={styles.status}>{copy.noMatches}</p> : <VisualCarousel key={groupKey} {...common} label={home ? copy.directions : specialization ? copy.specializations : copy.roles} variant={home ? 'direction' : 'bubble'} items={choices} initialIndex={focusedPositions[groupKey] || 0} onFocus={i => setFocusedPositions(current => ({ ...current, [groupKey]: i }))} renderItem={(i, active) => {
           const item = choices[i];
           const action = home ? text.explore : 'specializationIds' in item && item.specializationIds?.length ? text.specialize : text.meet;
           const open = () => home ? navigate({ ...initialExploreState, direction: item.id, step: 'roles' }) : state.step === 'industries' ? navigate({ ...state, industry: item.id, career: null, step: 'roles' }) : goCareer(item.id);
-          return <div className={styles.choiceBody} style={home && 'presentation' in item ? tone(item.presentation) : undefined}><Illustration key={item.id} illustration={'illustration' in item ? item.illustration : undefined} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: home || active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
+          return <div className={styles.choiceBody} style={home && 'presentation' in item ? tone(item.presentation) : undefined}><Illustration key={item.id} illustration={'illustration' in item ? item.illustration : undefined} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
         }} />}
+        {!home && state.step !== 'industries' && <details className={styles.completeList} key={groupKey}>
+          <summary>{specialization ? 'All specializations' : 'All careers in this direction'} · {choices.length} {specialization ? 'specializations' : 'careers and groups'}</summary>
+          <p>Groups open their specializations. Careers may appear in more than one direction.</p>
+          <label>Find a career<input type="search" value={listQuery} onChange={event => setListQuery(event.target.value)} /></label>
+          <ul>{choices.filter(item => `${item.title} ${item.summary}`.toLocaleLowerCase(locale).includes(listQuery.toLocaleLowerCase(locale))).map(item => <li key={item.id}><button onClick={() => goCareer(item.id)}><span>{item.title}</span>{'specializationIds' in item && Boolean(item.specializationIds?.length) && <small>{item.specializationIds?.length} specializations</small>}<ArrowRight size={16} /></button></li>)}</ul>
+          {listQuery && !choices.some(item => `${item.title} ${item.summary}`.toLocaleLowerCase(locale).includes(listQuery.toLocaleLowerCase(locale))) && <p role="status">{copy.noMatches}</p>}
+        </details>}
         {specialization && <button className={styles.quiet} onClick={() => goCareer(career!.id, true)}>{text.meet}: {career?.title}<ArrowRight size={14} /></button>}
       </>}
     </div>

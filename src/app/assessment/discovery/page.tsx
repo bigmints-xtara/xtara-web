@@ -111,6 +111,7 @@ export default function DiscoveryResultPage() {
                       ))}
                     </ul>
                   ) : null}
+                  <Link className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary underline-offset-4 hover:underline" href={`/explore?${new URLSearchParams({ direction: area.id, step: 'roles' })}`}>View all careers in this direction<ArrowRight className="ml-2 h-4 w-4" /></Link>
                   {reasonsByArea[area.id]?.length ? <div className="mt-6 border-t border-slate-100 pt-5"><p className="text-sm font-semibold text-primary">{catalog.result.why}</p><ul className="mt-3 space-y-3">{reasonsByArea[area.id].map((reason) => <li key={reason} className="flex gap-3 text-sm leading-6 text-muted-foreground"><Check className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{reason}</li>)}</ul></div> : null}
                   <Button type="button" className="mt-7 min-h-12 w-full justify-between rounded-xl" aria-label={`${catalog.result.viewArea}: ${area.title}`} onClick={() => pursueArea(area.id)}>{catalog.result.viewArea}<ArrowRight className="h-4 w-4" /></Button>
                 </CardContent></Card>

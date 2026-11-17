@@ -26,6 +26,7 @@ vi.mock("@/components/Header", () => ({
   },
 }));
 vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn() }));
+vi.mock("@/lib/career-overview-api", () => ({ getCareerOverview: vi.fn().mockRejectedValue(new Error("Unavailable")), getExplorerAccountContext: vi.fn() }));
 const fixture: CareerExplorerResponse = {
   schemaVersion: 1,
   locale: "en",
@@ -129,7 +130,7 @@ describe("career exploration", () => {
     await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     for (const name of ['What you’ll do', 'Skills you’ll use', 'Where you’ll work', 'Good to know']) {
-      expect(screen.getByRole('region', { name })).toHaveTextContent('More about this part of the career is coming soon.');
+      expect(screen.getByRole('region', { name })).toHaveTextContent('Reviewed guidance has not been published yet.');
     }
     fireEvent.click(screen.getAllByRole('button', { name: 'Help people' }).at(-1)!);
     expect(window.location.search).toContain('step=roles');
@@ -139,6 +140,8 @@ describe("career exploration", () => {
   it("focuses a neighboring direction before opening it and keeps one primary action", async () => {
     mount();
     await screen.findByRole('heading', { name: 'What interests you?' });
+    expect(screen.queryByText('Follow your curiosity. See where it could take you.')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('button', { name: 'Explore this direction' })).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Career directions: Help people' }));
     expect(window.location.search).toBe('');
@@ -249,3 +252,17 @@ describe("career exploration", () => {
     expect(safeSourceUrl('https://example.org')).toBe('https://example.org/');
   });
 });
+
+ it('exposes the complete ordered direction list and a directly mapped specialization', async () => {
+  const graph = structuredClone(fixture);
+  graph.careers.push(...Array.from({ length: 4 }, (_, i) => ({ ...graph.careers[0], id: `extra-${i}`, title: `Career ${i}`, parentCareerId: i === 3 ? 'unmapped-parent' : undefined })));
+  graph.directions[0].careerIds = ['extra-3', 'civil', 'extra-0', 'extra-1', 'extra-2', 'civil'];
+  vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+  window.history.replaceState({}, '', '/explore?direction=build&step=roles');
+  mount();
+  const summary = await screen.findByText('All careers in this direction · 5 careers and groups');
+  fireEvent.click(summary);
+  fireEvent.change(screen.getByRole('searchbox', { name: 'Find a career' }), { target: { value: 'Career 3' } });
+  fireEvent.click(screen.getByRole('button', { name: /^Career 3/ }));
+  expect(window.location.search).toContain('career=extra-3');
+ });

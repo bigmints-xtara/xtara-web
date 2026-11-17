@@ -56,7 +56,7 @@ export default function DreamCareerProfileCards({ profile, locale }: Props) {
       </div>)}</div>
     </ProfileCard>
 
-    <ProfileChapter number="02" title="Build your future" lead="Understand the skills, career growth, costs, earnings, and future demand." />
+    <ProfileChapter number="02" title="Build your future" lead="Understand the skills, career growth, costs, pay outlook, and future demand." />
 
     {profile.skills.length ? <ProfileCard icon={Sparkles} title="Skills to build" span={2}>
       <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">{profile.skills.map((skill) => <div key={skill.id} className="border-l-2 border-primary/20 pl-5"><div className="flex flex-wrap gap-2"><strong className="text-foreground">{skill.name}</strong><Badge variant="secondary">{label(skill.importance)}</Badge></div><p className="mt-2">{skill.howUsed}</p><p className="mt-2 text-xs">{label(skill.category)}</p></div>)}</div>
@@ -72,11 +72,10 @@ export default function DreamCareerProfileCards({ profile, locale }: Props) {
       })}</div>
     </ProfileCard>
 
-    <ProfileCard icon={BadgeIndianRupee} title="Education costs, earnings and payback" span={3}>
-      <div className="grid gap-4 lg:grid-cols-3">
+    <ProfileCard icon={BadgeIndianRupee} title="Education costs and pay outlook" span={3}>
+      <div className="grid gap-4 lg:grid-cols-2">
         <FinancialColumn title="Government and private fees" items={profile.financials.educationCosts.map((item) => ({ title: `${item.institutionName} · ${formatMoney(item.amount)} ${label(item.feePeriod)}`, body: `${item.programName} · ${label(item.institutionType)} · ${label(item.feeCategory)} · as of ${item.asOf}`, detail: `${educationCostDurationNote(item)} ${item.admissionRoute.description} Score effects: ${item.admissionRoute.scoreEffects.map(label).join(', ')}. Published fee changes with score: ${item.admissionRoute.publishedFeeChangesWithScore ? 'yes' : 'no'}. Includes: ${item.includes.join(', ')}. Excludes: ${item.excludes.join(', ')}.` }))} />
-        <FinancialColumn title="Earnings evidence" items={profile.financials.earnings.map((item) => ({ title: `${formatMoney(item.amount)} per year`, body: `${item.geography} · ${label(item.careerStage)} · ${label(item.basis)} · as of ${item.asOf}`, detail: item.evidenceNotes?.join(' ') }))} />
-        <FinancialColumn title="Simple gross payback" items={profile.financials.returnOnEducation.map((item) => ({ title: `${range(item.paybackMonths)} months`, body: `Living costs ${item.includesLivingCosts ? 'included' : 'not included'} · Foregone earnings ${item.includesForegoneEarnings ? 'included' : 'not included'}`, detail: item.assumptions.join(' ') }))} />
+        <div><h3 className="font-semibold text-foreground">Pay outlook</h3><p className="mt-3">Reviewed qualitative pay guidance is not available yet.</p></div>
       </div>
     </ProfileCard>
 

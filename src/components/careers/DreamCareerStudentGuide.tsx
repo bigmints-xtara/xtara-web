@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Banknote, GraduationCap, Lightbulb, Sparkles } from 'lucide-react';
+import { GraduationCap, Lightbulb, Sparkles } from 'lucide-react';
 
 import type {
   CareerAdditionalTopic,
@@ -350,23 +350,8 @@ export function DreamCareerStudentGuide({
   }
 
   if (current('earnings') && guide.aboutCareer.earnings.length) {
-    aboutQuestions.push({
-      id: 'earnings',
-      title: text.earnings,
-      content: (
-        <ProgressiveList
-          items={guide.aboutCareer.earnings}
-          labels={text}
-          renderItem={(earning) => (
-            <GuideItem title={`${formatMoney(earning.amountMin, locale)}–${formatMoney(earning.amountMax, locale)} ${earning.period === 'month' ? text.perMonth : text.perYear}`}>
-              {enumLabel(earning.careerStage, locale)} · {earning.geography} · {text.asOf} {formatDate(earning.asOf, locale)}
-            </GuideItem>
-          )}
-        />
-      ),
-    });
+    aboutQuestions.push({ id: 'earnings', title: text.earnings, content: <p>Reviewed qualitative pay guidance is not available yet.</p> });
   }
-
   if (current('notablePeople') && guide.aboutCareer.notablePeople.length) {
     aboutQuestions.push({
       id: 'notable-people',
@@ -681,7 +666,7 @@ export function DreamCareerStudentGuide({
                 <GuideChapter chapter={chapter} />
                 {index === 0 ? (
                   <div className="border-y border-border bg-muted/20 px-5 py-6 sm:px-6" data-testid="compact-guide-widgets">
-                    <GuideUtilityRail response={response} locale={locale} text={text} />
+                    <GuideUtilityRail response={response} text={text} />
                   </div>
                 ) : null}
               </Fragment>
@@ -726,7 +711,7 @@ export function DreamCareerStudentGuide({
 
           <aside className="min-w-0" aria-label={text.whatYouCanDoNow} data-testid="career-guide-widgets">
             <div className="sticky top-24 border-l border-border bg-muted/20 px-6 py-1">
-              <GuideUtilityRail response={response} locale={locale} text={text} />
+              <GuideUtilityRail response={response} text={text} />
             </div>
           </aside>
         </div>
@@ -737,18 +722,15 @@ export function DreamCareerStudentGuide({
 
 function GuideUtilityRail({
   response,
-  locale,
   text,
 }: {
   response: DreamCareerStudentGuideResponse;
-  locale: DreamCareerGuideLocale;
   text: GuideLabels;
 }) {
   const available = (questionId: CareerGuideQuestionId) => {
     const status = response.coverage.byQuestion[questionId]?.status;
     return status === 'available' || status === 'partial';
   };
-  const earning = available('earnings') ? response.guide.aboutCareer.earnings[0] : undefined;
   const route = available('educationRoutes') ? response.guide.howToGetThere.educationRoutes[0] : undefined;
   const starter = available('starterActivity') ? response.guide.whatYouCanDoNow.starterActivity : undefined;
   const skillLabels = new Map(response.resolved.labels.skills.map((item) => [item.id, item.label]));
@@ -756,26 +738,10 @@ function GuideUtilityRail({
     ? response.guide.whatYouCanDoNow.skills.flatMap((skill) => skillLabels.get(skill.skillId) ?? []).slice(0, 3)
     : [];
 
-  if (!earning && !route && !starter && !skills.length) return null;
+  if (!route && !starter && !skills.length) return null;
 
   return (
     <div className="divide-y divide-border text-sm">
-      {earning ? (
-        <section className="py-6 first:pt-5">
-          <div className="flex items-center gap-3 text-primary">
-            <Banknote aria-hidden className="h-5 w-5 text-accent" />
-            <p className="text-xs font-bold uppercase tracking-[0.14em]">{text.earnings}</p>
-          </div>
-          <p className="mt-4 text-lg font-semibold leading-7 text-foreground">
-            {formatMoney(earning.amountMin, locale)}–{formatMoney(earning.amountMax, locale)}
-          </p>
-          <p className="mt-1 leading-6 text-muted-foreground">
-            {earning.period === 'month' ? text.perMonth : text.perYear} · {earning.geography}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">{text.asOf} {formatDate(earning.asOf, locale)}</p>
-        </section>
-      ) : null}
-
       {route ? (
         <section className="py-6">
           <div className="flex items-center gap-3 text-primary">
@@ -1072,11 +1038,6 @@ function formatGrade(value: string, locale: DreamCareerGuideLocale) {
   if (locale === 'hi') return `कक्षा ${number}`;
   if (locale === 'ta') return `வகுப்பு ${number}`;
   return `Grade ${number}`;
-}
-
-function formatMoney(value: number, locale: DreamCareerGuideLocale) {
-  const language = locale === 'ml' ? 'ml-IN' : locale === 'hi' ? 'hi-IN' : locale === 'ta' ? 'ta-IN' : 'en-IN';
-  return new Intl.NumberFormat(language, { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
 }
 
 function formatDate(value: string, locale: DreamCareerGuideLocale) {

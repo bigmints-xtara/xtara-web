@@ -1,7 +1,7 @@
 import type { Locale } from '@/i18n/config';
 const invitationEnglish = {
   yourDream:'Your Dream Career', headingLead:'Make it your', headingAccent:'Dream Career.', choice:'Your choice', change:'Change choice',
-  benefitsTitle:'With your Xtara account', saveDetail:'Keep your choices together in My Direction.', guideDetail:'Add your study details to see relevant guidance.', returnDetail:'Return to your direction and update your choices.',
+  benefitsTitle:'With your Xtara account', saveDetail:'Keep your choices together in My Direction.', guideDetail:'Save your assessment and revisit suggested directions.', returnDetail:'Return to your direction and update your choices.',
   create:'Create an account', already:'Already have an account?', signin:'Sign in',
 };
 export const invitationCopy: Record<Locale, typeof invitationEnglish> = {
@@ -25,7 +25,7 @@ const en = {
   missing: 'More about this part of the career is coming soon.', pursue: 'Pursue this career', saving: 'Saving…', saved: 'Saved to My Direction',
   saveError: 'We couldn’t save this career. Please try again.', chapter: 'Could this be your next chapter?',
   chapterHint: 'Explore your interests, or make this a Dream Career.', benefits: 'What comes with an Xtara account?',
-  benefitSave: 'Save your Dream Careers', benefitGuide: 'Explore guidance for your school stage', benefitReturn: 'Come back to your choices anytime',
+  benefitSave: 'Save your Dream Careers', benefitGuide: 'Keep your assessment', benefitReturn: 'Come back to your choices anytime',
   continue: 'Continue to My Direction', open: 'Open', all: 'All directions',
 };
 export const journeyCopy: Record<Locale, typeof en> = {
