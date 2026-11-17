@@ -19,8 +19,8 @@ const ContactPage = async () => {
 
   return (
     <MarketingLayout>
-      <Container>
-        <div className="py-4 px-6 md:py-6 md:px-8">
+      <Container marketing>
+        <div className="py-4 md:py-6">
           <div className="mb-8">
             <Breadcrumb
               items={[

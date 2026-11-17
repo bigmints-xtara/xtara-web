@@ -1,0 +1,14 @@
+/* Shared outer grid for public pages; inner reading columns may be narrower. */
+.shell {
+  --marketing-width: 1280px;
+  --marketing-gutter: 32px;
+}
+.container {
+  width: 100%;
+  max-width: var(--marketing-width, 1280px);
+  margin-inline: auto;
+  padding-inline: var(--marketing-gutter, 32px);
+}
+@media (max-width: 700px) {
+  .shell { --marketing-gutter: 22px; }
+}

@@ -14,8 +14,8 @@ import {
   Users,
 } from "lucide-react";
 
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import MarketingLayout from "@/components/MarketingLayout";
+import Container from "@/components/Container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -34,12 +34,10 @@ export default function EducatorsPage() {
   const primaryHref = hasAccount ? "/organization" : "/signup?mode=educator&next=%2Forganization%2Fsignup";
 
   return (
-    <div className="min-h-screen bg-[#f7fafc] text-foreground">
-      <Header />
-      <main>
-        <section className="relative overflow-hidden px-5 py-14 sm:py-20 lg:py-24">
+    <MarketingLayout>
+        <section className="relative overflow-hidden py-14 sm:py-20 lg:py-24">
           <div className="pointer-events-none absolute inset-0"><div className="absolute -left-24 top-8 h-72 w-72 rounded-full bg-sky-200/40 blur-3xl" /><div className="absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-amber-200/40 blur-3xl" /></div>
-          <div className="relative mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-16">
+          <Container marketing className="relative grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:gap-16">
             <div>
               <Badge variant="secondary" className="border border-primary/10 bg-white text-primary">{content.eyebrow}</Badge>
               <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-primary sm:text-5xl md:text-6xl">{content.pageTitle}</h1>
@@ -54,32 +52,32 @@ export default function EducatorsPage() {
             </div>
 
             <DashboardPreview content={content.preview} />
-          </div>
+          </Container>
         </section>
 
-        <section className="bg-white px-5 py-16 sm:py-24">
-          <div className="mx-auto max-w-7xl">
+        <section className="bg-white py-16 sm:py-24">
+          <Container marketing>
             <div className="mx-auto max-w-3xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.capabilitiesEyebrow}</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">{content.capabilitiesTitle}</h2><p className="mx-auto mt-5 max-w-2xl leading-7 text-slate-600">{content.capabilitiesDescription}</p></div>
             <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">{content.features.map((feature, index) => { const Icon = featureIcons[index] ?? Users; return <Card key={feature.title} className="border-primary/10 shadow-none"><CardContent className="p-6"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/5 text-primary"><Icon className="h-5 w-5" /></span><h3 className="mt-5 text-lg font-semibold text-primary">{feature.title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{feature.description}</p></CardContent></Card>; })}</div>
-          </div>
+          </Container>
         </section>
 
-        <section className="px-5 py-16 sm:py-24">
-          <div className="mx-auto max-w-7xl">
+        <section className="py-16 sm:py-24">
+          <Container marketing>
             <div className="max-w-3xl"><p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.stepsEyebrow}</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">{content.stepsTitle}</h2><p className="mt-5 leading-7 text-slate-600">{content.stepsDescription}</p></div>
             <div className="mt-10 grid gap-5 md:grid-cols-3">{content.steps.map((step, index) => { const Icon = stepIcons[index] ?? Building2; return <div key={step.title} className="rounded-3xl border border-primary/10 bg-white p-6"><div className="flex items-center justify-between"><span className="text-sm font-semibold text-primary/40">0{index + 1}</span><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/5 text-primary"><Icon className="h-5 w-5" /></span></div><h3 className="mt-7 text-xl font-semibold text-primary">{step.title}</h3><p className="mt-3 text-sm leading-6 text-slate-600">{step.description}</p></div>; })}</div>
-          </div>
+          </Container>
         </section>
 
-        <section className="px-5 pb-16 sm:pb-24">
-          <div className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white sm:px-10 sm:py-16 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:px-14">
+        <section className="pb-16 sm:pb-24">
+          <Container marketing>
+          <div className="overflow-hidden rounded-[2rem] bg-primary px-6 py-12 text-white sm:px-10 sm:py-16 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:px-14">
             <div className="max-w-3xl"><ShieldCheck className="h-7 w-7 text-amber-300" /><h2 className="mt-5 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{content.finalTitle}</h2><p className="mt-4 max-w-2xl leading-7 text-white/70">{content.finalDescription}</p></div>
             <Button asChild size="lg" variant="secondary" className="mt-8 shrink-0 rounded-full px-7 lg:mt-0"><Link href={primaryHref}>{hasAccount ? content.primaryLoggedIn : content.primary}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
           </div>
+          </Container>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </MarketingLayout>
   );
 }
 

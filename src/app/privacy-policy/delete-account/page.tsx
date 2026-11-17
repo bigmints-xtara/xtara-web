@@ -47,7 +47,7 @@ This request was submitted through the Xtara website account deletion form.`;
 
   return (
     <MarketingLayout>
-      <Container>
+      <Container marketing>
         <div className="max-w-2xl mx-auto py-12">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">

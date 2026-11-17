@@ -23,7 +23,7 @@ export default function Home() {
     <MarketingLayout>
       <JsonLd data={siteStructuredData} />
       <Hero />
-      <Container>
+      <Container marketing>
         <Benefits />
         <FAQ />
         <CTA />

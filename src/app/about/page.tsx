@@ -46,8 +46,8 @@ export default async function AboutPage() {
 
   return (
     <MarketingLayout>
-      <Container className="!px-0">
-        <div className="px-5 pb-16 pt-5 sm:px-8 sm:pb-24 sm:pt-7">
+      <Container marketing>
+        <div className="pb-16 pt-5 sm:pb-24 sm:pt-7">
           <Breadcrumb
             items={[
               { label: messages.common.breadcrumb.home, href: "/" },

@@ -36,3 +36,10 @@ available. Password visibility is an explicit labelled toggle. The illustration
 supports the form on large screens and is hidden on compact screens. Keep all
 four login translations together; presentation changes must preserve existing
 role checks and assessment/save continuation.
+
+Public pages share the outer grid in `MarketingLayout.module.css`: 1280px
+maximum width including 32px side gutters, reduced to 22px at 700px and below.
+Use `<Container marketing>` inside `MarketingLayout` and avoid another layer of
+page gutters. Hero, header and footer align to the same grid. Card padding and
+narrower article or form columns are intentional inner layouts. Authenticated
+workspaces and native Flutter screens retain their own layout conventions.
