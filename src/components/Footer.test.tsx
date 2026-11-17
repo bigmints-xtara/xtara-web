@@ -36,6 +36,7 @@ describe.each([['marketing', MarketingFooter], ['dashboard', DashboardFooter]] a
     mocks.auth.mockReturnValue({ user: null });
     render(<LanguageProvider initialLocale="en"><Footer /></LanguageProvider>);
     expect(document.querySelector('a[href="/news"]')).not.toBeNull();
+    expect(document.querySelector('a[href="/about"]')).not.toBeNull();
   });
   it('does not show marketing feeds while workspace access is unresolved', () => {
     mocks.workspace.mockReturnValue({ isStaff: false, loading: true });

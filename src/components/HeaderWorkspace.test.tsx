@@ -87,7 +87,7 @@ describe("workspace-aware header", () => {
   });
 
   it.each([
-    ["/", "/#how-it-works", "How it works", "location"],
+    ["/parents", "/parents", "For parents", "page"],
     ["/explore/roles/software-developer/study-options", "/explore/roles/software-developer/study-options", "Explore Careers", "page"],
     ["/dream-careers/software-developer", "/dream-careers/software-developer", "Explore Careers", "page"],
     ["/explorer", "/explorer", "Explore Careers", undefined],
@@ -107,6 +107,9 @@ describe("workspace-aware header", () => {
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
     renderHeader();
     expect(screen.getByRole("link", { name: "Explore Careers" })).toHaveAttribute("href", "/explore");
+    expect(screen.getByRole("link", { name: "For parents" })).toHaveAttribute("href", "/parents");
+    expect(screen.queryByRole("link", { name: "About" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "How it works" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Xtara Logo" })).toHaveAttribute("href", "/");
   });
 

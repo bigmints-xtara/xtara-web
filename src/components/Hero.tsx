@@ -17,10 +17,10 @@ export default function Hero() {
   return <section id="hero" className={styles.hero}>
     <div>
       <div className={styles.eyebrow}>{content.eyebrow}</div>
-      <h1>{copy.title}</h1>
-      <p>{copy.description}</p>
+      <h1>{content.title}</h1>
+      <p>{content.description}</p>
       <div className={styles.actions}>
-        <Button asChild size="lg" className={styles.primary}><Link href={signedIn ? '/dashboard' : '/assessment'} onClick={() => trackEvent({action:'cta_click',category:'engagement',label:signedIn?'home_open_path':'home_start_assessment'})}>{signedIn ? content.primaryLoggedIn : copy.start}<ArrowRight aria-hidden="true" /></Link></Button>
+        <Button asChild size="lg" className={styles.primary}><Link href={signedIn ? '/dashboard' : '/assessment'} onClick={() => trackEvent({action:'cta_click',category:'engagement',label:signedIn?'home_open_path':'home_start_assessment'})}>{signedIn ? content.primaryLoggedIn : content.primaryLoggedOut}<ArrowRight aria-hidden="true" /></Link></Button>
         <Button asChild size="lg" variant="outline"><Link href="/explore">{copy.explore}<ArrowRight aria-hidden="true" /></Link></Button>
       </div>
       <ul className={styles.proofs}>{content.proofs.map(proof=><li key={proof}><Check size={15} aria-hidden="true" />{proof}</li>)}</ul>

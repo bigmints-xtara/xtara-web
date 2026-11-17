@@ -51,6 +51,12 @@ const Footer = () => {
                         {isAdmin ? <li><Link href="/admin">{adminNavigationCopy[locale].administration}</Link></li> : null}
                         {!studentMvp && <>
                         <li className="mb-2">
+                            <Link href="/parents" className="hover:text-foreground transition-colors">{t("header.nav.parents")}</Link>
+                        </li>
+                        <li className="mb-2">
+                            <Link href="/educators" className="hover:text-foreground transition-colors">{t("header.nav.educators")}</Link>
+                        </li>
+                        <li className="mb-2">
                             <Link href="/about" className="hover:text-foreground transition-colors">{t("footer.links.about")}</Link>
                         </li>
                         <li className="mb-2">

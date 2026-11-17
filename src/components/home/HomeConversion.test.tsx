@@ -70,11 +70,13 @@ describe("value-led homepage conversion journey", () => {
       rendered = true;
     });
 
-    expect(container.textContent).toContain("Your future starts with curiosity.");
-    expect(container.textContent).toContain("Leave with direction, choices, and a next step.");
-    expect(container.textContent).toContain("Make the next career conversation easier.");
-    expect(container.textContent).toContain("Curated, not generated");
-    expect(container.textContent).toContain("No perfect-match claims");
+    expect(container.textContent).toContain("Not sure what to do after school?");
+    expect(container.textContent).toContain("How Xtara helps");
+    expect(container.textContent).not.toContain("Make the next career conversation easier.");
+    expect(container.textContent).not.toContain("Curated, not generated");
+    expect(container.querySelectorAll('h3')).toHaveLength(6);
+    expect(container.querySelector('header a[href="/parents"]')).not.toBeNull();
+    expect(container.querySelector('header a[href="/about"]')).toBeNull();
 
     expect(container.querySelectorAll('a[href="/assessment"]').length).toBeGreaterThanOrEqual(3);
     expect(container.querySelectorAll('a[href="/login"]').length).toBeGreaterThanOrEqual(2);
@@ -108,8 +110,8 @@ describe("value-led homepage conversion journey", () => {
 
   it("keeps the same value story available in Malayalam", () => {
     const content = getMessages("ml").trustedDiscovery.home;
-    expect(content.hero.title).toContain("എനിക്ക് അറിയില്ല");
-    expect(content.conversation.title).toContain("കരിയറിനെക്കുറിച്ച്");
+    expect(content.hero.title).toContain("സ്കൂൾ കഴിഞ്ഞ്");
+    expect(content.audiences.items[1].title).toBe("രക്ഷിതാക്കൾക്ക്");
     expect(content.cta.login).toContain("ലോഗിൻ");
   });
 });

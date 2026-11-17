@@ -10,7 +10,7 @@
   },
   "metadata": {
     "title": "Xtara - Explore your future with confidence",
-    "description": "Trusted career exploration and decision guidance for students from Grade 8 onward."
+    "description": "Xtara helps students in Classes 8–12 learn about jobs and what they need to study."
   },
   "auth": {
     "common": {
@@ -264,17 +264,17 @@
   "trustedDiscovery": {
     "home": {
       "hero": {
-        "eyebrow": "Career conversations can start in Grade 8",
-        "title": "Turn “I don’t know” into a future worth exploring.",
-        "description": "Xtara helps students understand themselves, discover Career Directions, choose Dream Careers, and build a practical plan they can discuss with parents and teachers.",
-        "primaryLoggedOut": "Explore my career path",
-        "primaryLoggedIn": "Open my career path",
+        "eyebrow": "For students in Classes 8–12",
+        "title": "Not sure what to do after school?",
+        "description": "Xtara helps students learn about different jobs. Answer questions about what you enjoy, find jobs to explore, and learn what you need to study.",
+        "primaryLoggedOut": "Answer questions",
+        "primaryLoggedIn": "See my saved choices",
         "login": "Log in to my plan",
         "imageAlt": "A joyful group of Indian school students",
         "proofs": [
-          "Grades 8–12",
-          "Interface: English, Malayalam, Hindi and Tamil",
-          "Clear reasons behind every direction"
+          "Classes 8–12",
+          "English, Malayalam, Hindi and Tamil",
+          "No account needed to start"
         ],
         "resultLabel": "What you will discover",
         "resultTitle": "Up to 3 Career Directions",
@@ -282,23 +282,23 @@
       },
       "outcomes": {
         "eyebrow": "A useful result—not a label",
-        "title": "Leave with direction, choices, and a next step.",
+        "title": "What can you do on Xtara?",
         "description": "The assessment does not try to name one perfect job. It gives the student a clear way to explore and decide over time.",
         "items": [
           {
             "step": "01",
-            "title": "Up to 3 Career Directions",
-            "description": "See broad futures worth exploring and understand why each one appeared."
+            "title": "Tell us what you enjoy",
+            "description": "Answer questions about your interests, what you find easy, and what you find difficult. There are no right or wrong answers."
           },
           {
             "step": "02",
-            "title": "1–3 Dream Careers",
-            "description": "Compare real work, study routes, salary, and difficult parts before preferring a role."
+            "title": "Learn about different jobs",
+            "description": "See areas of work you may like. Read about what people do in each job and how they get there."
           },
           {
             "step": "03",
-            "title": "My Career Path",
-            "description": "Build skills, try activities, discuss choices, and keep the plan moving."
+            "title": "Save the jobs you want to explore",
+            "description": "Choose jobs you would like to know more about. Sign in to save them. You can change your choices later."
           }
         ]
       },
@@ -364,109 +364,125 @@
       },
       "educators": {
         "eyebrow": "For schools, teachers, and counsellors",
-        "title": "Give every learner thoughtful, personal guidance.",
-        "description": "Bring classes into one responsible guidance workspace. See who has completed discovery, understand shared learner signals, and know where a human conversation can help next.",
-        "pageTitle": "Help more students move from uncertainty to a practical next step.",
-        "pageDescription": "Xtara gives educators a structured view of learner discovery and progress without turning assessment results into rankings, labels, or permanent decisions.",
+        "title": "Help students learn about life after school.",
+        "description": "Use the interests students share with you to help them learn about jobs and study choices.",
+        "pageTitle": "See what your students are interested in.",
+        "pageDescription": "Bring your class onto Xtara. See who has answered the questions, which jobs students want to explore, and who may need your help.",
         "primary": "Create an educator account",
-        "primaryLoggedIn": "Open educator workspace",
-        "secondary": "See how it works",
+        "primaryLoggedIn": "Open my classes",
+        "secondary": "For educators",
         "login": "Educator login",
         "proofs": [
-          "Create classes and invite learners securely",
-          "See only consented, role-scoped guidance",
-          "Keep each student's Xtara account independent"
+          "Create classes and invite students",
+          "Students choose what to share with you",
+          "Students keep their own accounts"
         ],
         "features": [
           {
-            "title": "Class-level visibility",
-            "description": "See invitations, joining progress, assessment completion, and follow-up needs for the classes assigned to you."
+            "title": "See your class",
+            "description": "See who has joined your class and who still needs to finish the questions."
           },
           {
-            "title": "Useful learner summaries",
-            "description": "Review shared directions and signals with plain-language prompts for a constructive conversation."
+            "title": "Understand each student",
+            "description": "Read the interests and job choices a student has agreed to share with you."
           },
           {
-            "title": "Responsible cohort insights",
-            "description": "Understand patterns only after a privacy threshold is reached—without student rankings or perfect-fit scores."
+            "title": "Plan who to help next",
+            "description": "See which students have unfinished steps or are due for a review."
           },
           {
-            "title": "Scoped and consented",
-            "description": "Role and class boundaries are enforced by the API, while learners keep ownership of their accounts and data."
+            "title": "Respect student privacy",
+            "description": "See only the information students share with your school and that your school role allows you to see."
           }
         ],
-        "capabilitiesEyebrow": "Built around educator decisions",
-        "capabilitiesTitle": "Know who needs support, and what conversation to have.",
-        "capabilitiesDescription": "The educator workspace turns learner activity into a focused support queue instead of another collection of charts.",
-        "stepsEyebrow": "A simple institution journey",
-        "stepsTitle": "Set up a school, invite a class, begin guiding.",
-        "stepsDescription": "Students complete the normal Xtara discovery journey before joining, so every educator view begins with learner-owned context and explicit sharing.",
+        "capabilitiesEyebrow": "In your classes",
+        "capabilitiesTitle": "Know who needs help.",
+        "capabilitiesDescription": "Use a student’s answers as a starting point. Ask what they would like to learn more about.",
+        "stepsEyebrow": "Getting started",
+        "stepsTitle": "Set up your school and invite students.",
+        "stepsDescription": "Students use their own Xtara accounts. They review what to share before joining a class.",
         "steps": [
           {
-            "title": "Create your institution",
-            "description": "Set up the school workspace, academic year, classes, and the educators responsible for each group."
+            "title": "Add your school and classes",
+            "description": "Set up the school year, add classes, and choose the teachers for each class."
           },
           {
-            "title": "Invite learners",
-            "description": "Share an expiring, capacity-limited class code. Learners complete assessment and review sharing before membership activates."
+            "title": "Invite your students",
+            "description": "Share the class code. Students finish the questions and choose what information to share when they join."
           },
           {
-            "title": "Guide the next step",
-            "description": "Use shared summaries, open questions, and follow-up needs to plan a useful conversation with each learner."
+            "title": "Help students explore",
+            "description": "Look at their shared interests and job choices. Help them find something to read, ask about, or try."
           }
         ],
-        "finalTitle": "Build a stronger guidance practice without taking over the student's decision.",
-        "finalDescription": "Start an institution workspace for your school or educational program. Students keep their individual Xtara journey while educators gain the context needed to support them responsibly.",
+        "finalTitle": "You don’t need to have every answer.",
+        "finalDescription": "Help students learn about work they may not know yet. Start by adding your school and inviting a class.",
         "preview": {
-          "label": "Consent-aware guidance",
+          "label": "Example class",
           "title": "Class 9A",
-          "classLabel": "Learner needing follow-up",
-          "learnersLabel": "Learners",
-          "assessedLabel": "Assessed",
-          "followUpLabel": "Follow-up",
-          "learnerName": "A learner is ready to discuss",
+          "classLabel": "Student to check in with",
+          "learnersLabel": "Students",
+          "assessedLabel": "Questions finished",
+          "followUpLabel": "Need help",
+          "learnerName": "A student has shared their interests",
           "learnerStatus": "Ready"
         }
       },
       "questions": {
-        "eyebrow": "Questions from students and parents",
-        "title": "Clear answers before you begin.",
-        "description": "Know what the assessment will—and will not—do.",
+        "eyebrow": "Questions you may have",
+        "title": "Before you start",
+        "description": "",
         "items": [
           {
-            "question": "Is Grade 8 too early to talk about careers?",
-            "answer": "It is too early to force a final choice, but it is a good time to discover unfamiliar possibilities, notice strengths, and learn how different kinds of work feel."
+            "question": "What if I have no idea what job I want?",
+            "answer": "That’s okay. Start with what you enjoy at school or at home. You can also browse the jobs without answering any questions."
           },
           {
-            "question": "Will the assessment decide one career for the student?",
-            "answer": "No. It suggests up to three Career Directions with reasons. The student chooses one to explore, then prefers up to three Dream Careers inside it."
+            "question": "Is this a test?",
+            "answer": "No. You won’t pass or fail. Your answers help Xtara suggest areas of work to explore. Answer for yourself, rather than choosing what someone else might want."
           },
           {
-            "question": "Do personality, strengths, family background, and finances matter?",
-            "answer": "The assessment considers interests, strengths, experiences, confidence, personality signals, and challenges. After the result, location, study details, family priorities, and affordability help shape practical course and college planning."
+            "question": "Will Xtara choose a job for me?",
+            "answer": "No. It suggests up to three areas of work based on your answers. You can read about jobs in each area and choose what you want to explore. You can change your mind."
           },
           {
-            "question": "How can a parent or teacher take part?",
-            "answer": "The student can open a Career Conversation slideshow that explains the suggested direction, chosen careers, daily work, preparation, salary, and difficult parts in a format designed for discussion."
-          },
-          {
-            "question": "Do I need an account before starting?",
-            "answer": "You can explore the assessment before signing in. Sign in to save your direction, career choices and study details."
+            "question": "Do I need an account?",
+            "answer": "You can answer the questions and browse jobs without an account. Sign in when you want to save your choices."
           },
           {
             "question": "Which languages can I choose?",
-            "answer": "You can choose English, Malayalam, Hindi or Tamil. Career guidance appears when reviewed content is available in your selected language."
+            "answer": "You can choose English, Malayalam, Hindi or Tamil. Some job information is still in English while translations are being prepared."
           }
         ]
       },
       "cta": {
-        "eyebrow": "A better question starts here",
-        "title": "Do not ask for one final answer. Start with a direction worth exploring.",
-        "description": "Begin the assessment now, or log in to continue a Career Path already in progress.",
-        "primary": "Explore my career path",
-        "primaryLoggedIn": "Open my career path",
-        "login": "Log in to my plan",
-        "imageAlt": "A young woman standing between two supportive parents"
+        "eyebrow": "Start here",
+        "title": "You don’t need to choose a job today.",
+        "description": "Begin by finding out what interests you.",
+        "primary": "Answer questions",
+        "primaryLoggedIn": "See my saved choices",
+        "login": "Log in",
+        "imageAlt": "Illustration of two students trying a model bridge and a plant drawing while a parent looks on"
+      },
+      "audiences": {
+        "title": "How Xtara helps",
+        "items": [
+          {
+            "title": "Students",
+            "description": "You don’t need a job in mind. Learn about work you may not have heard of and see what interests you.",
+            "action": "Start with the questions"
+          },
+          {
+            "title": "Parents",
+            "description": "Learn about jobs with your child, even if you don’t know much about them. Help your child explore without rushing a choice.",
+            "action": "Read the parents guide"
+          },
+          {
+            "title": "Teachers and counsellors",
+            "description": "See which students have finished the questions and what interests they have shared with you. Find out who needs help.",
+            "action": "See tools for educators"
+          }
+        ]
       }
     },
     "hero": {
@@ -553,12 +569,30 @@
       "areasTitle": "Six places to begin exploring",
       "areasDescription": "Career Directions are starting points, not boxes. Each one contains many Dream Careers.",
       "areas": [
-        { "title": "Technology", "description": "Build apps, solve problems, and create useful digital tools." },
-        { "title": "Health", "description": "Help people stay healthy, recover, and live well." },
-        { "title": "Science", "description": "Ask questions, test ideas, and learn how things work." },
-        { "title": "Business", "description": "Turn ideas into useful products, services, and organisations." },
-        { "title": "Design and Media", "description": "Create clear, useful, and engaging experiences and stories." },
-        { "title": "Education and Society", "description": "Teach, support communities, and help solve public problems." }
+        {
+          "title": "Technology",
+          "description": "Build apps, solve problems, and create useful digital tools."
+        },
+        {
+          "title": "Health",
+          "description": "Help people stay healthy, recover, and live well."
+        },
+        {
+          "title": "Science",
+          "description": "Ask questions, test ideas, and learn how things work."
+        },
+        {
+          "title": "Business",
+          "description": "Turn ideas into useful products, services, and organisations."
+        },
+        {
+          "title": "Design and Media",
+          "description": "Create clear, useful, and engaging experiences and stories."
+        },
+        {
+          "title": "Education and Society",
+          "description": "Teach, support communities, and help solve public problems."
+        }
       ],
       "trustTitle": "You are exploring, not locking in a future.",
       "trustDescription": "Xtara will show several possibilities and help you gather evidence. You can disagree, change your profile, and revisit your direction.",
@@ -569,6 +603,40 @@
       "title": "Start with curiosity, not a final answer.",
       "description": "Start with your class and assessment. Create an account when you want to save your Career Direction, Dream Careers, study details, and learning progress.",
       "action": "Explore my career path"
+    },
+    "parents": {
+      "title": "You don’t need to know every job to help your child.",
+      "description": "If your child has not thought about work yet, that is okay. Xtara helps students in Classes 8–12 learn about different jobs and find out what interests them.",
+      "primary": "Explore jobs together",
+      "secondary": "See the questions",
+      "stepsTitle": "Three ways you can help",
+      "steps": [
+        {
+          "title": "Let your child answer",
+          "description": "The questions are about what your child enjoys and finds easy or difficult. Let them choose their own answers. There are no marks."
+        },
+        {
+          "title": "Read about one job together",
+          "description": "Look at what people do each day and what they need to study. Ask your child which parts sound interesting and which do not."
+        },
+        {
+          "title": "Try something small",
+          "description": "Your child could draw something, grow a plant, repair a simple object, or ask someone about their work. Notice what they enjoy doing."
+        }
+      ],
+      "reassuranceTitle": "“I don’t know” is a place to start.",
+      "reassuranceBody": "Your child does not need to decide now. Start with everyday things they like doing. Their interests may change as they learn more.",
+      "prompts": [
+        "“What did you enjoy doing today?”",
+        "“What would you like to learn how to do?”",
+        "“Which of these jobs would you like to know more about?”"
+      ],
+      "practicalTitle": "When it is time to choose what to study",
+      "practicalBody": "Read about the study needed for jobs your child likes. Check course fees, entry requirements and travel with the school or college. A teacher or counsellor can help you compare the choices.",
+      "accountNote": "You can browse jobs together without an account. Your child can sign in to save their own choices. This page is a guide for parents; it does not give access to a child’s private account.",
+      "metadataTitle": "Help your child learn about jobs | Xtara for parents",
+      "metadataDescription": "Simple ways to help your child explore jobs, understand what to study, and try new interests. For parents of students in Classes 8–12.",
+      "eyebrow": "For parents"
     }
   },
   "common": {
@@ -830,7 +898,8 @@
       "educatorProfile": "My profile",
       "about": "About",
       "news": "News",
-      "contact": "Contact"
+      "contact": "Contact",
+      "parents": "For parents"
     },
     "cta": {
       "joinWaitlist": "Explore my career path",
@@ -839,7 +908,7 @@
   },
   "footer": {
     "brand": "Xtara",
-    "about": "Career exploration and decision guidance that helps students understand possibilities, test ideas, and take a clear next step.",
+    "about": "Xtara helps students in Classes 8–12 learn about jobs and what they need to study.",
     "quickLinksTitle": "Quick Links",
     "contactTitle": "Contact Us",
     "labels": {

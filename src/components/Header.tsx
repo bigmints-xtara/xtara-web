@@ -94,9 +94,8 @@ const Header = () => {
         ]
         : [
             ...(MVP_NAVIGATION_ENABLED ? [{ key: "explore", url: "/explore" }] : []),
-            { key: "howItWorks", url: "/#how-it-works" },
+            { key: "parents", url: "/parents" },
             { key: "educators", url: "/educators" },
-            { key: "about", url: "/about" },
         ];
 
     const navLabel = (key: string) => {

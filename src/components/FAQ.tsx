@@ -18,7 +18,7 @@ const FAQ = () => {
           <h2 className="mt-4 max-w-xl text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
             {content.title}
           </h2>
-          <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">{content.description}</p>
+          {content.description ? <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">{content.description}</p> : null}
         </div>
 
         <div className="divide-y divide-primary/10 border-y border-primary/10">

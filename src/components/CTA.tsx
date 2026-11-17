@@ -25,8 +25,8 @@ const CTA = () => {
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.description}</p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" className="rounded-full px-7">
+          <div className="mt-8 flex flex-col flex-wrap gap-3 sm:flex-row">
+            <Button asChild size="lg" className="h-auto min-h-12 whitespace-normal rounded-full px-7 py-3">
               <Link
                 href={isLoggedIn ? "/dashboard" : "/assessment"}
                 onClick={() => trackEvent({ action: "cta_click", category: "engagement", label: isLoggedIn ? "home_final_open_path" : "home_final_assessment" })}
@@ -36,7 +36,7 @@ const CTA = () => {
               </Link>
             </Button>
             {!isLoggedIn ? (
-              <Button asChild size="lg" variant="outline" className="rounded-full border-primary/15 bg-white px-7">
+              <Button asChild size="lg" variant="outline" className="h-auto min-h-12 whitespace-normal rounded-full border-primary/15 bg-white px-7 py-3">
                 <Link
                   href="/login"
                   onClick={() => trackEvent({ action: "login_click", category: "engagement", label: "home_final_login" })}
@@ -49,16 +49,15 @@ const CTA = () => {
           </div>
         </div>
 
-        <div className="relative h-full min-h-[360px] w-full self-stretch lg:min-h-[480px]">
+        <div className="w-full px-4 pb-4 lg:p-6">
           <Image
-            src="/images/home/family-supported-future.jpg"
+            src="/images/home/exploring-together.webp"
             alt={content.imageAlt}
-            width={1400}
-            height={1500}
+            width={1200}
+            height={800}
             sizes="(min-width: 1024px) 40vw, 100vw"
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="h-auto w-full rounded-2xl"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent lg:bg-gradient-to-r lg:from-[#eaf4fa] lg:via-transparent lg:to-transparent" />
         </div>
       </div>
     </section>

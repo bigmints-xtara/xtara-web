@@ -10,7 +10,7 @@
   },
   "metadata": {
     "title": "Xtara - करियर गाइडेंस",
-    "description": "सफलता की ओर आपका पहला कदम"
+    "description": "Xtara कक्षा 8–12 के छात्रों को कामों और उनके लिए ज़रूरी पढ़ाई के बारे में जानने में मदद करता है।"
   },
   "auth": {
     "common": {
@@ -264,17 +264,17 @@
   "trustedDiscovery": {
     "home": {
       "hero": {
-        "eyebrow": "Career conversations Grade 8 से शुरू हो सकते हैं",
-        "title": "Students को career चुनने से पहले समझने दें।",
-        "description": "Xtara interests, strengths, family context और real career information को जोड़कर student को साफ next steps देता है।",
-        "primaryLoggedOut": "Career path शुरू करें",
-        "primaryLoggedIn": "अपनी progress देखें",
+        "eyebrow": "कक्षा 8–12 के छात्रों के लिए",
+        "title": "स्कूल के बाद क्या करें, समझ नहीं आ रहा?",
+        "description": "Xtara छात्रों को अलग-अलग कामों के बारे में जानने में मदद करता है। अपनी पसंद से जुड़े सवालों के जवाब दें। जानें कि कौन-से काम आपको अच्छे लगते हैं और उनके लिए क्या पढ़ना होता है।",
+        "primaryLoggedOut": "सवालों के जवाब दें",
+        "primaryLoggedIn": "मेरे सहेजे हुए विकल्प देखें",
         "login": "Log in करें",
         "imageAlt": "Career planning देखते students",
         "proofs": [
           "कक्षा 8–12",
-          "इंटरफ़ेस: अंग्रेज़ी, मलयालम, हिंदी और तमिल",
-          "हर दिशा का स्पष्ट कारण"
+          "अंग्रेज़ी, मलयालम, हिंदी और तमिल",
+          "शुरू करने के लिए अकाउंट ज़रूरी नहीं"
         ],
         "resultLabel": "Assessment के बाद",
         "resultTitle": "Career Direction और next steps",
@@ -282,23 +282,23 @@
       },
       "outcomes": {
         "eyebrow": "Assessment के बाद",
-        "title": "Direction, choices और एक next step लेकर निकलें।",
+        "title": "Xtara पर आप क्या कर सकते हैं?",
         "description": "Assessment एक perfect job बताने की कोशिश नहीं करता। यह student को areas समझने, roles compare करने और आगे क्या try करना है यह तय करने में मदद करता है।",
         "items": [
           {
-            "step": "1",
-            "title": "Up to 3 Career Directions",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "step": "01",
+            "title": "बताएँ कि आपको क्या पसंद है",
+            "description": "अपनी रुचियों और उन कामों के बारे में जवाब दें जो आपको आसान या मुश्किल लगते हैं। कोई सही या गलत जवाब नहीं है।"
           },
           {
-            "step": "2",
-            "title": "1-3 Dream Careers",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "step": "02",
+            "title": "अलग-अलग कामों को जानें",
+            "description": "ऐसे काम देखें जिनमें आपकी रुचि हो सकती है। पढ़ें कि लोग रोज़ क्या करते हैं और वहाँ तक कैसे पहुँचते हैं।"
           },
           {
-            "step": "3",
-            "title": "My Career Path",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "step": "03",
+            "title": "पसंद के काम सहेजें",
+            "description": "वे काम चुनें जिनके बारे में आप और जानना चाहते हैं। उन्हें सहेजने के लिए लॉग इन करें। आप बाद में अपनी पसंद बदल सकते हैं।"
           }
         ]
       },
@@ -364,109 +364,125 @@
       },
       "educators": {
         "eyebrow": "Schools, teachers और counsellors के लिए",
-        "title": "Give every learner thoughtful, personal guidance.",
-        "description": "Students की readiness, interests और next steps समझें ताकि बातचीत timely और useful रहे।",
-        "pageTitle": "Educators के लिए career guidance",
-        "pageDescription": "Xtara gives educators a structured view of learner discovery and progress without turning assessment results into rankings, labels, or permanent decisions.",
-        "primary": "शुरू करें",
-        "primaryLoggedIn": "Dashboard खोलें",
-        "secondary": "और देखें",
+        "title": "छात्रों को स्कूल के बाद की ज़िंदगी समझने में मदद करें।",
+        "description": "छात्रों की साझा की गई रुचियों से उन्हें कामों और पढ़ाई के बारे में जानने में मदद करें।",
+        "pageTitle": "जानें कि आपके छात्रों को क्या पसंद है।",
+        "pageDescription": "अपनी कक्षा को Xtara पर लाएँ। देखें कि किसने सवाल पूरे किए, छात्र किन कामों के बारे में जानना चाहते हैं और किसे आपकी मदद चाहिए।",
+        "primary": "शिक्षक अकाउंट बनाएँ",
+        "primaryLoggedIn": "मेरी कक्षाएँ खोलें",
+        "secondary": "शिक्षकों के लिए",
         "login": "Log in करें",
         "proofs": [
-          "Career path को साफ रखने वाला step",
-          "Career path को साफ रखने वाला step",
-          "Career path को साफ रखने वाला step"
+          "कक्षाएँ बनाएँ और छात्रों को बुलाएँ",
+          "छात्र तय करते हैं कि आपसे क्या साझा करें",
+          "छात्र अपने अकाउंट रखते हैं"
         ],
         "features": [
           {
-            "title": "Class-level visibility",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "अपनी कक्षा देखें",
+            "description": "देखें कि कौन जुड़ गया है और किसे अभी सवाल पूरे करने हैं।"
           },
           {
-            "title": "Useful learner summaries",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "हर छात्र को समझें",
+            "description": "छात्र की वे रुचियाँ और पसंद के काम पढ़ें जिन्हें उसने आपसे साझा करने की अनुमति दी है।"
           },
           {
-            "title": "Responsible cohort insights",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "तय करें कि किसे मदद चाहिए",
+            "description": "देखें कि किसके कुछ कदम अधूरे हैं या किससे दोबारा बात करने का समय है।"
           },
           {
-            "title": "Scoped और consent-based",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "छात्र की निजता का ध्यान रखें",
+            "description": "केवल वही जानकारी देखें जो छात्रों ने स्कूल से साझा की है और जिसे देखने की अनुमति आपकी स्कूल की भूमिका में है।"
           }
         ],
-        "capabilitiesEyebrow": "Educator tools",
-        "capabilitiesTitle": "Know who needs support, and what conversation to have.",
-        "capabilitiesDescription": "The educator workspace turns learner activity into a focused support queue instead of another collection of charts.",
-        "stepsEyebrow": "A simple institution journey",
-        "stepsTitle": "Set up a school, invite a class, begin guiding.",
-        "stepsDescription": "Students complete the normal Xtara discovery journey before joining, so every educator view begins with learner-owned context and explicit sharing.",
+        "capabilitiesEyebrow": "आपकी कक्षाओं में",
+        "capabilitiesTitle": "जानें कि किसे मदद चाहिए।",
+        "capabilitiesDescription": "छात्र के जवाबों से शुरुआत करें। पूछें कि वह किस बारे में और जानना चाहता है।",
+        "stepsEyebrow": "शुरुआत करें",
+        "stepsTitle": "स्कूल जोड़ें और छात्रों को बुलाएँ।",
+        "stepsDescription": "छात्र अपने Xtara अकाउंट इस्तेमाल करते हैं। कक्षा में जुड़ने से पहले वे देखते हैं कि क्या साझा करना है।",
         "steps": [
           {
-            "title": "Institution बनाएँ",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "स्कूल और कक्षाएँ जोड़ें",
+            "description": "पढ़ाई का साल, कक्षाएँ और हर कक्षा के शिक्षक जोड़ें।"
           },
           {
-            "title": "Learners invite करें",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "छात्रों को बुलाएँ",
+            "description": "कक्षा का कोड दें। छात्र सवाल पूरे करते हैं और जुड़ते समय तय करते हैं कि क्या साझा करना है।"
           },
           {
-            "title": "Next step guide करें",
-            "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।"
+            "title": "जानने में मदद करें",
+            "description": "उनकी साझा रुचियाँ और पसंद के काम देखें। उन्हें पढ़ने, पूछने या आज़माने के लिए कुछ ढूँढने में मदद करें।"
           }
         ],
-        "finalTitle": "Build a stronger guidance practice without taking over the student's decision.",
-        "finalDescription": "Start an institution workspace for your school or educational program. Students keep their individual Xtara journey while educators gain the context needed to support them responsibly.",
+        "finalTitle": "आपको हर जवाब पता होना ज़रूरी नहीं है।",
+        "finalDescription": "छात्रों को ऐसे कामों के बारे में जानने में मदद करें जिन्हें वे अभी नहीं जानते। अपना स्कूल जोड़कर एक कक्षा को बुलाएँ।",
         "preview": {
-          "label": "Class snapshot",
-          "title": "Career discussion ready",
-          "classLabel": "Learner needing follow-up",
-          "learnersLabel": "Learners",
-          "assessedLabel": "Assessed",
-          "followUpLabel": "Follow-up",
-          "learnerName": "एक learner discussion के लिए ready है",
-          "learnerStatus": "Ready"
+          "label": "कक्षा का उदाहरण",
+          "title": "कक्षा 9A",
+          "classLabel": "जिस छात्र से बात करनी है",
+          "learnersLabel": "छात्र",
+          "assessedLabel": "सवाल पूरे",
+          "followUpLabel": "मदद चाहिए",
+          "learnerName": "एक छात्र ने अपनी रुचियाँ साझा की हैं",
+          "learnerStatus": "तैयार"
         }
       },
       "questions": {
-        "eyebrow": "Students और parents के सवाल",
-        "title": "Clear answers before you begin.",
-        "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
+        "eyebrow": "आपके सवाल",
+        "title": "शुरू करने से पहले",
+        "description": "",
         "items": [
           {
-            "question": "क्या Grade 8 career बात के लिए बहुत जल्दी है?",
-            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+            "question": "अगर मुझे पता ही नहीं कि कौन-सा काम करना है?",
+            "answer": "कोई बात नहीं। स्कूल या घर में जो करना पसंद है, उससे शुरू करें। बिना सवालों के जवाब दिए भी कामों के बारे में पढ़ सकते हैं।"
           },
           {
-            "question": "क्या assessment student के लिए एक career decide करेगा?",
-            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+            "question": "क्या यह परीक्षा है?",
+            "answer": "नहीं। इसमें पास या फेल नहीं होते। आपके जवाब Xtara को काम के कुछ क्षेत्र सुझाने में मदद करते हैं। वही जवाब चुनें जो आप सोचते हैं, न कि जो दूसरे चाहते हैं।"
           },
           {
-            "question": "क्या personality, strengths, family background और finances matter करते हैं?",
-            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
+            "question": "क्या Xtara मेरे लिए काम चुनेगा?",
+            "answer": "नहीं। आपके जवाबों से यह काम के तीन क्षेत्रों तक के सुझाव देता है। हर क्षेत्र के कामों को पढ़कर तय करें कि किसके बारे में और जानना है। आप अपनी पसंद बदल सकते हैं।"
           },
           {
-            "question": "Parent या teacher कैसे जुड़ सकते हैं?",
-            "answer": "नहीं। इसे final answer की तरह नहीं, explore करने की शुरुआत की तरह use करें।"
-          },
-          {
-            "question": "Start करने से पहले account चाहिए?",
-            "answer": "साइन इन करने से पहले आप आकलन शुरू कर सकते हैं। अपनी दिशा, करियर विकल्प और पढ़ाई की जानकारी सहेजने के लिए साइन इन करें।"
+            "question": "क्या अकाउंट ज़रूरी है?",
+            "answer": "बिना अकाउंट के सवालों के जवाब दे सकते हैं और कामों के बारे में पढ़ सकते हैं। अपने विकल्प सहेजने के लिए लॉग इन करें।"
           },
           {
             "question": "मैं कौन-सी भाषाएँ चुन सकता हूँ?",
-            "answer": "आप अंग्रेज़ी, मलयालम, हिंदी या तमिल चुन सकते हैं। आपकी चुनी हुई भाषा में समीक्षा की गई सामग्री उपलब्ध होने पर करियर मार्गदर्शन दिखाई देगा।"
+            "answer": "आप अंग्रेज़ी, मलयालम, हिंदी या तमिल चुन सकते हैं। अनुवाद तैयार होने तक कुछ कामों की जानकारी अंग्रेज़ी में मिलेगी।"
           }
         ]
       },
       "cta": {
-        "eyebrow": "आज शुरू करें",
-        "title": "एक final answer मत खोजिए। Explore करने लायक direction से शुरू करें।",
-        "description": "Assessment शुरू करें, या login करके अपना Career Path आगे बढ़ाएँ।",
-        "primary": "Career path explore करें",
-        "primaryLoggedIn": "मेरी progress खोलें",
-        "login": "Log in करें",
-        "imageAlt": "Supportive parents के बीच खड़ी young student"
+        "eyebrow": "यहाँ से शुरू करें",
+        "title": "आज ही कोई काम चुनना ज़रूरी नहीं है।",
+        "description": "पहले जानें कि आपको क्या अच्छा लगता है।",
+        "primary": "सवालों के जवाब दें",
+        "primaryLoggedIn": "मेरे सहेजे हुए विकल्प देखें",
+        "login": "लॉग इन करें",
+        "imageAlt": "चित्र में दो छात्र पुल का मॉडल और पौधे का चित्र बना रहे हैं, पास बैठी माँ उन्हें देख रही हैं"
+      },
+      "audiences": {
+        "title": "Xtara कैसे मदद करता है?",
+        "items": [
+          {
+            "title": "छात्रों के लिए",
+            "description": "अभी कोई काम चुना होना ज़रूरी नहीं है। ऐसे कामों के बारे में जानें जिनके नाम भी शायद आपने न सुने हों। देखें कि आपको क्या अच्छा लगता है।",
+            "action": "सवालों से शुरू करें"
+          },
+          {
+            "title": "माता-पिता के लिए",
+            "description": "कामों के बारे में ज़्यादा न जानते हों, तो भी बच्चे के साथ सीख सकते हैं। जल्दी फैसला करने का दबाव डाले बिना उसे जानने में मदद करें।",
+            "action": "माता-पिता के लिए सुझाव पढ़ें"
+          },
+          {
+            "title": "शिक्षकों और काउंसलरों के लिए",
+            "description": "देखें कि किन छात्रों ने सवाल पूरे किए हैं और उन्होंने आपसे कौन-सी रुचियाँ साझा की हैं। जानें कि किसे मदद चाहिए।",
+            "action": "शिक्षकों के लिए सुविधाएँ देखें"
+          }
+        ]
       }
     },
     "hero": {
@@ -587,6 +603,40 @@
       "title": "Start with curiosity, not a final answer.",
       "description": "Student को options, reasons और next steps साफ समझने में मदद मिलती है।",
       "action": "Career path शुरू करें"
+    },
+    "parents": {
+      "title": "बच्चे की मदद के लिए हर काम के बारे में जानना ज़रूरी नहीं है।",
+      "description": "बच्चे ने अभी काम के बारे में नहीं सोचा है, तो कोई बात नहीं। Xtara कक्षा 8–12 के छात्रों को अलग-अलग कामों और अपनी रुचियों को जानने में मदद करता है।",
+      "primary": "साथ मिलकर कामों के बारे में जानें",
+      "secondary": "सवाल देखें",
+      "stepsTitle": "आप तीन तरह से मदद कर सकते हैं",
+      "steps": [
+        {
+          "title": "बच्चे को खुद जवाब देने दें",
+          "description": "सवाल बच्चे की पसंद और आसान या मुश्किल लगने वाले कामों के बारे में हैं। उसे अपने जवाब चुनने दें। इसमें अंक नहीं मिलते।"
+        },
+        {
+          "title": "एक काम के बारे में साथ पढ़ें",
+          "description": "देखें कि लोग हर दिन क्या करते हैं और क्या पढ़ना होता है। बच्चे से पूछें कि उसे कौन-सी बातें अच्छी लगीं और कौन-सी नहीं।"
+        },
+        {
+          "title": "कुछ छोटा करके देखें",
+          "description": "बच्चा चित्र बना सकता है, पौधा उगा सकता है, कोई छोटी चीज़ ठीक कर सकता है या किसी से उनके काम के बारे में पूछ सकता है। ध्यान दें कि उसे क्या करना अच्छा लगता है।"
+        }
+      ],
+      "reassuranceTitle": "“मुझे नहीं पता” से भी शुरुआत हो सकती है।",
+      "reassuranceBody": "बच्चे को अभी फैसला नहीं करना है। रोज़ की पसंद से शुरू करें। सीखने के साथ उसकी रुचियाँ बदल सकती हैं।",
+      "prompts": [
+        "“आज तुम्हें क्या करना अच्छा लगा?”",
+        "“तुम क्या करना सीखना चाहोगे?”",
+        "“इनमें से किस काम के बारे में और जानना चाहोगे?”"
+      ],
+      "practicalTitle": "जब पढ़ाई चुनने का समय आए",
+      "practicalBody": "बच्चे की पसंद के काम के लिए ज़रूरी पढ़ाई के बारे में पढ़ें। फीस, दाखिले की शर्तें और आने-जाने की जानकारी स्कूल या कॉलेज से लें। शिक्षक या काउंसलर विकल्पों को समझने में मदद कर सकते हैं।",
+      "accountNote": "बिना अकाउंट के साथ मिलकर कामों के बारे में पढ़ सकते हैं। बच्चा अपनी पसंद सहेजने के लिए लॉग इन कर सकता है। यह माता-पिता के लिए सुझावों का पेज है; इससे बच्चे के निजी अकाउंट तक पहुँच नहीं मिलती।",
+      "metadataTitle": "बच्चे को कामों के बारे में जानने में मदद करें | Xtara",
+      "metadataDescription": "कक्षा 8–12 के बच्चों को कामों, पढ़ाई और नई रुचियों के बारे में जानने में मदद करने के आसान तरीके।",
+      "eyebrow": "माता-पिता के लिए"
     }
   },
   "common": {
@@ -887,14 +937,15 @@
       "learnerNavigation": "विद्यार्थी नेविगेशन",
       "explore": "Explore",
       "howItWorks": "कैसे काम करता है",
-      "educators": "Educators",
+      "educators": "शिक्षकों के लिए",
       "organization": "Workspace",
       "learners": "Students",
       "classes": "Classes",
       "educatorProfile": "My profile",
       "about": "हमारे बारे में",
       "news": "न्यूज़",
-      "contact": "संपर्क"
+      "contact": "संपर्क",
+      "parents": "माता-पिता के लिए"
     },
     "cta": {
       "joinWaitlist": "वेटलिस्ट जॉइन करें",
@@ -903,7 +954,7 @@
   },
   "footer": {
     "brand": "Xtara",
-    "about": "छात्रों को उनके सपनों का करियर खोजने में मदद करने वाला प्लेटफॉर्म।",
+    "about": "Xtara कक्षा 8–12 के छात्रों को कामों और उनके लिए ज़रूरी पढ़ाई के बारे में जानने में मदद करता है।",
     "quickLinksTitle": "Quick Links",
     "contactTitle": "संपर्क",
     "labels": {

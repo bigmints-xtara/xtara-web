@@ -4,7 +4,7 @@ type MarketingMetadata = Record<Locale, { title: string; description: string }>;
 
 export const homeMetadata = {
   title: "Career Guidance for Students in India | Xtara",
-  description: "Explore Career Directions, discover Dream Careers, and build a practical plan with Xtara. Career guidance for students in India from Grade 8 onward.",
+  description: "Xtara helps students in Classes 8–12 learn about different jobs, find what interests them, and understand what they need to study.",
 };
 
 export const explorerMetadata: MarketingMetadata = {
@@ -29,7 +29,7 @@ export const explorerMetadata: MarketingMetadata = {
 export const educatorMetadata: MarketingMetadata = {
   en: {
     title: "Career Guidance for Educators and Schools | Xtara",
-    description: "Help students from Grade 8 onward explore careers through guided assessments, Career Directions, and Dream Careers.",
+    description: "See your students’ interests and job choices, keep track of who has finished the questions, and find out who needs help.",
   },
   ml: {
     title: "അധ്യാപകർക്കും സ്കൂളുകൾക്കുമുള്ള കരിയർ മാർഗ്ഗനിർദ്ദേശം | Xtara",
