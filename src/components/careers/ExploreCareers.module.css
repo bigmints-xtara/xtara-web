@@ -32,7 +32,7 @@
 }
 @font-face{font-family:ExplorerMona;src:url('/fonts/MonaSans-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:ExplorerMona;src:url('/fonts/MonaSans-SemiBold.woff2') format('woff2');font-weight:600 900;font-display:swap}
-.explorer{--scene-accent:#315ad2;--scene-tint:#e3efff;--scene-wash:#d9e9ff;--scene-wash-end:#e7e0ff;--scene-color:var(--scene-accent);--wash:var(--scene-tint);--ink:#17324b;--soft-ink:#56697c;font-family:ExplorerMona,var(--font-inter),sans-serif;background:#f8fbff;color:var(--ink)}
+.explorer{--scene-accent:#315ad2;--scene-tint:#e3efff;--scene-wash:#d9e9ff;--scene-wash-end:#e7e0ff;--scene-color:var(--scene-accent);--wash:var(--scene-tint);--ink:#17324b;--soft-ink:#56697c;font-family:ExplorerMona,var(--font-inter),var(--font-indic),sans-serif;background:#f8fbff;color:var(--ink)}
 .motion{min-height:42px;padding:8px;font-size:13px;color:var(--soft-ink);white-space:nowrap}
 .main{background:radial-gradient(ellipse at 50% 57%,var(--scene-wash) 0,transparent 56%),linear-gradient(#f8fbff,#f5f8fc)}
 .home{background:radial-gradient(ellipse at 8% 65%,#d8f1e4 0,transparent 43%),radial-gradient(ellipse at 90% 60%,#eee3ff 0,transparent 47%),linear-gradient(#f8fbff,#edf3ff)}
@@ -253,6 +253,16 @@
 
 /* Assessment is a quiet text-and-arrow action, not an underlined heading. */
 .home .intro .quiet { text-decoration: none; font-weight: 500; }
+
+/* Localized titles need real space; flex-shrinking them overlaps the summary. */
+.motion:is(:lang(hi), :lang(ml), :lang(ta)) { white-space: normal; text-align: right; }
+.home:is(:lang(hi), :lang(ml), :lang(ta)) { height: auto; max-height: none; }
+.direction:is(:lang(hi), :lang(ml), :lang(ta)) .viewport { min-height: 520px; }
+.direction:is(:lang(hi), :lang(ml), :lang(ta)) .slide { height: 480px; }
+.direction:is(:lang(hi), :lang(ml), :lang(ta)) .cardCopy { height: auto; min-height: 205px; }
+.direction:is(:lang(hi), :lang(ml), :lang(ta)) .cardCopy h2 { flex: none; min-height: 0; font-size: 20px; }
+.direction:is(:lang(hi), :lang(ml), :lang(ta)) .cardCopy p { flex: none; }
+.direction:is(:lang(hi), :lang(ml), :lang(ta)) .cardAction { margin-top: 12px; }
 
 /* Career detail is a reading page: its height follows its content. */
 .overview { padding-bottom: 72px; }

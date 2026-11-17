@@ -3,11 +3,11 @@
 .canvas { background:var(--canvas); min-height:100vh; }
 .hero { padding:24px 0 38px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:28px; align-items:center; }
 .eyebrow { display:flex; align-items:center; gap:9px; color:var(--muted); font-size:13px; }
-.hero h1,.hero h2,.sectionHeading { font-family:Georgia,'Times New Roman',serif; font-weight:400; letter-spacing:-.035em; line-height:1.13; }
+.hero h1,.hero h2,.sectionHeading { font-family:Georgia,'Times New Roman',var(--font-indic),serif; font-weight:400; letter-spacing:-.035em; line-height:1.13; }
 .hero h1,.hero h2 { font-size:clamp(34px,4.3vw,56px); max-width:760px; margin:12px 0 16px; text-wrap:balance; }
 .hero p,.intro { color:var(--muted); line-height:1.75; max-width:660px; font-size:15px; }
 .sun { border-radius:50%; width:142px; height:142px; display:grid; place-content:center; background:var(--sun); color:#34473a; outline:1px dashed var(--sun); outline-offset:10px; transform:rotate(-7deg); }
-.sun strong { font-family:Georgia,serif; font-size:48px; font-weight:400; text-align:center; }
+.sun strong { font-family:Georgia,var(--font-indic),serif; font-size:48px; font-weight:400; text-align:center; }
 .sun span { font-size:12px; max-width:105px; text-align:center; }
 .sectionHeading { font-size:clamp(27px,3vw,36px); margin:0 0 12px; }
 .sectionTop { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; margin-bottom:24px; }
@@ -21,7 +21,7 @@
 .studentLink { display:flex; gap:15px; align-items:flex-start; padding:19px 8px; border-bottom:1px dashed var(--line); border-radius:15px; text-decoration:none; }
 .studentLink:hover { background:var(--mint); }
 .studentLink:focus-visible,.island:focus-visible { outline:3px solid var(--sun); outline-offset:3px; }
-.avatar { flex:none; width:44px; height:44px; border-radius:42% 58% 56% 44%; display:grid; place-items:center; color:var(--ink); background:var(--mint); font-family:Georgia,serif; font-size:21px; }
+.avatar { flex:none; width:44px; height:44px; border-radius:42% 58% 56% 44%; display:grid; place-items:center; color:var(--ink); background:var(--mint); font-family:Georgia,var(--font-indic),serif; font-size:21px; }
 .studentLink p { margin:4px 0 0; font-size:13px; line-height:1.65; color:var(--muted); }
 .studentLink strong { font-size:16px; font-weight:600; }
 .linkLabel { display:inline-flex; align-items:center; gap:8px; margin-top:8px; font-size:12px; color:var(--ink); }
@@ -62,12 +62,12 @@
 .timeline { border-left:2px dashed var(--line); margin-left:12px; padding-left:28px; display:grid; gap:30px; }
 .note { position:relative; border:1px solid var(--line); border-radius:8px 30px 30px 30px; background:var(--paper); padding:28px; box-shadow:0 4px 0 color-mix(in srgb,var(--line) 30%,transparent); }
 .note:before { content:''; position:absolute; left:-38px; top:35px; width:16px; height:16px; border:4px solid var(--canvas); border-radius:50%; background:var(--sun); box-sizing:content-box; }
-.note h3 { font-family:Georgia,serif; font-size:25px; line-height:1.35; font-weight:400; margin:13px 0; }
+.note h3 { font-family:Georgia,var(--font-indic),serif; font-size:25px; line-height:1.35; font-weight:400; margin:13px 0; }
 .noteMeta { display:flex; flex-wrap:wrap; gap:8px 16px; color:var(--muted); font-size:12px; align-items:center; }
 .recap { white-space:pre-wrap; line-height:1.85; font-size:15px; overflow-wrap:anywhere; }
 .noteLayout { display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:25px; }
 .checkIn { background:color-mix(in srgb,var(--sun) 28%,var(--paper)); border-radius:7px 7px 22px 7px; padding:18px; align-self:start; }
-.checkIn strong { font-family:Georgia,serif; font-size:22px; display:block; margin:9px 0; }
+.checkIn strong { font-family:Georgia,var(--font-indic),serif; font-size:22px; display:block; margin:9px 0; }
 .checkIn p { color:var(--muted); font-size:12px; line-height:1.5; }
 .actions { display:grid; gap:10px; margin:22px 0; }
 .action { display:flex; align-items:start; gap:12px; border:1px solid var(--line); border-radius:16px; padding:14px; background:var(--canvas); }

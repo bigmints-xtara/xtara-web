@@ -217,7 +217,7 @@
 /* Shared Launchpad typography and component geometry. */
 @font-face { font-family:LaunchpadMona; src:url('/fonts/MonaSans-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
 @font-face { font-family:LaunchpadMona; src:url('/fonts/MonaSans-SemiBold.woff2') format('woff2'); font-weight:600 900; font-display:swap; }
-.surface, .dashboard, .profileSurface, .studentChrome { font-family:LaunchpadMona, var(--font-inter), sans-serif; }
+.surface, .dashboard, .profileSurface, .studentChrome { font-family:LaunchpadMona, var(--font-inter), var(--font-indic), sans-serif; }
 .heading, .profileMain h1 { font-size:clamp(36px,4.8vw,62px); line-height:1.12; font-weight:650; letter-spacing:-.045em; }
 .resultCard, .careerCard { border-color:var(--border); border-radius:10px; box-shadow:none; }
 .resultCard .motif, .careerIcon { background:var(--journey-soft); color:var(--foreground); border-radius:8px; }

@@ -1,0 +1,28 @@
+{
+  "retrieved": "2026-11-17",
+  "upstream": "https://github.com/EkType/Anek",
+  "license": "OFL-1.1",
+  "fonts": [
+    {
+      "family": "Anek Devanagari",
+      "file": "AnekDevanagari-Variable.woff2",
+      "bytes": 257340,
+      "sha256": "4357cb640e8b9e2dc87e7ce6d37992ef8d5daee04b41d508cf9ff57cdf72dc53",
+      "url": "https://fonts.gstatic.com/s/anekdevanagari/v17/jVyd7nP0CGrUsxB-QiRgw0NlLaVt_QUAkYxLRoCL23mlrWAxpYkTsmHNHQ.woff2"
+    },
+    {
+      "family": "Anek Malayalam",
+      "file": "AnekMalayalam-Variable.woff2",
+      "bytes": 66404,
+      "sha256": "0fb53a38244a808fc6e26b830b07fd4852a411e1e8b4d4d0c333fd932b253947",
+      "url": "https://fonts.gstatic.com/s/anekmalayalam/v18/6qLUKZActRTs_mZAJUZWWkhke0nYa_vC8_Azq3-gP1S7bb9_TDudCngS.woff2"
+    },
+    {
+      "family": "Anek Tamil",
+      "file": "AnekTamil-Variable.woff2",
+      "bytes": 50900,
+      "sha256": "b39254c4df9230c5453ee52a01cc307cf58721fcfabb6002f11ffef771ba82a7",
+      "url": "https://fonts.gstatic.com/s/anektamil/v18/XLY2IZH2bYJHGYtPGSbUB8JKTp-_9n55SsLHW2-DU89pEWoElno.woff2"
+    }
+  ]
+}

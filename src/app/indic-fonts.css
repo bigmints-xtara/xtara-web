@@ -1,0 +1,52 @@
+/* Self-hosted, script-only Anek variable fonts. See public/fonts/anek/README.md. */
+@font-face {
+  font-family: "Anek Devanagari";
+  src: url("/fonts/anek/AnekDevanagari-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF4, U+1CF7-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF, U+11B00-11B0A;
+}
+
+@font-face {
+  font-family: "Anek Malayalam";
+  src: url("/fonts/anek/AnekMalayalam-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  unicode-range: U+0307, U+0323, U+0951-0952, U+0964-0965, U+0B83, U+0D00-0D7F, U+1CDA, U+1CF2, U+200C-200D, U+20B9, U+25CC, U+A830-A832;
+}
+
+@font-face {
+  font-family: "Anek Tamil";
+  src: url("/fonts/anek/AnekTamil-Variable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  unicode-range: U+0964-0965, U+0B82-0BFA, U+200C-200D, U+20B9, U+25CC;
+}
+
+:root {
+  /* Script coverage selects the face even in mixed-language menus and Admin fields.
+     Tamil precedes Malayalam because their upstream subsets share U+0B83. */
+  --font-indic: "Anek Devanagari", "Anek Tamil", "Anek Malayalam";
+}
+
+/* Latin display tracking and tight leading crowd Indic vowel marks/conjuncts.
+   These reading safeguards intentionally override page-specific display styles. */
+:where(:lang(hi), :lang(ml), :lang(ta)) {
+  letter-spacing: normal !important;
+}
+
+:is(h1, h2, h3, h4, h5, h6):is(:lang(hi), :lang(ml), :lang(ta)) {
+  line-height: 1.45 !important;
+}
+
+/* The Latin 80px hero scale breaks long Indic words into oversized lines. */
+#hero h1:is(:lang(hi), :lang(ml), :lang(ta)) {
+  font-size: clamp(2rem, 4.2vw, 3.5rem);
+}
+
+#hero h1:lang(ta) {
+  font-size: clamp(1.75rem, 4.2vw, 3.5rem);
+}
