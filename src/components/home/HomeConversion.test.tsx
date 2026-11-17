@@ -70,7 +70,7 @@ describe("value-led homepage conversion journey", () => {
       rendered = true;
     });
 
-    expect(container.textContent).toContain("Not sure what to do after school?");
+    expect(container.textContent).toContain("Not sure what to study or which job to choose?");
     expect(container.textContent).toContain("How Xtara helps");
     expect(container.textContent).not.toContain("Make the next career conversation easier.");
     expect(container.textContent).not.toContain("Curated, not generated");
@@ -110,7 +110,7 @@ describe("value-led homepage conversion journey", () => {
 
   it("keeps the same value story available in Malayalam", () => {
     const content = getMessages("ml").trustedDiscovery.home;
-    expect(content.hero.title).toContain("സ്കൂൾ കഴിഞ്ഞ്");
+    expect(content.hero.title).toContain("എന്ത് പഠിക്കണം");
     expect(content.audiences.items[1].title).toBe("രക്ഷിതാക്കൾക്ക്");
     expect(content.cta.login).toContain("ലോഗിൻ");
   });
