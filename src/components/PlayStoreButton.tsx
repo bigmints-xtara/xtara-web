@@ -2,16 +2,18 @@
 
 import { useTranslations } from "@/i18n/language-provider";
 
-const PlayStoreButton = ({ dark, url }: { dark?: boolean; url: string }) => {
+const PlayStoreButton = ({ dark, url, unavailableLabel }: { dark?: boolean; url: string | null; unavailableLabel?: string }) => {
     const { t } = useTranslations();
 
+    const Tag = url ? "a" : "div";
+
     return (
-        <a href={url}>
-            <button
-                type="button"
-                className={`flex items-center justify-center min-w-[205px] mt-3 px-6 h-14 rounded-full w-full sm:w-fit ${dark ? "text-white bg-foreground" : "text-foreground bg-white"}`}
+            <Tag
+                href={url ?? undefined}
+                aria-disabled={url ? undefined : true}
+                className={`flex items-center justify-center min-w-[205px] max-w-full px-5 min-h-14 py-2 rounded-lg w-full sm:w-fit border border-current/15 focus-visible:outline-2 focus-visible:outline-offset-4 ${dark ? "text-white bg-foreground" : "text-foreground bg-white"} ${url ? "" : "opacity-60"}`}
             >
-                <div className="mr-3">
+                <div className="mr-3 shrink-0" aria-hidden="true">
                     <svg viewBox="30 336.7 120.9 129.2" width="30">
                         <path fill="#FFD400" d="M119.2,421.2c15.3-8.4,27-14.8,28-15.3c3.2-1.7,6.5-6.2,0-9.7  c-2.1-1.1-13.4-7.3-28-15.3l-20.1,20.2L119.2,421.2z">
                         </path>
@@ -25,14 +27,13 @@ const PlayStoreButton = ({ dark, url }: { dark?: boolean; url: string }) => {
                 </div>
                 <div>
                     <div className="text-xs">
-                        {t("download.storeButtons.playStore.caption")}
+                        {!url && unavailableLabel ? unavailableLabel : t("download.storeButtons.playStore.caption")}
                     </div>
                     <div className="-mt-1 font-sans text-xl font-semibold">
                         {t("download.storeButtons.playStore.title")}
                     </div>
                 </div>
-            </button>
-        </a>
+            </Tag>
     )
 }
 
