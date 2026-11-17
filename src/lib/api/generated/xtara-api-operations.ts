@@ -64,6 +64,7 @@ export const XTARA_API_OPERATIONS = {
   "getCollegesCollegeId": { method: "GET", path: "/api/v1/colleges/{collegeId}", authenticated: false },
   "getDreamCareers": { method: "GET", path: "/api/v1/dream-careers", authenticated: false },
   "getDreamCareersCareerId": { method: "GET", path: "/api/v1/dream-careers/{careerId}", authenticated: false },
+  "getDreamCareersCareerIdOverview": { method: "GET", path: "/api/v1/dream-careers/{careerId}/overview", authenticated: false },
   "getDreamCareersCareerIdStudentGuide": { method: "GET", path: "/api/v1/dream-careers/{careerId}/student-guide", authenticated: false },
   "postEventsBatch": { method: "POST", path: "/api/v1/events/batch", authenticated: false },
   "getFeedHome": { method: "GET", path: "/api/v1/feed/home", authenticated: false },
