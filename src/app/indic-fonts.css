@@ -44,9 +44,13 @@
 
 /* The Latin 80px hero scale breaks long Indic words into oversized lines. */
 #hero h1:is(:lang(hi), :lang(ml), :lang(ta)) {
-  font-size: clamp(2rem, 4.2vw, 3.5rem);
+  font-size: clamp(1.75rem, 3.6vw, 3rem);
 }
 
 #hero h1:lang(ta) {
-  font-size: clamp(1.75rem, 4.2vw, 3.5rem);
+  font-size: clamp(1.625rem, 3.6vw, 3rem);
+}
+
+#hero p:is(:lang(hi), :lang(ml), :lang(ta)) {
+  font-size: 1rem;
 }
