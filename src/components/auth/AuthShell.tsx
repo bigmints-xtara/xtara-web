@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft, Check } from "lucide-react"
 
 import LanguageSwitcher from "@/components/LanguageSwitcher"
+import loginStyles from './LoginShell.module.css'
+import journeyStyles from '@/components/journey/journey.module.css'
 
 type AuthShellProps = {
   children: React.ReactNode
@@ -15,6 +17,7 @@ type AuthShellProps = {
   title: string
   description: string
   proofs: string[]
+  presentation?: 'photo' | 'illustration'
 }
 
 export function AuthShell({
@@ -26,7 +29,29 @@ export function AuthShell({
   title,
   description,
   proofs,
+  presentation = 'photo',
 }: AuthShellProps) {
+  if (presentation === 'illustration') return (
+    <main className={`${journeyStyles.surface} ${loginStyles.page}`}>
+      <header className={loginStyles.header}>
+        <Link href="/" aria-label={backLabel}><Image src="/images/logo-color.svg" alt="Xtara" width={90} height={34} priority /></Link>
+        <div className={loginStyles.headerActions}>
+          <Link href="/" className={loginStyles.back}><ArrowLeft size={16} aria-hidden="true" />{backLabel}</Link>
+          <LanguageSwitcher />
+        </div>
+      </header>
+      <div className={loginStyles.layout}>
+        <section className={loginStyles.form}>{children}</section>
+        <aside className={loginStyles.panel}>
+          <p className={loginStyles.eyebrow}>{eyebrow}</p>
+          <h2>{title}</h2>
+          <p className={loginStyles.description}>{description}</p>
+          <Image src={imageSrc} alt={imageAlt} width={1200} height={800} sizes="(max-width:900px) 0px, 45vw" className={loginStyles.image} />
+          <ul className={loginStyles.proofs}>{proofs.map(proof => <li key={proof}><Check size={16} aria-hidden="true" />{proof}</li>)}</ul>
+        </aside>
+      </div>
+    </main>
+  )
   return (
     <main className="min-h-svh bg-[#f4f8fb] text-foreground">
       <div className="grid min-h-svh lg:grid-cols-[minmax(0,1fr)_minmax(430px,0.92fr)]">

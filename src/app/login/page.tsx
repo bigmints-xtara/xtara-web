@@ -120,9 +120,10 @@ function LoginContent() {
 
   return (
     <AuthShell
+      presentation="illustration"
       backLabel={commonCopy.backHome}
-      imageSrc={educatorMode ? "/images/home/student-guidance.jpg" : "/images/home/hero-career-exploration.jpg"}
-      imageAlt={modeCopy.imageAlt}
+      imageSrc="/images/home/exploring-together.webp"
+      imageAlt={messages.trustedDiscovery.home.cta.imageAlt}
       eyebrow={modeCopy.sideEyebrow}
       title={modeCopy.sideTitle}
       description={modeCopy.sideDescription}
@@ -140,6 +141,8 @@ function LoginContent() {
           email: commonCopy.email,
           emailPlaceholder: commonCopy.emailPlaceholder,
           password: commonCopy.password,
+          showPassword: loginCopy.showPassword,
+          hidePassword: loginCopy.hidePassword,
           submit: modeCopy.submit,
           submitting: modeCopy.submitting,
           google: modeCopy.google,
@@ -168,7 +171,7 @@ function LoginContent() {
         onGoogleLogin={handleGoogleLogin}
       />
       {!educatorMode && MVP_NAVIGATION_ENABLED && (
-        <Button asChild variant="ghost" className="mt-4 w-full">
+        <Button asChild variant="ghost" className="mt-4 h-auto min-h-11 w-full whitespace-normal text-muted-foreground">
           <Link href="/explore">{mvpNavigationCopy[locale].exploreCareers}</Link>
         </Button>
       )}

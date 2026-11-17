@@ -27,44 +27,44 @@
       "chooseType": "Choose how you use Xtara",
       "learnerTab": "Student",
       "educatorTab": "Educator",
-      "divider": "or continue with",
-      "assessmentPrompt": "Not sure where to begin?",
-      "assessmentAction": "Explore your career path first",
-      "signupPrompt": "Need a new account?",
-      "signupAction": "Create one",
+      "divider": "or use your email",
+      "assessmentPrompt": "Just getting started?",
+      "assessmentAction": "Answer the questions first",
+      "signupPrompt": "New to Xtara?",
+      "signupAction": "Create an account",
       "learner": {
         "title": "Welcome back",
-        "description": "Return to your assessment and career choices.",
-        "submit": "Open my career path",
-        "submitting": "Opening your path…",
+        "description": "Log in to see the jobs you saved.",
+        "submit": "Log in",
+        "submitting": "Logging in…",
         "google": "Continue with Google",
-        "sideEyebrow": "Your career path",
-        "sideTitle": "Your future can become clearer one step at a time.",
-        "sideDescription": "Explore careers and discuss your choices with someone you trust.",
+        "sideEyebrow": "For students",
+        "sideTitle": "Learn more about the jobs you like.",
+        "sideDescription": "See what people do at work and what they need to study.",
         "sideProofs": [
-          "Your Career Directions and Dream Careers stay together",
-          "Explore the careers that interest you",
-          "You can change your choices as you learn more"
+          "Keep your chosen jobs together",
+          "Change your choices when you want"
         ],
         "imageAlt": "A group of Indian students exploring their future together"
       },
       "educator": {
         "title": "Educator login",
-        "description": "Open your institution workspace and support the students assigned to you.",
-        "submit": "Open educator workspace",
-        "submitting": "Opening your workspace…",
-        "google": "Continue with Google as educator",
-        "educatorNote": "Institution membership determines educator access. Choosing this tab does not grant additional permissions.",
-        "sideEyebrow": "Better career conversations",
-        "sideTitle": "Help every student explore a future they can explain.",
-        "sideDescription": "Bring structure to career conversations without forcing students into a permanent choice too early.",
+        "description": "Log in to see your classes and students.",
+        "submit": "Log in",
+        "submitting": "Logging in…",
+        "google": "Continue with Google",
+        "educatorNote": "Your school decides which classes and student information you can see.",
+        "sideEyebrow": "For teachers and counsellors",
+        "sideTitle": "Help students learn about jobs.",
+        "sideDescription": "See what interests your students and who needs your help.",
         "sideProofs": [
-          "See only the learners assigned to your institution",
-          "Use clear directions and career evidence in conversations",
-          "Support progress without deciding for the student"
+          "See the classes you teach",
+          "Read what students choose to share"
         ],
         "imageAlt": "Two young adults discussing a plan using a laptop"
-      }
+      },
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     },
     "signup": {
       "name": "Full name",

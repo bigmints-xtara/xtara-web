@@ -27,44 +27,44 @@
       "chooseType": "आप Xtara कैसे इस्तेमाल करते हैं?",
       "learnerTab": "Student",
       "educatorTab": "Educator",
-      "divider": "अपने account में जाएँ",
-      "assessmentPrompt": "अभी account नहीं है?",
-      "assessmentAction": "पहले अपना career path देखें",
-      "signupPrompt": "नया account चाहिए?",
-      "signupAction": "Account बनाएँ",
+      "divider": "या अपना ईमेल इस्तेमाल करें",
+      "assessmentPrompt": "पहली बार आए हैं?",
+      "assessmentAction": "पहले सवालों के जवाब दें",
+      "signupPrompt": "Xtara पर नए हैं?",
+      "signupAction": "अकाउंट बनाएँ",
       "learner": {
         "title": "वापस स्वागत है",
-        "description": "अपने आकलन और चुने हुए करियर पर लौटें।",
-        "submit": "मेरा career path खोलें",
-        "submitting": "खोल रहे हैं...",
+        "description": "अपने सहेजे हुए कामों को देखने के लिए लॉग इन करें।",
+        "submit": "लॉग इन करें",
+        "submitting": "लॉग इन हो रहा है…",
         "google": "Google से जारी रखें",
-        "sideEyebrow": "आपका career path",
-        "sideTitle": "एक-एक step से future साफ हो सकता है।",
-        "sideDescription": "करियर खोजें और किसी भरोसेमंद व्यक्ति से अपने विकल्पों पर बात करें।",
+        "sideEyebrow": "छात्रों के लिए",
+        "sideTitle": "पसंद के कामों के बारे में और जानें।",
+        "sideDescription": "जानें कि लोग अपने काम में क्या करते हैं और क्या पढ़ना होता है।",
         "sideProofs": [
-          "Career Directions और Careers एक जगह",
-          "अपनी रुचि के करियर खोजें",
-          "Family conversation के लिए clear notes"
+          "अपनी पसंद के काम एक जगह रखें",
+          "जब चाहें अपनी पसंद बदलें"
         ],
         "imageAlt": "अपने future पर साथ में बात करते भारतीय students"
       },
       "educator": {
         "title": "Educator login",
-        "description": "Students की progress, choices और guidance notes देखने के लिए sign in करें।",
-        "submit": "Institution dashboard खोलें",
-        "submitting": "खोल रहे हैं...",
+        "description": "अपनी कक्षाओं और छात्रों को देखने के लिए लॉग इन करें।",
+        "submit": "लॉग इन करें",
+        "submitting": "लॉग इन हो रहा है…",
         "google": "Google से जारी रखें",
-        "educatorNote": "Institution access से educator dashboard खुलता है।",
-        "sideEyebrow": "Schools और mentors के लिए",
-        "sideTitle": "Students के career conversations को बेहतर support दें।",
-        "sideDescription": "Class की progress देखें, students की choices समझें, और सही समय पर practical guidance दें।",
+        "educatorNote": "आप कौन-सी कक्षाएँ और छात्र की जानकारी देख सकते हैं, यह आपका स्कूल तय करता है।",
+        "sideEyebrow": "शिक्षकों और काउंसलरों के लिए",
+        "sideTitle": "छात्रों को कामों के बारे में जानने में मदद करें।",
+        "sideDescription": "जानें कि छात्रों को क्या पसंद है और किसे आपकी मदद चाहिए।",
         "sideProofs": [
-          "Class-wise career insights",
-          "Student progress एक जगह",
-          "Guidance conversations के लिए simple notes"
+          "जिन कक्षाओं को आप पढ़ाते हैं, उन्हें देखें",
+          "छात्रों की साझा की गई जानकारी पढ़ें"
         ],
         "imageAlt": "Students के साथ career plan discuss करते teacher"
-      }
+      },
+      "showPassword": "पासवर्ड दिखाएँ",
+      "hidePassword": "पासवर्ड छिपाएँ"
     },
     "signup": {
       "name": "नाम",

@@ -29,3 +29,10 @@ and server-authoritative saved choices.
 Image provenance and the generation brief are in
 `public/images/home/README.md`. Keep illustrated people described as an
 illustration, not actual customers or a testimonial.
+
+Login uses short, practical copy about returning to saved jobs or school classes.
+Keep student and educator entry points clear, and keep Google and email sign-in
+available. Password visibility is an explicit labelled toggle. The illustration
+supports the form on large screens and is hidden on compact screens. Keep all
+four login translations together; presentation changes must preserve existing
+role checks and assessment/save continuation.

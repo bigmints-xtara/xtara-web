@@ -38,6 +38,8 @@ describe("branded authentication forms", () => {
             email: common.email,
             emailPlaceholder: common.emailPlaceholder,
             password: common.password,
+            showPassword: login.showPassword,
+            hidePassword: login.hidePassword,
             submit: login.learner.submit,
             submitting: login.learner.submitting,
             google: login.learner.google,
@@ -72,6 +74,38 @@ describe("branded authentication forms", () => {
     expect(container.querySelector('a[href="/signup"]')).not.toBeNull();
     expect(container.textContent).toContain("Continue with Google");
     expect(container.textContent).not.toContain("Apple");
+  });
+
+  it("disables sign-in actions while busy and permits a retry after an error", async () => {
+    const login = getMessages("en").auth.login;
+    const onSubmit = vi.fn((event: React.FormEvent<HTMLFormElement>) => event.preventDefault());
+    const onGoogleLogin = vi.fn();
+    const form = (loading: boolean, error?: string) => <LoginForm
+      mode="learner"
+      copy={{ ...common, ...login, ...login.learner }}
+      email="student@example.com"
+      password="example-only-password"
+      loading={loading}
+      error={error}
+      learnerHref="/login"
+      educatorHref="/login?mode=educator"
+      signupHref="/signup"
+      onEmailChange={vi.fn()}
+      onPasswordChange={vi.fn()}
+      onSubmit={onSubmit}
+      onGoogleLogin={onGoogleLogin}
+    />;
+    await act(async () => root.render(form(true)));
+    expect(container.querySelector('form')).toHaveAttribute('aria-busy', 'true');
+    for (const control of container.querySelectorAll('input, button')) expect(control).toBeDisabled();
+    await act(async () => root.render(form(false, 'Please try again.')));
+    expect(container.querySelector('[role="alert"]')).toHaveTextContent('Please try again.');
+    for (const control of container.querySelectorAll('input, button')) expect(control).toBeEnabled();
+    await act(async () => container.querySelector<HTMLButtonElement>('button')!.click());
+    expect(onGoogleLogin).toHaveBeenCalledOnce();
+    expect(onSubmit).not.toHaveBeenCalled();
+    await act(async () => container.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })));
+    expect(onSubmit).toHaveBeenCalledOnce();
   });
 
   it("provides a complete signup form and Malayalam auth copy", async () => {

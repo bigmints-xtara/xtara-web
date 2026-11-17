@@ -1,17 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
-import { Building2, GraduationCap, Loader2, LogIn } from "lucide-react"
+import { Building2, GraduationCap, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
@@ -30,6 +24,8 @@ type LoginFormCopy = {
   email: string
   emailPlaceholder: string
   password: string
+  showPassword: string
+  hidePassword: string
   submit: string
   submitting: string
   google: string
@@ -45,7 +41,7 @@ type LoginFormCopy = {
   privacy: string
 }
 
-type LoginFormProps = React.ComponentProps<"div"> & {
+type LoginFormProps = Omit<React.ComponentProps<"div">, "onSubmit"> & {
   mode: "learner" | "educator"
   copy: LoginFormCopy
   email: string
@@ -80,114 +76,123 @@ export function LoginForm({
   onGoogleLogin,
   ...props
 }: LoginFormProps) {
+  const [passwordVisible, setPasswordVisible] = useState(false)
   const educatorMode = mode === "educator"
   const controlsDisabled = loading || disabled
 
   return (
     <div className={cn("flex w-full flex-col gap-5", className)} {...props}>
-      <Card className="gap-0 rounded-[1.75rem] border-primary/10 bg-white py-0 shadow-2xl shadow-primary/8">
-        <CardHeader className="gap-0 px-6 pb-0 pt-6 sm:px-8 sm:pt-8">
-          <div className="grid grid-cols-2 rounded-xl bg-slate-100 p-1" aria-label={copy.chooseType}>
+      <div>
+        <div>
+          <nav className="grid grid-cols-2 gap-1 rounded-xl border border-border bg-muted/50 p-1" aria-label={copy.chooseType}>
             <Link
               href={learnerHref}
               aria-current={!educatorMode ? "page" : undefined}
               className={cn(
-                "flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold transition-colors",
-                !educatorMode ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-900",
+                "flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 py-2 text-center text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+                !educatorMode ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <GraduationCap className="size-4" />
+              <GraduationCap className="size-4 shrink-0" aria-hidden="true" />
               {copy.learnerTab}
             </Link>
             <Link
               href={educatorHref}
               aria-current={educatorMode ? "page" : undefined}
               className={cn(
-                "flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold transition-colors",
-                educatorMode ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-900",
+                "flex min-h-11 items-center justify-center gap-2 rounded-lg px-3 py-2 text-center text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
+                educatorMode ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <Building2 className="size-4" />
+              <Building2 className="size-4 shrink-0" aria-hidden="true" />
               {copy.educatorTab}
             </Link>
-          </div>
+          </nav>
 
-          <div className="pt-7 text-center">
-            <span className="mx-auto flex size-11 items-center justify-center rounded-2xl bg-primary/6 text-primary">
-              {educatorMode ? <Building2 className="size-5" /> : <GraduationCap className="size-5" />}
-            </span>
-            <CardTitle role="heading" aria-level={1} className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary">
-              {copy.title}
-            </CardTitle>
-            <CardDescription className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-600">
-              {copy.description}
-            </CardDescription>
+          <div className="pb-7 pt-8">
+            <h1 className="text-4xl font-semibold leading-tight tracking-[-0.04em] text-primary">{copy.title}</h1>
+            <p className="mt-3 text-base leading-7 text-muted-foreground">{copy.description}</p>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="px-6 pb-6 pt-6 sm:px-8 sm:pb-8">
+        <div>
           {error ? (
             <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-5 text-red-700">
               {error}
             </div>
           ) : null}
 
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} aria-busy={loading}>
             <FieldGroup className="gap-5">
+              <Field>
+                <Button type="button" size="lg" variant="outline" disabled={controlsDisabled} className="h-auto min-h-12 w-full whitespace-normal rounded-xl bg-background px-4 py-3 font-medium shadow-none" onClick={onGoogleLogin}>
+                  <GoogleMark />
+                  {copy.google}
+                </Button>
+              </Field>
+              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-background">{copy.divider}</FieldSeparator>
+
               <Field>
                 <FieldLabel htmlFor="login-email">{copy.email}</FieldLabel>
                 <Input
                   id="login-email"
                   type="email"
                   autoComplete="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  inputMode="email"
                   placeholder={copy.emailPlaceholder}
                   value={email}
                   onChange={(event) => onEmailChange(event.target.value)}
                   disabled={controlsDisabled}
-                  className="h-11 rounded-xl bg-white"
+                  className="h-12 rounded-xl bg-background px-4 shadow-none"
                   required
                 />
               </Field>
               <Field>
                 <FieldLabel htmlFor="login-password">{copy.password}</FieldLabel>
+                <div className="relative">
                 <Input
                   id="login-password"
-                  type="password"
+                  type={passwordVisible ? "text" : "password"}
                   autoComplete="current-password"
                   value={password}
                   onChange={(event) => onPasswordChange(event.target.value)}
                   disabled={controlsDisabled}
-                  className="h-11 rounded-xl bg-white"
+                  className="h-12 rounded-xl bg-background pl-4 pr-14 shadow-none"
                   required
                 />
+                  <button
+                    type="button"
+                    aria-label={passwordVisible ? copy.hidePassword : copy.showPassword}
+                    aria-pressed={passwordVisible}
+                    aria-controls="login-password"
+                    disabled={controlsDisabled}
+                    onClick={() => setPasswordVisible(visible => !visible)}
+                    className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
+                  >
+                    {passwordVisible ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                  </button>
+                </div>
               </Field>
               <Field>
-                <Button type="submit" size="lg" disabled={controlsDisabled} className="h-11 w-full rounded-xl font-semibold">
-                  {loading ? <Loader2 className="size-4 animate-spin" /> : <LogIn className="size-4" />}
+                <Button type="submit" size="lg" disabled={controlsDisabled} className="h-auto min-h-12 w-full whitespace-normal rounded-xl px-5 py-3 font-semibold">
+                  {loading ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
                   {loading ? copy.submitting : copy.submit}
+                  {!loading ? <ArrowRight className="size-4" aria-hidden="true" /> : null}
                 </Button>
               </Field>
 
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-white">
-                {copy.divider}
-              </FieldSeparator>
-
-              <Field>
-                <Button type="button" size="lg" variant="outline" disabled={controlsDisabled} className="h-11 w-full rounded-xl bg-white" onClick={onGoogleLogin}>
-                  <GoogleMark />
-                  {copy.google}
-                </Button>
-              </Field>
             </FieldGroup>
           </form>
 
           {copy.educatorNote ? (
-            <p className="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-900">
+            <p className="mt-5 rounded-xl bg-muted/60 px-4 py-3 text-sm leading-6 text-muted-foreground">
               {copy.educatorNote}
             </p>
           ) : null}
 
-          <div className="mt-6 space-y-2 text-center text-sm text-slate-600">
+          <div className="mt-6 space-y-3 text-center text-sm leading-6 text-muted-foreground">
             {!educatorMode ? (
               <p>
                 {copy.assessmentPrompt}{" "}
@@ -203,10 +208,10 @@ export function LoginForm({
               </Link>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <FieldDescription className="px-5 text-center text-xs leading-5">
+      <FieldDescription className="border-t border-border pt-5 text-center text-xs leading-5">
         {copy.termsPrefix}{" "}
         <Link href="/terms-of-use">{copy.terms}</Link>{" "}
         {copy.privacyConnector}{" "}
