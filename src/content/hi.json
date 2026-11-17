@@ -271,11 +271,7 @@
         "primaryLoggedIn": "मेरे सहेजे हुए विकल्प देखें",
         "login": "Log in करें",
         "imageAlt": "Career planning देखते students",
-        "proofs": [
-          "कक्षा 8–12",
-          "अंग्रेज़ी, मलयालम, हिंदी और तमिल",
-          "शुरू करने के लिए अकाउंट ज़रूरी नहीं"
-        ],
+        "startNote": "बिना अकाउंट बनाए सवालों के जवाब दें और कामों के बारे में पढ़ें।",
         "resultLabel": "Assessment के बाद",
         "resultTitle": "Career Direction और next steps",
         "resultDescription": "Assessment के बाद student को direction, roles और next steps मिलते हैं।"

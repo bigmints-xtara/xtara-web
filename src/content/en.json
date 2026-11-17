@@ -271,11 +271,7 @@
         "primaryLoggedIn": "See my saved choices",
         "login": "Log in to my plan",
         "imageAlt": "A joyful group of Indian school students",
-        "proofs": [
-          "Classes 8–12",
-          "English, Malayalam, Hindi and Tamil",
-          "No account needed to start"
-        ],
+        "startNote": "You can answer the questions and browse jobs without an account.",
         "resultLabel": "What you will discover",
         "resultTitle": "Up to 3 Career Directions",
         "resultDescription": "Starting points to explore—not a permanent label."

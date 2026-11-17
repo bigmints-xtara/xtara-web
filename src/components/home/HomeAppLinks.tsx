@@ -5,7 +5,8 @@ import PlayStoreButton from '@/components/PlayStoreButton';
 import { useTranslations } from '@/i18n/language-provider';
 import type { Locale } from '@/i18n/config';
 
-// The previous Apple ID was a placeholder. Enable only with a verified listing.
+// App Store Connect ID: 6749342993. Its public listing currently returns 404.
+// Enable only once the app is available at https://apps.apple.com/app/id6749342993.
 const appStoreUrl: string | null = null;
 const playStoreUrl = 'https://play.google.com/store/apps/details?id=com.bigmints.xtara';
 const copy: Record<Locale, { title: string; unavailable: string }> = {

@@ -94,7 +94,8 @@ describe("value-led homepage conversion journey", () => {
       expect(container.textContent).not.toContain(item.description);
     }
     expect(container.textContent).toContain("8–12");
-    expect(container.textContent).toContain(content.hero.proofs[1]);
+    expect(container.textContent).toContain(content.hero.startNote);
+    expect(container.querySelector("#hero ul")).toBeNull();
     const questions = container.querySelectorAll<HTMLButtonElement>("#faq button");
     await act(async () => questions[questions.length - 1].click());
     expect(container.textContent).toContain(content.questions.items.at(-1)!.answer);
