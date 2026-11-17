@@ -31,6 +31,7 @@ export default function CareerOverviewSections({ career }: { career: ExplorerCar
     <p>{item.description}</p>
     {item.gradeIds.length > 0 && <p className={styles.studyMeta}>{item.gradeIds.map(id => id.replace(/^grade/, 'Grade ')).join(', ')}</p>}
     {item.requirement && <p className={styles.studyMeta}>{item.requirement.replaceAll('_', ' ')}</p>}
+    {item.geography && <p className={styles.studyMeta}>{item.geography}</p>}
     {citations(item.sourceIds)}
   </li>;
   return <div className={styles.careerSections} lang="en">

@@ -16,6 +16,7 @@ export interface CareerStudyItem {
   pathwayId?: string;
   pathwayTitle?: string;
   requirement: string;
+  geography?: string;
   sourceIds: string[];
 }
 export interface CareerOverview extends CareerOverviewIdentity {

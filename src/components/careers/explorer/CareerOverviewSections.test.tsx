@@ -14,7 +14,7 @@ const overview: CareerOverview = {
   schemaVersion: 1, id: career.id, title: career.title, overview: career.summary, locale: 'en', translationFallback: false, directionIds: ['tech'],
   whatYouDo: { summary: career.summary, activities: ['Reviewed work'] }, skills: ['Problem solving'], workplaces: ['Software teams'],
   jobRoles: [{ id: 'entry', stage: 'entry', label: 'Starting roles', description: 'Work with an experienced team.', jobTitles: ['Junior developer'], sourceIds: ['source'] }],
-  studyPaths: { grades8To10: [{ id: 'subject', kind: 'subject', title: 'Mathematics', description: 'Build a foundation.', gradeIds: ['grade8', 'grade10'], requirement: 'recommended', sourceIds: ['source'] }], afterGrade10: [], afterGrade12: [] },
+  studyPaths: { grades8To10: [{ id: 'subject', kind: 'subject', title: 'Mathematics', description: 'Build a foundation.', gradeIds: ['grade8', 'grade10'], requirement: 'recommended', geography: 'India', sourceIds: ['source'] }], afterGrade10: [], afterGrade12: [] },
   earnings: { status: 'unavailable', reason: 'reviewed_evidence_required' }, studyOptions: 'public_pilot', sources: [{ id: 'source', label: 'Reviewed source', url: 'https://example.edu/study' }],
 };
 const mount = (children: React.ReactNode) => render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })}>{children}</QueryClientProvider>);
@@ -24,6 +24,7 @@ it('uses reviewed roles and phase-specific guidance with citations while keeping
   mount(<CareerOverviewSections career={career} />);
   expect(await screen.findByText('Junior developer')).toBeInTheDocument();
   expect(screen.getByText('Grade 8, Grade 10')).toBeInTheDocument();
+  expect(screen.getByText('India')).toBeInTheDocument();
   for (const label of ['Grades 8–10', 'After grade 10', 'After grade 12']) expect(screen.getByRole('heading', { name: label })).toBeInTheDocument();
   expect(screen.getAllByRole('link', { name: 'Reviewed source' })).toHaveLength(2);
   expect(screen.getByRole('link', { name: 'Explore study options' })).toHaveAttribute('href', expect.stringContaining('/software-developer/study-options'));
