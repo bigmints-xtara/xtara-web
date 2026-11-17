@@ -30,6 +30,17 @@ it('uses reviewed roles and phase-specific guidance with citations while keeping
   expect(screen.getByText('Reviewed qualitative pay guidance is not available yet.')).toBeInTheDocument();
   expect(screen.queryByText('Published basics')).not.toBeInTheDocument();
 });
+it('renders reviewed qualitative pay with its population and citation', async () => {
+  vi.mocked(getCareerOverview).mockResolvedValue({ ...overview, earnings: {
+    status: 'available', description: 'This employer uses published pay grades.',
+    measure: 'Published grade', population: 'Public hospital residents',
+    geography: 'India', experience: 'Residency', asOf: '2026-01-01', sourceIds: ['source'],
+  } });
+  mount(<CareerOverviewSections career={career} />);
+  expect(await screen.findByText('This employer uses published pay grades.')).toBeInTheDocument();
+  expect(screen.getByText(/Public hospital residents/)).toBeInTheDocument();
+  expect(screen.getAllByRole('link', { name: 'Reviewed source' })).toHaveLength(3);
+});
 it('keeps basics on a failed overview, then retries without substituting made-up fields', async () => {
   vi.mocked(getCareerOverview).mockRejectedValueOnce(new Error('offline'));
   mount(<CareerOverviewSections career={career} />);

@@ -43,7 +43,13 @@ export default function CareerOverviewSections({ career }: { career: ExplorerCar
     <section className={styles.careerSection} aria-labelledby="section-roles"><header><span className={styles.sectionNumber}>05</span><h2 id="section-roles">Job roles</h2></header>
       {!data?.jobRoles.length ? missing : <ul className={styles.factList}>{data.jobRoles.map(role => <li key={role.id}><h3>{role.label}</h3><p>{role.description}</p>{role.jobTitles.length > 0 && <p>{role.jobTitles.join(' · ')}</p>}{citations(role.sourceIds)}</li>)}</ul>}
     </section>
-    <section className={styles.careerSection} aria-labelledby="section-pay"><header><span className={styles.sectionNumber}>06</span><h2 id="section-pay">Pay outlook</h2></header><p className={styles.sectionEmpty}>Reviewed qualitative pay guidance is not available yet.</p></section>
+  <section className={styles.careerSection} aria-labelledby="section-pay"><header><span className={styles.sectionNumber}>06</span><h2 id="section-pay">Pay outlook</h2></header>
+    {data?.earnings.status === 'available' ? <>
+      <p>{data.earnings.description}</p>
+      <p className={styles.studyMeta}>{[data.earnings.measure, data.earnings.population, data.earnings.experience, data.earnings.geography, data.earnings.asOf].join(' · ')}</p>
+      {citations(data.earnings.sourceIds)}
+    </> : <p className={styles.sectionEmpty}>Reviewed qualitative pay guidance is not available yet.</p>}
+  </section>
     <section className={styles.careerSection} aria-labelledby="section-study"><header><span className={styles.sectionNumber}>07</span><h2 id="section-study">Your study path</h2></header>
       <div className={styles.studyPhases}>{phases.map(([key, label]) => <section key={key}><h3>{label}</h3>{!data?.studyPaths[key].length ? missing : <ul className={styles.factList}>{data.studyPaths[key].map(studyItem)}</ul>}</section>)}
         {data?.studyOptions === 'public_pilot' && <p><Link className={styles.secondary} href={studyOptionsHref(career.id, `/explore?career=${encodeURIComponent(career.id)}&step=work`)}>Explore study options</Link><span className={styles.studyMeta}>Public pilot for this career. Check entry requirements with each provider.</span></p>}

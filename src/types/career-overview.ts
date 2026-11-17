@@ -28,7 +28,10 @@ export interface CareerOverview extends CareerOverviewIdentity {
   jobRoles: { id: string; stage: string; label: string; description: string; jobTitles: string[]; sourceIds: string[] }[];
   skills: string[];
   workplaces: string[];
-  earnings: { status: 'unavailable'; reason: 'reviewed_evidence_required' };
+  earnings: { status: 'unavailable'; reason: 'reviewed_evidence_required' } | {
+    status: 'available'; description: string; geography: string; experience: string;
+    population: string; asOf: string; measure: string; sourceIds: string[];
+  };
   studyPaths: { grades8To10: CareerStudyItem[]; afterGrade10: CareerStudyItem[]; afterGrade12: CareerStudyItem[] };
   sources: { id: string; label: string; url: string }[];
   studyOptions: 'public_pilot' | 'unavailable';
