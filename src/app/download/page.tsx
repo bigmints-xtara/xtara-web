@@ -1,3 +1,4 @@
+import publicType from "@/components/MarketingLayout.module.css";
 import Container from "@/components/Container";
 import Breadcrumb from "@/components/Breadcrumb";
 import AppStoreButton from "@/components/AppStoreButton";
@@ -35,7 +36,7 @@ const DownloadPage = async () => {
           <div className="relative isolate overflow-hidden bg-gradient-to-br from-primary via-primary to-sky-500 py-24 sm:py-32 rounded-3xl">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center">
-                <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+                <h1 className={`font-bold text-white ${publicType.title}`}>
                   {messages.download.hero.title}
                 </h1>
                 <p className="mt-6 text-lg leading-8 text-gray-200">
@@ -47,7 +48,7 @@ const DownloadPage = async () => {
 
           <div className="mx-auto max-w-4xl py-24 sm:py-32">
             <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-6">
+              <h2 className={`font-bold text-gray-900 mb-6 ${publicType.sectionTitle}`}>
                 {messages.download.downloadSection.title}
               </h2>
               <p className="text-lg leading-8 text-gray-600 mb-12">
@@ -80,7 +81,7 @@ const DownloadPage = async () => {
           <div className="bg-gray-50 py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center mb-16">
-                <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                <h2 className={`font-bold text-gray-900 ${publicType.sectionTitle}`}>
                   {messages.download.features.title}
                 </h2>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
@@ -128,7 +129,7 @@ const DownloadPage = async () => {
           <div className="bg-primary py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                <h2 className={`font-bold text-white ${publicType.sectionTitle}`}>
                   {messages.download.finalCta.title}
                 </h2>
                 <p className="mt-6 text-lg leading-8 text-gray-300">

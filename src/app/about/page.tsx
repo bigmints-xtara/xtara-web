@@ -1,3 +1,4 @@
+import publicType from "@/components/MarketingLayout.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -62,7 +63,7 @@ export default async function AboutPage() {
             <div className="relative grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary/60">{content.hero.eyebrow}</p>
-                <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.06] tracking-[-0.045em] text-primary sm:text-5xl lg:text-6xl">
+                <h1 className={`mt-5 max-w-3xl font-semibold text-primary ${publicType.title}`}>
                   {content.hero.title}
                 </h1>
                 <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
@@ -126,7 +127,7 @@ export default async function AboutPage() {
 
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary/60">{content.mission.eyebrow}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
+              <h2 className={`mt-4 font-semibold text-primary ${publicType.sectionTitle}`}>
                 {content.mission.title}
               </h2>
               <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.mission.description}</p>
@@ -154,7 +155,7 @@ export default async function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr]">
               <div className="px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-sky-200">{content.story.eyebrow}</p>
-                <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl md:text-5xl">{content.story.title}</h2>
+                <h2 className={`mt-4 font-semibold ${publicType.sectionTitle}`}>{content.story.title}</h2>
                 <p className="mt-5 max-w-2xl text-base leading-7 text-white/75">{content.story.description}</p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -187,7 +188,7 @@ export default async function AboutPage() {
           <section className="py-16 sm:py-24">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary/60">{content.journey.eyebrow}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">{content.journey.title}</h2>
+              <h2 className={`mt-4 font-semibold text-primary ${publicType.sectionTitle}`}>{content.journey.title}</h2>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.journey.description}</p>
             </div>
 
@@ -213,7 +214,7 @@ export default async function AboutPage() {
           <section className="overflow-hidden rounded-[2rem] bg-[#f4f8fb] px-6 py-12 sm:px-10 sm:py-16">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary/60">{content.trust.eyebrow}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">{content.trust.title}</h2>
+              <h2 className={`mt-4 font-semibold text-primary ${publicType.sectionTitle}`}>{content.trust.title}</h2>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.trust.description}</p>
             </div>
 
@@ -234,7 +235,7 @@ export default async function AboutPage() {
           <section className="py-16 sm:py-24">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary/60">{content.people.eyebrow}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">{content.people.title}</h2>
+              <h2 className={`mt-4 font-semibold text-primary ${publicType.sectionTitle}`}>{content.people.title}</h2>
             </div>
             <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-5 md:grid-cols-3">
               {content.people.items.map((item, index) => {

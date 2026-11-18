@@ -43,3 +43,8 @@ Use `<Container marketing>` inside `MarketingLayout` and avoid another layer of
 page gutters. Hero, header and footer align to the same grid. Card padding and
 narrower article or form columns are intentional inner layouts. Authenticated
 workspaces and native Flutter screens retain their own layout conventions.
+
+Keep public typography restrained: main headings use the shared 32–44px scale,
+large section headings use 24–32px, and introductory body text is 16px. Use the
+`title` and `sectionTitle` classes from `MarketingLayout.module.css` for public
+page headings. Smaller labels and preview headings retain their own sizes.

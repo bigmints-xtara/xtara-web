@@ -1,5 +1,6 @@
 "use client";
 
+import publicType from "@/components/MarketingLayout.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, LogIn } from "lucide-react";
@@ -20,7 +21,7 @@ const CTA = () => {
       <div className="grid grid-cols-1 items-center lg:grid-cols-[1.15fr_0.85fr]">
         <div className="px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.eyebrow}</p>
-          <h2 className="mt-4 max-w-3xl text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
+          <h2 className={`mt-4 max-w-3xl font-semibold text-primary ${publicType.sectionTitle}`}>
             {content.title}
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">{content.description}</p>

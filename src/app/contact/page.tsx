@@ -1,3 +1,4 @@
+import publicType from "@/components/MarketingLayout.module.css";
 import Container from "@/components/Container";
 import Breadcrumb from "@/components/Breadcrumb";
 import ContactForm from "@/components/ContactForm";
@@ -33,7 +34,7 @@ const ContactPage = async () => {
           <div className="relative isolate overflow-hidden bg-gradient-to-br from-primary via-primary to-sky-500 py-24 sm:py-32 rounded-3xl">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center">
-                <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
+                <h1 className={`font-bold text-white ${publicType.title}`}>
                   {messages.contact.hero.title}
                 </h1>
                 <p className="mt-6 text-lg leading-8 text-gray-200">

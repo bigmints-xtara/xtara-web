@@ -1,5 +1,6 @@
 "use client";
 
+import publicType from "@/components/MarketingLayout.module.css";
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
 
@@ -15,7 +16,7 @@ const FAQ = () => {
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-16">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.eyebrow}</p>
-          <h2 className="mt-4 max-w-xl text-3xl font-semibold tracking-[-0.035em] text-primary sm:text-4xl md:text-5xl">
+          <h2 className={`mt-4 max-w-xl font-semibold text-primary ${publicType.sectionTitle}`}>
             {content.title}
           </h2>
           {content.description ? <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">{content.description}</p> : null}
@@ -34,7 +35,7 @@ const FAQ = () => {
                   onClick={() => setOpenIndex((current) => current === index ? null : index)}
                   className="flex w-full items-start justify-between gap-5 py-6 text-left"
                 >
-                  <span className="text-lg font-semibold leading-7 text-primary sm:text-xl">{faq.question}</span>
+                  <span className="text-base font-semibold leading-6 text-primary sm:text-lg">{faq.question}</span>
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary">
                     {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                   </span>
