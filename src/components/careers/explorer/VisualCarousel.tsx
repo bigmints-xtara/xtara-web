@@ -49,7 +49,7 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
     if (variant === 'fact' || !viewport.current) return;
     const content = viewport.current.querySelector('[data-active="true"] > div:last-child');
     if (!(content instanceof HTMLElement)) return;
-    const measure = () => setContentHeight(Math.ceil(content.scrollHeight + 36));
+    const measure = () => setContentHeight(Math.ceil(content.scrollHeight + 32));
     measure();
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
     observer?.observe(content);
