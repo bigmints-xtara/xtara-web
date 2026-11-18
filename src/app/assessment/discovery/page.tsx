@@ -4,7 +4,7 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, ChevronDown, Compass,
+  ArrowRight, ChevronDown, Compass, Ellipsis,
 } from "lucide-react";
 
 import { ExplorerScene, explorerTone } from '@/components/careers/explorer/ExplorerScene';
@@ -17,6 +17,12 @@ import styles from '@/components/journey/journey.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useTranslations } from "@/i18n/language-provider";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -28,6 +34,13 @@ import {
 } from "@/lib/assessment-v2";
 import { loadDirectionPlan, saveDirectionPlan, switchCareerDirection } from "@/lib/direction";
 import { saveDirectionToApi } from "@/lib/direction-api";
+
+const browseCopy = {
+  en: { all: "View all careers in this direction", more: "More options" },
+  ml: { all: "ഈ ദിശയിലെ എല്ലാ കരിയറുകളും കാണാം", more: "കൂടുതൽ ഓപ്ഷനുകൾ" },
+  hi: { all: "इस दिशा के सभी करियर देखें", more: "और विकल्प" },
+  ta: { all: "இந்தத் திசையில் உள்ள அனைத்துத் தொழில்களையும் பாருங்கள்", more: "மேலும் விருப்பங்கள்" },
+} as const;
 
 function subscribeToLocalResult(onChange: () => void) {
   window.addEventListener("storage", onChange);
@@ -43,6 +56,7 @@ export default function DiscoveryResultPage() {
   const { user } = useAuth();
   const { locale } = useTranslations();
   const catalog = getAssessmentV2Catalog(locale);
+  const browse = browseCopy[locale];
   const { data: publicExplorer } = useCareerExplorer(locale);
   const rawResult = useSyncExternalStore(
     subscribeToLocalResult,
@@ -85,9 +99,9 @@ export default function DiscoveryResultPage() {
 
   return (
     <div className={styles.surface}><Header />
-      <main className={`${explorer.explorer} ${design.shell}`}>
+      <main className={`${explorer.explorer} ${design.shell} ${design.resultsShell}`}>
         <div className="mx-auto max-w-6xl">
-          <JourneySteps step={1} locale={locale} />
+          <div className={design.resultsProgress}><JourneySteps step={1} locale={locale} /></div>
           <header className={design.intro}>
             <h1 className={design.heading}>{{ en: "Choose a Career Direction to explore.", ml: "അറിയാൻ ഒരു കരിയർ ദിശ തിരഞ്ഞെടുക്കൂ.", hi: "खोजने के लिए एक करियर दिशा चुनें।", ta: "ஆராய ஒரு தொழில் திசையைத் தேர்ந்தெடுங்கள்." }[locale]}</h1>
             <p className={styles.intro}>{catalog.result.description}</p>
@@ -100,34 +114,46 @@ export default function DiscoveryResultPage() {
               const featured = index === 0;
               const reasons = reasonsByArea[area.id] ?? [];
               const evidence = <ul className={design.reasons}>{reasons.map(reason => <li key={reason}>{reason}</li>)}</ul>;
+              const catalogueHref = `/explore?${new URLSearchParams({ direction: direction?.id ?? area.id, step: 'roles' })}`;
 
               return (
                 <article key={area.id} className={design.recommendation} data-featured={featured}
                   style={explorerTone(direction?.presentation)} aria-labelledby={`result-${area.id}`}>
                   <div className={design.recommendationArt}>
                     <ExplorerScene illustration={direction?.illustration} placeholder={journeyCopy[locale].illustration}
-                      bubble decorative sizes={featured ? '(max-width: 600px) 70vw, 320px' : '64px'} />
+                      bubble decorative sizes={featured ? '(max-width: 600px) 104px, 320px' : '64px'} />
                   </div>
                   <div className={design.recommendationCopy}>
                     <h2 id={`result-${area.id}`}>{area.title}</h2>
                     <p>{area.description}</p>
-                    {area.roles.length > 0 && (
-                      <ul className={design.exampleCareers} aria-label={`${area.title} careers`}>
-                        {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
-                      </ul>
-                    )}
-                    {reasons.length > 0 && (featured ?
-                      <div className={design.evidence}><h3>{catalog.result.why}</h3>{evidence}</div> :
-                      <details className={design.evidence}><summary>{catalog.result.why}</summary>{evidence}</details>)}
                     <div className={design.actions}>
                       <Button type="button" className={design.action} aria-label={`${catalog.result.viewArea}: ${area.title}`}
                         variant={featured ? 'default' : 'outline'} onClick={() => void pursueArea(area.id)}>
                         {catalog.result.viewArea}<ArrowRight size={16} aria-hidden="true" />
                       </Button>
-                      <Link className={design.browseLink} href={`/explore?${new URLSearchParams({ direction: direction?.id ?? area.id, step: 'roles' })}`}>
-                        View all careers in this direction<ArrowRight size={16} aria-hidden="true" />
+                      <Link className={design.browseLink} href={catalogueHref}>
+                        {browse.all}<ArrowRight size={16} aria-hidden="true" />
                       </Link>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button type="button" variant="ghost" size="icon" className={design.resultsMenu}
+                            aria-label={`${browse.more}: ${area.title}`}>
+                            <Ellipsis size={20} aria-hidden="true" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className={design.catalogueMenu}>
+                          <DropdownMenuItem asChild><Link href={catalogueHref}>{browse.all}</Link></DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
+                    {reasons.length > 0 && (
+                      <details className={design.evidence}><summary>{catalog.result.why}</summary>{evidence}</details>
+                    )}
+                    {area.roles.length > 0 && (
+                      <ul className={design.exampleCareers} aria-label={`${area.title} careers`}>
+                        {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
+                      </ul>
+                    )}
                   </div>
                 </article>
               );

@@ -8,6 +8,14 @@
 
 .links, .actions { display: none; }
 .compactActions { display: flex; margin-left: auto; align-items: center; gap: 4px; }
+/* Keep both controls reachable when a compact browser enlarges rem units. */
+.compactActions [role='combobox'] {
+  min-width: 72px;
+  min-height: 44px;
+  padding-inline: 8px;
+  gap: 6px;
+}
+.compactActions > [data-slot='button'] { width: 44px; height: 44px; }
 
 .navLink {
   display: flex;
