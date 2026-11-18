@@ -8,12 +8,6 @@
   min-height: 100vh;
 }
 .shell { max-width: 1160px; margin: auto; padding: 36px 24px 112px; }
-.steps { display: flex; gap: 28px; margin: 0 0 40px; padding: 0 0 22px; border-bottom: 1px solid var(--border); list-style: none; }
-.steps li { display: flex; align-items: center; gap: 9px; font-size: 12px; line-height: 1.5; color: #667779; }
-.steps li[aria-current] { color: var(--foreground); font-weight: 650; }
-.stepNumber { display: flex; width: 26px; height: 26px; flex-shrink: 0; align-items: center; justify-content: center; border: 1px solid #bdcdca; border-radius: 50%; }
-.steps li[aria-current] .stepNumber { background: #123b42; color: white; border-color: #123b42; }
-.steps li[data-complete='true'] .stepNumber { background: #deeee6; color: #196047; border-color: transparent; }
 .heading { font-size: clamp(30px, 3.5vw, 46px); line-height: 1.18; font-weight: 650; letter-spacing: -.04em; max-width: 800px; text-wrap: balance; }
 .intro { max-width: 660px; margin-top: 16px; color: var(--journey-muted); line-height: 1.75; font-size: 16px; }
 .resultsHeader { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
@@ -71,14 +65,10 @@
 :global(.dark) .receiptHeader, :global(.dark) .previewIntro { background: #193b36; color: #e2f1e8; }
 :global(.dark) .previewIntro p { color: #b2c8c4; }
 :global(.dark) .dashboardCareer:hover { background: #193b36; }
-:global(.dark) .steps li { color: #afc3c8; }
 @media (min-width: 1280px) { .selectionBar { bottom: 24px; } }
 @media (max-width: 850px) { .careerGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } .summaryLayout { gap: 32px; } }
 @media (max-width: 600px) {
   .shell, .dashboard { padding: 24px 20px 120px; }
-  .steps { gap: 12px; margin-bottom: 28px; }
-  .steps li { flex: 1; align-items: flex-start; gap: 6px; font-size: 10px; }
-  .stepNumber { width: 22px; height: 22px; }
   .compass { display: none; }
   .careerGrid { grid-template-columns: 1fr; gap: 14px; }
   .careerBody { padding: 20px; }
@@ -95,8 +85,6 @@
 :global(.dark) .directionContext > span { background: #254d40; color: #d7e8df; }
 .dashboard { --journey-muted: #52656b; }
 :global(.dark) .dashboard { --journey-muted: #aebfc2; }
-.steps li { min-width: 0; }
-.steps li > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 
 .savedCareers { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,280px),1fr)); gap: 16px; margin-top: 18px; }
 .conversation { max-width: none; }
@@ -169,7 +157,6 @@
 .careerCard[data-selected='true'] { border-color:#003763; background:#edf6fb; }
 .directionContext { color:var(--journey-ink); }
 .directionContext > span, .compass { background:var(--journey-soft); color:var(--journey-accent); border-color:var(--journey-soft); }
-.steps li[aria-current] .stepNumber { background:var(--foreground); border-color:var(--foreground); color:var(--background); }
 .previewIntro p { color:var(--journey-muted); }
 :global(.dark) .surface, :global(.dark) .dashboard, :global(.dark) .profileSurface, :global(.dark) .studentChrome {
  background:var(--background); color:var(--foreground);
@@ -202,7 +189,6 @@
 .resultCard .directionImage { aspect-ratio:2/1; flex-shrink:0; }
 .resultCard { display:flex; flex-direction:column; }
 .resultCard .resultBody { flex:1; height:auto; }
-.steps li[data-complete='true'] .stepNumber { background:var(--journey-soft); color:var(--foreground); }
 .receiptCareers li svg { color:var(--journey-accent); }
 :global(.dark) .directionContext > span { background:var(--journey-soft); color:var(--foreground); }
 @media(max-width:600px) { .dashboardHero .directionImage { aspect-ratio:2/1; } }

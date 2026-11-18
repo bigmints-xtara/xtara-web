@@ -1,0 +1,64 @@
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 2vw, 12px);
+  max-width: 32rem;
+  margin: 0 0 clamp(16px, 3vw, 28px);
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  min-width: 0;
+  color: var(--muted-foreground);
+  font-size: .8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.steps li::before {
+  content: '';
+  display: block;
+  height: 4px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.steps li[data-complete='true']::before {
+  background: color-mix(in srgb, var(--primary) 45%, var(--border));
+}
+
+.steps li[aria-current='step'] {
+  color: var(--foreground);
+  font-weight: 650;
+}
+
+.steps li[aria-current='step']::before {
+  background: var(--primary);
+}
+
+@media (max-width: 600px) {
+  .steps li::before { margin-bottom: 0; }
+
+  .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@media (forced-colors: active) {
+  .steps li::before {
+    background: Canvas;
+    border: 1px solid GrayText;
+    forced-color-adjust: none;
+  }
+
+  .steps li[data-complete='true']::before { background: GrayText; }
+  .steps li[aria-current='step']::before { background: Highlight; }
+}
