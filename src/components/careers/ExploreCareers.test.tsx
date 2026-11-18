@@ -124,6 +124,36 @@ beforeEach(() => {
   window.history.replaceState({}, "", "/explore");
 });
 describe("career exploration", () => {
+  it('keeps one career carousel when paging updates the focused position', async () => {
+    const graph = structuredClone(fixture);
+    const careers = Array.from({ length: 5 }, (_, index) => ({
+      ...graph.careers[0], id: `career-${index}`, title: `Career ${index}`,
+    }));
+    graph.careers = careers;
+    graph.directions[0].careerIds = careers.map(career => career.id);
+    vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/explore?direction=build&step=roles');
+    const { container } = mount();
+    await screen.findByRole('button', { name: 'Next' });
+
+    const expectOneCarousel = () => {
+      expect(container.querySelectorAll('[aria-roledescription="carousel"]')).toHaveLength(1);
+      expect(container.querySelectorAll('[aria-roledescription="slide"]')).toHaveLength(5);
+      expect(screen.getAllByRole('button', { name: 'Meet this career' })).toHaveLength(1);
+    };
+    expectOneCarousel();
+    for (let index = 0; index < 3; index++) {
+      fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      expectOneCarousel();
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Previous' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pause motion' }));
+    fireEvent.click(screen.getByText('All careers in this direction · 5 careers and groups'));
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Find a career' }), { target: { value: 'Career 2' } });
+    expectOneCarousel();
+    expect(errors.mock.calls.filter(args => String(args[0]).includes('same key'))).toHaveLength(0);
+  });
   it('retains the chapter structure for sparse careers and navigates from the direction orb', async () => {
     window.history.replaceState({}, '', '/explore?direction=health&career=doctor&step=work');
     mount();
