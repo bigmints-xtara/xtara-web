@@ -4,7 +4,7 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, ChevronDown, Compass, Ellipsis,
+  ArrowRight, ChevronDown, ChevronRight, Compass, Ellipsis,
 } from "lucide-react";
 
 import { ExplorerScene, explorerTone } from '@/components/careers/explorer/ExplorerScene';
@@ -14,7 +14,6 @@ import { resolveExplorerDirection } from '@/lib/career-direction-imagery';
 import explorer from '@/components/careers/ExploreCareers.module.css';
 import design from '@/components/journey/ExplorerJourney.module.css';
 import styles from '@/components/journey/journey.module.css';
-import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,11 +34,11 @@ import {
 import { loadDirectionPlan, saveDirectionPlan, switchCareerDirection } from "@/lib/direction";
 import { saveDirectionToApi } from "@/lib/direction-api";
 
-const browseCopy = {
-  en: { all: "View all careers in this direction", more: "More options" },
-  ml: { all: "ഈ ദിശയിലെ എല്ലാ കരിയറുകളും കാണാം", more: "കൂടുതൽ ഓപ്ഷനുകൾ" },
-  hi: { all: "इस दिशा के सभी करियर देखें", more: "और विकल्प" },
-  ta: { all: "இந்தத் திசையில் உள்ள அனைத்துத் தொழில்களையும் பாருங்கள்", more: "மேலும் விருப்பங்கள்" },
+const resultsCopy = {
+  en: { heading: "Choose a direction", explore: "Explore", details: "Details", insights: "Assessment insights", all: "View all careers", more: "More options" },
+  ml: { heading: "ഒരു ദിശ തിരഞ്ഞെടുക്കൂ", explore: "കൂടുതൽ അറിയാം", details: "വിശദാംശങ്ങൾ", insights: "അസസ്‌മെന്റ് കണ്ടെത്തലുകൾ", all: "എല്ലാ കരിയറുകളും കാണാം", more: "കൂടുതൽ ഓപ്ഷനുകൾ" },
+  hi: { heading: "एक दिशा चुनें", explore: "देखें", details: "जानकारी", insights: "आकलन की जानकारी", all: "सभी करियर देखें", more: "और विकल्प" },
+  ta: { heading: "ஒரு திசையைத் தேர்ந்தெடுங்கள்", explore: "ஆராயுங்கள்", details: "விவரங்கள்", insights: "மதிப்பீட்டுக் குறிப்புகள்", all: "அனைத்துத் தொழில்களையும் பாருங்கள்", more: "மேலும் விருப்பங்கள்" },
 } as const;
 
 function subscribeToLocalResult(onChange: () => void) {
@@ -56,7 +55,7 @@ export default function DiscoveryResultPage() {
   const { user } = useAuth();
   const { locale } = useTranslations();
   const catalog = getAssessmentV2Catalog(locale);
-  const browse = browseCopy[locale];
+  const copy = resultsCopy[locale];
   const { data: publicExplorer } = useCareerExplorer(locale);
   const rawResult = useSyncExternalStore(
     subscribeToLocalResult,
@@ -101,10 +100,8 @@ export default function DiscoveryResultPage() {
     <div className={styles.surface}><Header />
       <main className={`${explorer.explorer} ${design.shell} ${design.resultsShell}`}>
         <div className="mx-auto max-w-6xl">
-          <div className={design.resultsProgress}><JourneySteps step={1} locale={locale} /></div>
           <header className={design.intro}>
-            <h1 className={design.heading}>{{ en: "Choose a Career Direction to explore.", ml: "അറിയാൻ ഒരു കരിയർ ദിശ തിരഞ്ഞെടുക്കൂ.", hi: "खोजने के लिए एक करियर दिशा चुनें।", ta: "ஆராய ஒரு தொழில் திசையைத் தேர்ந்தெடுங்கள்." }[locale]}</h1>
-            <p className={styles.intro}>{catalog.result.description}</p>
+            <h1 className={design.heading}>{copy.heading}</h1>
           </header>
 
           {saveError && <p role="alert">{catalog.ui.errorTitle} {catalog.ui.retry}</p>}
@@ -113,8 +110,9 @@ export default function DiscoveryResultPage() {
               const direction = resolveExplorerDirection(publicExplorer?.directions, area.id);
               const featured = index === 0;
               const reasons = reasonsByArea[area.id] ?? [];
-              const evidence = <ul className={design.reasons}>{reasons.map(reason => <li key={reason}>{reason}</li>)}</ul>;
               const catalogueHref = `/explore?${new URLSearchParams({ direction: direction?.id ?? area.id, step: 'roles' })}`;
+
+              const select = () => void pursueArea(area.id);
 
               return (
                 <article key={area.id} className={design.recommendation} data-featured={featured}
@@ -124,35 +122,47 @@ export default function DiscoveryResultPage() {
                       bubble decorative sizes={featured ? '(max-width: 600px) 104px, 320px' : '64px'} />
                   </div>
                   <div className={design.recommendationCopy}>
-                    <h2 id={`result-${area.id}`}>{area.title}</h2>
-                    <p>{area.description}</p>
+                    <h2 id={`result-${area.id}`}>
+                      {featured ? area.title : (
+                        <button type="button" className={design.directionPick} onClick={select}>
+                          <span>{area.title}</span><ChevronRight size={17} aria-hidden="true" />
+                        </button>
+                      )}
+                    </h2>
                     <div className={design.actions}>
-                      <Button type="button" className={design.action} aria-label={`${catalog.result.viewArea}: ${area.title}`}
-                        variant={featured ? 'default' : 'outline'} onClick={() => void pursueArea(area.id)}>
-                        {catalog.result.viewArea}<ArrowRight size={16} aria-hidden="true" />
-                      </Button>
-                      <Link className={design.browseLink} href={catalogueHref}>
-                        {browse.all}<ArrowRight size={16} aria-hidden="true" />
-                      </Link>
+                      {featured ? (
+                        <Button type="button" className={design.action} aria-label={`${copy.explore}: ${area.title}`} onClick={select}>
+                          {copy.explore}<ArrowRight size={16} aria-hidden="true" />
+                        </Button>
+                      ) : null}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button type="button" variant="ghost" size="icon" className={design.resultsMenu}
-                            aria-label={`${browse.more}: ${area.title}`}>
+                            aria-label={`${copy.more}: ${area.title}`}>
                             <Ellipsis size={20} aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className={design.catalogueMenu}>
-                          <DropdownMenuItem asChild><Link href={catalogueHref}>{browse.all}</Link></DropdownMenuItem>
+                          <DropdownMenuItem asChild><Link href={catalogueHref}>{copy.all}</Link></DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    {reasons.length > 0 && (
-                      <details className={design.evidence}><summary>{catalog.result.why}</summary>{evidence}</details>
-                    )}
-                    {area.roles.length > 0 && (
-                      <ul className={design.exampleCareers} aria-label={`${area.title} careers`}>
-                        {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
-                      </ul>
+                    {!!(area.description || reasons.length || area.roles.length) && (
+                      <details className={design.evidence}>
+                        <summary>{copy.details}</summary>
+                        {area.description && <p className={design.directionDescription}>{area.description}</p>}
+                        {reasons.length > 0 && (
+                          <div className={design.directionReasons}>
+                            <h3>{catalog.result.why}</h3>
+                            <ul className={design.reasons}>{reasons.map(reason => <li key={reason}>{reason}</li>)}</ul>
+                          </div>
+                        )}
+                        {area.roles.length > 0 && (
+                          <ul className={design.exampleCareers} aria-label={`${area.title} careers`}>
+                            {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
+                          </ul>
+                        )}
+                      </details>
                     )}
                   </div>
                 </article>
@@ -160,22 +170,23 @@ export default function DiscoveryResultPage() {
             })}
           </section>
 
-          <div className="mt-8 border-y border-primary/10 py-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
-            <div><h2 className="font-semibold text-primary">{catalog.result.reflectionTitle}</h2><p className="mt-1 text-sm leading-6 text-muted-foreground">{catalog.result.reflectionDescription}</p></div>
-            <Link href="/assessment" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary underline-offset-4 hover:underline sm:mt-0 sm:shrink-0">{catalog.result.edit}<ArrowRight className="h-4 w-4" /></Link>
-          </div>
+          <Link href="/assessment" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary underline-offset-4 hover:underline">
+            {catalog.result.edit}<ArrowRight size={16} aria-hidden="true" />
+          </Link>
 
-          <details className="group mt-8 rounded-2xl border border-primary/10 bg-card">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-left sm:p-6">
-              <span><span className="block font-semibold text-primary">{catalog.result.detailsTitle}</span><span className="mt-1 block text-sm leading-6 text-muted-foreground">{catalog.result.detailsDescription}</span></span>
+          {(result.signals.length > 0 || result.traits.length > 0 || result.contextSummary.family || result.contextSummary.weaknesses.length > 0) && (
+            <details className="group mt-4 rounded-xl border border-primary/10 bg-card">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-4 py-2 text-left text-sm font-semibold text-primary">
+                {copy.insights}
               <ChevronDown className="h-5 w-5 shrink-0 text-primary transition-transform group-open:rotate-180" aria-hidden="true" />
-            </summary>
-            <div className="grid gap-8 border-t border-primary/10 p-5 sm:p-6 lg:grid-cols-3">
-              {result.signals.length ? <section aria-labelledby="patterns-title"><h2 id="patterns-title" className="font-semibold text-primary">{catalog.result.patternsTitle}</h2><ul className="mt-4 space-y-4">{result.signals.map((signal) => <li key={signal.id}><h3 className="text-sm font-semibold text-foreground">{signal.title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{signal.description}</p></li>)}</ul></section> : null}
-              {result.traits.length ? <section aria-labelledby="traits-title"><h2 id="traits-title" className="font-semibold text-primary">{catalog.result.traitsTitle}</h2><ul className="mt-4 space-y-4">{result.traits.map((trait) => <li key={trait.id}><h3 className="text-sm font-semibold text-foreground">{trait.title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{trait.description}</p></li>)}</ul></section> : null}
-              {result.contextSummary.family || result.contextSummary.weaknesses.length ? <section aria-labelledby="context-title"><h2 id="context-title" className="font-semibold text-primary">{catalog.result.contextTitle}</h2>{result.contextSummary.family ? <p className="mt-4 text-sm leading-6 text-muted-foreground">{result.contextSummary.family}</p> : null}{result.contextSummary.weaknesses.length ? <ul className="mt-4 space-y-3">{result.contextSummary.weaknesses.map((summary) => <li key={summary} className="text-sm leading-6 text-muted-foreground">{summary}</li>)}</ul> : null}</section> : null}
-            </div>
-          </details>
+              </summary>
+              <div className="grid gap-8 border-t border-primary/10 p-5 sm:p-6 lg:grid-cols-3">
+                {result.signals.length ? <section aria-labelledby="patterns-title"><h2 id="patterns-title" className="font-semibold text-primary">{catalog.result.patternsTitle}</h2><ul className="mt-4 space-y-4">{result.signals.map((signal) => <li key={signal.id}><h3 className="text-sm font-semibold text-foreground">{signal.title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{signal.description}</p></li>)}</ul></section> : null}
+                {result.traits.length ? <section aria-labelledby="traits-title"><h2 id="traits-title" className="font-semibold text-primary">{catalog.result.traitsTitle}</h2><ul className="mt-4 space-y-4">{result.traits.map((trait) => <li key={trait.id}><h3 className="text-sm font-semibold text-foreground">{trait.title}</h3><p className="mt-1 text-sm leading-6 text-muted-foreground">{trait.description}</p></li>)}</ul></section> : null}
+                {result.contextSummary.family || result.contextSummary.weaknesses.length ? <section aria-labelledby="context-title"><h2 id="context-title" className="font-semibold text-primary">{catalog.result.contextTitle}</h2>{result.contextSummary.family ? <p className="mt-4 text-sm leading-6 text-muted-foreground">{result.contextSummary.family}</p> : null}{result.contextSummary.weaknesses.length ? <ul className="mt-4 space-y-3">{result.contextSummary.weaknesses.map((summary) => <li key={summary} className="text-sm leading-6 text-muted-foreground">{summary}</li>)}</ul> : null}</section> : null}
+              </div>
+            </details>
+          )}
         </div>
       </main>
     </div>

@@ -80,10 +80,14 @@ describe("discovery result chooser", () => {
   it("puts the direction decision first without badges or assessment jargon", async () => {
     const { container } = render(<DiscoveryResultPage />);
 
-    expect(await screen.findByRole("heading", { name: "Choose a Career Direction to explore." })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Explore these careers:/ })).toHaveLength(3);
-    expect(screen.getAllByRole("link", { name: "View all careers in this direction" })).toHaveLength(3);
-    expect(screen.getAllByRole("link", { name: "View all careers in this direction" })[0]).toHaveAttribute("href", "/explore?direction=health&step=roles");
+    expect(await screen.findByRole("heading", { name: "Choose a direction" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Explore:/ })).toHaveLength(1);
+    const featured = screen.getAllByRole("article")[0];
+    const details = featured.querySelector("details")!;
+    expect(details).not.toHaveAttribute("open");
+    expect(within(featured).getByText("Physician")).not.toBeVisible();
+    fireEvent.click(within(featured).getByText("Details"));
+    expect(details).toHaveAttribute("open");
     expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physician");
     expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physiotherapist");
     expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Biomedical Engineer");
@@ -111,18 +115,22 @@ describe("discovery result chooser", () => {
     expect(cards[0]).toHaveAttribute('data-featured', 'true');
     expect(cards[1]).toHaveAttribute('data-featured', 'false');
     expect(within(cards[1]).getByRole('heading', { name: longTitle })).toBeVisible();
+    expect(within(cards[1]).getByText('Full description for Engineering.')).not.toBeVisible();
+    fireEvent.click(within(cards[1]).getByText('Details'));
     expect(within(cards[1]).getByText('Full description for Engineering.')).toBeVisible();
     expect(cards[1].querySelector('img')).toHaveAttribute('src', 'https://example.test/engineering.webp');
     expect(cards[1].querySelector('img')).toHaveAttribute('alt', '');
-    expect(within(cards[1]).getByRole('link')).toHaveAttribute('href', '/explore?direction=engineering-and-built-world&step=roles');
+    fireEvent.keyDown(within(cards[1]).getByRole('button', { name: `More options: ${longTitle}` }), { key: 'Enter' });
+    expect(await screen.findByRole('menuitem', { name: 'View all careers' })).toHaveAttribute('href', '/explore?direction=engineering-and-built-world&step=roles');
+    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
     expect(container.querySelector('header')!.compareDocumentPosition(screen.getByRole('heading', { level: 1 })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(within(cards[1]).getByRole('button', { name: `Explore these careers: ${longTitle}` }));
+    fireEvent.click(within(cards[1]).getByRole('button', { name: longTitle }));
     expect(mocks.push).toHaveBeenCalledWith('/assessment/careers/engineering-and-built-world');
   });
 
   it("does not repeat the same answer beneath every direction", async () => {
     render(<DiscoveryResultPage />);
-    await screen.findByRole("heading", { name: "Choose a Career Direction to explore." });
+    await screen.findByRole("heading", { name: "Choose a direction" });
 
     expect(screen.getAllByText("Build an app, game, website, or digital tool")).toHaveLength(1);
     expect(screen.getAllByText("Investigate a question through facts or experiments")).toHaveLength(1);
