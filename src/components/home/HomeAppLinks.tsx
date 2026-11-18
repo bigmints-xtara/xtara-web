@@ -18,11 +18,11 @@ const copy: Record<Locale, { title: string; unavailable: string }> = {
 
 export default function HomeAppLinks() {
   const { locale } = useTranslations();
-  return <div className="mt-7 border-t border-border pt-5" role="group" aria-label={copy[locale].title}>
-    <div className="mb-3 text-sm font-medium">{copy[locale].title}</div>
-    <div className="flex flex-wrap gap-3">
+  return <section id="download-app" className="mb-8 flex flex-col gap-5 border-t border-border py-8 sm:mb-12 md:flex-row md:items-center md:justify-between md:gap-8" aria-labelledby="download-app-title">
+    <h2 id="download-app-title" className="text-xl font-semibold leading-7">{copy[locale].title}</h2>
+    <div className="flex shrink-0 flex-wrap gap-3">
       <AppStoreButton dark url={appStoreUrl} unavailableLabel={copy[locale].unavailable} />
       <PlayStoreButton dark url={playStoreUrl} />
     </div>
-  </div>;
+  </section>;
 }

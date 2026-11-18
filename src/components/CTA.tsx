@@ -17,7 +17,7 @@ const CTA = () => {
   const isLoggedIn = Boolean(user && !user.isAnonymous);
 
   return (
-    <section id="cta" className="mb-16 overflow-hidden rounded-[2rem] bg-[#eaf4fa] sm:mb-24">
+    <section id="cta" className="mb-8 overflow-hidden rounded-[2rem] bg-[#eaf4fa] sm:mb-12">
       <div className="grid grid-cols-1 items-center lg:grid-cols-[1.15fr_0.85fr]">
         <div className="px-6 py-12 sm:px-10 sm:py-16 lg:px-14">
           <p className="text-sm font-semibold uppercase tracking-[0.15em] text-primary/60">{content.eyebrow}</p>

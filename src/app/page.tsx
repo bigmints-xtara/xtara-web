@@ -6,6 +6,7 @@ import FAQ from "@/components/FAQ";
 import Benefits from "@/components/Benefits/Benefits";
 import Container from "@/components/Container";
 import CTA from "@/components/CTA";
+import HomeAppLinks from "@/components/home/HomeAppLinks";
 import JsonLd from "@/components/JsonLd";
 import { siteStructuredData } from "@/lib/seo/structured-data";
 import MarketingLayout from "@/components/MarketingLayout";
@@ -27,6 +28,7 @@ export default function Home() {
         <Benefits />
         <FAQ />
         <CTA />
+        <HomeAppLinks />
 
       </Container>
     </MarketingLayout>

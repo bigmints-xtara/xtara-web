@@ -24,6 +24,7 @@ import CTA from "@/components/CTA";
 import FAQ from "@/components/FAQ";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import HomeAppLinks from "@/components/home/HomeAppLinks";
 
 describe("value-led homepage conversion journey", () => {
   let container: HTMLDivElement;
@@ -64,6 +65,7 @@ describe("value-led homepage conversion journey", () => {
             <Benefits />
             <FAQ />
             <CTA />
+            <HomeAppLinks />
           </main>
         </LanguageProvider>,
       );
@@ -75,6 +77,9 @@ describe("value-led homepage conversion journey", () => {
     expect(container.textContent).not.toContain("Make the next career conversation easier.");
     expect(container.textContent).not.toContain("Curated, not generated");
     expect(container.querySelectorAll('h3')).toHaveLength(6);
+    expect(container.querySelector("#hero #download-app")).toBeNull();
+    expect(container.querySelector("main")?.lastElementChild).toHaveAttribute("id", "download-app");
+    expect(container.querySelector('#download-app a[href="https://play.google.com/store/apps/details?id=com.bigmints.xtara"]')).not.toBeNull();
     expect(container.querySelector('header a[href="/parents"]')).not.toBeNull();
     expect(container.querySelector('header a[href="/about"]')).toBeNull();
 
