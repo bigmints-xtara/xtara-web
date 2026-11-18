@@ -199,6 +199,27 @@ describe("career exploration", () => {
     expect(screen.getByText('Building sites')).toBeInTheDocument();
     expect(screen.getByText('Work can happen outdoors')).toBeInTheDocument();
   });
+  it('opens a legacy assessment Direction and keeps its group and detail context', async () => {
+    const graph = structuredClone(fixture);
+    graph.directions[0].id = 'engineering-and-built-world';
+    graph.directions[0].title = 'Engineering & the Built World';
+    graph.careers[0].specializationIds = ['structures'];
+    graph.careers.push({
+      ...graph.careers[0], id: 'structures', title: 'Structural Engineering',
+      parentCareerId: 'civil', specializationIds: [],
+    });
+    window.history.replaceState({}, '', '/explore?direction=engineering&step=roles');
+    vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    mount();
+    expect(await screen.findByRole('navigation', { name: 'Your path' })).toHaveTextContent('Engineering & the Built World');
+    fireEvent.click(await screen.findByRole('button', { name: 'Explore specializations' }));
+    expect(window.location.search).toContain('direction=engineering-and-built-world');
+    expect(window.location.search).toContain('step=specializations');
+    fireEvent.click(await screen.findByRole('button', { name: /^Meet this career$/ }));
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Structural Engineering');
+    expect(screen.getByRole('navigation', { name: 'Your path' })).toHaveTextContent('Engineering & the Built World');
+  });
+
   it("opens an optional specialization with its three connected contexts", async () => {
     const graph = structuredClone(fixture);
     graph.careers[0].specializationIds = ['structures'];

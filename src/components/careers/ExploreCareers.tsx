@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, ImageIcon, Sparkles } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, Sparkles } from 'lucide-react';
 import Header from '@/components/Header';
 import { useTranslations } from '@/i18n/language-provider';
 import { useAuth } from '@/context/AuthContext';
-import { getCareerExplorer } from '@/lib/career-explorer-api';
 import { pursueCareer } from '@/lib/career-pursuit-api';
 import { explorerCopy } from './explorer/copy';
 import { journeyCopy, explorerHeadings, invitationCopy } from './explorer/journey-copy';
@@ -16,24 +14,16 @@ import { exploreUrl, initialExploreState, readExploreState, type ExploreState } 
 import VisualCarousel from './explorer/VisualCarousel';
 import CareerOverviewSections from './explorer/CareerOverviewSections';
 import ExplorerAccountContext from './explorer/ExplorerAccountContext';
-import type { ExplorerIllustration } from '@/types/career-explorer';
 import styles from './ExploreCareers.module.css';
+import { ExplorerScene, explorerTone } from './explorer/ExplorerScene';
+import { useCareerExplorer } from './explorer/useCareerExplorer';
+
+export { safeSourceUrl } from './explorer/ExplorerScene';
 
 const navigationEvent = 'xtara-explore-navigate';
 function subscribe(listener: () => void) { window.addEventListener('popstate', listener); window.addEventListener(navigationEvent, listener); return () => { window.removeEventListener('popstate', listener); window.removeEventListener(navigationEvent, listener); }; }
 const snapshot = () => window.location.search;
 const serverSnapshot = () => '';
-export function safeSourceUrl(url: string) { try { const value = new URL(url); return ['https:', 'http:'].includes(value.protocol) ? value.href : null; } catch { return null; } }
-
-function Illustration({ illustration, placeholder, bubble = false }: { illustration?: ExplorerIllustration; placeholder: string; bubble?: boolean }) {
-  const [failedUrl, setFailedUrl] = useState<string>();
-  const url = illustration && safeSourceUrl(illustration.url);
-  return <div className={`${styles.media} ${bubble ? styles.bubbleMedia : ''}`}>
-    {url && url !== failedUrl ? <Image unoptimized fill sizes="(max-width:700px) 80vw, 410px" src={url} alt={illustration?.alt ?? ''} draggable={false} onError={() => setFailedUrl(url)} /> : <span className={styles.placeholder}><ImageIcon size={34} strokeWidth={1.2} aria-hidden="true" /><span>{placeholder}</span></span>}
-  </div>;
-}
-const tone = (presentation?: { accent: string; tint: string; wash: string; washEnd: string }) => presentation ? ({ '--scene-accent': presentation.accent, '--scene-tint': presentation.tint, '--scene-wash': presentation.wash, '--scene-wash-end': presentation.washEnd } as CSSProperties) : undefined;
-
 export default function ExploreCareers() {
   const { locale } = useTranslations();
   const copy = explorerCopy[locale], text = journeyCopy[locale];
@@ -44,7 +34,7 @@ export default function ExploreCareers() {
   useEffect(() => { owner.current = user?.uid; }, [user?.uid]);
   const queryClient = useQueryClient();
   const search = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
-  const { data, isPending, isError, refetch } = useQuery({ queryKey: ['career-explorer', locale], queryFn: ({ signal }) => getCareerExplorer(locale, signal), meta: { authScope: 'public' }, staleTime: 60_000, retry: false });
+  const { data, isPending, isError, refetch } = useCareerExplorer(locale);
   const state = readExploreState(search, data);
   const [listQuery, setListQuery] = useState('');
   const [paused, setPaused] = useState(false);
@@ -103,7 +93,7 @@ export default function ExploreCareers() {
 
   return <div className={styles.page}>
     <Header />
-    <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={tone(direction?.presentation)}>
+    <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={explorerTone(direction?.presentation)}>
       <main className={`${styles.main} ${home ? styles.home : ''} ${invitation ? styles.invitation : overview ? styles.overview : styles.journey}`}>
         <div className={styles.topline} data-inner={!home || undefined}>
           {!home && breadcrumbs}
@@ -114,7 +104,7 @@ export default function ExploreCareers() {
         </div>
       <div key={`${groupKey}:${locale}`} className={styles.stage}>
         {isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
-        <div className={styles.invitationBubble}><Illustration illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>
+        <div className={styles.invitationBubble}><ExplorerScene illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>
         <p className={styles.eyebrow}>{text.nextStep}</p>
         <h1 ref={heading} tabIndex={-1}>{invite.headingLead}<br /><span>{invite.headingAccent}</span></h1>
         <div className={styles.careerIntent}><p>{invite.choice}</p><h2>{parent?.title || career.title}</h2>{parent && <p>{career.title}</p>}<button className={styles.quiet} onClick={() => navigate({...state,career:null,step:'roles',q:''})}>{invite.change}</button></div>
@@ -126,9 +116,9 @@ export default function ExploreCareers() {
       </section> : overview && career ? <>
         <div className={styles.connection} aria-label={`${direction?.title || ''}, ${parent?.title || career.title}, ${parent ? career.title : text.nextStep}`}>
           <span className={styles.orbit} /><span className={styles.orbitTwo} />
-          <button className={`${styles.satellite} ${styles.connectionLink}`} aria-label={direction?.title} disabled={!direction} onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}><Illustration illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></button>
-          <div className={styles.central}><Illustration illustration={(parent || career).illustration} placeholder={text.illustration} bubble /><span>{parent?.title || career.title}</span></div>
-          <div className={styles.satellite}>{parent ? <Illustration illustration={career.illustration} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
+          <button className={`${styles.satellite} ${styles.connectionLink}`} aria-label={direction?.title} disabled={!direction} onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}><ExplorerScene illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></button>
+          <div className={styles.central}><ExplorerScene illustration={(parent || career).illustration} placeholder={text.illustration} bubble /><span>{parent?.title || career.title}</span></div>
+          <div className={styles.satellite}>{parent ? <ExplorerScene illustration={career.illustration} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
         </div>
         <header className={styles.intro}><p className={styles.eyebrow}>{text.future}</p><h1 ref={heading} tabIndex={-1}>{text.closer}<br /><span>{career.title}.</span></h1><p>{career.summary}</p></header>
         {career.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
@@ -143,7 +133,7 @@ export default function ExploreCareers() {
       </> : <>
         <header className={`${styles.intro} ${styles.browseIntro}`}>
           {!home && <div className={styles.contextArtwork} aria-hidden="true">
-            <Illustration illustration={(specialization ? career : direction)?.illustration} placeholder={text.illustration} bubble />
+            <ExplorerScene illustration={(specialization ? career : direction)?.illustration} placeholder={text.illustration} bubble />
           </div>}
           <div>
             {!home && <p className={styles.eyebrow}>{specialization ? career?.title : direction?.title || copy.roles}</p>}
@@ -158,7 +148,7 @@ export default function ExploreCareers() {
           const item = choices[i];
           const action = home ? text.explore : 'specializationIds' in item && item.specializationIds?.length ? text.specialize : text.meet;
           const open = () => home ? navigate({ ...initialExploreState, direction: item.id, step: 'roles' }) : state.step === 'industries' ? navigate({ ...state, industry: item.id, career: null, step: 'roles' }) : goCareer(item.id);
-          return <div className={styles.choiceBody} style={home && 'presentation' in item ? tone(item.presentation) : undefined}><Illustration key={item.id} illustration={'illustration' in item ? item.illustration : undefined} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
+          return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={'illustration' in item ? item.illustration : undefined} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
         }} />}
         {direction?.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
         <div className={styles.browseContext}>

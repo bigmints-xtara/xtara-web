@@ -3,13 +3,17 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Compass, Loader2, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Compass, Loader2, Plus } from "lucide-react";
 
 import CareerPreviewDialog from "@/components/careers/CareerPreviewDialog";
 import Footer from "@/components/Footer";
 import styles from '@/components/journey/journey.module.css';
-import DirectionImage from '@/components/journey/DirectionImage';
-import launchpad from '@/components/launchpad/launchpad.module.css';
+import { ExplorerScene, explorerTone } from '@/components/careers/explorer/ExplorerScene';
+import { useCareerExplorer } from '@/components/careers/explorer/useCareerExplorer';
+import { journeyCopy } from '@/components/careers/explorer/journey-copy';
+import { resolveExplorerDirection } from '@/lib/career-direction-imagery';
+import explorer from '@/components/careers/ExploreCareers.module.css';
+import design from '@/components/journey/ExplorerJourney.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -124,6 +128,10 @@ export default function CareerDirectionPage() {
   const [accountError, setAccountError] = useState(false);
   const { locale } = useTranslations();
   const text = copy[locale];
+  const { data: publicExplorer } = useCareerExplorer(locale);
+  const publicDirection = resolveExplorerDirection(publicExplorer?.directions, areaId);
+  const careerArtwork = new Map(publicExplorer?.careers.map(career => [career.id, career.illustration]));
+  const sceneTone = explorerTone(publicDirection?.presentation);
   const fallbackCatalog = getCareerKnowledgeCatalog(locale);
   const rawResult = useSyncExternalStore(subscribeToAssessment, () => localStorage.getItem(assessmentV2StorageKey), serverSnapshot);
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, serverSnapshot);
@@ -192,7 +200,7 @@ export default function CareerDirectionPage() {
   const openPreview = (career: DreamCareerView) => {
     const url = new URL(window.location.href);
     url.searchParams.set('career', career.id);
-    window.history.pushState({ ...window.history.state, xtaraCareerPreview: career.id }, '', url);
+    window.history.pushState({ xtaraCareerPreview: career.id }, '', url);
     setPreview(career);
   };
   const closePreview = () => {
@@ -261,17 +269,23 @@ export default function CareerDirectionPage() {
   return (
     <div className={styles.surface}>
       <Header />
-      <main className={styles.shell}>
-        <JourneySteps step={2} locale={locale} />
+      <main className={`${explorer.explorer} ${design.shell}`} style={sceneTone}>
         <div className="mx-auto max-w-6xl">
+          <JourneySteps step={2} locale={locale} />
           <Link href="/assessment/discovery" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-4 w-4" />{text.results}
           </Link>
 
-          <section className={launchpad.directionHero}>
-            <div><p className={launchpad.eyebrow}>{text.selectedDirection}</p><h1>{direction.title}</h1></div>
-            <DirectionImage directionId={direction.id} />
-          </section>
+          <header className={design.directionHeader}>
+            <div>
+              <p className={design.eyebrow}>{text.selectedDirection}</p>
+              <h1 className={design.heading}>{direction.title}</h1>
+            </div>
+            <div className={design.directionArt}>
+              <ExplorerScene illustration={publicDirection?.illustration} placeholder={journeyCopy[locale].illustration}
+                bubble decorative sizes="128px" />
+            </div>
+          </header>
 
           <section className="mt-8" aria-labelledby="dream-careers-title">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -291,15 +305,22 @@ export default function CareerDirectionPage() {
               {careers.filter((career) => `${career.title} ${career.englishTitle || ""}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).map((career) => {
                 const selected = selectedIds.includes(career.id);
                 return (
-                  <Card key={career.id} className={styles.careerCard} data-selected={selected}>
+                  <Card key={career.id} className={`${styles.careerCard} ${design.careerCard}`} data-selected={selected}>
                     <CardContent className={styles.careerBody}>
-                      <div className={styles.cardToolbar}><span className={styles.careerIcon} aria-hidden="true"><BriefcaseBusiness size={23} strokeWidth={1.5} /></span>                      <Button type="button" variant={selected ? "default" : "outline"} className={styles.selectButton} disabled={saving} onClick={() => void toggle(career.id)} aria-pressed={selected} aria-label={`${selected ? ({ en: "Remove", ml: "നീക്കുക", hi: "हटाएँ", ta: "நீக்கு" })[locale] : ({ en: "Choose", ml: "തിരഞ്ഞെടുക്കൂ", hi: "चुनें", ta: "தேர்ந்தெடுக்கவும்" })[locale]} ${career.title}`}>
+                      <div className={styles.cardToolbar}><div className={design.careerArt}>
+                        <ExplorerScene illustration={careerArtwork.get(career.id)} placeholder={journeyCopy[locale].illustration}
+                          bubble decorative sizes="64px" />
+                      </div>
+                      <Button type="button" variant={selected ? "default" : "outline"} className={styles.selectButton} disabled={saving} onClick={() => void toggle(career.id)} aria-pressed={selected} aria-label={`${selected ? ({ en: "Remove", ml: "നീക്കുക", hi: "हटाएँ", ta: "நீக்கு" })[locale] : ({ en: "Choose", ml: "തിരഞ്ഞെടുക്കൂ", hi: "चुनें", ta: "தேர்ந்தெடுக்கவும்" })[locale]} ${career.title}`}>
                         {selected ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
                         {selected ? ({ en: 'Remove', ml: 'നീക്കുക', hi: 'हटाएँ', ta: 'நீக்கு' })[locale] : ({ en: 'Choose', ml: 'തിരഞ്ഞെടുക്കൂ', hi: 'चुनें', ta: 'தேர்ந்தெடுக்கவும்' })[locale]}
                       </Button></div>
-                      <button type="button" disabled={saving} onClick={() => openPreview(career)} className={styles.careerRead} aria-label={career.title}>
+                      <button type="button" disabled={saving} onClick={(event) => {
+                          event.currentTarget.focus({ preventScroll: true });
+                          openPreview(career);
+                        }} className={styles.careerRead} aria-label={career.title}>
 
-                        <span><span className={styles.careerTitle}>{career.title}</span>
+                        <span data-career-copy><span className={styles.careerTitle}>{career.title}</span>
                           {locale !== "en" && career.englishTitle ? <span className="mt-1 block text-xs text-muted-foreground">{career.englishTitle}</span> : null}
                           <span className={styles.careerSummary}>{career.summary}</span>
                         </span>
@@ -329,7 +350,7 @@ export default function CareerDirectionPage() {
           </section>
         </div>
       </main>
-      {preview ? <CareerPreviewDialog career={preview} onClose={closePreview} /> : null}
+      {preview ? <CareerPreviewDialog career={preview} illustration={careerArtwork.get(preview.id)} tone={sceneTone} onClose={closePreview} /> : null}
       <Footer />
     </div>
   );

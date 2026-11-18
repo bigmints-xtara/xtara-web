@@ -4,16 +4,19 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, Check, ChevronDown, Compass,
+  ArrowRight, ChevronDown, Compass,
 } from "lucide-react";
 
-import DirectionImage from "@/components/journey/DirectionImage";
-import DirectionMark from "@/components/journey/DirectionMark";
+import { ExplorerScene, explorerTone } from '@/components/careers/explorer/ExplorerScene';
+import { useCareerExplorer } from '@/components/careers/explorer/useCareerExplorer';
+import { journeyCopy } from '@/components/careers/explorer/journey-copy';
+import { resolveExplorerDirection } from '@/lib/career-direction-imagery';
+import explorer from '@/components/careers/ExploreCareers.module.css';
+import design from '@/components/journey/ExplorerJourney.module.css';
 import styles from '@/components/journey/journey.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useTranslations } from "@/i18n/language-provider";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -40,6 +43,7 @@ export default function DiscoveryResultPage() {
   const { user } = useAuth();
   const { locale } = useTranslations();
   const catalog = getAssessmentV2Catalog(locale);
+  const { data: publicExplorer } = useCareerExplorer(locale);
   const rawResult = useSyncExternalStore(
     subscribeToLocalResult,
     () => localStorage.getItem(assessmentV2StorageKey),
@@ -56,7 +60,7 @@ export default function DiscoveryResultPage() {
     [result?.areas],
   );
 
-  if (!result || !storedResult) {
+  if (!result?.areas.length || !storedResult) {
     return (
       <div className="min-h-screen bg-[#f7fafc]"><Header />
         <main className="mx-auto max-w-xl px-5 py-20 text-center">
@@ -81,42 +85,53 @@ export default function DiscoveryResultPage() {
 
   return (
     <div className={styles.surface}><Header />
-      <main className={styles.shell}>
-        <JourneySteps step={1} locale={locale} />
+      <main className={`${explorer.explorer} ${design.shell}`}>
         <div className="mx-auto max-w-6xl">
-          <div className={styles.resultsHeader}><div>
-            <h1 className={styles.heading}>{{ en: "Choose a Career Direction to explore.", ml: "അറിയാൻ ഒരു കരിയർ ദിശ തിരഞ്ഞെടുക്കൂ.", hi: "खोजने के लिए एक करियर दिशा चुनें।", ta: "ஆராய ஒரு தொழில் திசையைத் தேர்ந்தெடுங்கள்." }[locale]}</h1>
+          <JourneySteps step={1} locale={locale} />
+          <header className={design.intro}>
+            <h1 className={design.heading}>{{ en: "Choose a Career Direction to explore.", ml: "അറിയാൻ ഒരു കരിയർ ദിശ തിരഞ്ഞെടുക്കൂ.", hi: "खोजने के लिए एक करियर दिशा चुनें।", ta: "ஆராய ஒரு தொழில் திசையைத் தேர்ந்தெடுங்கள்." }[locale]}</h1>
             <p className={styles.intro}>{catalog.result.description}</p>
-          </div><span className={styles.compass} aria-hidden="true"><Compass size={52} strokeWidth={1.3} /></span></div>
+          </header>
 
-          {saveError ? <p role="alert">{catalog.ui.errorTitle} {catalog.ui.retry}</p> : null}
-          <section className="mt-8 sm:mt-10" aria-label={catalog.result.areasLabel}>
-            <h2 className="sr-only">{catalog.result.areasLabel}</h2>
-            <div className="mt-5 grid gap-5 lg:grid-cols-3">
-              {result.areas.map((area) => (
-                <Card key={area.id} className={styles.resultCard}><DirectionImage directionId={area.id} sizes="(max-width: 1023px) 100vw, 400px" /><CardContent className={styles.resultBody}>
+          {saveError && <p role="alert">{catalog.ui.errorTitle} {catalog.ui.retry}</p>}
+          <section className={design.recommendations} aria-label={catalog.result.areasLabel}>
+            {result.areas.map((area, index) => {
+              const direction = resolveExplorerDirection(publicExplorer?.directions, area.id);
+              const featured = index === 0;
+              const reasons = reasonsByArea[area.id] ?? [];
+              const evidence = <ul className={design.reasons}>{reasons.map(reason => <li key={reason}>{reason}</li>)}</ul>;
 
-                  <div className="flex items-center gap-3">
-                    <DirectionMark directionId={area.id} />
-                    <h3 className="min-w-0 break-words text-2xl font-semibold text-primary">{area.title}</h3>
+              return (
+                <article key={area.id} className={design.recommendation} data-featured={featured}
+                  style={explorerTone(direction?.presentation)} aria-labelledby={`result-${area.id}`}>
+                  <div className={design.recommendationArt}>
+                    <ExplorerScene illustration={direction?.illustration} placeholder={journeyCopy[locale].illustration}
+                      bubble decorative sizes={featured ? '(max-width: 600px) 70vw, 320px' : '64px'} />
                   </div>
-                  <p className="mt-3 leading-7 text-muted-foreground">{area.description}</p>
-                  {area.roles.length ? (
-                    <ul className="mt-5 space-y-2" aria-label={`${area.title} careers`}>
-                      {area.roles.slice(0, 3).map((career) => (
-                        <li key={career.id} className="flex items-center gap-2 text-sm font-semibold text-primary">
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-                          {career.title}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  <Link className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-primary underline-offset-4 hover:underline" href={`/explore?${new URLSearchParams({ direction: area.id, step: 'roles' })}`}>View all careers in this direction<ArrowRight className="ml-2 h-4 w-4" /></Link>
-                  {reasonsByArea[area.id]?.length ? <div className="mt-6 border-t border-slate-100 pt-5"><p className="text-sm font-semibold text-primary">{catalog.result.why}</p><ul className="mt-3 space-y-3">{reasonsByArea[area.id].map((reason) => <li key={reason} className="flex gap-3 text-sm leading-6 text-muted-foreground"><Check className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{reason}</li>)}</ul></div> : null}
-                  <Button type="button" className="mt-7 min-h-12 w-full justify-between rounded-xl" aria-label={`${catalog.result.viewArea}: ${area.title}`} onClick={() => pursueArea(area.id)}>{catalog.result.viewArea}<ArrowRight className="h-4 w-4" /></Button>
-                </CardContent></Card>
-              ))}
-            </div>
+                  <div className={design.recommendationCopy}>
+                    <h2 id={`result-${area.id}`}>{area.title}</h2>
+                    <p>{area.description}</p>
+                    {area.roles.length > 0 && (
+                      <ul className={design.exampleCareers} aria-label={`${area.title} careers`}>
+                        {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
+                      </ul>
+                    )}
+                    {reasons.length > 0 && (featured ?
+                      <div className={design.evidence}><h3>{catalog.result.why}</h3>{evidence}</div> :
+                      <details className={design.evidence}><summary>{catalog.result.why}</summary>{evidence}</details>)}
+                    <div className={design.actions}>
+                      <Button type="button" className={design.action} aria-label={`${catalog.result.viewArea}: ${area.title}`}
+                        variant={featured ? 'default' : 'outline'} onClick={() => void pursueArea(area.id)}>
+                        {catalog.result.viewArea}<ArrowRight size={16} aria-hidden="true" />
+                      </Button>
+                      <Link className={design.browseLink} href={`/explore?${new URLSearchParams({ direction: direction?.id ?? area.id, step: 'roles' })}`}>
+                        View all careers in this direction<ArrowRight size={16} aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </section>
 
           <div className="mt-8 border-y border-primary/10 py-6 sm:flex sm:items-center sm:justify-between sm:gap-6">

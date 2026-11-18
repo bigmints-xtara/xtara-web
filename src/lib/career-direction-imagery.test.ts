@@ -7,8 +7,9 @@ const direction = (id: string, url = 'https://xtara.ai/xtara-service/media/direc
 });
 describe('canonical Career Direction imagery', () => {
   it('resolves canonical and legacy identities without owning image paths', () => {
-    expect(supportedCareerDirectionIds).toHaveLength(17);
+    expect(supportedCareerDirectionIds).toHaveLength(18);
     expect(canonicalCareerDirectionId('technology')).toBe('digital-and-computing');
+    expect(canonicalCareerDirectionId('engineering')).toBe('engineering-and-built-world');
     const published = direction('digital-and-computing');
     expect(getCareerDirectionIllustration([published], 'technology')).toBe(published.illustration);
     expect(getCareerDirectionIllustration([published], published.id)).toBe(published.illustration);

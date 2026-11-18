@@ -19,6 +19,7 @@ const legacyDirectionAliases: Record<string, CanonicalDirectionId> = {
   business: 'business-finance-and-entrepreneurship',
   design: 'arts-design-and-creative-media',
   health: 'health-and-wellbeing',
+  engineering: 'engineering-and-built-world',
   science: 'science-and-discovery',
   society: 'education-and-human-development',
   technology: 'digital-and-computing',
@@ -41,16 +42,23 @@ export function canonicalCareerDirectionId(
     : null;
 }
 
-/** Resolve artwork from the same published catalogue as Explorer, never a local substitute. */
+/** Prefer an exact published ID before resolving a known historical alias. */
+export function resolveExplorerDirection(
+  directions: readonly ExplorerDirection[] | undefined,
+  directionId: string | null | undefined,
+): ExplorerDirection | undefined {
+  if (!directionId || !directions) return undefined;
+  const canonicalId = canonicalCareerDirectionId(directionId);
+  return directions.find(item => item.id === directionId)
+    ?? (canonicalId ? directions.find(item => canonicalCareerDirectionId(item.id) === canonicalId) : undefined);
+}
+
+/** Resolve artwork from the same published catalogue as Explorer. */
 export function getCareerDirectionIllustration(
   directions: readonly ExplorerDirection[] | undefined,
   directionId: string | null | undefined,
 ): ExplorerIllustration | null {
-  const canonicalId = canonicalCareerDirectionId(directionId);
-  if (!directionId || !directions) return null;
-  const direction = directions.find(item => item.id === directionId)
-    ?? (canonicalId ? directions.find(item => canonicalCareerDirectionId(item.id) === canonicalId) : undefined);
-  const illustration = direction?.illustration;
+  const illustration = resolveExplorerDirection(directions, directionId)?.illustration;
   if (!illustration) return null;
   try {
     const url = new URL(illustration.url);

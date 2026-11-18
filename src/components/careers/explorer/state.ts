@@ -1,3 +1,4 @@
+import { resolveExplorerDirection } from '@/lib/career-direction-imagery';
 import type { CareerExplorerResponse, ExplorerCareer } from "@/types/career-explorer";
 export type ExploreStep =
   | "directions"
@@ -38,11 +39,9 @@ export function readExploreState(
     q: (p.get("q") || "").slice(0, 200),
   };
   if (!data) return { ...initialExploreState, view: state.view, q: state.q };
-  const d = data.directions.find((d) => d.id === state.direction);
-  if (!d) {
-    state.direction = null;
-    state.industry = null;
-  }
+  const d = resolveExplorerDirection(data.directions, state.direction);
+  state.direction = d?.id ?? null;
+  if (!d) state.industry = null;
   const i = data.industries.find(
     (i) => i.id === state.industry && d?.industryIds.includes(i.id),
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import styles from '@/components/journey/journey.module.css';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,11 @@ import { useTranslations } from '@/i18n/language-provider';
 import { getDreamCareerStudentGuide } from '@/lib/dream-career-student-guide-api';
 import type { DreamCareerStudentGuideResponse } from '@/types/dream-career-student-guide';
 import { DreamCareerStudentGuide } from './DreamCareerStudentGuide';
+import { ExplorerScene } from './explorer/ExplorerScene';
+import { journeyCopy } from './explorer/journey-copy';
+import type { ExplorerIllustration } from '@/types/career-explorer';
+import explorer from './ExploreCareers.module.css';
+import design from '@/components/journey/ExplorerJourney.module.css';
 
 const copy = {
   en: { back: 'Back to careers', loading: 'Loading career details…', error: 'We couldn’t load the details.', retry: 'Try again' },
@@ -17,16 +22,19 @@ const copy = {
 };
 
 /** A reading detour: it never changes the selection or replaces the chooser. */
-export default function CareerPreviewDialog({ career, onClose }: {
-  career: { id: string; title: string; summary: string }; onClose: () => void;
-}) {
+type PreviewProps = {
+  career: { id: string; title: string; summary: string };
+  illustration?: ExplorerIllustration;
+  tone?: CSSProperties;
+  onClose: () => void;
+};
+
+export default function CareerPreviewDialog(props: PreviewProps) {
   const { locale } = useTranslations();
-  return <CareerPreviewContent key={`${career.id}:${locale}`} career={career} onClose={onClose} locale={locale} />;
+  return <CareerPreviewContent key={`${props.career.id}:${locale}`} {...props} locale={locale} />;
 }
 
-function CareerPreviewContent({ career, onClose, locale }: {
-  career: { id: string; title: string; summary: string }; onClose: () => void; locale: keyof typeof copy;
-}) {
+function CareerPreviewContent({ career, illustration, tone, onClose, locale }: PreviewProps & { locale: keyof typeof copy }) {
   const text = copy[locale];
   const dialog = useRef<HTMLDialogElement>(null);
   const [guide, setGuide] = useState<DreamCareerStudentGuideResponse | null>(null);
@@ -50,13 +58,17 @@ function CareerPreviewContent({ career, onClose, locale }: {
   const retry = () => { setLoading(true); setError(false); setGuide(null); setAttempt((n) => n + 1); };
   return <dialog ref={dialog} aria-labelledby="career-preview-title" onCancel={(event) => { event.preventDefault(); onClose(); }}
     onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
-    className={`${styles.preview} m-auto max-h-[90dvh] w-[92vw] overflow-y-auto border border-border bg-background p-0 text-foreground backdrop:bg-black/50`}>
+    style={tone} className={`${styles.preview} ${explorer.explorer} ${design.preview} m-auto max-h-[90dvh] w-[92vw] overflow-y-auto border border-border bg-background p-0 text-foreground backdrop:bg-black/50`}>
     <div className="sticky top-0 z-10 flex justify-end border-b border-border bg-background p-3">
       <Button variant="ghost" onClick={onClose}><X className="mr-2 h-4 w-4" />{text.back}</Button>
     </div>
-    <div className={styles.previewIntro}><h2 id="career-preview-title" className="text-2xl font-semibold sm:text-3xl">{career.title}</h2>
+    <header className={design.previewIntro}>
+      <div className={design.previewArt}>
+        <ExplorerScene illustration={illustration} placeholder={journeyCopy[locale].illustration} bubble decorative sizes="150px" />
+      </div>
+      <h2 id="career-preview-title" className={design.heading}>{career.title}</h2>
       <p className="mt-4 leading-7 text-muted-foreground">{career.summary}</p>
-    </div>
+    </header>
     {loading ? <p role="status" className="px-5 pb-8 sm:px-8">{text.loading}</p> : null}
     {error ? <div className="px-5 pb-8 sm:px-8"><p role="alert">{text.error}</p><Button variant="outline" className="mt-3" onClick={retry}>{text.retry}</Button></div> : null}
     {guide ? <DreamCareerStudentGuide embedded response={guide} locale={locale} onRetryRelationship={retry} /> : null}

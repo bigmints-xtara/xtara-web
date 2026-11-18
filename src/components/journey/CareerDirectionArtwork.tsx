@@ -2,10 +2,9 @@
 
 import Image from 'next/image';
 import { useState, type ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Compass } from 'lucide-react';
 import { useTranslations } from '@/i18n/language-provider';
-import { getCareerExplorer } from '@/lib/career-explorer-api';
+import { useCareerExplorer } from '@/components/careers/explorer/useCareerExplorer';
 import { getCareerDirectionIllustration } from '@/lib/career-direction-imagery';
 
 /** Shares Explorer's locale-scoped public query and immutable published image URLs. */
@@ -19,13 +18,7 @@ export default function CareerDirectionArtwork({ directionId, width = 240, heigh
   fallback?: ReactNode;
 }) {
   const { locale } = useTranslations();
-  const { data } = useQuery({
-    queryKey: ['career-explorer', locale],
-    queryFn: ({ signal }) => getCareerExplorer(locale, signal),
-    meta: { authScope: 'public' },
-    staleTime: 60_000,
-    retry: false,
-  });
+  const { data } = useCareerExplorer(locale);
   const illustration = getCareerDirectionIllustration(data?.directions, directionId);
   const [failedUrl, setFailedUrl] = useState<string>();
   if (!illustration || failedUrl === illustration.url) {

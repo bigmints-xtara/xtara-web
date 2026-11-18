@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({ push: vi.fn(), catalog: vi.fn(), hydrate: vi.f
 vi.mock('next/navigation', () => ({ useParams: () => ({ areaId: 'engineering-and-built-world' }), useRouter: () => ({ push: mocks.push }) }));
 vi.mock('@/components/careers/CareerPreviewDialog', () => ({ default: ({ career, onClose }: { career: { title: string }; onClose: () => void }) => <div role="dialog"><h2>{career.title}</h2><button onClick={onClose}>Back to careers</button></div> }));
 // Artwork transport is covered by CareerDirectionArtwork.test.tsx.
-vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
+vi.mock('@/components/careers/explorer/useCareerExplorer', () => ({ useCareerExplorer: () => ({ data: undefined }) }));
 vi.mock('@/components/Header', () => ({ default: () => null }));
 vi.mock('@/components/Footer', () => ({ default: () => null }));
 vi.mock('@/context/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }) }));

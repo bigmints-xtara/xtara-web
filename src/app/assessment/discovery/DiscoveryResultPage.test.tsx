@@ -1,9 +1,17 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { assessmentV2StorageKey, type DiscoveryResult } from "@/lib/assessment-v2";
 
-vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
+vi.mock('@/components/careers/explorer/useCareerExplorer', () => ({
+  useCareerExplorer: () => ({
+    data: { directions: [{
+      id: 'engineering-and-built-world',
+      illustration: { url: 'https://example.test/engineering.webp', alt: 'Engineering world' },
+      presentation: { accent: '#8b6224', tint: '#faedca', wash: '#fae5b2', washEnd: '#f9f0d9' },
+    }] },
+  }),
+}));
 
 const mocks = vi.hoisted(() => ({
   push: vi.fn(),
@@ -85,6 +93,31 @@ describe("discovery result chooser", () => {
     expect(container.textContent).not.toContain("Repeated pattern");
     expect(container.textContent).not.toContain("Temporary until signup");
     expect(container.textContent).not.toContain("What to do next");
+  });
+
+  it('keeps server order, uses published artwork and separates browse from choosing', async () => {
+    const longTitle = 'Engineering and Designing Sustainable Infrastructure for Communities';
+    const engineering = { ...result.areas[0], id: 'engineering-and-built-world' };
+    localStorage.setItem(assessmentV2StorageKey, JSON.stringify({
+      ...result,
+      areas: [result.areas[0], engineering, result.areas[1]],
+      catalogSnapshot: { roles: [], directions: [
+        { id: engineering.id, gradeGuidance: { en: {} }, translations: { en: { title: longTitle, summary: 'Full description for Engineering.' } } },
+      ] },
+    }));
+    const { container } = render(<DiscoveryResultPage />);
+    const cards = screen.getAllByRole('article');
+    expect(cards).toHaveLength(3);
+    expect(cards[0]).toHaveAttribute('data-featured', 'true');
+    expect(cards[1]).toHaveAttribute('data-featured', 'false');
+    expect(within(cards[1]).getByRole('heading', { name: longTitle })).toBeVisible();
+    expect(within(cards[1]).getByText('Full description for Engineering.')).toBeVisible();
+    expect(cards[1].querySelector('img')).toHaveAttribute('src', 'https://example.test/engineering.webp');
+    expect(cards[1].querySelector('img')).toHaveAttribute('alt', '');
+    expect(within(cards[1]).getByRole('link')).toHaveAttribute('href', '/explore?direction=engineering-and-built-world&step=roles');
+    expect(container.querySelector('header')!.compareDocumentPosition(screen.getByRole('heading', { level: 1 })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(within(cards[1]).getByRole('button', { name: `Explore these careers: ${longTitle}` }));
+    expect(mocks.push).toHaveBeenCalledWith('/assessment/careers/engineering-and-built-world');
   });
 
   it("does not repeat the same answer beneath every direction", async () => {

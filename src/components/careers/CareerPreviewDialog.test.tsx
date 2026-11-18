@@ -43,4 +43,26 @@ describe('career preview dialog', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading career details');
     expect(screen.queryByText('Compact career details')).toBeNull();
   });
+  it('restores focus to the reading action after late career artwork arrives', () => {
+    mocks.get.mockImplementation(() => new Promise(() => {}));
+    const trigger = document.createElement('button');
+    trigger.textContent = 'Read career details';
+    document.body.append(trigger);
+    trigger.focus();
+    try {
+      const career = { id: 'career', title: 'Sustainable Infrastructure Engineer', summary: 'Design public infrastructure.' };
+      const illustration = { url: 'https://example.test/career.webp', alt: 'Infrastructure world' };
+      const onClose = vi.fn();
+      const view = render(<CareerPreviewDialog career={career} onClose={onClose} />);
+      view.rerender(<CareerPreviewDialog career={career} illustration={illustration} onClose={onClose} />);
+      expect(view.container.querySelector('img')).toHaveAttribute('src', illustration.url);
+      expect(screen.getByRole('dialog', { name: career.title })).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: 'Back to careers' }));
+      expect(onClose).toHaveBeenCalledOnce();
+      view.unmount();
+      expect(trigger).toHaveFocus();
+    } finally {
+      trigger.remove();
+    }
+  });
 });
