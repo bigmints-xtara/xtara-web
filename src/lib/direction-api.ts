@@ -1,3 +1,4 @@
+import { trackProductEvent } from "@/lib/analytics";
 import { xtaraApi } from "@/lib/api/client";
 import { invalidateDashboardCache } from './dashboard-cache';
 import type { Locale } from "@/i18n/config";
@@ -32,6 +33,7 @@ export async function saveDirectionToApi(plan: DirectionPlan, expectedUserId?: s
     throw new Error("Your Career Direction was not returned by account readback.");
   }
   invalidateDashboardCache();
+  trackProductEvent("career_plan_saved", "student_portal");
   return saved;
 }
 

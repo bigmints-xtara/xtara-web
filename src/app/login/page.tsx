@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { Suspense, useState } from "react";
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Link from "next/link";
@@ -48,26 +49,26 @@ function LoginContent() {
   const loginCopy = messages.auth.login;
   const modeCopy = educatorMode ? loginCopy.educator : loginCopy.learner;
 
-  async function finishLogin(userId: string, idToken: string) {
+  async function finishLogin(userId: string, idToken: string): Promise<"student_portal" | "educator_portal"> {
     await createApiSession(idToken);
     const pursuitId = searchParams.get("pursueCareer");
     const pursuitDirection = searchParams.get("directionId");
     if (pursuitId && pursuitDirection) {
       await pursueCareer(pursuitId, pursuitDirection, userId);
       router.push("/dashboard");
-      return;
+      return "student_portal";
     }
     if (searchParams.get("saveDiscovery") === "1") {
       const didSave = await savePendingCareerChoiceToAccount(userId);
       if (!didSave) throw new Error("Choose your Career Direction and Dream Careers before signing in.");
       router.push(requestedNext || "/dashboard");
-      return;
+      return "student_portal";
     }
     if (searchParams.get("saveAssessment") === "1") {
       const didSave = await savePendingAssessmentToAccount(userId);
       if (!didSave) throw new Error("Complete the assessment before joining an institution.");
       router.push(requestedNext || WORKSPACE_MANIFESTS.student.homePath);
-      return;
+      return "student_portal";
     }
     if (educatorMode) {
       const context = await getOrganizationContext();
@@ -76,21 +77,22 @@ function LoginContent() {
       }
       if (context) {
         router.push(requestedNext || WORKSPACE_MANIFESTS.educator.homePath);
-        return;
+        return "educator_portal";
       }
       if (requestedNext?.startsWith("/join/")) {
         router.push(requestedNext);
-        return;
+        return "educator_portal";
       }
       router.push(`${WORKSPACE_MANIFESTS.educator.homePath}/signup`);
-      return;
+      return "educator_portal";
     }
     const context = await getOrganizationContext().catch(() => null);
     if (context?.membership.role && context.membership.role !== "student") {
       router.push(WORKSPACE_MANIFESTS.educator.homePath);
-      return;
+      return "educator_portal";
     }
     router.push(requestedNext || await getPostAuthDestination());
+    return "student_portal";
   }
 
   const handleLogin = async (event: React.FormEvent) => {
@@ -99,7 +101,8 @@ function LoginContent() {
     setLoading(true);
     try {
       const credential = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
-      await finishLogin(credential.user.uid, await credential.user.getIdToken());
+      const surface = await finishLogin(credential.user.uid, await credential.user.getIdToken());
+      trackProductEvent("login", surface, "email");
     } catch (reason) {
       setError(friendlyLoginError(reason));
       setLoading(false);
@@ -111,7 +114,8 @@ function LoginContent() {
     setLoading(true);
     try {
       const credential = await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
-      await finishLogin(credential.user.uid, await credential.user.getIdToken());
+      const surface = await finishLogin(credential.user.uid, await credential.user.getIdToken());
+      trackProductEvent("login", surface, "google");
     } catch (reason) {
       setError(friendlyLoginError(reason));
       setLoading(false);

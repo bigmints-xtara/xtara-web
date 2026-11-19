@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -40,6 +41,7 @@ export default function OrganizationSignupPage() {
     setError("");
     try {
       await createOrganization({ name, kind, academicYear: academicYear || undefined });
+      trackProductEvent("organization_created", "educator_portal");
       await refresh();
       router.push("/organization");
     } catch (reason) {

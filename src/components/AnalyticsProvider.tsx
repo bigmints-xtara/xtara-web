@@ -6,13 +6,11 @@ import { trackPageview } from "@/lib/analytics";
 
 const AnalyticsProvider = () => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const educatorMode = useSearchParams()?.get("mode") === "educator";
 
   useEffect(() => {
-    const query = searchParams?.toString();
-    const url = query ? `${pathname}?${query}` : pathname;
-    trackPageview(url);
-  }, [pathname, searchParams]);
+    trackPageview(pathname, educatorMode);
+  }, [pathname, educatorMode]);
 
   return null;
 };

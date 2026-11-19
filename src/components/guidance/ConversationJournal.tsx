@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, BookOpen, Check, Heart, MessageCircle, Plus, RefreshCw, Send, Sparkles, X } from 'lucide-react';
@@ -79,7 +80,7 @@ function ConversationForm({ uid, membershipId, onCancel, onSaved }: { uid: strin
   const [busy, setBusy] = useState(false); const [error, setError] = useState('');
   async function submit(event: React.FormEvent) {
     event.preventDefault(); setBusy(true); setError('');
-    try { onSaved(await shareConversation(uid, membershipId, { requestId, title, recap, occurredOn, followUpOn: followUpOn || null, actions: actions.filter(action => action.text.trim()) })); }
+    try { onSaved(await shareConversation(uid, membershipId, { requestId, title, recap, occurredOn, followUpOn: followUpOn || null, actions: actions.filter(action => action.text.trim()) })); trackProductEvent("guidance_conversation_saved", "educator_portal"); }
     catch (reason) { setError(reason instanceof Error ? reason.message : c.error); }
     finally { setBusy(false); }
   }

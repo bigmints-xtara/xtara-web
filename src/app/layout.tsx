@@ -1,4 +1,3 @@
-import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
@@ -40,23 +39,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocaleFromCookie();
-  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_ID?.trim();
 
   return (
     <html lang={locale} style={{ colorScheme: "light" }}>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {gaMeasurementId ? <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
-            strategy="afterInteractive"
-          />
-          <Script id="ga-setup" strategy="afterInteractive">
-            {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${gaMeasurementId}');`}
-          </Script>
-        </> : null}
         <WaitlistScript />
         <ReactQueryProvider>
         <AuthProvider>

@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { trackProductEvent } from "@/lib/analytics";
+import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
@@ -106,10 +107,17 @@ function AssessmentJourney() {
     },
     [effectiveStage, questions, rawDraft, storedResult],
   );
+  const started = useRef(false);
+  const trackStart = () => {
+    if (started.current) return;
+    started.current = true;
+    trackProductEvent("assessment_start", "student_portal");
+  };
   const [processing, setProcessing] = useState(false);
   const [processingError, setProcessingError] = useState("");
 
   const handleComplete = async (answers: AssessmentAnswers) => {
+    trackStart();
     setProcessing(true);
     setProcessingError("");
     try {
@@ -128,6 +136,7 @@ function AssessmentJourney() {
       if (user && !user.isAnonymous) {
         if (!await savePendingAssessmentToAccount(user.uid)) throw new Error(ui.errorTitle);
       }
+      trackProductEvent("assessment_complete", "student_portal");
       const pendingJoinCode = getPendingOrganizationJoin();
       router.push(pendingJoinCode
         ? `/join/${encodeURIComponent(pendingJoinCode)}`
@@ -141,7 +150,7 @@ function AssessmentJourney() {
   if (draft === null) return <AssessmentLoading />;
 
   if (!introDismissed && !effectiveStage) {
-    return <AssessmentIntro catalog={catalog} onStart={() => setIntroDismissed(true)} />;
+    return <AssessmentIntro catalog={catalog} onStart={() => { trackStart(); setIntroDismissed(true); }} />;
   }
 
   if (processingError || definitionFailed) {
@@ -179,6 +188,7 @@ function AssessmentJourney() {
           initialAnswers={draft}
           labels={ui}
           onAnswersChange={(answers) => {
+            trackStart();
             const selectedStage = parseOptionalAssessmentStage(typeof answers.currentGrade === "string" ? answers.currentGrade : null);
             if (selectedStage) {
               localStorage.setItem(assessmentStageStorageKey, selectedStage);

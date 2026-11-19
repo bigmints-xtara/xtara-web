@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -152,6 +153,7 @@ function LearnerRoster({ dashboard, units, canManage, onRemoved }: {
     setRemoveError("");
     try {
       await removeOrganizationMember(membershipId);
+      trackProductEvent("organization_learner_removed", "educator_portal");
       await onRemoved();
     } catch (reason) {
       setRemoveError(reason instanceof Error ? reason.message : "Could not remove learner.");
@@ -173,7 +175,7 @@ function CreateUnitCard({ units, onCreated }: { units: OrganizationUnit[]; onCre
   const [parentUnitId, setParentUnitId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const submit = async (event: React.FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try { await createOrganizationUnit({ name, kind, parentUnitId: parentUnitId || undefined }); setName(""); await onCreated(); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not create the class."); } finally { setSaving(false); } };
+  const submit = async (event: React.FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try { await createOrganizationUnit({ name, kind, parentUnitId: parentUnitId || undefined }); trackProductEvent("organization_class_created", "educator_portal"); setName(""); await onCreated(); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not create the class."); } finally { setSaving(false); } };
   return <Card className="border-primary/10 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 text-lg"><Plus className="h-5 w-5 text-primary" />Add a class or group</CardTitle></CardHeader><CardContent><form className="space-y-3" onSubmit={submit}><Input aria-label="Class or group name" placeholder="Class 9A" value={name} onChange={(event) => setName(event.target.value)} required /><select aria-label="Unit type" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={kind} onChange={(event) => setKind(event.target.value)}><option value="class">Class</option><option value="grade">Grade</option><option value="guidance_group">Guidance group</option><option value="department">Department</option></select>{units.length ? <select aria-label="Parent unit" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={parentUnitId} onChange={(event) => setParentUnitId(event.target.value)}><option value="">No parent unit</option>{units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}</select> : null}{error ? <p role="alert" className="text-sm text-red-700">{error}</p> : null}<Button type="submit" disabled={saving || !name.trim()} className="w-full">{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Add unit</Button></form></CardContent></Card>;
 }
 
@@ -186,7 +188,7 @@ function CreateInvitationCard({ role, units, onCreated }: { role: OrganizationRo
   const [error, setError] = useState("");
   const staffRoles = role === "owner" || role === "admin";
   const unitRequired = invitedRole !== "admin";
-  const submit = async (event: React.FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try { const invitation = await createOrganizationInvitation({ role: invitedRole, unitIds: unitId ? [unitId] : [], email: invitedRole === "student" ? undefined : email, maxUses: invitedRole === "student" ? maxUses : 1 }); onCreated(invitation.code); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not create the invitation."); } finally { setSaving(false); } };
+  const submit = async (event: React.FormEvent) => { event.preventDefault(); setSaving(true); setError(""); try { const invitation = await createOrganizationInvitation({ role: invitedRole, unitIds: unitId ? [unitId] : [], email: invitedRole === "student" ? undefined : email, maxUses: invitedRole === "student" ? maxUses : 1 }); trackProductEvent("organization_invitation_created", "educator_portal"); onCreated(invitation.code); } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not create the invitation."); } finally { setSaving(false); } };
   return <Card className="border-primary/10 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 text-lg"><UserRoundCheck className="h-5 w-5 text-primary" />Create an invitation</CardTitle></CardHeader><CardContent><form className="space-y-3" onSubmit={submit}><select aria-label="Invitation role" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={invitedRole} onChange={(event) => setInvitedRole(event.target.value as typeof invitedRole)}><option value="student">Student</option>{staffRoles ? <><option value="admin">Organization admin</option><option value="unit_admin">Class admin</option><option value="educator">Educator</option><option value="counselor">Counselor</option></> : null}</select><select aria-label="Assigned class or group" className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={unitId} onChange={(event) => setUnitId(event.target.value)} required={unitRequired}><option value="">{unitRequired ? "Choose class or group" : "Institution-wide"}</option>{units.map((unit) => <option key={unit.id} value={unit.id}>{unit.name}</option>)}</select>{invitedRole === "student" ? <label className="block space-y-1"><span className="text-xs text-muted-foreground">Maximum learners</span><Input type="number" min={1} max={500} value={maxUses} onChange={(event) => setMaxUses(Number(event.target.value))} /></label> : <Input type="email" placeholder="educator@example.edu" value={email} onChange={(event) => setEmail(event.target.value)} required />}{error ? <p role="alert" className="text-sm text-red-700">{error}</p> : null}<Button type="submit" disabled={saving || (unitRequired && !unitId)} className="w-full">{saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}Create invitation</Button></form></CardContent></Card>;
 }
 

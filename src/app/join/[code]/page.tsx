@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -109,6 +110,7 @@ export default function JoinOrganizationPage() {
         consentVersion: preview.consentVersion,
         guardianConfirmed: preview.role === "student" ? guardianConfirmed : undefined,
       });
+      trackProductEvent("organization_joined", context.membership.role === "student" ? "student_portal" : "educator_portal");
       clearPendingOrganizationJoin();
       router.push(context.membership.role === "student" ? "/dashboard" : "/organization");
     } catch (reason) {

@@ -1,3 +1,4 @@
+import { trackProductEvent } from "@/lib/analytics";
 import { xtaraApi } from '@/lib/api/client';
 import { invalidateDashboardCache } from './dashboard-cache';
 import type { DirectionPlan } from '@/lib/direction';
@@ -15,5 +16,6 @@ export async function pursueCareer(careerId: string, directionId: string, expect
     throw new Error('Your career choice could not be verified. Please try again.');
   }
   invalidateDashboardCache();
+  trackProductEvent("career_pursuit_saved", "student_portal");
   return result;
 }

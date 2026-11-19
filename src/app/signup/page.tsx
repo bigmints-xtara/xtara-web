@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { Suspense, useState } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -82,6 +83,7 @@ function SignupContent() {
       }
 
       await createApiSession(await credential.user.getIdToken(true));
+      trackProductEvent("sign_up", educatorMode ? "educator_portal" : "student_portal", "email");
 
       if (pursuitId && pursuitDirection) {
         await pursueCareer(pursuitId, pursuitDirection, credential.user.uid);

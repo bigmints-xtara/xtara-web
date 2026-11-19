@@ -1,5 +1,6 @@
 "use client";
 
+import { trackProductEvent } from "@/lib/analytics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "@/i18n/language-provider";
 import { organizationProfileCopy } from "@/lib/organization-profile-copy";
@@ -145,6 +146,7 @@ export default function EducatorProfilePage() {
       setTitle(savedStaff.profile.title); setDepartment(savedStaff.profile.department);
       setPhone(savedStaff.profile.phone); setBio(savedStaff.profile.bio);
       setStatus(copy.saved);
+      trackProductEvent("educator_profile_saved", "educator_portal");
     } catch (reason) {
       if (current()) setError(`${reason instanceof Error ? reason.message : copy.saveError} ${copy.retryHint}`);
     } finally {
