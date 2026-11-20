@@ -390,3 +390,32 @@
   .journey .carousel .media { height: clamp(92px, 21svh, 170px); }
   .sourceLinks { display: grid; }
 }
+
+.guideIntro, .directionNotes {
+  box-sizing: border-box;
+  width: min(100%, 38rem);
+  margin-inline: auto;
+  padding: 2rem clamp(1.5rem, 5vw, 3rem);
+  color: var(--ink);
+}
+.guideIntro { margin-block: auto; padding-block: clamp(2rem, 8vh, 5rem); text-align: center; }
+.guideIntro h1 { margin: 1rem 0 .7rem; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.12; letter-spacing: -.04em; font-weight: 600; }
+.guideIntro p { max-width: 36ch; margin: 0 auto 1.6rem; line-height: 1.5; color: var(--soft-ink); }
+.guideIntro .primary { margin: auto; min-height: 48px; }
+.guideArt { position: relative; width: min(100%, 340px); aspect-ratio: 340 / 216; margin: 0 auto; }
+.guideArt span { position: absolute; top: 14%; width: 39%; height: 72%; padding: 4%; border: 4px solid white; border-radius: 18%; box-shadow: 0 7px 16px #182e4724; display: grid; place-items: center; }
+.guideArt img { object-fit: contain; width: 100%; height: 100%; }
+.guideArt span:first-child { left: 4%; background: #d9e8ff; transform: rotate(-12deg); }
+.guideArt span:nth-child(2) { right: 4%; background: #ffdfdc; transform: rotate(12deg); }
+.guideArt span:last-child { left: 30.5%; top: 6%; background: #d6f1e3; transform: rotate(-2deg); }
+.browseFold { min-height: calc(100svh - 126px - var(--learner-nav-space)); display: flex; flex-direction: column; justify-content: center; gap: clamp(.5rem, 2vh, 1.4rem); }
+.directionNotes h3 { margin: 1.2rem 0 .45rem; font-size: 1rem; font-weight: 600; }
+.directionNotes .helpSteps { list-style: none; padding: 0; }
+.helpSteps li { display: flex; align-items: center; gap: .85rem; padding-block: .45rem; }
+.helpSteps svg { flex: none; width: 2.35rem; height: 2.35rem; padding: .55rem; border-radius: 50%; background: var(--wash); color: var(--ink); }
+.directionNotes { text-align: start; }
+.directionNotes > div { margin-block-end: 1.5rem; }
+.directionNotes h2 { font-size: 1.2rem; font-weight: 600; margin-block-end: .5rem; }
+.directionNotes p, .directionNotes li, .guideIntro li { color: var(--soft-ink); line-height: 1.55; }
+.directionNotes ul { list-style: disc; padding-inline-start: 1.25rem; }
+.directionNotes summary, .directionNotes button { cursor: pointer; padding-block: .65rem; }

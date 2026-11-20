@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, Sparkles, MoveHorizontal, ArrowDown, MousePointer2 } from 'lucide-react';
 import Header from '@/components/Header';
 import { useTranslations } from '@/i18n/language-provider';
 import { useAuth } from '@/context/AuthContext';
 import { pursueCareer } from '@/lib/career-pursuit-api';
 import { explorerCopy } from './explorer/copy';
+import DirectionNotes from './explorer/DirectionNotes';
+import { guideCopy } from './explorer/guide-copy';
 import { journeyCopy, explorerHeadings, invitationCopy } from './explorer/journey-copy';
 import { exploreUrl, initialExploreState, readExploreState, type ExploreState } from './explorer/state';
 import VisualCarousel from './explorer/VisualCarousel';
@@ -55,6 +58,9 @@ export default function ExploreCareers() {
   const invitation = state.step === 'pursuit' && Boolean(career) && (!user || user.isAnonymous);
   const overview = Boolean(career && !specialization && !invitation);
   const home = state.step === 'directions';
+  const params = new URLSearchParams(search);
+  const introduction = !['view', 'direction', 'industry', 'career', 'step', 'q'].some(key => params.has(key));
+  const guide = guideCopy[locale];
   const groupKey = `${state.step}:${state.direction}:${state.career}`;
   const goCareer = (id: string, skip = false) => {
     const item = data?.careers.find(c => c.id === id);
@@ -95,15 +101,22 @@ export default function ExploreCareers() {
     <Header />
     <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={explorerTone(direction?.presentation)}>
       <main className={`${styles.main} ${home ? styles.home : ''} ${invitation ? styles.invitation : overview ? styles.overview : styles.journey}`}>
-        <div className={styles.topline} data-inner={!home || undefined}>
+        {!introduction && <div className={styles.topline} data-inner={!home || undefined}>
           {!home && breadcrumbs}
           <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>
             <MotionIcon size={17} aria-hidden="true" />
             <span>{motionLabel}</span>
           </button>
-        </div>
+        </div>}
       <div key={`${groupKey}:${locale}`} className={styles.stage}>
-        {isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
+        {introduction ? <section className={styles.guideIntro}>
+        <div className={styles.guideArt} aria-hidden="true">
+          {['digital','art','science'].map(item => <span key={item}><Image unoptimized src={`/images/explorer-guide/${item}.webp`} alt="" width="110" height="120" /></span>)}
+        </div>
+        <h1 ref={heading} tabIndex={-1}>{guide.guideTitle}</h1>
+        <p>{guide.guideLead}</p>
+        <button className={styles.primary} onClick={() => navigate(initialExploreState)}>{guide.guideStart}<ArrowRight size={16}/></button>
+      </section> : isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
         <div className={styles.invitationBubble}><ExplorerScene illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>
         <p className={styles.eyebrow}>{text.nextStep}</p>
         <h1 ref={heading} tabIndex={-1}>{invite.headingLead}<br /><span>{invite.headingAccent}</span></h1>
@@ -121,8 +134,13 @@ export default function ExploreCareers() {
           <div className={styles.satellite}>{parent ? <ExplorerScene illustration={career.illustration} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
         </div>
         <header className={styles.intro}><p className={styles.eyebrow}>{text.future}</p><h1 ref={heading} tabIndex={-1}>{text.closer}<br /><span>{career.title}.</span></h1><p>{career.summary}</p></header>
-        {career.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
+        {(career.translationFallback || parent?.translationFallback || direction?.translationFallback) && <p className={styles.notice}>{copy.fallback}</p>}
         {locale !== 'en' && <p className={styles.notice}>Career guidance below is currently in English.</p>}
+        {direction && <section className={styles.directionNotes}>
+          <h2>{guide.pathHeading}</h2>
+          <p>{(parent ? guide.pathTrio : guide.pathPair).replace('{direction}', direction.title).replace('{career}', (parent || career).title).replace('{specialty}', career.title)}</p>
+          {[direction, ...(parent ? [parent] : [])].filter(item => item.summary).map(item => <div key={item.id}><h3>{item.title}</h3><p>{item.summary}</p></div>)}
+        </section>}
         <CareerOverviewSections career={career} />
         <section className={styles.decision}><ExplorerAccountContext /><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href="/assessment">{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
           {saveState === 'error' && <p role="alert">{text.saveError}</p>}{saveState === 'saved' && <p role="status">{text.saved}</p>}
@@ -131,6 +149,7 @@ export default function ExploreCareers() {
           <button className={styles.quiet} onClick={() => navigate(initialExploreState)}>{copy.keepExploring} <ArrowRight size={14} /></button>
         </section>
       </> : <>
+        <section className={styles.browseFold}>
         <header className={`${styles.intro} ${styles.browseIntro}`}>
           {!home && <div className={styles.contextArtwork} aria-hidden="true">
             <ExplorerScene illustration={(specialization ? career : direction)?.illustration} placeholder={text.illustration} bubble />
@@ -150,11 +169,22 @@ export default function ExploreCareers() {
           const open = () => home ? navigate({ ...initialExploreState, direction: item.id, step: 'roles' }) : state.step === 'industries' ? navigate({ ...state, industry: item.id, career: null, step: 'roles' }) : goCareer(item.id);
           return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={'illustration' in item ? item.illustration : undefined} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
         }} />}
-        {direction?.translationFallback && <p className={styles.notice}>{copy.fallback}</p>}
-        <div className={styles.browseContext}>
-          {home ? <Link className={styles.quiet} href="/assessment">{copy.assessment}<ArrowUpRight size={14} /></Link> :
-            <p>{specialization ? career?.summary : direction?.summary}</p>}
-        </div>
+        </section>
+        {home && <section className={styles.directionNotes}><h2>{guide.howTo}</h2>
+          <ul className={styles.helpSteps}>
+            <li><MoveHorizontal aria-hidden="true"/>{guide.guideBrowse}</li>
+            <li><MousePointer2 aria-hidden="true"/>{guide.guideOpen}</li>
+            <li><ArrowDown aria-hidden="true"/>{guide.guideScroll}</li>
+          </ul>
+          <Link className={styles.quiet} href="/assessment">{copy.assessment}<ArrowUpRight size={14} /></Link>
+        </section>}
+        {state.step === 'roles' && direction && <DirectionNotes direction={direction} careers={data.careers} locale={locale} />}
+        {specialization && career && <section className={styles.directionNotes}>
+          <h2>{guide.about.replace('{name}', career.title)}</h2><p>{career.summary}</p>
+          {career.activities.length > 0 && <div><h3>{guide.workExamples}</h3><ul>{career.activities.slice(0,2).map(line => <li key={line}>{line}</li>)}</ul></div>}
+          {!!career.workplaces?.length && <div><h3>{guide.places}</h3><p>{career.workplaces.join(' · ')}</p></div>}
+        </section>}
+        {(direction?.translationFallback || (specialization && career?.translationFallback)) && <p className={styles.notice}>{copy.fallback}</p>}
         {!home && state.step !== 'industries' && <details className={styles.completeList} key={`directory:${groupKey}`}>
           <summary>{specialization ? 'All specializations' : 'All careers in this direction'} · {choices.length} {specialization ? 'specializations' : 'careers and groups'}</summary>
           <p>Groups open their specializations. Careers may appear in more than one direction.</p>

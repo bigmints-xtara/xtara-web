@@ -2,7 +2,7 @@ import { fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ExploreCareers, { safeSourceUrl } from "./ExploreCareers";
-import { getCareerExplorer } from "@/lib/career-explorer-api";
+import { getCareerExplorer, getExplorerDirectionRecord } from "@/lib/career-explorer-api";
 import type { CareerExplorerResponse } from "@/types/career-explorer";
 import {
   readExploreState,
@@ -25,7 +25,7 @@ vi.mock("@/components/Header", () => ({
     );
   },
 }));
-vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn() }));
+vi.mock("@/lib/career-explorer-api", () => ({ getCareerExplorer: vi.fn(), getExplorerDirectionRecord: vi.fn() }));
 vi.mock("@/lib/career-overview-api", () => ({ getCareerOverview: vi.fn().mockRejectedValue(new Error("Unavailable")), getExplorerAccountContext: vi.fn() }));
 const fixture: CareerExplorerResponse = {
   schemaVersion: 1,
@@ -117,6 +117,10 @@ function mount() {
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 beforeEach(() => {
   setLocale.mockReset();
+  vi.mocked(getExplorerDirectionRecord).mockClear().mockImplementation(async id => ({
+    id, published: true, translations: { en: { reflectionPrompt: 'Consider ' + id } },
+    gradeGuidance: { en: { grade9: ['Try a school project'] } },
+  } as Awaited<ReturnType<typeof getExplorerDirectionRecord>>));
   window.scrollTo = vi.fn();
   vi.mocked(getCareerExplorer)
     .mockReset()
@@ -169,14 +173,20 @@ describe("career exploration", () => {
   });
   it("focuses a neighboring direction before opening it and keeps one primary action", async () => {
     mount();
+    expect(screen.getByRole('heading', { name: 'Explore career directions' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Start exploring' }));
+    await screen.findByRole('heading', {name: 'How to explore'});
     await screen.findByRole('heading', { name: 'What interests you?' });
     expect(screen.queryByText('Follow your curiosity. See where it could take you.')).not.toBeInTheDocument();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('button', { name: 'Explore this direction' })).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Career directions: Help people' }));
-    expect(window.location.search).toBe('');
+    expect(window.location.search).toBe('?view=map');
+    expect(getExplorerDirectionRecord).not.toHaveBeenCalled();
+    expect(screen.queryByText('Consider build')).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Explore this direction' }));
     expect(window.location.search).toContain('direction=health');
+    expect(await screen.findByText('Consider health')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Doctor');
@@ -230,9 +240,11 @@ describe("career exploration", () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Explore specializations' }));
     expect(window.location.search).toContain('step=specializations');
     expect(screen.getByRole('heading', { name: 'Structural Engineering' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'About Civil Engineer' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Structural Engineering');
     expect(window.location.search).toContain('career=structures');
+    expect(screen.getByText('Within Build things, you explored Civil Engineer. Structural Engineering is a specialization of that career.')).toBeInTheDocument();
   });
   it('invites guests to save their selected career before signup and preserves their choice in both auth links', async () => {
     window.history.replaceState({}, '', '/explore?direction=build&career=civil&step=work');
@@ -251,7 +263,7 @@ describe("career exploration", () => {
   it.each(['work', 'pursuit'])('retains the selected career and %s step when a locale change refreshes the router', async step => {
     // Next's native-history integration ignores writes already marked as internal.
     // A refresh uses the last URL synchronized through that integration.
-    let routerLocation = '/explore';
+    let routerLocation = '/explore?view=map';
     const nativePush = window.history.pushState.bind(window.history);
     window.history.replaceState({__NA:true}, '', routerLocation);
     vi.spyOn(window.history, 'pushState').mockImplementation((state, unused, url) => {
@@ -274,6 +286,7 @@ describe("career exploration", () => {
     expect(screen.getByRole('heading',{level:1})).toHaveTextContent(step === 'pursuit' ? 'Make it yourDream Career.' : 'Civil Engineer');
   });
   it("offers retry and an honest empty catalogue", async () => {
+    window.history.replaceState({}, '', '/explore?view=map');
     vi.mocked(getCareerExplorer).mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ ...fixture, careers: [], directions: [], industries: [] });
     mount();
     expect(screen.getByRole('status')).toHaveTextContent('Loading careers');

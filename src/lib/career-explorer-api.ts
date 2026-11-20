@@ -3,6 +3,8 @@ import { xtaraApi } from "@/lib/api/client";
 import type { Locale } from "@/i18n/config";
 import type { CareerExplorerResponse } from "@/types/career-explorer";
 
+import type { FutureDirection } from "@/types/curated-career";
+
 export async function getCareerExplorer(
   locale: Locale,
   signal?: AbortSignal,
@@ -23,4 +25,12 @@ export async function getCareerExplorer(
     );
   }
   return data;
+}
+
+export async function getExplorerDirectionRecord(id: string, signal?: AbortSignal) {
+  const record = await xtaraApi.get<FutureDirection>(
+    xtaraApiOperationPath('getFutureDirectionsDirectionId', { directionId: id }), { signal },
+  );
+  if (record.id !== id || (!record.published && record.status !== 'published')) throw new Error('Invalid published direction');
+  return record;
 }
