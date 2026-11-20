@@ -26,6 +26,22 @@ describe('touch carousel', () => {
     } finally { measure.mockRestore(); }
   });
 
+  it('exposes only slides with a visible part in a compact career carousel', () => {
+    const measure = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(320);
+    try {
+      render(<VisualCarousel label="Careers" previous="Previous" next="Next" hint=""
+        items={['One', 'Two', 'Three', 'Four'].map(title => ({ id: title, title }))}
+        renderItem={(index) => <p>Career {index + 1}</p>} />);
+      expect(screen.getAllByRole('article')).toHaveLength(2);
+      expect(screen.queryByRole('button', { name: 'Careers: Three' })).toBeNull();
+      fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+      expect(screen.getAllByRole('article')).toHaveLength(3);
+      expect(screen.queryByRole('button', { name: 'Careers: Four' })).toBeNull();
+    } finally {
+      measure.mockRestore();
+    }
+  });
+
   it('snaps horizontal drags one slide and clamps first/last boundaries', () => {
     expect(swipeIndex(0, -100, 3)).toBe(1);
     expect(swipeIndex(1, 100, 3)).toBe(0);

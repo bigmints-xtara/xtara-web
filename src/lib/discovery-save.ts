@@ -282,10 +282,8 @@ export async function hydrateDiscoveryFromAccount(
   if (
     !saved
     || (typeof saved.schemaVersion !== "string" || !/^\d+\.\d+\.\d+$/.test(saved.schemaVersion))
-    || !resultData?.signals
-    || !resultData.traits
-    || !resultData.areas
-    || !resultData.context
+    || !Array.isArray(resultData?.signals)
+    || !Array.isArray(resultData.areas)
   ) throw new Error("Your saved assessment could not be loaded. Please retry.");
 
   const savedStage = parseOptionalAssessmentStage(typeof saved.stage === "string" ? saved.stage : null);
@@ -297,10 +295,21 @@ export async function hydrateDiscoveryFromAccount(
     locale: saved.locale === "ml" || saved.locale === "hi" || saved.locale === "ta" ? saved.locale : "en",
     createdAt: typeof saved.completedAt === "string" ? saved.completedAt : new Date().toISOString(),
     answers: typeof saved.answers === "object" && saved.answers ? saved.answers as DiscoveryResult["answers"] : {},
-    signals: resultData.signals,
-    traits: resultData.traits,
-    areas: resultData.areas,
-    context: resultData.context,
+    // Early results saved rankings before evidence references, traits, and context.
+    signals: resultData.signals.map(signal => ({
+      ...signal, evidenceRefs: Array.isArray(signal.evidenceRefs) ? signal.evidenceRefs : [],
+    })),
+    traits: Array.isArray(resultData.traits) ? resultData.traits : [],
+    areas: resultData.areas.map(area => ({
+      ...area,
+      evidenceRefs: Array.isArray(area.evidenceRefs) ? area.evidenceRefs : [],
+      roleIds: Array.isArray(area.roleIds) ? area.roleIds : [],
+    })),
+    context: {
+      familyInfluence: resultData.context?.familyInfluence ?? null,
+      familyPriorities: resultData.context?.familyPriorities ?? [],
+      weaknessPatterns: resultData.context?.weaknessPatterns ?? [],
+    },
     reflection: resultData.reflection,
     catalogSnapshot: resultData.catalogSnapshot,
     definitionDocumentId: typeof saved.definitionDocumentId === "string" ? saved.definitionDocumentId : resultData.definitionDocumentId,

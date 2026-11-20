@@ -7,6 +7,8 @@ vi.mock('@/components/careers/explorer/useCareerExplorer', () => ({
   useCareerExplorer: () => ({
     data: { directions: [{
       id: 'engineering-and-built-world',
+      title: 'Engineering and Built World',
+      summary: 'Design, build, and improve infrastructure.',
       illustration: { url: 'https://example.test/engineering.webp', alt: 'Engineering world' },
       presentation: { accent: '#8b6224', tint: '#faedca', wash: '#fae5b2', washEnd: '#f9f0d9' },
     }] },
@@ -126,6 +128,17 @@ describe("discovery result chooser", () => {
     expect(container.querySelector('header')!.compareDocumentPosition(screen.getByRole('heading', { level: 1 })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     fireEvent.click(within(cards[1]).getByRole('button', { name: longTitle }));
     expect(mocks.push).toHaveBeenCalledWith('/assessment/careers/engineering-and-built-world');
+  });
+
+  it('shows the published name for a saved result without a catalogue snapshot', () => {
+    localStorage.setItem(assessmentV2StorageKey, JSON.stringify({
+      ...result, areas: [{ ...result.areas[0], id: 'engineering-and-built-world' }],
+    }));
+
+    render(<DiscoveryResultPage />);
+
+    expect(screen.getByRole('heading', { name: 'Engineering and Built World' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Choose this direction: Engineering and Built World' })).toBeVisible();
   });
 
   it("does not repeat the same answer beneath every direction", async () => {

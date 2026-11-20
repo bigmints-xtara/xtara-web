@@ -85,8 +85,10 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
         const rotation = variant === 'direction' && !compact ? Math.max(-6, Math.min(6, relative * 2)) : 0;
         const translation = variant === 'fact' ? Math.max(-12, Math.min(12, relative * spacing)) : relative * spacing;
         const hiddenFact = variant === 'fact' && !active;
+        const offscreen = !active && Math.abs(translation) >= (width + cardWidth) / 2;
+        const hidden = hiddenFact || offscreen;
         const transform = `translate(-50%, -50%) translate3d(${translation}px, ${variant === 'direction' && !compact ? Math.min(depth * depth * 7, 65) : 0}px, 0) rotateY(${yaw}deg) rotateZ(${rotation}deg) scale(${variant === 'direction' && !compact ? Math.max(.7375, 1 - depth * .075) : 1})`;
-        return <article key={item.id} className={`${styles.slide} ${active ? styles.active : ''}`} data-active={active} aria-hidden={hiddenFact || undefined} inert={hiddenFact || undefined} aria-roledescription="slide" aria-label={`${i + 1} / ${items.length}: ${item.title}`}
+        return <article key={item.id} className={`${styles.slide} ${active ? styles.active : ''}`} data-active={active} aria-hidden={hidden || undefined} inert={hidden || undefined} aria-roledescription="slide" aria-label={`${i + 1} / ${items.length}: ${item.title}`}
           style={{ width: cardWidth, transform, zIndex: 20 - Math.min(19, Math.round(depth)), opacity: depth > 4 || hiddenFact ? 0 : 1, pointerEvents: depth > 4 || hiddenFact ? 'none' : undefined } as CSSProperties}
           onClick={() => { if (!active) focus(i); }}>
           {!active && <button className={styles.focusTarget} aria-label={`${label}: ${item.title}`} tabIndex={-1} onClick={() => focus(i)} />}

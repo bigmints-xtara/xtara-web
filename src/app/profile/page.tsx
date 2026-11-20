@@ -117,6 +117,7 @@ const copy = {
     "account": "Account & privacy",
     "accountHelp": "Manage verification, sign out, and account deletion.",
     "signOut": "Sign out",
+    "signOutError": "Could not sign out. Try again.",
     "delete": "Delete account",
     "deleteTitle": "Delete your Xtara account?",
     "deleteHelp": "This permanently removes your account. Enter your email to confirm.",
@@ -183,6 +184,7 @@ const copy = {
     "account": "അക്കൗണ്ടും സ്വകാര്യതയും",
     "accountHelp": "സ്ഥിരീകരണം, സൈൻ ഔട്ട്, അക്കൗണ്ട് നീക്കം എന്നിവ നിയന്ത്രിക്കൂ.",
     "signOut": "സൈൻ ഔട്ട്",
+    "signOutError": "സൈൻ ഔട്ട് ചെയ്യാനായില്ല. വീണ്ടും ശ്രമിക്കുക.",
     "delete": "അക്കൗണ്ട് നീക്കുക",
     "deleteTitle": "Xtara അക്കൗണ്ട് നീക്കണോ?",
     "deleteHelp": "ഇത് അക്കൗണ്ട് സ്ഥിരമായി നീക്കും. സ്ഥിരീകരിക്കാൻ ഇമെയിൽ നൽകൂ.",
@@ -249,6 +251,7 @@ const copy = {
     "account": "Account & privacy",
     "accountHelp": "Manage verification, sign out, and account deletion.",
     "signOut": "Sign out",
+    "signOutError": "साइन आउट नहीं हो सका। फिर कोशिश करें।",
     "delete": "Delete account",
     "deleteTitle": "Delete your Xtara account?",
     "deleteHelp": "This permanently removes your account. Enter your email to confirm.",
@@ -315,6 +318,7 @@ const copy = {
     "account": "கணக்கு & தனியுரிமை",
     "accountHelp": "சரிபார்ப்பை நிர்வகிக்கவும், வெளியேறவும், கணக்கை நீக்கவும்.",
     "signOut": "வெளியேறு",
+    "signOutError": "வெளியேற முடியவில்லை. மீண்டும் முயற்சிக்கவும்.",
     "delete": "கணக்கை நீக்கு",
     "deleteTitle": "உங்கள் Xtara கணக்கை நீக்கவா?",
     "deleteHelp": "இது உங்கள் கணக்கை நிரந்தரமாக நீக்கிவிடும். உறுதிப்படுத்த உங்கள் மின்னஞ்சலை உள்ளிடவும்.",
@@ -366,7 +370,11 @@ export default function ProfilePage() {
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => { if (!loading && !user) router.replace("/login?next=%2Fprofile"); }, [loading, router, user]);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState(false);
+  useEffect(() => {
+    if (!loading && !user && !signingOut) router.replace("/login?next=%2Fprofile");
+  }, [loading, router, signingOut, user]);
 
   useEffect(() => {
     if (hydratedOwner.current !== user?.uid) {
@@ -456,7 +464,18 @@ export default function ProfilePage() {
   const addCustomSubject = () => { const value = customSubject.trim(); if (value && !subjects.some((item) => item.toLocaleLowerCase() === value.toLocaleLowerCase())) setSubjects((current) => [...current, value]); setCustomSubject(""); };
 
   const resendVerification = async () => { if (!user) return; await sendEmailVerification(user); setVerificationSent(true); };
-  const logout = async () => { await signOut(getFirebaseAuth()); router.push("/"); };
+  const logout = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError(false);
+    try {
+      await signOut(getFirebaseAuth());
+      router.replace("/");
+    } catch {
+      setSignOutError(true);
+      setSigningOut(false);
+    }
+  };
   const removeAccount = async () => {
     if (!user || deleteEmail.trim().toLocaleLowerCase() !== user.email?.toLocaleLowerCase()) { setDeleteError(text.emailMismatch); return; }
     setDeleting(true);
@@ -515,7 +534,8 @@ export default function ProfilePage() {
           {section === "settings" ? <><ProfilePreferences locale={locale} />
           <ProfileCard id="account" icon={LockKeyhole} title={text.account} description={text.accountHelp}>
             {!user.emailVerified ? <div className="rounded-xl bg-amber-50 p-4 text-sm text-amber-950"><p>{text.notVerified}</p><Button variant="link" className="mt-1 h-auto p-0 text-amber-900" onClick={resendVerification}>{text.resend}</Button>{verificationSent ? <p role="status" className="mt-2 text-emerald-800">{text.sent}</p> : null}</div> : <div className="flex items-center gap-2 text-sm text-foreground"><BadgeCheck className="h-4 w-4" />{text.verified}</div>}
-            <Separator className="my-5" /><div className="flex flex-col gap-3 sm:flex-row"><Button variant="outline" onClick={logout}><LogOut className="mr-2 h-4 w-4" />{text.signOut}</Button><Button variant="ghost" className="text-destructive hover:bg-red-50 hover:text-red-800" onClick={() => setDeleteOpen(true)}><Trash2 className="mr-2 h-4 w-4" />{text.delete}</Button></div>
+            <Separator className="my-5" /><div className="flex flex-col gap-3 sm:flex-row"><Button variant="outline" onClick={logout} disabled={signingOut}><LogOut className="mr-2 h-4 w-4" />{text.signOut}</Button><Button variant="ghost" className="text-destructive hover:bg-red-50 hover:text-red-800" onClick={() => setDeleteOpen(true)}><Trash2 className="mr-2 h-4 w-4" />{text.delete}</Button></div>
+            {signOutError ? <p role="alert" className="mt-3 text-sm text-destructive">{text.signOutError}</p> : null}
             {deleteOpen ? <div role="dialog" aria-modal="true" aria-labelledby="delete-title" className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 sm:p-5"><div className="flex items-start justify-between gap-3"><div><h3 id="delete-title" className="font-semibold text-red-950">{text.deleteTitle}</h3><p className="mt-1 text-sm leading-6 text-red-800">{text.deleteHelp}</p></div><Button size="icon" variant="ghost" aria-label={text.cancel} onClick={() => setDeleteOpen(false)}><X className="h-4 w-4" /></Button></div><Field label={text.confirmEmail} className="mt-4"><Input type="email" value={deleteEmail} onChange={(event) => setDeleteEmail(event.target.value)} /></Field>{deleteError ? <p role="alert" className="mt-2 text-sm text-red-800">{deleteError}</p> : null}<div className="mt-4 flex justify-end gap-2"><Button variant="outline" onClick={() => setDeleteOpen(false)}>{text.cancel}</Button><Button variant="destructive" onClick={removeAccount} disabled={deleting}>{deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}{text.deleteForever}</Button></div></div> : null}
           </ProfileCard></> : null}
 

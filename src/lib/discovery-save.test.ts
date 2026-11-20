@@ -107,7 +107,32 @@ describe("staged discovery account sync", () => {
     expect(hydrated?.pathwayProfile).toBeNull();
   });
 
-  it('clears stale browser discovery for an account with no saved assessment', async () => {
+  it('recovers early saved directions without inventing trait or context evidence', async () => {
+  const { result } = pendingCareerChoice();
+  const earlyResult = {
+    signals: result.signals.map(({ id, evidence }) => ({ id, evidence })),
+    areas: result.areas.map(({ id, evidence, roleIds }) => ({ id, evidence, roleIds })),
+  };
+  mocks.getDirectionFromApi.mockResolvedValue(null);
+  mocks.get.mockImplementation(async (path: string) => path === '/me' ? {} : {
+    assessment: { answers: {
+      definitionId: result.definitionId, schemaVersion: result.version,
+      stage: result.stage, answers: result.answers, result: earlyResult,
+    } },
+  });
+
+  const hydrated = await hydrateDiscoveryFromAccount();
+
+  expect(hydrated?.assessment.areas.map(({ id }) => id)).toEqual(result.areas.map(({ id }) => id));
+  expect(hydrated?.assessment.areas.every(area => area.evidenceRefs.length === 0)).toBe(true);
+  expect(hydrated?.assessment.signals.every(signal => signal.evidenceRefs.length === 0)).toBe(true);
+  expect(hydrated?.assessment.traits).toEqual([]);
+  expect(hydrated?.assessment.context).toEqual({
+    familyInfluence: null, familyPriorities: [], weaknessPatterns: [],
+  });
+});
+
+it('clears stale browser discovery for an account with no saved assessment', async () => {
     pendingCareerChoice();
     mocks.get.mockResolvedValue({});
     mocks.getDirectionFromApi.mockResolvedValue(null);

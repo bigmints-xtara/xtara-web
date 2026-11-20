@@ -56,7 +56,10 @@ function AssessmentJourney() {
 
 function AssessmentJourneyBody({ owner }: { owner?: string }) {
   const router = useRouter();
-  const fromExplore = useSearchParams().get('from') === 'explore';
+  const searchParams = useSearchParams();
+  const fromExplore = searchParams.get('from') === 'explore';
+  const returnTo = searchParams.get('returnTo');
+  const exploreReturn = returnTo?.startsWith('/explore?') ? returnTo : '/explore';
   const stageKey = assessmentStageKey(owner);
   const { locale } = useTranslations();
   const rawStage = useSyncExternalStore(
@@ -220,7 +223,7 @@ function AssessmentJourneyBody({ owner }: { owner?: string }) {
             saveAssessmentDraft(selectedStage ?? effectiveStage ?? "grade8", answers, owner);
           }}
           onComplete={handleComplete}
-          onExit={() => router.push(fromExplore ? "/explore" : owner ? "/dashboard" : "/")}
+          onExit={() => router.replace(fromExplore ? exploreReturn : owner ? "/dashboard" : "/")}
         />
       </main>
     </div>

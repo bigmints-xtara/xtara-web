@@ -39,6 +39,7 @@ export default function ExploreCareers() {
   const search = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
   const { data, isPending, isError, refetch } = useCareerExplorer(locale);
   const state = readExploreState(search, data);
+  const assessmentHref = `/assessment?${new URLSearchParams({ from: 'explore', returnTo: exploreUrl(state) })}`;
   const [listQuery, setListQuery] = useState('');
   const [paused, setPaused] = useState(false);
   const [saveResult, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -151,7 +152,7 @@ export default function ExploreCareers() {
           {[direction, ...(parent ? [parent] : [])].filter(item => item.summary).map(item => <div key={item.id}><h3>{item.title}</h3><p>{item.summary}</p></div>)}
         </section>}
         <CareerOverviewSections career={career} />
-        <section className={styles.decision}><ExplorerAccountContext /><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href="/assessment?from=explore">{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
+        <section className={styles.decision}><ExplorerAccountContext /><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href={assessmentHref}>{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
           {saveState === 'error' && <p role="alert">{text.saveError}</p>}{saveState === 'saved' && <p role="status">{text.saved}</p>}
           </div>
           {(!user || user.isAnonymous) && <details className={styles.benefits}><summary>{text.benefits}</summary><ul><li>{text.benefitSave}</li><li>{text.benefitGuide}</li><li>{text.benefitReturn}</li></ul></details>}
@@ -185,7 +186,7 @@ export default function ExploreCareers() {
             <li><MousePointer2 aria-hidden="true"/>{guide.guideOpen}</li>
             <li><ArrowDown aria-hidden="true"/>{guide.guideScroll}</li>
           </ul>
-          <Link className={styles.quiet} href="/assessment?from=explore">{copy.assessment}<ArrowUpRight size={14} /></Link>
+          <Link className={styles.quiet} href={assessmentHref}>{copy.assessment}<ArrowUpRight size={14} /></Link>
         </section>}
         {state.step === 'roles' && direction && <DirectionNotes direction={direction} careers={data.careers} locale={locale} />}
         {specialization && career && <section className={styles.directionNotes}>

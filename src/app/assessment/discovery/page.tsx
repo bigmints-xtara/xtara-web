@@ -151,11 +151,13 @@ export default function DiscoveryResultPage() {
           <section className={design.recommendations} aria-label={catalog.result.areasLabel}>
             {result.areas.map((area, index) => {
               const direction = resolveExplorerDirection(publicExplorer?.directions, area.id);
+              const title = area.title === area.id ? direction?.title || area.title : area.title;
+              const description = area.description || direction?.summary;
               const featured = index === 0;
               const reasons = reasonsByArea[area.id] ?? [];
               const catalogueHref = `/explore?${new URLSearchParams({ direction: direction?.id ?? area.id, step: 'roles' })}`;
 
-              const select = () => void pursueArea(area.id);
+              const select = () => void pursueArea(owner ? direction?.id ?? area.id : area.id);
 
               return (
                 <article key={area.id} className={design.recommendation} data-featured={featured}
@@ -166,22 +168,22 @@ export default function DiscoveryResultPage() {
                   </div>
                   <div className={design.recommendationCopy}>
                     <h2 id={`result-${area.id}`}>
-                      {featured ? area.title : (
+                      {featured ? title : (
                         <button type="button" className={design.directionPick} onClick={select} disabled={saving}>
-                          <span>{area.title}</span><ChevronRight size={17} aria-hidden="true" />
+                          <span>{title}</span><ChevronRight size={17} aria-hidden="true" />
                         </button>
                       )}
                     </h2>
                     <div className={design.actions}>
                       {featured ? (
-                        <Button type="button" className={design.action} aria-label={`${copy.choose}: ${area.title}`} onClick={select} disabled={saving}>
+                        <Button type="button" className={design.action} aria-label={`${copy.choose}: ${title}`} onClick={select} disabled={saving}>
                           {copy.choose}<ArrowRight size={16} aria-hidden="true" />
                         </Button>
                       ) : null}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button type="button" variant="ghost" size="icon" className={design.resultsMenu}
-                            aria-label={`${copy.more}: ${area.title}`}>
+                            aria-label={`${copy.more}: ${title}`}>
                             <Ellipsis size={20} aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -190,10 +192,10 @@ export default function DiscoveryResultPage() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    {!!(area.description || reasons.length || area.roles.length) && (
+                    {!!(description || reasons.length || area.roles.length) && (
                       <details className={design.evidence}>
                         <summary>{copy.details}</summary>
-                        {area.description && <p className={design.directionDescription}>{area.description}</p>}
+                        {description && <p className={design.directionDescription}>{description}</p>}
                         {reasons.length > 0 && (
                           <div className={design.directionReasons}>
                             <h3>{catalog.result.why}</h3>
@@ -201,7 +203,7 @@ export default function DiscoveryResultPage() {
                           </div>
                         )}
                         {area.roles.length > 0 && (
-                          <ul className={design.exampleCareers} aria-label={`${area.title} careers`}>
+                          <ul className={design.exampleCareers} aria-label={`${title} careers`}>
                             {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
                           </ul>
                         )}

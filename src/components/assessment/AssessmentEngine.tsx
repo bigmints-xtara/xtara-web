@@ -3,6 +3,7 @@
 import styles from '@/components/launchpad/launchpad.module.css';
 import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
+import { AlertDialog } from "radix-ui";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,7 +75,6 @@ export default function AssessmentEngine({
             : firstIncomplete;
     });
     const [answers, setAnswers] = useState<AssessmentAnswers>(initialAnswers);
-    const [confirmingExit, setConfirmingExit] = useState(false);
 
     const visibleQuestions = useMemo(
         () => getVisibleAssessmentQuestions(questions, answers, isRetake),
@@ -109,49 +109,41 @@ export default function AssessmentEngine({
     };
 
     return (
-        <div className={styles.engine}>
-            <div className="mb-5 sm:mb-7">
-                <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-                    <span>{selectingStage ? labels.chooseGrade : formatLabel(labels.stepOf, { current: safeIndex + 1, total: visibleQuestions.length })}</span>
-                    <span>{Math.round(progress)}%</span>
-                </div>
-                <Progress value={progress} className="mt-2 h-2" />
-            </div>
-
-            <div className={styles.question}>
-                <h1 className="text-xl font-semibold leading-tight text-primary sm:text-2xl">{currentQuestion.label}</h1>
-                {currentQuestion.description ? (
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground">{currentQuestion.description}</p>
-                ) : null}
-
-                <div className="mt-7">
-                    <QuestionInput question={currentQuestion} value={currentAnswer} onChange={handleAnswer} labels={labels} />
-                </div>
-            </div>
-
-            <div className="w-full">
-                <div className={styles.engineFooter}>
-                    {safeIndex === 0 ? (
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setConfirmingExit(true)}
-                            className="min-h-12 shrink-0 rounded-xl px-4"
-                        >
-                            <X className="mr-2 h-4 w-4" />
+        <AlertDialog.Root>
+            <div className={styles.engine}>
+                <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 sm:mb-7">
+                    <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2 text-xs font-medium text-muted-foreground">
+                            <span>{selectingStage ? labels.chooseGrade : formatLabel(labels.stepOf, { current: safeIndex + 1, total: visibleQuestions.length })}</span>
+                            <span>{Math.round(progress)}%</span>
+                        </div>
+                        <Progress value={progress} className="mt-2 h-2" />
+                    </div>
+                    <AlertDialog.Trigger asChild>
+                        <Button type="button" variant="ghost" className="min-h-11 shrink-0 rounded-xl">
+                            <X className="mr-1 h-4 w-4" aria-hidden="true" />
                             {labels.exit}
                         </Button>
-                    ) : (
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            onClick={() => setCurrentIndex(safeIndex - 1)}
-                            className="min-h-12 shrink-0 rounded-xl px-4"
-                        >
+                    </AlertDialog.Trigger>
+                </div>
+
+                <div className={styles.question}>
+                    <h1 className="text-xl font-semibold leading-tight text-primary sm:text-2xl">{currentQuestion.label}</h1>
+                    {currentQuestion.description ? (
+                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{currentQuestion.description}</p>
+                    ) : null}
+                    <div className="mt-7">
+                        <QuestionInput question={currentQuestion} value={currentAnswer} onChange={handleAnswer} labels={labels} />
+                    </div>
+                </div>
+
+                <div className={styles.engineFooter}>
+                    {safeIndex > 0 ? (
+                        <Button type="button" variant="ghost" onClick={() => setCurrentIndex(safeIndex - 1)} className="min-h-12 shrink-0 rounded-xl px-4">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             {labels.back}
                         </Button>
-                    )}
+                    ) : null}
                     <Button
                         type="button"
                         onClick={handleNext}
@@ -164,24 +156,18 @@ export default function AssessmentEngine({
                     </Button>
                 </div>
             </div>
-            {confirmingExit ? (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4">
-                    <div
-                        role="dialog"
-                        aria-modal="true"
-                        aria-labelledby="assessment-exit-title"
-                        className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-2xl"
-                    >
-                        <h2 id="assessment-exit-title" className="text-xl font-semibold text-primary">{labels.exitTitle}</h2>
-                        <p className="mt-3 text-sm leading-6 text-muted-foreground">{labels.exitDescription}</p>
-                        <div className="mt-6 flex justify-end gap-3">
-                            <Button type="button" variant="ghost" onClick={() => setConfirmingExit(false)}>{labels.stay}</Button>
-                            <Button type="button" onClick={onExit}>{labels.exit}</Button>
-                        </div>
+            <AlertDialog.Portal>
+                <AlertDialog.Overlay className="fixed inset-0 z-50 bg-slate-950/60" />
+                <AlertDialog.Content className="fixed inset-x-4 top-1/2 z-50 mx-auto max-h-[calc(100dvh-2rem)] max-w-sm -translate-y-1/2 overflow-y-auto rounded-2xl bg-card p-6 shadow-2xl">
+                    <AlertDialog.Title className="text-xl font-semibold text-primary">{labels.exitTitle}</AlertDialog.Title>
+                    <AlertDialog.Description className="mt-3 text-sm leading-6 text-muted-foreground">{labels.exitDescription}</AlertDialog.Description>
+                    <div className="mt-6 flex flex-wrap justify-end gap-3">
+                        <AlertDialog.Cancel asChild><Button type="button" variant="ghost">{labels.stay}</Button></AlertDialog.Cancel>
+                        <AlertDialog.Action asChild><Button type="button" onClick={onExit}>{labels.exit}</Button></AlertDialog.Action>
                     </div>
-                </div>
-            ) : null}
-        </div>
+                </AlertDialog.Content>
+            </AlertDialog.Portal>
+        </AlertDialog.Root>
     );
 }
 

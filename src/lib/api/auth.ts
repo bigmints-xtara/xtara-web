@@ -1,4 +1,5 @@
 import { xtaraApi } from '@/lib/api/client';
+import { MVP_NAVIGATION_ENABLED } from '@/lib/mvp-navigation';
 
 export type ApiSessionUser = {
   uid: string;
@@ -31,6 +32,7 @@ export async function getPostAuthDestination(): Promise<string> {
     // Continue through the learner destination checks.
   }
 
+  if (MVP_NAVIGATION_ENABLED) return '/dashboard';
   try {
     const careerPaths = await xtaraApi.get<{ items?: Array<{ id: string }> }>('/career-paths/me');
     const firstPath = careerPaths.items?.[0];
