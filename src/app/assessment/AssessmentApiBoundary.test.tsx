@@ -1,8 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, expect, it, vi } from 'vitest';
-import { assessmentStageStorageKey, assessmentV2StorageKey, readAssessmentDraft } from '@/lib/assessment-v2';
+import { assessmentStageKey, assessmentStageStorageKey, assessmentV2StorageKey, readAssessmentDraft } from '@/lib/assessment-v2';
 const mocks = vi.hoisted(() => ({ definition: vi.fn(), evaluate: vi.fn(), push: vi.fn(), sync: vi.fn(), user: null as null | { uid: string; isAnonymous: boolean } }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mocks.push }), useSearchParams: () => new URLSearchParams() }));
 vi.mock('@/components/Header', () => ({ default: () => null }));
 vi.mock('@/context/AuthContext', () => ({ useAuth: () => ({ user: mocks.user }) }));
 vi.mock('@/i18n/language-provider', () => ({ useTranslations: () => ({ locale: 'en' }) }));
@@ -39,14 +39,23 @@ it('evaluation outage preserves answers and cannot create a local result or navi
   await waitFor(() => expect(mocks.evaluate).toHaveBeenCalledTimes(1));
 });
 
-it('signed-in persistence failure retains server result without navigating or claiming sync', async () => {
+it('signed-in persistence failure retains only the account draft and retries the same submission', async () => {
   mocks.user = { uid: 'learner', isAnonymous: false };
+  localStorage.setItem(assessmentStageKey('learner'), 'grade11');
   mocks.definition.mockResolvedValue({ id: 'career-discovery', stage: 'grade11', locale: 'en', version: '3.1.0', questions: [{ id: 'currentGrade' }, { id: 'focus' }] });
   mocks.evaluate.mockResolvedValue({ version: '3.1.0', stage: 'grade11', areas: [{ id: 'science' }], syncStatus: 'temporary' });
-  mocks.sync.mockRejectedValue(new Error('Readback failed'));
+  mocks.sync.mockRejectedValueOnce(new Error('Readback failed')).mockResolvedValueOnce(true);
   render(<Page />);
   fireEvent.click(await screen.findByText(/Server questions/));
   await screen.findByRole('alert');
   expect(mocks.push).not.toHaveBeenCalled();
-  expect(JSON.parse(localStorage.getItem(assessmentV2StorageKey)!)).toMatchObject({ syncStatus: 'temporary' });
+  expect(localStorage.getItem(assessmentV2StorageKey)).toBeNull();
+  expect(readAssessmentDraft('grade11', 'learner')).not.toBeNull();
+  expect(readAssessmentDraft('grade11', 'another-learner')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+  fireEvent.click(await screen.findByText(/Server questions/));
+  await waitFor(() => expect(mocks.push).toHaveBeenCalledWith('/assessment/discovery?stage=grade11'));
+  expect(mocks.evaluate).toHaveBeenCalledTimes(1);
+  expect(mocks.sync.mock.calls[1][1]).toBe(mocks.sync.mock.calls[0][1]);
+  expect(readAssessmentDraft('grade11', 'learner')).toBeNull();
 });

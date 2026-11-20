@@ -441,38 +441,50 @@ export function parseDiscoveryResult(raw: string | null): DiscoveryResult | null
   }
 }
 
-export function saveAssessmentDraft(stage: AssessmentStage, answers: AssessmentAnswers): void {
-  localStorage.setItem(getAssessmentDraftStorageKey(stage), JSON.stringify(answers));
+export function assessmentStageKey(owner?: string): string {
+  return owner ? `${assessmentStageStorageKey}:${owner}` : assessmentStageStorageKey;
 }
 
-export function loadAssessmentDraft(stage: AssessmentStage): AssessmentAnswers {
-  return parseAssessmentDraft(readAssessmentDraft(stage));
+export function saveAssessmentDraft(stage: AssessmentStage, answers: AssessmentAnswers, owner?: string): void {
+  localStorage.setItem(getAssessmentDraftStorageKey(stage, owner), JSON.stringify(answers));
 }
 
-export function readAssessmentDraft(stage: AssessmentStage): string | null {
-  const current = localStorage.getItem(getAssessmentDraftStorageKey(stage));
+export function loadAssessmentDraft(stage: AssessmentStage, owner?: string): AssessmentAnswers {
+  return parseAssessmentDraft(readAssessmentDraft(stage, owner));
+}
+
+export function hasAssessmentDraft(owner: string): boolean {
+  if (typeof window === "undefined") return false;
+  const stage = parseOptionalAssessmentStage(localStorage.getItem(assessmentStageKey(owner)));
+  return stage !== null && Object.keys(loadAssessmentDraft(stage, owner)).length > 0;
+}
+
+export function readAssessmentDraft(stage: AssessmentStage, owner?: string): string | null {
+  const current = localStorage.getItem(getAssessmentDraftStorageKey(stage, owner));
   if (current !== null) return current;
-  // Grades 8–10 questions are unchanged in 3.1; preserve unfinished 3.0 drafts.
-  return ["grade8", "grade9", "grade10"].includes(stage)
+  // Grades 8–10 questions are unchanged in 3.1; preserve anonymous 3.0 drafts.
+  return !owner && ["grade8", "grade9", "grade10"].includes(stage)
     ? localStorage.getItem(`${assessmentV2StorageKey}:draft:3.0.0:${stage}`)
     : null;
 }
 
-export function getAssessmentDraftStorageKey(stage: AssessmentStage): string {
-  return `${assessmentV2StorageKey}:draft:${assessmentV2Version}:${stage}`;
+export function getAssessmentDraftStorageKey(stage: AssessmentStage, owner?: string): string {
+  const key = `${assessmentV2StorageKey}:draft:${assessmentV2Version}:${stage}`;
+  return owner ? `${key}:${owner}` : key;
 }
 
 export function parseAssessmentDraft(raw: string | null): AssessmentAnswers {
   try {
-    return raw ? JSON.parse(raw) as AssessmentAnswers : {};
+    const value = raw ? JSON.parse(raw) : null;
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
   } catch {
     return {};
   }
 }
 
-export function clearAssessmentDraft(stage: AssessmentStage): void {
-  localStorage.removeItem(getAssessmentDraftStorageKey(stage));
-  localStorage.removeItem(`${assessmentV2StorageKey}:draft:3.0.0:${stage}`);
+export function clearAssessmentDraft(stage: AssessmentStage, owner?: string): void {
+  localStorage.removeItem(getAssessmentDraftStorageKey(stage, owner));
+  if (!owner) localStorage.removeItem(`${assessmentV2StorageKey}:draft:3.0.0:${stage}`);
 }
 
 function localizeEvidenceReasons(references: EvidenceReference[], questions: Question[]): string[] {

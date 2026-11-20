@@ -153,7 +153,7 @@ describe('pursued-area learner dashboard', () => {
     mocks.hydrateDirection.mockResolvedValue({id:'design', title:'Account direction', summary:'Saved on the server', reasons:[], guidance:[], reflectionPrompt:'', careers:[]});
     await act(async () => { root.render(<UserDashboard />); });
     expect(container.textContent).toContain('Account direction');
-    expect(container.querySelector('a[href="/assessment/careers/design"]')).toBeNull();
+    expect(container.querySelector('a[href="/assessment/careers/design"]')).not.toBeNull();
     expect(container.querySelector('a[href="/assessment/discovery"]')).toBeNull();
   });
 
@@ -183,7 +183,12 @@ describe('pursued-area learner dashboard', () => {
   it('keeps career conversation launch available without hidden engagement data in MVP', async () => {
     mocks.mvpEnabled = true;
     const before = localStorage.getItem(directionStorageKey);
-    await act(async () => { root.render(<UserDashboard />); });
+    mocks.hydrateDirection.mockResolvedValue({
+    id: 'design', title: 'Design and Media', summary: 'Make ideas visible.',
+    reasons: [], guidance: [], reflectionPrompt: '',
+    careers: [{ id: 'ux-designer', title: 'UX Designer', summary: 'Design useful products.' }],
+  });
+  await act(async () => { root.render(<UserDashboard />); });
     expect(container.textContent).toContain('My Direction');
     expect(container.textContent).toContain('UX Designer');
     expect(container.textContent).toContain('Career Conversation');
@@ -219,7 +224,7 @@ describe('pursued-area learner dashboard', () => {
     expect(page).toContain('Try sketching a tool for a problem at school.');
     expect(page).toContain('What would you like to build?');
     expect(container.querySelector('a[href="/dream-careers/software-developer?from=dashboard"]')?.textContent).toContain('Design and build software.');
-    expect(container.querySelector('a[href="/assessment/careers/digital-and-computing"]')).toBeNull();
+    expect(container.querySelector('a[href="/assessment/careers/digital-and-computing"]')).not.toBeNull();
   });
 
   it('keeps the direction and career picker visible when no careers are saved', async () => {
@@ -341,4 +346,24 @@ describe('pursued-area learner dashboard', () => {
     expect(container.textContent).not.toContain('What I can study later');
     expect(container.textContent).not.toContain('Colleges to explore');
   });
+
+it('offers assessment or browsing when another learner left results on this browser', async () => {
+  mocks.mvpEnabled = true;
+  localStorage.setItem('xtara_discovery_cache_owner_v1', 'different-learner');
+  mocks.hydrateDirection.mockResolvedValue(null);
+  await act(async () => { root.render(<UserDashboard />); });
+  expect(container.querySelector('a[href="/assessment"]')).not.toBeNull();
+  expect(container.querySelector('a[href="/explore"]')).not.toBeNull();
+  expect(container.querySelector('a[href="/assessment/discovery"]')).toBeNull();
+  expect(container.querySelector('#next-steps')).toBeNull();
+});
+
+it('offers saved results before a Career Direction has been chosen', async () => {
+  mocks.mvpEnabled = true;
+  localStorage.removeItem(directionStorageKey);
+  mocks.hydrateDirection.mockResolvedValue(null);
+  await act(async () => { root.render(<UserDashboard />); });
+  expect(container.querySelector('a[href="/assessment/discovery"]')).not.toBeNull();
+  expect(container.querySelector('#next-steps')).toBeNull();
+});
 });

@@ -29,12 +29,14 @@ import {
   saveDirectionPlan,
   setDreamCareers,
   subscribeToDirection,
+  type DirectionPlan,
 } from "@/lib/direction";
-import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 import { canAccessPursuedArea } from "@/lib/exploration-access";
 import type { CuratedDreamCareer, FutureDirection } from "@/types/curated-career";
 
-import { saveDirectionToApi } from '@/lib/direction-api';
+import { dashboardCopy } from "@/lib/dashboard-copy";
+import { mvpNavigationCopy } from "@/lib/mvp-navigation";
+import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
 import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
 
 const serverSnapshot = () => null;
@@ -136,7 +138,9 @@ export default function CareerDirectionPage() {
   const rawResult = useSyncExternalStore(subscribeToAssessment, () => localStorage.getItem(assessmentV2StorageKey), serverSnapshot);
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, serverSnapshot);
   const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
-  const plan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
+  const localPlan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
+  const [accountPlan, setAccountPlan] = useState<DirectionPlan | null>(null);
+  const plan = owner ? accountPlan : localPlan;
   const [directions, setDirections] = useState<FutureDirection[]>([]);
   const directionRecord = directions.find((item) => item.id === areaId);
   const direction = directionRecord ? { id: directionRecord.id, title: directionRecord.translations[locale]?.title || directionRecord.translations.en.title } : null;
@@ -146,8 +150,7 @@ export default function CareerDirectionPage() {
   const [curatedCareers, setCuratedCareers] = useState<CuratedDreamCareer[]>([]);
   const hydrated = useSyncExternalStore(subscribeToHydration, () => true, () => false);
   const [loading, setLoading] = useState(true);
-  const [selectionOverride, setSelectionOverride] = useState<string[] | null>(null);
-  const rawSelectedIds = selectionOverride ?? (plan?.areaId === areaId ? plan.dreamCareerIds : []);
+  const rawSelectedIds = plan?.areaId === areaId ? plan.dreamCareerIds : [];
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
@@ -157,12 +160,15 @@ export default function CareerDirectionPage() {
     let active = true;
     const saveScope = currentScope.current;
     saveScope.generation += 1;
-    setSelectionOverride(null);
     setSaving(false);
     setAccountError(false);
     setLoadedOwner(null);
-    if (owner) void hydrateDiscoveryFromAccount()
-      .then(() => { if (active) setLoadedOwner(owner); })
+    if (owner) void getDirectionFromApi(owner)
+      .then(plan => {
+        if (!active) return;
+        setAccountPlan(plan);
+        setLoadedOwner(owner);
+      })
       .catch(() => { if (active) setAccountError(true); });
     return () => { active = false; saveScope.generation += 1; };
   }, [owner, areaId, reload]);
@@ -226,7 +232,7 @@ export default function CareerDirectionPage() {
     return <EmptyState title={fallbackCatalog.ui.notFound} action={fallbackCatalog.ui.back} href="/assessment" />;
   }
 
-  if (!canAccessPursuedArea(storedResult, plan, areaId)) {
+  if (owner ? plan?.areaId !== areaId : !canAccessPursuedArea(storedResult, plan, areaId)) {
     return <EmptyState title={text.lockedTitle} description={text.lockedDescription} action={storedResult ? text.results : fallbackCatalog.ui.back} href={storedResult ? "/assessment/discovery" : "/assessment"} />;
   }
 
@@ -242,7 +248,6 @@ export default function CareerDirectionPage() {
     // Anonymous choices are a resumable draft, including while opening a guide.
     if ((!user || user.isAnonymous) && plan) {
       saveDirectionPlan(setDreamCareers(plan, next));
-      setSelectionOverride(null);
     } else if (owner) {
       const scope = { ...currentScope.current };
       const isCurrent = () => currentScope.current.owner === scope.owner && currentScope.current.areaId === scope.areaId && currentScope.current.generation === scope.generation;
@@ -252,7 +257,7 @@ export default function CareerDirectionPage() {
         if (!isCurrent()) return;
         markDiscoveryCacheOwner(owner);
         saveDirectionPlan(saved);
-        setSelectionOverride(null);
+      setAccountPlan(saved);
       } catch {
         if (isCurrent()) setError(text.saveFailed);
       } finally {
@@ -261,9 +266,9 @@ export default function CareerDirectionPage() {
     }
   };
 
-  const continueToSummary = () => {
-    if (saving || !selectedIds.length || !plan) return;
-    router.push('/assessment/save');
+  const continueJourney = () => {
+    if (saving || (!owner && !selectedIds.length) || !plan) return;
+    router.push(owner ? '/dashboard' : '/assessment/save');
   };
 
   return (
@@ -272,8 +277,8 @@ export default function CareerDirectionPage() {
       <main className={`${explorer.explorer} ${design.shell}`} style={sceneTone}>
         <div className="mx-auto max-w-6xl">
           <JourneySteps step={2} locale={locale} />
-          <Link href="/assessment/discovery" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
-            <ArrowLeft className="h-4 w-4" />{text.results}
+          <Link href={owner ? "/dashboard" : "/assessment/discovery"} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+            <ArrowLeft className="h-4 w-4" />{owner ? mvpNavigationCopy[locale].myDirection : text.results}
           </Link>
 
           <header className={design.directionHeader}>
@@ -341,8 +346,8 @@ export default function CareerDirectionPage() {
             })[locale]}</p> : null}
 
             <div className={styles.selectionBar}>
-              <div><p className="text-sm font-semibold" aria-live="polite" aria-label={`${selectedIds.length} / 3 ${text.selected}`}>{selectedIds.length} / 3</p><p className={styles.selectionNames}>{careers.filter((career) => selectedIds.includes(career.id)).map((career) => career.title).join(', ') || text.chooseOne}</p></div>
-              <Button size="lg" className="min-h-11" disabled={saving || !selectedIds.length} onClick={continueToSummary}>
+              <div><p className="text-sm font-semibold" aria-live="polite" aria-label={`${selectedIds.length} / 3 ${text.selected}`}>{selectedIds.length} / 3</p><p className={styles.selectionNames}>{careers.filter((career) => selectedIds.includes(career.id)).map((career) => career.title).join(', ') || (owner ? dashboardCopy[locale].chooseCareersDescription : text.chooseOne)}</p></div>
+              <Button size="lg" className="min-h-11" disabled={saving || (!owner && !selectedIds.length)} onClick={continueJourney}>
                 {saving ? text.saving : ({ en: 'Continue', ml: 'തുടരൂ', hi: 'आगे बढ़ें', ta: 'தொடர்க' })[locale]}{saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}
               </Button>
             </div>

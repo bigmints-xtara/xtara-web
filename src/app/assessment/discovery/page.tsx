@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -32,13 +32,15 @@ import {
   parseDiscoveryResult,
 } from "@/lib/assessment-v2";
 import { loadDirectionPlan, saveDirectionPlan, switchCareerDirection } from "@/lib/direction";
-import { saveDirectionToApi } from "@/lib/direction-api";
+import { getDirectionFromApi, saveDirectionToApi } from "@/lib/direction-api";
+import { discoveryCacheOwnerKey, markDiscoveryCacheOwner } from "@/lib/discovery-cache-owner";
+import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 
 const resultsCopy = {
-  en: { heading: "Choose a direction", explore: "Explore", details: "Details", insights: "Assessment insights", all: "View all careers", more: "More options" },
-  ml: { heading: "ഒരു ദിശ തിരഞ്ഞെടുക്കൂ", explore: "കൂടുതൽ അറിയാം", details: "വിശദാംശങ്ങൾ", insights: "അസസ്‌മെന്റ് കണ്ടെത്തലുകൾ", all: "എല്ലാ കരിയറുകളും കാണാം", more: "കൂടുതൽ ഓപ്ഷനുകൾ" },
-  hi: { heading: "एक दिशा चुनें", explore: "देखें", details: "जानकारी", insights: "आकलन की जानकारी", all: "सभी करियर देखें", more: "और विकल्प" },
-  ta: { heading: "ஒரு திசையைத் தேர்ந்தெடுங்கள்", explore: "ஆராயுங்கள்", details: "விவரங்கள்", insights: "மதிப்பீட்டுக் குறிப்புகள்", all: "அனைத்துத் தொழில்களையும் பாருங்கள்", more: "மேலும் விருப்பங்கள்" },
+  en: { heading: "Choose a direction", choose: "Choose this direction", details: "Details", insights: "Assessment insights", all: "View all careers", more: "More options" },
+  ml: { heading: "ഒരു ദിശ തിരഞ്ഞെടുക്കൂ", choose: "ഈ ദിശ തിരഞ്ഞെടുക്കൂ", details: "വിശദാംശങ്ങൾ", insights: "അസസ്‌മെന്റ് കണ്ടെത്തലുകൾ", all: "എല്ലാ കരിയറുകളും കാണാം", more: "കൂടുതൽ ഓപ്ഷനുകൾ" },
+  hi: { heading: "एक दिशा चुनें", choose: "यह दिशा चुनें", details: "जानकारी", insights: "आकलन की जानकारी", all: "सभी करियर देखें", more: "और विकल्प" },
+  ta: { heading: "ஒரு திசையைத் தேர்ந்தெடுங்கள்", choose: "இந்தத் திசையைத் தேர்ந்தெடுக்கவும்", details: "விவரங்கள்", insights: "மதிப்பீட்டுக் குறிப்புகள்", all: "அனைத்துத் தொழில்களையும் பாருங்கள்", more: "மேலும் விருப்பங்கள்" },
 } as const;
 
 function subscribeToLocalResult(onChange: () => void) {
@@ -52,14 +54,17 @@ function subscribeToLocalResult(onChange: () => void) {
 
 export default function DiscoveryResultPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const owner = user && !user.isAnonymous ? user.uid : null;
   const { locale } = useTranslations();
   const catalog = getAssessmentV2Catalog(locale);
   const copy = resultsCopy[locale];
   const { data: publicExplorer } = useCareerExplorer(locale);
   const rawResult = useSyncExternalStore(
     subscribeToLocalResult,
-    () => localStorage.getItem(assessmentV2StorageKey),
+    () => localStorage.getItem(discoveryCacheOwnerKey) === owner
+      ? localStorage.getItem(assessmentV2StorageKey)
+      : null,
     () => null,
   );
   const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
@@ -68,10 +73,39 @@ export default function DiscoveryResultPage() {
     [locale, storedResult],
   );
   const [saveError, setSaveError] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const scope = useRef(owner);
+  scope.current = owner;
+  const [readback, setReadback] = useState<{ owner: string; failed: boolean } | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const reasonsByArea = useMemo(
     () => getDistinctAreaReasons(result?.areas ?? []),
     [result?.areas],
   );
+
+  useEffect(() => {
+    if (loading || !owner || storedResult?.areas.length) return;
+    let active = true;
+    hydrateDiscoveryFromAccount().then(() => {
+      if (active) setReadback({ owner, failed: false });
+    }).catch(() => {
+      if (active) setReadback({ owner, failed: true });
+    });
+    return () => { active = false; };
+  }, [attempt, loading, owner, storedResult]);
+
+  if (loading || (owner && !storedResult && readback?.owner !== owner)) {
+    return <main className="p-8 text-center"><p role="status">{catalog.ui.loading}</p></main>;
+  }
+  if (owner && !storedResult && readback?.owner === owner && readback.failed) {
+    return <main className="p-8 text-center">
+      <p role="alert">{catalog.ui.errorTitle}</p>
+      <Button className="mt-4" onClick={() => {
+        setReadback(null);
+        setAttempt(value => value + 1);
+      }}>{catalog.ui.retry}</Button>
+    </main>;
+  }
 
   if (!result?.areas.length || !storedResult) {
     return (
@@ -86,13 +120,22 @@ export default function DiscoveryResultPage() {
   }
 
   const pursueArea = async (areaId: string) => {
-    const plan = switchCareerDirection(loadDirectionPlan(), areaId);
+    if (saving) return;
+    setSaving(true);
     setSaveError(false);
     try {
-      saveDirectionPlan(user && !user.isAnonymous ? await saveDirectionToApi(plan) : plan);
-      router.push(`/assessment/careers/${areaId}`);
+      const current = owner ? await getDirectionFromApi(owner) : loadDirectionPlan();
+      if (scope.current !== owner) return;
+      const plan = switchCareerDirection(current, areaId);
+      const saved = owner ? await saveDirectionToApi(plan, owner) : plan;
+      if (scope.current !== owner) return;
+      if (owner) markDiscoveryCacheOwner(owner);
+      saveDirectionPlan(saved);
+      router.push(`/assessment/careers/${encodeURIComponent(areaId)}`);
     } catch {
-      setSaveError(true);
+      if (scope.current === owner) setSaveError(true);
+    } finally {
+      if (scope.current === owner) setSaving(false);
     }
   };
 
@@ -124,15 +167,15 @@ export default function DiscoveryResultPage() {
                   <div className={design.recommendationCopy}>
                     <h2 id={`result-${area.id}`}>
                       {featured ? area.title : (
-                        <button type="button" className={design.directionPick} onClick={select}>
+                        <button type="button" className={design.directionPick} onClick={select} disabled={saving}>
                           <span>{area.title}</span><ChevronRight size={17} aria-hidden="true" />
                         </button>
                       )}
                     </h2>
                     <div className={design.actions}>
                       {featured ? (
-                        <Button type="button" className={design.action} aria-label={`${copy.explore}: ${area.title}`} onClick={select}>
-                          {copy.explore}<ArrowRight size={16} aria-hidden="true" />
+                        <Button type="button" className={design.action} aria-label={`${copy.choose}: ${area.title}`} onClick={select} disabled={saving}>
+                          {copy.choose}<ArrowRight size={16} aria-hidden="true" />
                         </Button>
                       ) : null}
                       <DropdownMenu>

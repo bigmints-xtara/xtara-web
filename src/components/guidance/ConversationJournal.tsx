@@ -17,6 +17,28 @@ function today() { const now = new Date(); return `${now.getFullYear()}-${String
 
 export function StudentGuidanceEntry() {
   const { c } = useConversationCopy();
+  const { user, loading } = useAuth();
+  const uid = !loading && user && !user.isAnonymous ? user.uid : null;
+  const [sharedWith, setSharedWith] = useState<string | null>(null);
+  useEffect(() => {
+    if (!uid) return;
+    let generation = 0;
+    const refresh = () => {
+      const requested = ++generation;
+      getConversations(uid).then(page => {
+        if (requested === generation) setSharedWith(page.items.length > 0 ? uid : null);
+      }).catch(() => {
+        if (requested === generation) setSharedWith(null);
+      });
+    };
+    window.addEventListener('focus', refresh);
+    refresh();
+    return () => {
+      generation += 1;
+      window.removeEventListener('focus', refresh);
+    };
+  }, [uid]);
+  if (!uid || sharedWith !== uid) return null;
   return <section className={styles.garden}><div className={styles.entry}>
     <span className={styles.entryIcon}><MessageCircle aria-hidden="true" size={27} /></span>
     <div className="min-w-0 flex-1"><h2 className="text-lg font-medium">{c.journal}</h2><p>{c.studentIntro}</p></div>

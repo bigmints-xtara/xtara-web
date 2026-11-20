@@ -81,7 +81,7 @@ describe("discovery result chooser", () => {
     const { container } = render(<DiscoveryResultPage />);
 
     expect(await screen.findByRole("heading", { name: "Choose a direction" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Explore:/ })).toHaveLength(1);
+    expect(screen.getAllByRole("button", { name: /Choose this direction:/ })).toHaveLength(1);
     const featured = screen.getAllByRole("article")[0];
     const details = featured.querySelector("details")!;
     expect(details).not.toHaveAttribute("open");

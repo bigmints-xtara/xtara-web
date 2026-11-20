@@ -2,7 +2,7 @@
 
 import { trackProductEvent } from "@/lib/analytics";
 import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import styles from '@/components/journey/journey.module.css';
@@ -17,7 +17,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import {
   assessmentV2StorageKey,
-  assessmentStageStorageKey,
+  assessmentStageKey,
+  clearAssessmentDraft,
+  type DiscoveryResult,
   readAssessmentDraft,
   getAssessmentV2Catalog,
   getAssessmentStageQuestion,
@@ -28,6 +30,7 @@ import {
   saveAssessmentDraft,
   saveDiscoveryResult,
 } from "@/lib/assessment-v2";
+import { discoveryCacheOwnerKey } from "@/lib/discovery-cache-owner";
 import { getPendingOrganizationJoin } from "@/lib/pending-organization-join";
 import { normalizeAssessmentAnswers } from "@/lib/assessment-selection";
 import { evaluateAssessmentOnServer, getActiveAssessmentDefinition, type ActiveAssessmentDefinition } from "@/lib/assessment-api";
@@ -45,12 +48,20 @@ export default function AssessmentPage() {
 }
 
 function AssessmentJourney() {
+  const { user, loading } = useAuth();
+  if (loading) return <AssessmentLoading />;
+  const owner = user && !user.isAnonymous ? user.uid : undefined;
+  return <AssessmentJourneyBody key={owner ?? 'guest'} owner={owner} />;
+}
+
+function AssessmentJourneyBody({ owner }: { owner?: string }) {
   const router = useRouter();
-  const { user } = useAuth();
+  const fromExplore = useSearchParams().get('from') === 'explore';
+  const stageKey = assessmentStageKey(owner);
   const { locale } = useTranslations();
   const rawStage = useSyncExternalStore(
     subscribeToAssessmentStage,
-    () => localStorage.getItem(assessmentStageStorageKey),
+    () => localStorage.getItem(stageKey),
     () => null,
   );
   const stage = parseOptionalAssessmentStage(rawStage);
@@ -61,7 +72,10 @@ function AssessmentJourney() {
   const catalog = getAssessmentV2Catalog(locale);
   const rawResult = useSyncExternalStore(
     subscribeToAssessmentDraft,
-    () => localStorage.getItem(assessmentV2StorageKey),
+    () => {
+      const cachedOwner = localStorage.getItem(discoveryCacheOwnerKey);
+      return cachedOwner === (owner ?? null) ? localStorage.getItem(assessmentV2StorageKey) : null;
+    },
     () => null,
   );
   const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
@@ -90,7 +104,7 @@ function AssessmentJourney() {
   const ui = { ...catalog.ui, ...Object.fromEntries(Object.entries(activeDefinition?.ui ?? {}).filter(([key, value]) => key in catalog.ui && typeof value === 'string')) };
   const rawDraft = useSyncExternalStore(
     subscribeToAssessmentDraft,
-    () => effectiveStage ? readAssessmentDraft(effectiveStage) ?? "{}" : "{}",
+    () => effectiveStage ? readAssessmentDraft(effectiveStage, owner) ?? "{}" : "{}",
     () => null,
   );
   const draft = useMemo(
@@ -113,6 +127,7 @@ function AssessmentJourney() {
     started.current = true;
     trackProductEvent("assessment_start", "student_portal");
   };
+  const evaluated = useRef<{ key: string; result: DiscoveryResult } | null>(null);
   const [processing, setProcessing] = useState(false);
   const [processingError, setProcessingError] = useState("");
 
@@ -122,19 +137,27 @@ function AssessmentJourney() {
     setProcessingError("");
     try {
       const completedStage = parseAssessmentStage(typeof answers.currentGrade === "string" ? answers.currentGrade : effectiveStage);
-      saveAssessmentDraft(completedStage, answers);
+      saveAssessmentDraft(completedStage, answers, owner);
       if (!activeDefinition || activeDefinition.stage !== completedStage || activeDefinition.locale !== locale) {
         throw new Error(ui.errorTitle);
       }
-      const result = await evaluateAssessmentOnServer({
+      const input = {
         definitionId: activeDefinition.id,
         version: activeDefinition.version,
         stage: completedStage, locale, answers,
-      });
+      };
+      const key = JSON.stringify(input);
+      const result = evaluated.current?.key === key
+        ? evaluated.current.result
+        : await evaluateAssessmentOnServer(input);
       if (!result.areas.length) throw new Error(ui.errorTitle);
-      saveDiscoveryResult(result);
-      if (user && !user.isAnonymous) {
-        if (!await savePendingAssessmentToAccount(user.uid)) throw new Error(ui.errorTitle);
+      evaluated.current = { key, result };
+      if (owner) {
+        if (!await savePendingAssessmentToAccount(owner, result)) throw new Error(ui.errorTitle);
+        clearAssessmentDraft(completedStage, owner);
+        localStorage.removeItem(stageKey);
+      } else {
+        saveDiscoveryResult(result);
       }
       trackProductEvent("assessment_complete", "student_portal");
       const pendingJoinCode = getPendingOrganizationJoin();
@@ -191,13 +214,13 @@ function AssessmentJourney() {
             trackStart();
             const selectedStage = parseOptionalAssessmentStage(typeof answers.currentGrade === "string" ? answers.currentGrade : null);
             if (selectedStage) {
-              localStorage.setItem(assessmentStageStorageKey, selectedStage);
+              localStorage.setItem(stageKey, selectedStage);
               window.dispatchEvent(new Event("xtara:assessment-stage-changed"));
             }
-            saveAssessmentDraft(selectedStage ?? effectiveStage ?? "grade8", answers);
+            saveAssessmentDraft(selectedStage ?? effectiveStage ?? "grade8", answers, owner);
           }}
           onComplete={handleComplete}
-          onExit={() => router.push("/")}
+          onExit={() => router.push(fromExplore ? "/explore" : owner ? "/dashboard" : "/")}
         />
       </main>
     </div>
@@ -236,7 +259,7 @@ function AssessmentIntro({ catalog, onStart }: { catalog: ReturnType<typeof getA
 
 function subscribeToAssessmentStage(onChange: () => void) {
   const onStorage = (event: StorageEvent) => {
-    if (event.key === assessmentStageStorageKey) onChange();
+    if (event.key === null || event.key.startsWith(assessmentStageKey())) onChange();
   };
   window.addEventListener("storage", onStorage);
   window.addEventListener("xtara:assessment-stage-changed", onChange);

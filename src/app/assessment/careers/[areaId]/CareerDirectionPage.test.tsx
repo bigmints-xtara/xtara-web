@@ -12,7 +12,7 @@ vi.mock('@/i18n/language-provider', () => ({ useTranslations: () => ({ locale: '
 vi.mock('@/lib/curated-career-api', () => ({ getPublishedCareerCatalog: mocks.catalog }));
 vi.mock('@/lib/exploration-access', () => ({ canAccessPursuedArea: () => true }));
 vi.mock('@/lib/discovery-save', () => ({ hydrateDiscoveryFromAccount: mocks.hydrate, savePendingCareerChoiceToAccount: vi.fn() }));
-vi.mock('@/lib/direction-api', () => ({ saveDirectionToApi: mocks.save }));
+vi.mock('@/lib/direction-api', () => ({ getDirectionFromApi: mocks.hydrate, saveDirectionToApi: mocks.save }));
 import CareerDirectionPage from './page';
 import { createAreaDirectionPlan, saveDirectionPlan, loadDirectionPlan } from '@/lib/direction';
 const catalog = { directions: [{ id: 'engineering-and-built-world', translations: { en: { title: 'API engineering direction' } } }], roles: [] };
@@ -54,7 +54,7 @@ describe('API-backed career direction page', () => {
     Object.defineProperty(window, 'localStorage', { configurable: true, value: storage });
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: storage });
     mocks.user = { uid: 'student-1', isAnonymous: false };
-    mocks.hydrate.mockImplementation(async () => { saveDirectionPlan(createAreaDirectionPlan('engineering-and-built-world')); return null; });
+    mocks.hydrate.mockResolvedValue(createAreaDirectionPlan('engineering-and-built-world'));
     let resolveSave!: (plan: ReturnType<typeof createAreaDirectionPlan>) => void;
     mocks.save.mockImplementation(() => new Promise((resolve) => { resolveSave = resolve; }));
     mocks.catalog.mockResolvedValue({

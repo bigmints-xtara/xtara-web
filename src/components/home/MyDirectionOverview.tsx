@@ -25,7 +25,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
   const copy = directionOverviewCopy[locale];
   const navigation = mvpNavigationCopy[locale];
   const changeHref = hasAssessment ? "/assessment/discovery" : "/assessment";
-  const editHref = canEditCareers ? `/assessment/careers/${direction.id}` : changeHref;
+  const editHref = canEditCareers ? `/assessment/careers/${encodeURIComponent(direction.id)}` : changeHref;
   const hasGuidance = direction.guidance.length > 0;
   const hasCareers = direction.careers.length > 0;
 

@@ -38,4 +38,11 @@ it('loading, retry, empty and paused sharing are explicit', async () => {
   mocks.get.mockRejectedValueOnce(new Error('Unavailable')).mockResolvedValue({ items: [{ ...record, canWrite: false }], nextOffset: null, canRecord: false }); show(); expect(screen.getByRole('status', { name: copy.en.loading })).toBeInTheDocument();
   fireEvent.click(await screen.findByRole('button', { name: copy.en.retry })); expect(await screen.findByText(copy.en.readOnly)).toBeInTheDocument(); expect(screen.getByRole('textbox')).toBeDisabled();
 });
-for (const locale of ['ml','hi','ta'] as const) it(`journal entry remains available before direction selection in ${locale}`, () => { render(<LanguageProvider initialLocale={locale}><StudentGuidanceEntry /></LanguageProvider>); expect(screen.getByRole('link', { name: copy[locale].openJournal })).toHaveAttribute('href','/guidance'); });
+for (const locale of ['ml','hi','ta'] as const) it(`shared journal entry is shown in ${locale}`, async () => { render(<LanguageProvider initialLocale={locale}><StudentGuidanceEntry /></LanguageProvider>); expect(await screen.findByRole('link', { name: copy[locale].openJournal })).toHaveAttribute('href','/guidance'); });
+
+it('keeps the teacher journal off Home when the account has no shared conversations', async () => {
+  mocks.get.mockResolvedValue({ items: [], nextOffset: null, canRecord: false });
+  render(<LanguageProvider initialLocale="en"><StudentGuidanceEntry /></LanguageProvider>);
+  await waitFor(() => expect(mocks.get).toHaveBeenCalledWith('student'));
+  expect(screen.queryByRole('link', { name: copy.en.openJournal })).toBeNull();
+});

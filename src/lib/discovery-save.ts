@@ -103,9 +103,9 @@ export async function savePendingDiscoveryToAccount(userId: string): Promise<boo
   return true;
 }
 
-export async function savePendingAssessmentToAccount(userId: string): Promise<boolean> {
+export async function savePendingAssessmentToAccount(userId: string, evaluated?: DiscoveryResult): Promise<boolean> {
   invalidateDashboardCache();
-  let assessment = parseDiscoveryResult(localStorage.getItem(assessmentV2StorageKey));
+  let assessment = evaluated ?? parseDiscoveryResult(localStorage.getItem(assessmentV2StorageKey));
   if (!assessment) return false;
   await ensureApiSession(userId);
   assessment = await currentAssessment(assessment);
@@ -115,6 +115,7 @@ export async function savePendingAssessmentToAccount(userId: string): Promise<bo
     throw new Error("Your assessment was not returned by account readback.");
   }
   assertOwner(userId);
+  preserveAnonymousDiscoveryDraft();
   markDiscoveryCacheOwner(userId);
   saveDiscoveryResult({ ...assessment, syncStatus: "synced" });
   invalidateDashboardCache();
@@ -265,7 +266,8 @@ export async function hydrateDiscoveryFromAccount(
   ]);
   assertOwner(userId);
   preserveAnonymousDiscoveryDraft();
-  if (!response.assessment) {
+  // An older assessment format has no Career Directions to resume.
+  if (!response.assessment || response.assessment.answers?.definitionId !== "career-discovery") {
     for (const key of [assessmentV2StorageKey, directionStorageKey, pathwayProfileStorageKey]) localStorage.removeItem(key);
     window.dispatchEvent(new Event('xtara:assessment-result-changed'));
     window.dispatchEvent(new Event('xtara:direction-changed'));
@@ -278,7 +280,7 @@ export async function hydrateDiscoveryFromAccount(
   );
   const directionPlan = parseDirectionPlan(remoteDirection ? JSON.stringify(remoteDirection) : null);
   if (
-    saved?.definitionId !== "career-discovery"
+    !saved
     || (typeof saved.schemaVersion !== "string" || !/^\d+\.\d+\.\d+$/.test(saved.schemaVersion))
     || !resultData?.signals
     || !resultData.traits

@@ -192,7 +192,7 @@ describe("career exploration", () => {
     fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Doctor');
     expect(screen.getByText(/Some information is shown in English/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Take the assessment' })).toHaveAttribute('href', '/assessment');
+    expect(screen.getByRole('link', { name: 'Take the assessment' })).toHaveAttribute('href', '/assessment?from=explore');
   });
   it("shows API artwork and career chapters without exposing public study routes", async () => {
     const graph = structuredClone(fixture);

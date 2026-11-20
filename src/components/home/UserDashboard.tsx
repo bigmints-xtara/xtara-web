@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
-import { getAssessmentV2Catalog, assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult } from "@/lib/assessment-v2";
+import { getAssessmentV2Catalog, assessmentV2StorageKey, localizeDiscoveryResult, parseDiscoveryResult, hasAssessmentDraft } from "@/lib/assessment-v2";
 import { dashboardCopy } from "@/lib/dashboard-copy";
 import MyDirectionOverview from "./MyDirectionOverview";
 import DashboardSkeleton from '@/components/skeletons/DashboardSkeleton';
@@ -71,7 +71,7 @@ export default function UserDashboard() {
   const currentReadback = accountLoad.owner === userId && accountLoad.attempt === retryAccount && accountLoad.locale === locale;
   const cachedReadback = isAccount && MVP_NAVIGATION_ENABLED ? readDashboardCache(userId!, locale) : null;
   const serverOverview = isAccount ? currentReadback && !accountLoad.error ? accountLoad.overview : cachedReadback?.overview : undefined;
-  const useCachedPresentation = !MVP_NAVIGATION_ENABLED || !isAccount || (currentReadback && serverOverview === undefined);
+  const useCachedPresentation = !MVP_NAVIGATION_ENABLED || !isAccount;
   const rawResult = useSyncExternalStore(subscribeToDiscovery, () => localStorage.getItem(assessmentV2StorageKey), () => null);
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, () => null);
   const storedResult = useMemo(() => parseDiscoveryResult(rawResult), [rawResult]);
@@ -152,13 +152,16 @@ export default function UserDashboard() {
       careers: selectedCareers,
     };
     const direction = serverOverview === undefined ? fallback : serverOverview;
-    const hasAccountAssessment = Boolean(storedResult) && (!isAccount || localStorage.getItem(discoveryCacheOwnerKey) === userId);
+    const hasAccountAssessment = Boolean(storedResult?.areas.length) &&
+      (!isAccount || localStorage.getItem(discoveryCacheOwnerKey) === userId);
     if (direction) return <>{refreshNotice}<MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
-      hasAssessment={hasAccountAssessment} canEditCareers={hasAccountAssessment && plan?.areaId === direction.id
-        && Boolean(storedResult?.areas.some((area) => area.id === direction.id))} /></>;
-    return <>{refreshNotice}{storedResult
-      ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" />
-      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />}</>;
+      hasAssessment={hasAccountAssessment} canEditCareers={isAccount || plan?.areaId === direction.id} /></>;
+    const draft = userId && isAccount && hasAssessmentDraft(userId);
+    const catalog = getAssessmentV2Catalog(locale);
+    const browse = mvpNavigationCopy[locale].exploreCareers;
+    return <>{refreshNotice}{hasAccountAssessment
+      ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" browse={browse} />
+      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={draft ? text.resumeAssessment : catalog.ui.startAssessment} href="/assessment" browse={browse} />}</>;
   }
 
   if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
@@ -340,8 +343,8 @@ function RewardValue({ value, label, compact = false }: { value: string; label: 
   return <div className="rounded-xl bg-slate-50 px-2 py-3"><p className={`${compact ? "text-sm capitalize" : "text-lg"} truncate font-semibold text-primary`}>{value}</p><p className="mt-1 text-[11px] text-muted-foreground">{label}</p></div>;
 }
 
-function EmptyState({ title, description, action, href }: { title: string; description: string; action: string; href: string }) {
-  return <main className="mx-auto max-w-4xl px-5 py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><Button asChild className="mt-7 rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button></main>;
+function EmptyState({ title, description, action, href, browse }: { title: string; description: string; action: string; href: string; browse?: string }) {
+  return <main className="mx-auto max-w-4xl px-5 py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>{browse && <Button asChild variant="outline" className="rounded-full"><Link href="/explore">{browse}</Link></Button>}</div></main>;
 }
 
 function subscribeToDiscovery(onChange: () => void) {
