@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, Sparkles, MoveHorizontal, ArrowDown, MousePointer2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, Sparkles, MoveHorizontal, ArrowDown, MousePointer2 } from 'lucide-react';
 import Header from '@/components/Header';
 import { useTranslations } from '@/i18n/language-provider';
 import { useAuth } from '@/context/AuthContext';
@@ -101,6 +101,15 @@ export default function ExploreCareers() {
     <Header />
     <div className={`${styles.explorer} ${paused ? styles.paused : ''}`} style={explorerTone(direction?.presentation)}>
       <main className={`${styles.main} ${home ? styles.home : ''} ${invitation ? styles.invitation : overview ? styles.overview : styles.journey}`}>
+        {introduction && <div className={styles.guideNavigation}>
+          <Link aria-label={copy.back} href={user && !user.isAnonymous ? '/dashboard' : '/'} onNavigate={event => {
+            const navigation = (window as Window & { navigation?: { canGoBack: boolean } }).navigation;
+            if (navigation?.canGoBack ?? (window.history.length > 1 && document.referrer.startsWith(window.location.origin + '/'))) {
+              event.preventDefault();
+              window.history.back();
+            }
+          }}><ArrowLeft size={22} aria-hidden="true" /></Link>
+        </div>}
         {!introduction && <div className={styles.topline} data-inner={!home || undefined}>
           {!home && breadcrumbs}
           <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>

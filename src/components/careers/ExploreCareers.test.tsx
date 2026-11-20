@@ -174,6 +174,7 @@ describe("career exploration", () => {
   it("focuses a neighboring direction before opening it and keeps one primary action", async () => {
     mount();
     expect(screen.getByRole('heading', { name: 'Explore career directions' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Back' })).toHaveAttribute('href', '/');
     fireEvent.click(screen.getByRole('button', { name: 'Start exploring' }));
     await screen.findByRole('heading', {name: 'How to explore'});
     await screen.findByRole('heading', { name: 'What interests you?' });

@@ -419,3 +419,6 @@
 .directionNotes p, .directionNotes li, .guideIntro li { color: var(--soft-ink); line-height: 1.55; }
 .directionNotes ul { list-style: disc; padding-inline-start: 1.25rem; }
 .directionNotes summary, .directionNotes button { cursor: pointer; padding-block: .65rem; }
+
+.guideNavigation { width: min(100%, 1120px); margin-inline: auto; padding-inline: clamp(12px, 3vw, 32px); }
+.guideNavigation a { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; color: var(--ink); }
