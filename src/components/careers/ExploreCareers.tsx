@@ -19,6 +19,7 @@ import CareerOverviewSections from './explorer/CareerOverviewSections';
 import ExplorerAccountContext from './explorer/ExplorerAccountContext';
 import styles from './ExploreCareers.module.css';
 import { ExplorerScene, explorerTone } from './explorer/ExplorerScene';
+import { resolveCareerArtwork, safeSourceUrl } from './explorer/career-artwork';
 import { useCareerExplorer } from './explorer/useCareerExplorer';
 
 export { safeSourceUrl } from './explorer/ExplorerScene';
@@ -55,6 +56,15 @@ export default function ExploreCareers() {
   const direction = data?.directions.find(d => d.id === state.direction);
   const career = data?.careers.find(c => c.id === state.career);
   const parent = data?.careers.find(c => c.id === career?.parentCareerId);
+  const selectedArtwork = resolveCareerArtwork(data, career, direction?.id);
+  const parentArtwork = resolveCareerArtwork(data, parent, direction?.id);
+  const directionUrl = direction?.illustration && safeSourceUrl(direction.illustration.url);
+  const centerArtwork = parent ? parentArtwork : selectedArtwork;
+  const centerContextShown = Boolean(centerArtwork.illustration && centerArtwork.illustration.url === directionUrl);
+  const detailContextShown = Boolean(selectedArtwork.illustration && (
+    selectedArtwork.illustration.url === directionUrl ||
+    selectedArtwork.illustration.url === parentArtwork.illustration?.url
+  ));
   const specialization = state.step === 'specializations';
   const invitation = state.step === 'pursuit' && Boolean(career) && (!user || user.isAnonymous);
   const overview = Boolean(career && !specialization && !invitation);
@@ -97,6 +107,15 @@ export default function ExploreCareers() {
   </nav>;
   const common = { previous: text.previous, next: text.next, hint: text.swipe };
   const choices = !data ? [] : home ? data.directions : specialization ? (career?.specializationIds || []).flatMap(id => data.careers.find(c => c.id === id) ?? []) : state.step === 'industries' ? data.industries.filter(i => direction?.industryIds.includes(i.id)).map(i => ({ ...i, summary: i.description })) : (state.industry ? data.industries.find(i => i.id === state.industry)?.careerIds || [] : direction?.careerIds || data.careers.map(c => c.id)).flatMap(id => data.careers.find(c => c.id === id) ?? []).filter((c, i, all) => all.findIndex(item => item.id === c.id) === i && (!c.parentCareerId || !all.some(item => item.id === c.parentCareerId)));
+  const careerArtwork = new Map(choices.flatMap(item => {
+    if (home || state.step === 'industries') return [];
+    const record = data?.careers.find(career => career.id === item.id);
+    return [[item.id, resolveCareerArtwork(data, record, direction?.id)] as const];
+  }));
+  const sceneCounts = new Map<string, number>();
+  for (const { illustration } of careerArtwork.values()) {
+    if (illustration) sceneCounts.set(illustration.url, (sceneCounts.get(illustration.url) ?? 0) + 1);
+  }
 
   return <div className={styles.page}>
     <Header />
@@ -127,7 +146,7 @@ export default function ExploreCareers() {
         <p>{guide.guideLead}</p>
         <button className={styles.primary} onClick={() => navigate(initialExploreState)}>{guide.guideStart}<ArrowRight size={16}/></button>
       </section> : isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
-        <div className={styles.invitationBubble}><ExplorerScene illustration={(parent || career).illustration} placeholder={text.illustration} bubble /></div>
+        <div className={styles.invitationBubble}><ExplorerScene illustration={selectedArtwork.illustration} contextTitle={selectedArtwork.contextTitle} placeholder={text.illustration} bubble /></div>
         <p className={styles.eyebrow}>{text.nextStep}</p>
         <h1 ref={heading} tabIndex={-1}>{invite.headingLead}<br /><span>{invite.headingAccent}</span></h1>
         <div className={styles.careerIntent}><p>{invite.choice}</p><h2>{parent?.title || career.title}</h2>{parent && <p>{career.title}</p>}<button className={styles.quiet} onClick={() => navigate({...state,career:null,step:'roles',q:''})}>{invite.change}</button></div>
@@ -140,8 +159,9 @@ export default function ExploreCareers() {
         <div className={styles.connection} aria-label={`${direction?.title || ''}, ${parent?.title || career.title}, ${parent ? career.title : text.nextStep}`}>
           <span className={styles.orbit} /><span className={styles.orbitTwo} />
           <button className={`${styles.satellite} ${styles.connectionLink}`} aria-label={direction?.title} disabled={!direction} onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}><ExplorerScene illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></button>
-          <div className={styles.central}><ExplorerScene illustration={(parent || career).illustration} placeholder={text.illustration} bubble /><span>{parent?.title || career.title}</span></div>
-          <div className={styles.satellite}>{parent ? <ExplorerScene illustration={career.illustration} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
+          <div className={styles.central}><ExplorerScene illustration={centerContextShown ? undefined : centerArtwork.illustration}
+            contextTitle={centerArtwork.contextTitle} contextShown={centerContextShown} placeholder={text.illustration} bubble /><span>{parent?.title || career.title}</span></div>
+          <div className={styles.satellite}>{parent ? <ExplorerScene illustration={detailContextShown ? undefined : selectedArtwork.illustration} contextTitle={selectedArtwork.contextTitle} contextShown={detailContextShown} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
         </div>
         <header className={styles.intro}><p className={styles.eyebrow}>{text.future}</p><h1 ref={heading} tabIndex={-1}>{text.closer}<br /><span>{career.title}.</span></h1><p>{career.summary}</p></header>
         {(career.translationFallback || parent?.translationFallback || direction?.translationFallback) && <p className={styles.notice}>{copy.fallback}</p>}
@@ -161,8 +181,8 @@ export default function ExploreCareers() {
       </> : <>
         <section className={styles.browseFold}>
         <header className={`${styles.intro} ${styles.browseIntro}`}>
-          {!home && <div className={styles.contextArtwork} aria-hidden="true">
-            <ExplorerScene illustration={(specialization ? career : direction)?.illustration} placeholder={text.illustration} bubble />
+          {!home && !specialization && <div className={styles.contextArtwork} aria-hidden="true">
+            <ExplorerScene illustration={direction?.illustration} placeholder={text.illustration} bubble />
           </div>}
           <div>
             {!home && <p className={styles.eyebrow}>{specialization ? career?.title : direction?.title || copy.roles}</p>}
@@ -177,7 +197,11 @@ export default function ExploreCareers() {
           const item = choices[i];
           const action = home ? text.explore : 'specializationIds' in item && item.specializationIds?.length ? text.specialize : text.meet;
           const open = () => home ? navigate({ ...initialExploreState, direction: item.id, step: 'roles' }) : state.step === 'industries' ? navigate({ ...state, industry: item.id, career: null, step: 'roles' }) : goCareer(item.id);
-          return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={'illustration' in item ? item.illustration : undefined} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
+          const artwork = careerArtwork.get(item.id);
+          const repeatedContext = !active && Boolean(artwork?.contextTitle && artwork.illustration &&
+            (sceneCounts.get(artwork.illustration.url) ?? 0) > 1);
+          const illustration = artwork ? artwork.illustration : 'illustration' in item ? item.illustration : undefined;
+          return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={repeatedContext ? undefined : illustration} contextTitle={artwork?.contextTitle} contextShown={repeatedContext} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
         }} />}
         </section>
         {home && <section className={styles.directionNotes}><h2>{guide.howTo}</h2>

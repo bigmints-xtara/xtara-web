@@ -422,3 +422,22 @@
 
 .guideNavigation { width: min(100%, 1120px); margin-inline: auto; padding-inline: clamp(12px, 3vw, 32px); }
 .guideNavigation a { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; color: var(--ink); }
+
+.artworkSource {
+  position: absolute;
+  inset-inline: 10%;
+  bottom: 8px;
+  z-index: 1;
+  width: fit-content;
+  max-width: 80%;
+  margin-inline: auto;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--muted-foreground);
+  font-size: .6875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: anywhere;
+}

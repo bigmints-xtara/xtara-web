@@ -25,6 +25,7 @@ const copy = {
 type PreviewProps = {
   career: { id: string; title: string; summary: string };
   illustration?: ExplorerIllustration;
+  contextTitle?: string;
   tone?: CSSProperties;
   onClose: () => void;
 };
@@ -34,7 +35,7 @@ export default function CareerPreviewDialog(props: PreviewProps) {
   return <CareerPreviewContent key={`${props.career.id}:${locale}`} {...props} locale={locale} />;
 }
 
-function CareerPreviewContent({ career, illustration, tone, onClose, locale }: PreviewProps & { locale: keyof typeof copy }) {
+function CareerPreviewContent({ career, illustration, contextTitle, tone, onClose, locale }: PreviewProps & { locale: keyof typeof copy }) {
   const text = copy[locale];
   const dialog = useRef<HTMLDialogElement>(null);
   const [guide, setGuide] = useState<DreamCareerStudentGuideResponse | null>(null);
@@ -64,7 +65,7 @@ function CareerPreviewContent({ career, illustration, tone, onClose, locale }: P
     </div>
     <header className={design.previewIntro}>
       <div className={design.previewArt}>
-        <ExplorerScene illustration={illustration} placeholder={journeyCopy[locale].illustration} bubble decorative sizes="150px" />
+        <ExplorerScene illustration={illustration} contextTitle={contextTitle} placeholder={journeyCopy[locale].illustration} bubble decorative sizes="150px" />
       </div>
       <h2 id="career-preview-title" className={design.heading}>{career.title}</h2>
       <p className="mt-4 leading-7 text-muted-foreground">{career.summary}</p>

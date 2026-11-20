@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, cleanup } from "@testing-library/react";
+import { act, fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ExploreCareers, { safeSourceUrl } from "./ExploreCareers";
@@ -232,6 +232,36 @@ describe("career exploration", () => {
     fireEvent.click(await screen.findByRole('button', { name: /^Meet this career$/ }));
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Structural Engineering');
     expect(screen.getByRole('navigation', { name: 'Your path' })).toHaveTextContent('Engineering & the Built World');
+  });
+
+  it('labels shared group artwork once and replaces it with the published specialization on refresh', async () => {
+    const graph = structuredClone(fixture);
+    const group = graph.careers[0];
+    group.illustration = { url: 'https://example.org/civil.webp', alt: 'Civil engineering scene' };
+    group.specializationIds = ['aerospace-engineer', 'structures'];
+    graph.careers.push(...group.specializationIds.map((id, index) => ({
+      ...group, id, title: index === 0 ? 'Aerospace Engineering' : 'Structural Engineering',
+      parentCareerId: group.id, specializationIds: [], illustration: undefined,
+    })));
+    vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    window.history.replaceState({}, '', '/explore?direction=build&career=civil&step=specializations');
+    const query = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const { container } = render(<QueryClientProvider client={query}><ExploreCareers /></QueryClientProvider>);
+    await screen.findByRole('heading', { name: 'Aerospace Engineering' });
+    expect(screen.getAllByAltText(group.illustration!.alt)).toHaveLength(1);
+    expect(container.querySelector('[data-active="true"]')).toHaveTextContent(group.title);
+    fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
+    expect(screen.getAllByAltText(group.illustration!.alt)).toHaveLength(1);
+
+    const updated = structuredClone(graph);
+    const url = 'https://xtara.ai/xtara-service/api/v1/media/images/799dc459faf1f1288bd94229706104b902fe234e96cf051ff609c8989759334d';
+    updated.careers.find(career => career.id === 'aerospace-engineer')!.illustration = {
+      url, alt: 'Aerospace Engineering',
+    };
+    vi.mocked(getCareerExplorer).mockResolvedValue(updated);
+    await act(async () => { await query.invalidateQueries({ queryKey: ['career-explorer', 'en'] }); });
+    expect(await screen.findByAltText('Aerospace Engineering')).toHaveAttribute('src', url);
+    expect(screen.getAllByAltText(group.illustration!.alt)).toHaveLength(1);
   });
 
   it("opens an optional specialization with its three connected contexts", async () => {

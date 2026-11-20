@@ -9,6 +9,7 @@ import CareerPreviewDialog from "@/components/careers/CareerPreviewDialog";
 import Footer from "@/components/Footer";
 import styles from '@/components/journey/journey.module.css';
 import { ExplorerScene, explorerTone } from '@/components/careers/explorer/ExplorerScene';
+import { resolveCareerArtwork } from '@/components/careers/explorer/career-artwork';
 import { useCareerExplorer } from '@/components/careers/explorer/useCareerExplorer';
 import { journeyCopy } from '@/components/careers/explorer/journey-copy';
 import { resolveExplorerDirection } from '@/lib/career-direction-imagery';
@@ -132,7 +133,9 @@ export default function CareerDirectionPage() {
   const text = copy[locale];
   const { data: publicExplorer } = useCareerExplorer(locale);
   const publicDirection = resolveExplorerDirection(publicExplorer?.directions, areaId);
-  const careerArtwork = new Map(publicExplorer?.careers.map(career => [career.id, career.illustration]));
+  const artworkFor = (id: string) => resolveCareerArtwork(
+    publicExplorer, publicExplorer?.careers.find(career => career.id === id), publicDirection?.id,
+  );
   const sceneTone = explorerTone(publicDirection?.presentation);
   const fallbackCatalog = getCareerKnowledgeCatalog(locale);
   const rawResult = useSyncExternalStore(subscribeToAssessment, () => localStorage.getItem(assessmentV2StorageKey), serverSnapshot);
@@ -309,11 +312,12 @@ export default function CareerDirectionPage() {
             <div className={styles.careerGrid}>
               {careers.filter((career) => `${career.title} ${career.englishTitle || ""}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).map((career) => {
                 const selected = selectedIds.includes(career.id);
+                const artwork = artworkFor(career.id);
                 return (
                   <Card key={career.id} className={`${styles.careerCard} ${design.careerCard}`} data-selected={selected}>
                     <CardContent className={styles.careerBody}>
                       <div className={styles.cardToolbar}><div className={design.careerArt}>
-                        <ExplorerScene illustration={careerArtwork.get(career.id)} placeholder={journeyCopy[locale].illustration}
+                        <ExplorerScene illustration={artwork.illustration} placeholder={journeyCopy[locale].illustration}
                           bubble decorative sizes="64px" />
                       </div>
                       <Button type="button" variant={selected ? "default" : "outline"} className={styles.selectButton} disabled={saving} onClick={() => void toggle(career.id)} aria-pressed={selected} aria-label={`${selected ? ({ en: "Remove", ml: "നീക്കുക", hi: "हटाएँ", ta: "நீக்கு" })[locale] : ({ en: "Choose", ml: "തിരഞ്ഞെടുക്കൂ", hi: "चुनें", ta: "தேர்ந்தெடுக்கவும்" })[locale]} ${career.title}`}>
@@ -327,6 +331,7 @@ export default function CareerDirectionPage() {
 
                         <span data-career-copy><span className={styles.careerTitle}>{career.title}</span>
                           {locale !== "en" && career.englishTitle ? <span className="mt-1 block text-xs text-muted-foreground">{career.englishTitle}</span> : null}
+                          {artwork.contextTitle && <span className={design.artworkCredit}>{artwork.contextTitle}</span>}
                           <span className={styles.careerSummary}>{career.summary}</span>
                         </span>
                         <span className={styles.details}>{text.details}<ArrowRight size={14} aria-hidden="true" /></span>
@@ -355,7 +360,7 @@ export default function CareerDirectionPage() {
           </section>
         </div>
       </main>
-      {preview ? <CareerPreviewDialog career={preview} illustration={careerArtwork.get(preview.id)} tone={sceneTone} onClose={closePreview} /> : null}
+      {preview ? <CareerPreviewDialog career={preview} {...artworkFor(preview.id)} tone={sceneTone} onClose={closePreview} /> : null}
       <Footer />
     </div>
   );
