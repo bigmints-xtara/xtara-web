@@ -8,7 +8,8 @@ export function isStudyOptionsCareer(careerId: string): boolean {
 const studyPath = (careerId: string) => `/explore/roles/${encodeURIComponent(careerId)}/study-options`;
 
 export function studyOptionsHref(careerId: string, returnTo: string) {
-  return `${studyPath(careerId)}?${new URLSearchParams({ returnTo })}`;
+  const destination = /^\/dream-careers\/[\w-]+\?from=dashboard$/.test(returnTo) ? returnTo + '#career-study' : returnTo;
+  return `${studyPath(careerId)}?${new URLSearchParams({ returnTo: destination })}`;
 }
 
 export function studyOptionsCareerReturn(careerId: string, returnTo: string | null) {

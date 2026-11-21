@@ -6,7 +6,7 @@ import SavedOfferingLink from './SavedOfferingLink';
 import SavedCareerSections from './SavedCareerSections';
 
 // Keep published web anchors stable across contract versions and native clients.
-const anchors = { work: 'about-career', study: 'how-to-get-there', colleges: 'courses-and-colleges', skills: 'what-you-can-do-now', progression: 'career-progression', pay: 'pay-outlook', sources: 'sources' } as const;
+const anchors: Record<string, string> = { work: 'about-career', study: 'how-to-get-there', colleges: 'courses-and-colleges', skills: 'what-you-can-do-now', progression: 'career-progression', pay: 'pay-outlook', sources: 'sources' } as const;
 
 export default function SavedCareerContractView({ screen, retry }: { screen: SavedCareerScreen; retry: () => void }) {
   const studyHref = studyOptionsHref(screen.careerId, savedCareerHref(screen.careerId));
@@ -23,7 +23,7 @@ export default function SavedCareerContractView({ screen, retry }: { screen: Sav
         return <Button key={key} asChild><Link href={block.action === 'all_states' ? studyHref + '&state=all' : studyHref}>{block.label}</Link></Button>;
     }
   };
-  return <SavedCareerSections locale={screen.locale} englishFallback={screen.englishFallback} sections={screen.sections.map(section => ({
-    id: anchors[section.id], semanticId: section.id, title: section.title, content: section.blocks.map(render),
+  return <SavedCareerSections tabs={screen.tabs} locale={screen.locale} englishFallback={screen.englishFallback} sections={screen.sections.map(section => ({
+    id: anchors[section.id] ?? `guide-section-${section.id}`, semanticId: section.id, title: section.title, content: section.blocks.map(render),
   }))} />;
 }

@@ -7,11 +7,11 @@
     "verification": "DreamCareerStudentGuidePage.test.tsx and verify:saved-career-ui"
   },
   "src/components/careers/SavedCareerSections.tsx#SavedCareerSections": {
-    "purpose": "Give saved readers a shared document outline, section anchors and compact jump navigation.",
-    "closest": "DropdownMenu, DropdownMenuItem and Button",
-    "gap": "Both saved career transports need the same responsive document shell, headings and keyboard destination focus.",
+    "purpose": "Display the saved career as accessible Overview and Study & colleges tab panels.",
+    "closest": "Radix Tabs and the registered Button primitive",
+    "gap": "CareerTabs has fixed Learn, Connect and Grow actions. Both saved readers need localized API panels, keyboard selection, section deep links and offering focus on return.",
     "consumer": "SavedCareerReader and SavedCareerContractView",
-    "verification": "SavedCareerReader.test.tsx and verify:saved-career-ui"
+    "verification": "SavedCareerReader.test.tsx, DreamCareerStudentGuidePage.test.tsx and verify:saved-career-ui"
   },
   "src/components/careers/SavedOfferingLink.tsx#SavedOfferingLink": {
     "purpose": "Open the precise college offering and restore focus on return.",

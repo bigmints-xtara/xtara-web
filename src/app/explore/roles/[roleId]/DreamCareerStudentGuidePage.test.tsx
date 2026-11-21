@@ -137,6 +137,7 @@ describe('Dream Career Student Guide page', () => {
   };
 
   beforeEach(() => {
+    window.history.replaceState(null, '', '/');
     mocks.mvp = false;
     mocks.getGuide.mockReset();
     mocks.getContext.mockReset();
@@ -390,27 +391,33 @@ describe('Dream Career Student Guide page', () => {
     const link = await screen.findByRole('link', { name: 'Find courses and colleges' });
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
-    expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard');
+    expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard#career-study');
   });
 
-  it('uses the authenticated reading order and study actions without fetching legacy editorial sources', async () => {
+  it('uses the authenticated panel order and study actions without fetching legacy editorial sources', async () => {
     mocks.mvp = true;
     mocks.user = { uid: 'student-1', isAnonymous: false };
     vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('from=dashboard') as ReturnType<typeof useSearchParams>);
     mocks.getContext.mockResolvedValue({
       saved: true, careerId: 'data-engineer', location: {}, assessmentReasons: [],
       screen: { schemaVersion: 1, careerId: 'data-engineer', locale: 'en', title: 'Shared career title',
-        summary: 'Shared introduction', englishFallback: false, sections: [
+        summary: 'Shared introduction', englishFallback: false, tabs: [
+          { id: 'overview', title: 'Career overview', sectionIds: ['work'] },
+          { id: 'study', title: 'Educational options', sectionIds: ['study', 'colleges'] },
+        ], sections: [
           { id: 'colleges', title: 'Nearby programmes', blocks: [{ kind: 'action', action: 'all_states', label: 'Broaden location' }] },
           { id: 'work', title: 'What engineers do', blocks: [{ kind: 'list', items: ['Design data flows'] }] },
+          { id: 'future-topic', title: 'Additional reviewed topic', blocks: [{ kind: 'text', text: 'New material' }] },
           { id: 'study', title: 'School preparation', blocks: [{ kind: 'heading', text: 'Your stage', phase: 'afterGrade10', current: true }] },
         ] },
     });
     render(<DreamCareerPage />);
     await screen.findByRole('heading', { name: 'Shared career title', level: 1 });
     expect(screen.getByRole('link', { name: 'My Direction' })).toHaveAttribute('href', '/dashboard');
-    expect(screen.getAllByRole('heading', { level: 2 }).map(el => el.textContent))
-      .toEqual(['Nearby programmes', 'What engineers do', 'School preparation']);
+    expect(screen.getAllByRole('heading', { level: 2 }).map(el => el.textContent)).toEqual(['What engineers do', 'Additional reviewed topic']);
+    expect(screen.getByRole('tabpanel', { name: 'Career overview' })).toBeVisible();
+    fireEvent.keyDown(screen.getByRole('tab', { name: 'Educational options' }), { key: 'Enter' });
+    expect(screen.getAllByRole('heading', { level: 2 }).map(el => el.textContent)).toEqual(['School preparation', 'Nearby programmes']);
     expect(screen.getByRole('heading', { name: 'Your stage' })).toHaveAttribute('aria-current', 'step');
     expect(screen.getByRole('link', { name: 'Broaden location' }).getAttribute('href')).toContain('state=all');
     expect(mocks.getContext).toHaveBeenCalledWith('data-engineer', expect.objectContaining({ screenLocale: 'en', expectedUserId: 'student-1' }));
@@ -434,6 +441,7 @@ describe('Dream Career Student Guide page', () => {
     });
     const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
     render(<QueryClientProvider client={client}><DreamCareerPage /></QueryClientProvider>);
+    fireEvent.keyDown(await screen.findByRole('tab', { name: 'Study & colleges' }), { key: 'Enter' });
     const link = await screen.findByRole('link', { name: /Data engineering programme.*Sample Institute.*Related study route/ });
     const target = new URL(link.getAttribute('href')!, window.location.origin);
     expect(target.pathname).toBe('/colleges/institute-7');
@@ -452,6 +460,7 @@ describe('Dream Career Student Guide page', () => {
     } }).mockResolvedValue({ careerId: 'data-engineer', saved: true, location: {}, study: { status: 'no_reviewed_mapping', browse: false, offerings: [] } });
     const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
     render(<QueryClientProvider client={client}><DreamCareerPage /></QueryClientProvider>);
+    fireEvent.keyDown(await screen.findByRole('tab', { name: 'Study & colleges' }), { key: 'Enter' });
     expect(await screen.findByText(/Study options are temporarily unavailable/)).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(await screen.findByText(/No study routes have been reviewed/)).toBeVisible();
@@ -486,7 +495,7 @@ describe('Dream Career Student Guide page', () => {
     const link = await screen.findByRole('link', { name: /Digital Experience and Interface Design/ });
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/ux-designer/study-options');
-    expect(url.searchParams.get('returnTo')).toBe('/dream-careers/designer?from=dashboard');
+    expect(url.searchParams.get('returnTo')).toBe('/dream-careers/designer?from=dashboard#career-study');
   });
 
   it('retries and replaces only the failed relationship subsection', async () => {

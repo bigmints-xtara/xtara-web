@@ -26,7 +26,7 @@ assert.equal(fixture.uid, 'render-learner');
 const temp = await mkdtemp(path.join(os.tmpdir(), 'xtara-career-chrome-'));
 const manifest = {
   schemaVersion: 1, surface: 'web', passed: false, fixtureSha256: createHash('sha256').update(bytes).digest('hex'),
-  offeringId: 'offering-0ba28dd20f42330f', institutionId: 'institution:56930', sections: {}, captures: [], checks: {}, measurements: [],
+  offeringId: 'offering-0ba28dd20f42330f', institutionId: 'institution:56930', tabSections: {}, captures: [], checks: {}, measurements: [],
   source: 'Production Next.js route modules and CSS, isolated synthetic identity, local API fixture, self-hosted Inter, installed Chrome.',
 };
 const children = [];
@@ -78,7 +78,7 @@ try {
     assert(locale, 'Fixture needs one translated career screen.');
     await walkthrough({ browser, origin, fixture, session, manifest, output, viewport, width, locale, screenshots });
   }
-  manifest.checks = { sectionOrder: true, offeringIdentity: true, sparseCoverage: true, keyboardOfferingReturn: true, keyboardStudyResultsReturn: true,
+  manifest.checks = { sectionOrder: true, tabSelection: true, studyTabReturn: true, offeringIdentity: true, sparseCoverage: true, keyboardOfferingReturn: true, keyboardStudyResultsReturn: true,
     currentGradePhase: true, selectedProgrammeTitle: true, dashboardReturnLabel: true, publicGutters: true, translatedWidth: true, darkStylePreview: true, noHorizontalOverflow: true };
   manifest.passed = true;
 } catch (error) {

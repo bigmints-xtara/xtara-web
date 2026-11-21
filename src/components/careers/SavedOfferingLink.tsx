@@ -13,7 +13,10 @@ export default function SavedOfferingLink({ careerId, offering, label }: { caree
     link.current?.scrollIntoView?.({ block: 'center' });
     link.current?.focus({ preventScroll: true });
   }, [anchor]);
-  return <Link ref={link} id={anchor} className="group flex min-h-14 scroll-mt-24 items-center justify-between gap-3 py-4 focus-visible:outline-2 focus-visible:outline-ring"
+  return <Link ref={link} id={anchor} onNavigate={() => {
+    // Keep the exact row as the source entry for the browser's Back action.
+    window.history.replaceState(window.history.state, '', '#' + anchor);
+  }} className="group flex min-h-14 scroll-mt-24 items-center justify-between gap-3 py-4 focus-visible:outline-2 focus-visible:outline-ring"
     href={collegeOfferingHref(offering, `${savedCareerHref(careerId)}#${anchor}`)}>
     <span className="grid min-w-0 gap-1 break-words">
       <span className="text-base font-semibold text-primary group-hover:underline">{offering.title}</span>

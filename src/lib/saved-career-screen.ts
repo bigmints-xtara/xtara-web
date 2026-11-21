@@ -23,8 +23,11 @@ const block = z.discriminatedUnion('kind', [
 const screen = z.object({
   schemaVersion: z.literal(1), careerId: text, title: text, summary: z.string(), locale: z.enum(locales),
   englishFallback: z.boolean(), grade: z.string().optional(),
+  tabs: z.array(z.object({
+    id: z.enum(['overview', 'study']), title: text, sectionIds: z.array(text),
+  })).optional().catch(undefined),
   sections: z.array(z.object({
-    id: z.enum(['work', 'study', 'colleges', 'skills', 'progression', 'pay', 'sources']), title: text, blocks: z.array(block),
+    id: z.string().regex(/^[a-z][a-z0-9_-]*$/), title: text, blocks: z.array(block),
   })).min(1),
 });
 
