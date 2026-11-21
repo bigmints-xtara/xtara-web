@@ -19,7 +19,7 @@ import design from '@/components/journey/ExplorerJourney.module.css';
 import JourneySteps from '@/components/journey/JourneySteps';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import VisualCarousel from "@/components/careers/explorer/VisualCarousel";
 import { useAuth } from "@/context/AuthContext";
 import { useTranslations } from "@/i18n/language-provider";
 import { assessmentV2StorageKey, getAssessmentV2Catalog, parseDiscoveryResult } from "@/lib/assessment-v2";
@@ -275,75 +275,65 @@ export default function CareerDirectionPage() {
     router.push(owner ? '/dashboard' : '/assessment/save');
   };
 
+  const matches = careers.filter(career => `${career.title} ${career.englishTitle || ""}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+  const journey = journeyCopy[locale];
+
   return (
     <div className={styles.surface}>
       <Header />
       <main className={`${explorer.explorer} ${design.shell}`} style={sceneTone}>
         <div className="site-frame">
-          <JourneySteps step={2} locale={locale} />
+          {!owner && <JourneySteps step={2} locale={locale} />}
           <Link href={owner ? "/dashboard" : "/assessment/discovery"} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-4 w-4" />{owner ? mvpNavigationCopy[locale].myDirection : text.results}
           </Link>
 
-          <header className={design.directionHeader}>
-            <div>
-              <p className={design.eyebrow}>{text.selectedDirection}</p>
-              <h1 className={design.heading}>{direction.title}</h1>
+          <header className={design.chooserHeading}>
+            <div className={design.chooserDirectionArt} aria-hidden="true">
+              <ExplorerScene illustration={publicDirection?.illustration} placeholder="" decorative bubble sizes="72px" />
             </div>
-            <div className={design.directionArt}>
-              <ExplorerScene illustration={publicDirection?.illustration} placeholder={journeyCopy[locale].illustration}
-                bubble decorative sizes="128px" />
+            <div><p className={design.eyebrow}>{text.selectedDirection}</p>
+              <h1 id="dream-careers-title" className={design.heading}>{direction.title}</h1>
+              <p className="mt-2 text-sm text-muted-foreground">{text.max}</p>
             </div>
           </header>
-
-          <section className="mt-8" aria-labelledby="dream-careers-title">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 id="dream-careers-title" className={styles.heading}>{text.title}</h2>
-                <p className="mt-2 text-sm text-muted-foreground">{text.max}</p>
-              </div>
-
-            </div>
-
+          <section aria-labelledby="dream-careers-title">
             {loading && !careers.length ? <p className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />{text.loading}</p> : null}
-            <label className="mt-6 block text-sm font-medium">{({ en: 'Find a career', ml: 'കരിയർ കണ്ടെത്തൂ', hi: 'करियर खोजें', ta: 'தொழிலைத் தேடுங்கள்' })[locale]}
+            <label className={design.chooserSearch}>{({ en: 'Find a career', ml: 'കരിയർ കണ്ടെത്തൂ', hi: 'करियर खोजें', ta: 'தொழிலைத் தேடுங்கள்' })[locale]}
               <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} className={styles.search} />
             </label>
-            {careers.length > 0 && !careers.some((career) => `${career.title} ${career.englishTitle || ''}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())) ? <p role="status" className="mt-6">{({ en: 'No careers found. Try another name.', ml: 'കരിയറുകൾ കണ്ടെത്താനായില്ല. മറ്റൊരു പേര് പരീക്ഷിക്കൂ.', hi: 'कोई करियर नहीं मिला। दूसरा नाम खोजें।', ta: 'தொழில்கள் கிடைக்கவில்லை. வேறு பெயரைத் தேடுங்கள்.' })[locale]}</p> : null}
-            <div className={styles.careerGrid}>
-              {careers.filter((career) => `${career.title} ${career.englishTitle || ""}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())).map((career) => {
+            {careers.length > 0 && !matches.length ? <p role="status" className="mt-6">{({ en: 'No careers found. Try another name.', ml: 'കരിയറുകൾ കണ്ടെത്താനായില്ല. മറ്റൊരു പേര് പരീക്ഷിക്കൂ.', hi: 'कोई करियर नहीं मिला। दूसरा नाम खोजें।', ta: 'தொழில்கள் கிடைக்கவில்லை. வேறு பெயரைத் தேடுங்கள்.' })[locale]}</p> : null}
+            <VisualCarousel key={areaId + ":" + query} items={matches} label={text.title}
+              previous={journey.previous} next={journey.next} hint={journey.swipe}
+              renderItem={(index, active) => {
+                const career = matches[index];
                 const selected = selectedIds.includes(career.id);
-                const artwork = artworkFor(career.id);
+                const record = publicExplorer?.careers.find(item => item.id === career.id);
+                const artwork = resolveCareerArtwork(publicExplorer, record, publicDirection?.id);
+                const action = selected ? ({ en: "Remove", ml: "നീക്കുക", hi: "हटाएँ", ta: "நீக்கு" })[locale]
+                  : ({ en: "Choose", ml: "തിരഞ്ഞെടുക്കൂ", hi: "चुनें", ta: "தேர்ந்தெடுக்கவும்" })[locale];
                 return (
-                  <Card key={career.id} className={`${styles.careerCard} ${design.careerCard}`} data-selected={selected}>
-                    <CardContent className={styles.careerBody}>
-                      <div className={styles.cardToolbar}><div className={design.careerArt}>
-                        <ExplorerScene illustration={artwork.illustration} placeholder={journeyCopy[locale].illustration}
-                          bubble decorative sizes="64px" />
+                  <div className={explorer.choiceBody}>
+                    <ExplorerScene illustration={artwork.illustration} contextTitle={artwork.contextTitle}
+                      placeholder={journey.illustration} bubble decorative sizes="(max-width: 600px) 64vw, 340px" />
+                    <div className={explorer.cardCopy}>
+                      <h2>{career.title}</h2>
+                      {locale !== "en" && career.englishTitle && <small>{career.englishTitle}</small>}
+                      <p>{record?.cardSummary || career.summary}</p>
+                      <div className={design.chooserActions} style={{ visibility: active ? "visible" : "hidden" }}>
+                        <Button type="button" variant={selected ? "secondary" : "default"} disabled={saving}
+                          onClick={() => void toggle(career.id)} aria-pressed={selected} aria-label={action + " " + career.title}>
+                          {selected ? <Check aria-hidden="true" /> : <Plus aria-hidden="true" />}{action}
+                        </Button>
+                        <Button type="button" variant="link" disabled={saving} aria-label={career.title}
+                          onClick={(event) => { event.currentTarget.focus({ preventScroll: true }); openPreview(career); }}>
+                          {text.details}<ArrowRight aria-hidden="true" />
+                        </Button>
                       </div>
-                      <Button type="button" variant={selected ? "default" : "outline"} className={styles.selectButton} disabled={saving} onClick={() => void toggle(career.id)} aria-pressed={selected} aria-label={`${selected ? ({ en: "Remove", ml: "നീക്കുക", hi: "हटाएँ", ta: "நீக்கு" })[locale] : ({ en: "Choose", ml: "തിരഞ്ഞെടുക്കൂ", hi: "चुनें", ta: "தேர்ந்தெடுக்கவும்" })[locale]} ${career.title}`}>
-                        {selected ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
-                        {selected ? ({ en: 'Remove', ml: 'നീക്കുക', hi: 'हटाएँ', ta: 'நீக்கு' })[locale] : ({ en: 'Choose', ml: 'തിരഞ്ഞെടുക്കൂ', hi: 'चुनें', ta: 'தேர்ந்தெடுக்கவும்' })[locale]}
-                      </Button></div>
-                      <Button variant="surface" type="button" disabled={saving} onClick={(event) => {
-                          event.currentTarget.focus({ preventScroll: true });
-                          openPreview(career);
-                        }} className={styles.careerRead} aria-label={career.title}>
-
-                        <span data-career-copy><span className={styles.careerTitle}>{career.title}</span>
-                          {locale !== "en" && career.englishTitle ? <span className="mt-1 block text-xs text-muted-foreground">{career.englishTitle}</span> : null}
-                          {artwork.contextTitle && <span className={design.artworkCredit}>{artwork.contextTitle}</span>}
-                          <span className={styles.careerSummary}>{career.summary}</span>
-                        </span>
-                        <span className={styles.details}>{text.details}<ArrowRight size={14} aria-hidden="true" /></span>
-                      </Button>
-
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
-              })}
-            </div>
-
+              }} />
             {!careers.length ? <p role="status" className="py-6 text-muted-foreground">{({
               en: 'No recommended careers are available for this direction yet.',
               ml: 'ഈ ദിശയിൽ ശുപാർശ ചെയ്ത കരിയറുകൾ ഇപ്പോൾ ലഭ്യമല്ല.',
@@ -351,7 +341,7 @@ export default function CareerDirectionPage() {
               ta: 'இந்தத் திசையில் பரிந்துரைக்கப்பட்ட தொழில்கள் இன்னும் கிடைக்கவில்லை.',
             })[locale]}</p> : null}
 
-            <div className={styles.selectionBar}>
+            <div className={`${styles.selectionBar} ${design.chooserFooter}`}>
               <div><p className="text-sm font-semibold" aria-live="polite" aria-label={`${selectedIds.length} / 3 ${text.selected}`}>{selectedIds.length} / 3</p><p className={styles.selectionNames}>{careers.filter((career) => selectedIds.includes(career.id)).map((career) => career.title).join(', ') || (owner ? dashboardCopy[locale].chooseCareersDescription : text.chooseOne)}</p></div>
               <Button size="lg" className="min-h-11" disabled={saving || (!owner && !selectedIds.length)} onClick={continueJourney}>
                 {saving ? text.saving : ({ en: 'Continue', ml: 'തുടരൂ', hi: 'आगे बढ़ें', ta: 'தொடர்க' })[locale]}{saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <ArrowRight className="ml-2 h-4 w-4" />}

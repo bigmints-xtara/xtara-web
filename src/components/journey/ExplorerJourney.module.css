@@ -199,3 +199,11 @@
   font-size: .75rem;
   line-height: 1.35;
 }
+
+.chooserHeading { display: flex; align-items: center; justify-content: center; text-align: start; gap: 16px; margin: 20px auto; }
+.chooserDirectionArt { width: clamp(52px, 7vw, 80px); flex: none; }
+.chooserDirectionArt > div { width: 100%; height: auto; aspect-ratio: 1; min-height: 0; }
+.chooserSearch { display: grid; gap: 6px; max-width: 30rem; margin: 16px auto; font-size: .875rem; font-weight: 600; }
+.chooserActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px; margin: 12px auto 0; }
+.chooserActions button { min-height: 44px; white-space: normal; }
+.chooserFooter { position: static; margin-top: 20px; }

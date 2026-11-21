@@ -26,5 +26,19 @@
     "gap": "Form editors consume DOM change events, option children and native validation. Radix Select has a different event and option model.",
     "consumer": "Admin content editors, study options and profile forms. Flutter retains its platform pickers.",
     "verification": "The local interactive picker specimen and web form tests exercise real option changes."
+  },
+  "src/components/journey/DiscoveryResultPage.tsx#DiscoveryResultPage": {
+    "purpose": "Share assessment direction selection and verified save across initial results and returning learner Explorer.",
+    "closest": "Existing DiscoveryResultPage and VisualCarousel",
+    "gap": "The two routes need different presentation with the same eligible directions, owner isolation and verified write.",
+    "consumer": "Assessment discovery and the My Direction change action. Flutter uses its native ExplorerCarousel.",
+    "verification": "DiscoveryResultPage tests and local Explorer browser journey."
+  },
+  "src/app/assessment/discovery/page.tsx#AssessmentDiscovery": {
+    "purpose": "Share assessment direction selection and verified save across initial results and returning learner Explorer.",
+    "closest": "Existing DiscoveryResultPage and VisualCarousel",
+    "gap": "The two routes need different presentation with the same eligible directions, owner isolation and verified write.",
+    "consumer": "Assessment discovery and the My Direction change action. Flutter uses its native ExplorerCarousel.",
+    "verification": "DiscoveryResultPage tests and local Explorer browser journey."
   }
 }

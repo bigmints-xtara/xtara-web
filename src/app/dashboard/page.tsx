@@ -35,9 +35,11 @@ export default function DashboardPage() {
     return (
         <div className={styles.surface}>
             <Navbar />
-            <UserDashboard />
-            <StudentGuidanceEntry />
-            <OrganizationMembershipCard />
+            <div className={styles.dashboardStack}>
+              <UserDashboard />
+              <StudentGuidanceEntry />
+              <OrganizationMembershipCard />
+            </div>
             <Footer />
         </div>
     );

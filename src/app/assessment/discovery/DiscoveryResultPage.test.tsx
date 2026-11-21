@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { assessmentV2StorageKey, type DiscoveryResult } from "@/lib/assessment-v2";
@@ -25,6 +25,7 @@ vi.mock("@/context/AuthContext", () => ({ useAuth: () => ({ user: null }) }));
 vi.mock("@/i18n/language-provider", () => ({ useTranslations: () => ({ locale: "en" }) }));
 
 import DiscoveryResultPage from "./page";
+import DirectionPicker from "@/components/journey/DiscoveryResultPage";
 
 const result: DiscoveryResult = {
   definitionId: "career-discovery",
@@ -77,6 +78,19 @@ describe("discovery result chooser", () => {
     localStorage.clear();
     localStorage.setItem(assessmentV2StorageKey, JSON.stringify(result));
     mocks.push.mockReset();
+  });
+
+  it("lets a returning learner browse recommended directions and choose from Explorer", async () => {
+    const { container } = render(<DirectionPicker choosing />);
+    expect(await screen.findByRole("link", { name: "My Direction" })).toHaveAttribute("href", "/dashboard");
+    expect(screen.queryByText("Assessment insights")).not.toBeInTheDocument();
+    const carousel = container.querySelector('[aria-roledescription="carousel"]')!;
+    const before = carousel.querySelector('[data-active="true"] h2')?.textContent;
+    fireEvent.click(within(carousel as HTMLElement).getByRole("button", { name: "Next" }));
+    const active = carousel.querySelector<HTMLElement>('[data-active="true"]')!;
+    expect(active.querySelector("h2")?.textContent).not.toBe(before);
+    fireEvent.click(within(active).getByRole("button", { name: /Choose this direction:/ }));
+    await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(expect.stringMatching(/^\/assessment\/careers\//)));
   });
 
   it("puts the direction decision first without badges or assessment jargon", async () => {

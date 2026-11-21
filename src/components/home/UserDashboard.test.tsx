@@ -8,6 +8,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assessmentV2StorageKey, type DiscoveryResult } from '@/lib/assessment-v2';
 import { createAreaDirectionPlan, directionStorageKey, selectDirectionRole, setDreamCareers } from '@/lib/direction';
 
+vi.mock('@/components/careers/explorer/useCareerExplorer', () => ({
+  useCareerExplorer: () => ({ data: { careers: [{
+    id: 'software-developer', title: 'Software Engineering',
+    illustration: { url: 'https://xtara.ai/media/software.webp', alt: 'Software Engineering' },
+  }], directions: [] } }),
+}));
+
 vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
 
 const mocks = vi.hoisted(() => ({
@@ -223,6 +230,9 @@ describe('pursued-area learner dashboard', () => {
     const page = container.textContent;
     expect(page).toContain('Build useful tools and solve problems with technology.');
     expect(page).toContain('Finding out why something works');
+    const thumbnail = container.querySelector('a[href="/dream-careers/software-developer?from=dashboard"] img');
+    expect(thumbnail?.getAttribute('src')).toBe('https://xtara.ai/media/software.webp');
+    expect(thumbnail?.getAttribute('alt')).toBe('');
     expect(page).toContain('Computing degree · Sample College');
     expect(page!.indexOf('Computing degree')).toBeLessThan(page!.indexOf('Try sketching'));
     expect(page).toContain('Try sketching a tool for a problem at school.');

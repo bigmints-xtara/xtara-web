@@ -4,6 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Compass, GraduationCap, MessageCircleMore, Sparkles } from "lucide-react";
 import CareerConversation from "@/components/career-path/CareerConversation";
+import { ExplorerScene, explorerTone } from "@/components/careers/explorer/ExplorerScene";
+import { resolveCareerArtwork } from "@/components/careers/explorer/career-artwork";
+import { useCareerExplorer } from "@/components/careers/explorer/useCareerExplorer";
+import { resolveExplorerDirection } from "@/lib/career-direction-imagery";
 import DirectionImage from "@/components/journey/DirectionImage";
 import styles from "@/components/journey/journey.module.css";
 import { Button } from "@/components/ui/button";
@@ -30,7 +34,9 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
   const study = studyOptionsCopy[locale];
   const careerText = savedCareerCopy[locale];
   const navigation = mvpNavigationCopy[locale];
-  const changeHref = hasAssessment ? "/assessment/discovery" : "/assessment";
+  const { data: catalogue } = useCareerExplorer(locale);
+  const presentation = resolveExplorerDirection(catalogue?.directions, direction.id)?.presentation;
+  const changeHref = hasAssessment ? "/explore?choose=direction" : "/assessment";
   const editHref = canEditCareers ? `/assessment/careers/${encodeURIComponent(direction.id)}` : changeHref;
   const hasGuidance = direction.guidance.length > 0;
   const hasCareers = direction.careers.length > 0;
@@ -40,7 +46,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
       {greeting && <p className="text-sm font-medium text-muted-foreground">{greeting}</p>}
       <h1 className="mt-1 text-primary">{navigation.myDirection}</h1>
 
-      <section data-testid="career-direction-hero" className={styles.directionStrip} aria-labelledby="career-direction-title">
+      <section data-testid="career-direction-hero" className={styles.directionStrip} style={explorerTone(presentation)} aria-labelledby="career-direction-title">
         <DirectionImage directionId={direction.id} />
         <div className={styles.stripCopy}>
           <div className={styles.overviewEyebrow}><Compass size={20} aria-hidden="true" />{text.careerDirection}</div>
@@ -64,11 +70,15 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
           <ol data-testid="dream-career-list" className={styles.savedCareerRows}>
             {direction.careers.map((career) => {
               const href = savedCareerHref(career.id);
+              const artwork = resolveCareerArtwork(catalogue, catalogue?.careers.find(item => item.id === career.id), direction.id);
               const offering = career.study?.offerings[0];
               const browse = career.study?.browse ?? isStudyOptionsCareer(career.id);
               return (
                 <li key={career.id} className={styles.savedCareerRow}>
                   <Link href={href} className={styles.savedCareerAction}>
+                    <div className={styles.savedArt} aria-hidden="true">
+                      <ExplorerScene illustration={artwork.illustration} decorative placeholder="" sizes="96px" />
+                    </div>
                     <span className="min-w-0">
                       <span className={styles.careerTitle}>{career.title}</span>
                       {career.summary.trim() && <span className={styles.careerSummary}>{career.summary}</span>}
