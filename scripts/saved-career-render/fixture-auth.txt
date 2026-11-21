@@ -1,0 +1,17 @@
+// This adapter is copied only into a disposable rendering build.
+import type { User } from 'firebase/auth';
+
+let currentUser: User | null = null;
+export function getFirebaseAuth() { return { get currentUser() { return currentUser; } }; }
+export function getFirebaseConfigurationError() { return null; }
+export function onAuthStateChanged(_auth: ReturnType<typeof getFirebaseAuth>, notify: (user: User | null) => void) {
+  let active = true;
+  const session = sessionStorage.getItem('xtara-render-session');
+  if (session) {
+    const { uid, token } = JSON.parse(session);
+    if (uid !== 'render-learner' || typeof token !== 'string' || !token) throw new Error('Expected synthetic rendering identity');
+    currentUser = { uid, displayName: 'Render Learner', isAnonymous: false, getIdToken: async () => token } as User;
+  } else currentUser = null;
+  queueMicrotask(() => { if (active) notify(currentUser); });
+  return () => { active = false; };
+}

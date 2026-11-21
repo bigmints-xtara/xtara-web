@@ -26,7 +26,7 @@ const mocks = vi.hoisted(() => ({
   user: null as null | { uid: string; isAnonymous: boolean },
 }));
 
-vi.mock('@/lib/mvp-navigation', () => ({ get MVP_NAVIGATION_ENABLED() { return mocks.mvp; } }));
+vi.mock('@/lib/mvp-navigation', async importOriginal => ({ ...await importOriginal<typeof import('@/lib/mvp-navigation')>(), get MVP_NAVIGATION_ENABLED() { return mocks.mvp; } }));
 // Artwork transport is covered by CareerDirectionArtwork.test.tsx.
 vi.mock('@/components/journey/DirectionImage', () => ({ default: () => null }));
 vi.mock('@/components/Header', () => ({ default: () => <header>Header</header> }));
@@ -391,6 +391,32 @@ describe('Dream Career Student Guide page', () => {
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
     expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard');
+  });
+
+  it('uses the authenticated reading order and study actions without fetching legacy editorial sources', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'student-1', isAnonymous: false };
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('from=dashboard') as ReturnType<typeof useSearchParams>);
+    mocks.getContext.mockResolvedValue({
+      saved: true, careerId: 'data-engineer', location: {}, assessmentReasons: [],
+      screen: { schemaVersion: 1, careerId: 'data-engineer', locale: 'en', title: 'Shared career title',
+        summary: 'Shared introduction', englishFallback: false, sections: [
+          { id: 'colleges', title: 'Nearby programmes', blocks: [{ kind: 'action', action: 'all_states', label: 'Broaden location' }] },
+          { id: 'work', title: 'What engineers do', blocks: [{ kind: 'list', items: ['Design data flows'] }] },
+          { id: 'study', title: 'School preparation', blocks: [{ kind: 'heading', text: 'Your stage', phase: 'afterGrade10', current: true }] },
+        ] },
+    });
+    render(<DreamCareerPage />);
+    await screen.findByRole('heading', { name: 'Shared career title', level: 1 });
+    expect(screen.getByRole('link', { name: 'My Direction' })).toHaveAttribute('href', '/dashboard');
+    expect(screen.getAllByRole('heading', { level: 2 }).map(el => el.textContent))
+      .toEqual(['Nearby programmes', 'What engineers do', 'School preparation']);
+    expect(screen.getByRole('heading', { name: 'Your stage' })).toHaveAttribute('aria-current', 'step');
+    expect(screen.getByRole('link', { name: 'Broaden location' }).getAttribute('href')).toContain('state=all');
+    expect(mocks.getContext).toHaveBeenCalledWith('data-engineer', expect.objectContaining({ screenLocale: 'en', expectedUserId: 'student-1' }));
+    expect(mocks.getGuide).not.toHaveBeenCalled();
+    expect(mocks.getOverview).not.toHaveBeenCalled();
+    expect(mocks.getDirection).not.toHaveBeenCalled();
   });
 
   it('opens a reviewed offering from a saved career even when its overview is unpublished', async () => {

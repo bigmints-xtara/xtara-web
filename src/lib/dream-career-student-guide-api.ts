@@ -1,3 +1,4 @@
+import { parseSavedCareerScreen } from '@/lib/saved-career-screen';
 import { xtaraApi } from '@/lib/api/client';
 import { xtaraApiOperationPath } from '@/lib/api/generated/xtara-api-operations';
 import type {
@@ -24,10 +25,12 @@ export async function getDreamCareerStudentGuide(
 
 export async function getDreamCareerStudentContext(
   careerId: string,
-  options: { signal?: AbortSignal; expectedUserId?: string } = {},
+  options: { signal?: AbortSignal; expectedUserId?: string; screenLocale?: DreamCareerGuideLocale } = {},
 ): Promise<CareerStudentContextResponse> {
   const path = xtaraApiOperationPath('getMeDreamCareersCareerIdStudentContext', { careerId });
-  return xtaraApi.get<CareerStudentContextResponse>(path, { signal: options.signal, expectedUserId: options.expectedUserId });
+  const query = options.screenLocale ? `?${new URLSearchParams({ screen: '1', locale: options.screenLocale })}` : '';
+  const context = await xtaraApi.get<CareerStudentContextResponse>(path + query, { signal: options.signal, expectedUserId: options.expectedUserId });
+  return context.screen ? { ...context, screen: parseSavedCareerScreen(context.screen) } : context;
 }
 
 function appendLocation(

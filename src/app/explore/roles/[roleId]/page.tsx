@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, GraduationCap, MessageCircleMore, Plus, X } from 'lucide-react';
 
 import SlideshowOverlay from '@/components/career-path/SlideshowOverlay';
+import SavedCareerContractView from '@/components/careers/SavedCareerContractView';
 import SavedCareerStudy from '@/components/careers/SavedCareerStudy';
 import SavedCareerReader from '@/components/careers/SavedCareerReader';
 import PilotCareerSpecializations from '@/components/careers/PilotCareerSpecializations';
@@ -43,7 +44,7 @@ import {
 } from '@/lib/direction';
 import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
 import { loadDiscoveryResult } from '@/lib/assessment-v2';
-import { MVP_NAVIGATION_ENABLED } from '@/lib/mvp-navigation';
+import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from '@/lib/mvp-navigation';
 import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
 import { isStudyOptionsCareer, studyOptionsHref } from '@/lib/study-options';
 import type {
@@ -179,11 +180,16 @@ function DreamCareerContent() {
     }
   }, [guideLocale, roleId, studentContext?.location]);
 
+  const savedEntry = MVP_NAVIGATION_ENABLED && Boolean(user && !user.isAnonymous) && from === 'dashboard';
+  const screen = savedEntry && studentContext?.screen?.schemaVersion === 1 && studentContext.screen.careerId === roleId
+    && studentContext.screen.locale === guideLocale ? studentContext.screen : undefined;
+  const waitForScreen = savedEntry && !contextFailed && !studentContext;
   useEffect(() => {
+    if (authLoading || waitForScreen || screen) return;
     const controller = new AbortController();
     void loadGuide(controller.signal);
     return () => controller.abort();
-  }, [loadGuide]);
+  }, [authLoading, waitForScreen, screen, loadGuide]);
 
   const contextUserId = user?.uid;
   const contextAnonymous = user?.isAnonymous;
@@ -196,14 +202,14 @@ function DreamCareerContent() {
     if (!contextUserId || contextAnonymous) return;
     const controller = new AbortController();
     setContextFailed(false);
-    getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId })
+    getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId, ...(savedEntry ? { screenLocale: guideLocale } : {}) })
       .then(context => { if (!controller.signal.aborted) setStudentContext(context); })
       .catch(() => { if (!controller.signal.aborted) setContextFailed(true); });
-    getDirectionFromApi(contextUserId)
+    if (!savedEntry) getDirectionFromApi(contextUserId)
       .then(direction => { if (!controller.signal.aborted) setRemotePlan(direction); })
       .catch(() => undefined);
     return () => { controller.abort(); selectionGeneration.current += 1; };
-  }, [roleId, contextUserId, contextAnonymous, contextAttempt]);
+  }, [roleId, contextUserId, contextAnonymous, contextAttempt, savedEntry, guideLocale]);
 
   const careerId = response?.career.id ?? roleId;
   const studyLink = (studentContext?.study?.browse ?? isStudyOptionsCareer(careerId)) && (
@@ -325,15 +331,16 @@ function DreamCareerContent() {
     }
   };
 
-  if (authLoading || (loading && !response)) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
-  if (MVP_NAVIGATION_ENABLED && signedIn && from === 'dashboard' && careerIdentity) {
+  if (authLoading || (!screen && (waitForScreen || (loading && !response)))) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
+  const savedIdentity = screen ? { id: screen.careerId, title: screen.title, summary: screen.summary, imageUrl: undefined } : careerIdentity;
+  if (savedEntry && savedIdentity) {
     const available = (key: CareerGuideQuestionId) => {
       const status = response?.coverage.byQuestion[key]?.status;
       return status === 'available' || status === 'partial';
     };
-    const slides = response ? careerConversationFromGuides([response], locale) : [];
+    const slides = !screen && response ? careerConversationFromGuides([response], locale) : [];
     const college = <>
-      <SavedCareerStudy careerId={careerIdentity.id} locale={locale} study={studentContext?.study} guide={response}
+      <SavedCareerStudy careerId={savedIdentity.id} locale={locale} study={studentContext?.study} guide={response}
         loading={!contextFailed && !studentContext} failed={contextFailed}
         onRetry={() => {
           setContextAttempt(attempt => attempt + 1);
@@ -341,23 +348,23 @@ function DreamCareerContent() {
         }} />
       {pilotSpecializations}
     </>;
-    return <div className={styles.surface}><Header /><main key={careerIdentity.id}>
+    return <div className={styles.surface}><Header /><main key={savedIdentity.id}>
       <header className="border-b border-border bg-muted/35">
         <div className="site-frame grid items-center gap-3 pt-3 pb-6 sm:pt-5 sm:pb-8">
-          <Link href={backHref} className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-primary hover:underline"><ArrowLeft size={16} aria-hidden="true" />{text.back}</Link>
+          <Link href={backHref} className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-primary hover:underline"><ArrowLeft size={16} aria-hidden="true" />{mvpNavigationCopy[guideLocale].myDirection}</Link>
           <div className="flex min-w-0 items-center justify-between gap-4">
             <div className="min-w-0">
-              {area && <p className="mb-2 text-sm font-semibold text-muted-foreground">{area.title}</p>}
-              <h1 className="text-3xl leading-tight font-semibold tracking-[-.04em] break-words text-primary sm:text-5xl">{careerIdentity.title}</h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">{careerIdentity.summary}</p>
+              {!screen && area && <p className="mb-2 text-sm font-semibold text-muted-foreground">{area.title}</p>}
+              <h1 className="text-3xl leading-tight font-semibold tracking-[-.04em] break-words text-primary sm:text-5xl">{savedIdentity.title}</h1>
+              <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">{savedIdentity.summary}</p>
             </div>
-            {careerIdentity.imageUrl && <Image unoptimized src={careerIdentity.imageUrl} alt="" width={208} height={140} className="hidden h-32 w-48 shrink-0 rounded-2xl object-contain sm:block" />}
+            {savedIdentity.imageUrl && <Image unoptimized src={savedIdentity.imageUrl} alt="" width={208} height={140} className="hidden h-32 w-48 shrink-0 rounded-2xl object-contain sm:block" />}
           </div>
         </div>
       </header>
-      {response ? <DreamCareerStudentGuide response={response} locale={guideLocale} savedCareer={{ college, grade: studentContext?.grade }}
+      {screen ? <SavedCareerContractView screen={screen} retry={() => setContextAttempt(attempt => attempt + 1)} /> : response ? <DreamCareerStudentGuide response={response} locale={guideLocale} savedCareer={{ college, grade: studentContext?.grade }}
         showCourseOptions={false} onRetryRelationship={subsection => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
-        : <SavedCareerReader careerId={careerIdentity.id} locale={guideLocale} intro={careerIdentity.summary} college={college} />}
+        : <SavedCareerReader careerId={savedIdentity.id} locale={guideLocale} intro={savedIdentity.summary} college={college} />}
       {response && (available('whatYouDo') || available('educationRoutes') || available('starterActivity')) && slides.length > 0 &&
         <div className="site-frame pb-8"><Button variant="outline" onClick={() => setConversationOpen(true)}><MessageCircleMore aria-hidden="true" />{text.conversation}</Button></div>}
     </main><Footer /><SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={slides} /></div>;

@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import SavedOfferingLink from './SavedOfferingLink';
 import Link from 'next/link';
 import { ArrowRight, GraduationCap } from 'lucide-react';
 import type { Locale } from '@/i18n/config';
 import type { CareerStudyPreview, StudyOffering } from '@/lib/study-options';
-import { collegeOfferingHref, isStudyOptionsCareer, savedCareerHref, studyOfferingAnchor, studyOptionsHref } from '@/lib/study-options';
+import { isStudyOptionsCareer, savedCareerHref, studyOptionsHref } from '@/lib/study-options';
 import type { DreamCareerStudentGuideResponse } from '@/types/dream-career-student-guide';
 import { studyOptionsCopy } from './study-options-copy';
 
@@ -32,31 +32,9 @@ export default function SavedCareerStudy({ careerId, locale, study, guide, loadi
     : failed || guide?.resolved.courseOptions.status === 'mapping_unavailable'
       || guide?.relationshipErrors.some(error => error.subsection === 'courseOptions');
   const offersHref = studyOptionsHref(careerId, href);
-  const restored = useRef('');
-  useEffect(() => {
-    const target = location.hash.slice(1);
-    if (!target.startsWith('study-offering-') || restored.current === target) return;
-    const row = document.getElementById(target);
-    if (row) {
-      row.scrollIntoView?.({ block: 'center' });
-      row.querySelector('a')?.focus({ preventScroll: true });
-      restored.current = target;
-    }
-  }, [offerings]);
-
   return <div className="grid min-w-0 gap-3">
     {offerings.length > 0 && <ul className="divide-y divide-border rounded-xl border border-border bg-card px-4">
-      {offerings.map(offering => <li key={offering.offeringId} id={studyOfferingAnchor(offering.offeringId)} className="scroll-mt-24">
-        <Link className="group flex min-h-14 items-center justify-between gap-3 py-4 focus-visible:outline-2 focus-visible:outline-ring"
-          href={collegeOfferingHref(offering, `${href}#${studyOfferingAnchor(offering.offeringId)}`)}>
-          <span className="grid min-w-0 gap-1 break-words">
-            <span className="text-base font-semibold text-primary group-hover:underline">{offering.title}</span>
-            <span>{offering.institutionName}</span>
-            <span className="text-sm text-muted-foreground">{[offering.city, offering.state, text[offering.match]].filter(Boolean).join(' · ')}</span>
-          </span>
-          <ArrowRight size={17} aria-hidden="true" className="shrink-0 text-primary" />
-        </Link>
-      </li>)}
+      {offerings.map(offering => <li key={offering.offeringId}><SavedOfferingLink careerId={careerId} offering={offering} label={text[offering.match]} /></li>)}
     </ul>}
     {unavailable ? <div role="status"><p>{text.unavailable}</p><button className="min-h-11 font-semibold text-primary underline" onClick={onRetry}>{text.retry}</button></div>
       : !offerings.length && loading ? <p role="status">{text.loading}</p>

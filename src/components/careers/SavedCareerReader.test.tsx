@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
 import type { Locale } from '@/i18n/config';
 import { getCareerOverview } from '@/lib/career-overview-api';
@@ -29,6 +29,7 @@ it.each(['en', 'hi', 'ml', 'ta'] as Locale[])('uses the requested %s layout, lan
   expect(screen.queryByText(copy.school)).toBeNull();
   expect(Boolean(screen.queryByText(copy.englishFallback))).toBe(locale !== 'en');
   expect(screen.getByText('Programme handbook')).toHaveAttribute('href', 'https://example.edu/programme');
-  fireEvent.change(screen.getByRole('combobox', { name: copy.jump }), { target: { value: 'courses-and-colleges' } });
-  expect(document.activeElement).toBe(document.getElementById('courses-and-colleges'));
+  fireEvent.keyDown(screen.getByRole('button', { name: copy.jump }), { key: 'ArrowDown' });
+  fireEvent.click(await screen.findByRole('menuitem', { name: copy.colleges }));
+  await waitFor(() => expect(document.activeElement).toBe(document.getElementById('courses-and-colleges')));
 });

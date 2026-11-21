@@ -5,6 +5,7 @@ import type { Locale } from '@/i18n/config';
 import { getCareerOverview } from '@/lib/career-overview-api';
 import { XtaraApiError } from '@/lib/api/client';
 import type { CareerOverview } from '@/types/career-overview';
+import SavedCareerSections from './SavedCareerSections';
 import { savedCareerCopy } from './saved-career-copy';
 import { studyOptionsCopy } from './study-options-copy';
 
@@ -97,29 +98,5 @@ export default function SavedCareerReader({ careerId, locale, intro, about = [],
   </> });
   const pay = overview?.earnings;
   if (pay?.status === 'available') sections.push({ id: 'pay-outlook', title: copy.pay, content: <><p>{pay.description}</p><p className="text-sm">{[pay.geography, pay.experience, pay.measure, pay.population, pay.asOf].filter(Boolean).join(' · ')}</p>{sources(pay.sourceIds)}</> });
-  return <div data-testid="saved-career-reader" className="site-frame pb-14">
-    <nav aria-label={copy.sections} className="border-b border-border py-2">
-      <label className="block py-1 sm:hidden">
-        <span className="sr-only">{copy.jump}</span>
-        <select value="" className="min-h-11 w-full rounded-lg border border-border bg-background px-3 text-sm font-semibold text-primary focus-visible:outline-2 focus-visible:outline-ring"
-          onChange={event => {
-            const target = document.getElementById(event.target.value);
-            if (!target) return;
-            window.history.pushState(null, '', `#${target.id}`);
-            target.focus({ preventScroll: true });
-            target.scrollIntoView?.({ block: 'start' });
-          }}>
-          <option value="" disabled>{copy.jump}</option>
-          {sections.map(section => <option key={section.id} value={section.id}>{section.title}</option>)}
-        </select>
-      </label>
-      <div className="hidden flex-wrap gap-x-5 sm:flex">{sections.map(section =>
-      <a href={`#${section.id}`} key={section.id} className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline-offset-4 hover:underline">{section.title}</a>)}</div></nav>
-    {(guideInEnglish || overview?.translationFallback) && locale !== 'en' && <p className="mt-4 text-sm text-muted-foreground">{fallbackText ?? copy.englishFallback}</p>}
-    <div className="divide-y divide-border">{sections.map(section => <section key={section.id} id={section.id} tabIndex={-1} aria-labelledby={`${section.id}-title`}
-      className="grid min-w-0 scroll-mt-24 gap-4 py-6 sm:py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,2.5fr)] md:gap-8">
-      <h2 id={`${section.id}-title`} className="text-xl leading-tight font-semibold tracking-tight text-primary sm:text-2xl">{section.title}</h2>
-      <div className="min-w-0 max-w-prose space-y-4 text-base leading-7 break-words text-muted-foreground">{section.content}</div>
-    </section>)}</div>{guideSources}
-  </div>;
+  return <SavedCareerSections sections={sections} locale={locale} englishFallback={guideInEnglish || overview?.translationFallback} fallbackText={fallbackText}>{guideSources}</SavedCareerSections>;
 }

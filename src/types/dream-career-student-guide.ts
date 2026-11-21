@@ -359,6 +359,7 @@ export interface DreamCareerStudentGuideResponse {
 }
 
 export interface CareerStudentContextResponse {
+  screen?: import('@/lib/saved-career-screen').SavedCareerScreen;
   study?: import("@/lib/study-options").CareerStudyPreview;
   careerId: string;
   saved: boolean;
