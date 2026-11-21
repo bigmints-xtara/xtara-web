@@ -53,7 +53,7 @@
 .track span { display:block; height:100%; background:var(--ink); border-radius:20px; }
 .classIsland small { color:var(--muted); display:block; margin-top:8px; }
 .journal { scroll-margin-top:100px; margin:36px auto; }
-.entry { display:flex; gap:22px; align-items:center; justify-content:space-between; max-width:1180px; margin:28px auto; padding:24px 28px; border-radius:24px; background:var(--mint); border:1px solid var(--line); }
+.entry { display:flex; gap:22px; align-items:center; justify-content:space-between; margin:28px auto; padding:24px 28px; border-radius:24px; background:var(--mint); border:1px solid var(--line); }
 .entryIcon { width:54px; height:54px; border-radius:42% 58% 44% 56%; display:grid; place-items:center; background:var(--sun); color:#294640; flex:none; }
 .entry p { font-size:14px; line-height:1.6; color:var(--muted); margin-top:5px; }
 .empty { text-align:center; padding:40px 24px; border:1px dashed var(--line); border-radius:32px; background:var(--paper); }

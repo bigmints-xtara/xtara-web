@@ -21,7 +21,8 @@ export function studyOptionsCareerReturn(careerId: string, returnTo: string | nu
 
 export function studyOptionsReturn(returnTo: string | null): string | null {
   const path = returnTo?.split(/[?#]/, 1)[0];
-  return path === studyPath("software-developer") || path === studyPath("ux-designer") ? returnTo : null;
+  if (!path) return null;
+  return /^\/explore\/roles\/[\w-]+\/study-options$/.test(path) || /^\/dream-careers\/[\w-]+$/.test(path) ? returnTo : null;
 }
 
 export function studyOfferingAnchor(offeringId: string) {
@@ -36,6 +37,21 @@ export interface StudyOffering {
   city?: string;
   state?: string;
   match: "direct" | "adjacent";
+}
+
+export interface CareerStudyPreview {
+  status: "available" | "no_reviewed_mapping" | "no_results" | "temporarily_unavailable";
+  browse: boolean;
+  offerings: StudyOffering[];
+}
+
+export function savedCareerHref(id: string) {
+  return `/dream-careers/${encodeURIComponent(id)}?from=dashboard`;
+}
+
+export function collegeOfferingHref(offering: StudyOffering, returnTo: string) {
+  const params = new URLSearchParams({ offeringId: offering.offeringId, returnTo });
+  return `/colleges/${encodeURIComponent(offering.institutionId)}?${params}`;
 }
 
 export interface StudyProgramme {

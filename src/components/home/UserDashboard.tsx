@@ -137,8 +137,8 @@ export default function UserDashboard() {
   const refreshNotice = isAccount && currentReadback && accountLoad.error && cachedReadback
     ? <div className={loadingStyles.notice} role="status"><span>{({en:'Showing your saved view. We couldn’t refresh it.',ml:'സംരക്ഷിച്ച കാഴ്ചയാണ് കാണിക്കുന്നത്. പുതുക്കാനായില്ല.',hi:'आपका सहेजा हुआ दृश्य दिखाया जा रहा है। अभी अपडेट नहीं हो पाया।',ta:'சேமித்த காட்சி காட்டப்படுகிறது. புதுப்பிக்க முடியவில்லை.'})[locale]}</span><button onClick={() => setRetryAccount(value => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</button></div> : null;
 
-  const name = userProfile?.fullName || user?.displayName || "Student";
-  const greeting = text.greeting.replace("{name}", name.split(" ")[0]);
+  const name = (userProfile?.fullName || user?.displayName || "").trim();
+  const greeting = name && name.toLowerCase() !== "student" ? text.greeting.replace("{name}", name.split(/\s+/)[0]) : "";
   if (MVP_NAVIGATION_ENABLED) {
     const published = storedResult?.catalogSnapshot?.directions.find((item) => item.id === focusedDirection?.id);
     const fallback = focusedDirection && {
@@ -154,7 +154,7 @@ export default function UserDashboard() {
     const direction = serverOverview === undefined ? fallback : serverOverview;
     const hasAccountAssessment = Boolean(storedResult?.areas.length) &&
       (!isAccount || localStorage.getItem(discoveryCacheOwnerKey) === userId);
-    if (direction) return <>{refreshNotice}<MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
+    if (direction) return <>{refreshNotice}<MyDirectionOverview onRetry={() => setRetryAccount(value => value + 1)} direction={direction} locale={locale} greeting={greeting}
       hasAssessment={hasAccountAssessment} canEditCareers={isAccount || plan?.areaId === direction.id} /></>;
     const draft = userId && isAccount && hasAssessmentDraft(userId);
     const catalog = getAssessmentV2Catalog(locale);
@@ -201,7 +201,7 @@ export default function UserDashboard() {
 
   return (
     <main className={styles.dashboard}>
-      <p className="text-sm font-medium text-muted-foreground">{greeting}</p>
+      {greeting && <p className="text-sm font-medium text-muted-foreground">{greeting}</p>}
       <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-primary sm:text-4xl">{MVP_NAVIGATION_ENABLED ? mvpNavigationCopy[locale].myDirection : text.title}</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{text.nextStepsDescription}</p>
 
@@ -344,7 +344,7 @@ function RewardValue({ value, label, compact = false }: { value: string; label: 
 }
 
 function EmptyState({ title, description, action, href, browse }: { title: string; description: string; action: string; href: string; browse?: string }) {
-  return <main className="mx-auto max-w-4xl px-5 py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>{browse && <Button asChild variant="outline" className="rounded-full"><Link href="/explore">{browse}</Link></Button>}</div></main>;
+  return <main className="site-frame py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>{browse && <Button asChild variant="outline" className="rounded-full"><Link href="/explore">{browse}</Link></Button>}</div></main>;
 }
 
 function subscribeToDiscovery(onChange: () => void) {

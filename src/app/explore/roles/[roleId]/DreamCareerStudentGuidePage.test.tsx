@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   getContext: vi.fn(),
   getDirection: vi.fn(),
   getExplorer: vi.fn(),
+  getOverview: vi.fn(),
   saveDirection: vi.fn(),
   generateSlides: vi.fn(() => []),
   user: null as null | { uid: string; isAnonymous: boolean },
@@ -41,6 +42,7 @@ vi.mock('@/lib/direction-api', () => ({
   getDirectionFromApi: mocks.getDirection,
   saveDirectionToApi: mocks.saveDirection,
 }));
+vi.mock('@/lib/career-overview-api', () => ({ getCareerOverview: mocks.getOverview }));
 vi.mock('@/lib/career-explorer-api', () => ({ getCareerExplorer: mocks.getExplorer }));
 vi.mock('@/lib/career-conversation-data', () => ({
   careerConversationFromGuides: mocks.generateSlides,
@@ -140,6 +142,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.getContext.mockReset();
     mocks.getDirection.mockReset();
     mocks.getExplorer.mockReset();
+    mocks.getOverview.mockReset().mockRejectedValue(new XtaraApiError('Not published', 404));
     mocks.saveDirection.mockReset();
     mocks.generateSlides.mockReset();
     mocks.generateSlides.mockReturnValue([]);
@@ -388,6 +391,45 @@ describe('Dream Career Student Guide page', () => {
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
     expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard');
+  });
+
+  it('opens a reviewed offering from a saved career even when its overview is unpublished', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'learner-1', isAnonymous: false };
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams({ from: 'dashboard' }) as ReturnType<typeof useSearchParams>);
+    const guide = guideResponse();
+    guide.guide.aboutCareer.whatYouDo = guide.career.summary;
+    mocks.getGuide.mockResolvedValue(guide);
+    mocks.getContext.mockResolvedValue({
+      careerId: 'data-engineer', saved: true, location: {}, study: { status: 'available', browse: true, offerings: [{
+        offeringId: 'offer-10', institutionId: 'institute-7', title: 'Data engineering programme', institutionName: 'Sample Institute',
+        city: 'Kochi', state: 'Kerala', match: 'adjacent',
+      }] },
+    });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+    render(<QueryClientProvider client={client}><DreamCareerPage /></QueryClientProvider>);
+    const link = await screen.findByRole('link', { name: /Data engineering programme.*Sample Institute.*Related study route/ });
+    const target = new URL(link.getAttribute('href')!, window.location.origin);
+    expect(target.pathname).toBe('/colleges/institute-7');
+    expect(target.searchParams.get('offeringId')).toBe('offer-10');
+    expect(target.searchParams.get('returnTo')).toBe('/dream-careers/data-engineer?from=dashboard#study-offering-offer-10');
+    expect(screen.getByRole('link', { name: 'Find courses and colleges' })).toHaveAttribute('href', expect.stringContaining('/data-engineer/study-options?'));
+    expect(screen.getAllByText(guide.career.summary)).toHaveLength(1);
+  });
+
+  it('retains the guide and offers retry after a failed college lookup', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'learner-1', isAnonymous: false };
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams({ from: 'dashboard' }) as ReturnType<typeof useSearchParams>);
+    mocks.getContext.mockResolvedValueOnce({ careerId: 'data-engineer', saved: true, location: {}, study: {
+      status: 'temporarily_unavailable', browse: false, offerings: [],
+    } }).mockResolvedValue({ careerId: 'data-engineer', saved: true, location: {}, study: { status: 'no_reviewed_mapping', browse: false, offerings: [] } });
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+    render(<QueryClientProvider client={client}><DreamCareerPage /></QueryClientProvider>);
+    expect(await screen.findByText(/Study options are temporarily unavailable/)).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText(/No study routes have been reviewed/)).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Data Engineer', level: 1 })).toBeVisible();
   });
 
   it('opens the published design specialization from its saved parent career', async () => {

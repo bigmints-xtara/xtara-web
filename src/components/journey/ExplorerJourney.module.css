@@ -1,7 +1,7 @@
 .shell {
   min-height: calc(100svh - 72px);
   max-width: none;
-  padding: clamp(20px, 4vw, 48px) clamp(16px, 5vw, 48px) 112px;
+  padding: clamp(20px, 4vw, 48px) 0 112px;
   background: linear-gradient(180deg, #f8fbff, var(--background));
 }
 

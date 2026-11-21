@@ -40,7 +40,7 @@ export default function OrganizationMembershipCard() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl px-5 pt-7" aria-labelledby="institution-membership-title">
+    <section className="site-frame pt-7" aria-labelledby="institution-membership-title">
       <Card className="border-primary/10 bg-white shadow-none">
         <CardContent className="p-5 sm:p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">

@@ -441,3 +441,5 @@
   text-align: center;
   overflow-wrap: anywhere;
 }
+
+.explorer .topline { max-width:var(--marketing-width); padding-inline:var(--marketing-gutter); }

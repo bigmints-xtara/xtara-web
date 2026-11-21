@@ -142,7 +142,7 @@ export default function DiscoveryResultPage() {
   return (
     <div className={styles.surface}><Header />
       <main className={`${explorer.explorer} ${design.shell} ${design.resultsShell}`}>
-        <div className="mx-auto max-w-6xl">
+        <div className="site-frame">
           <header className={design.intro}>
             <h1 className={design.heading}>{copy.heading}</h1>
           </header>

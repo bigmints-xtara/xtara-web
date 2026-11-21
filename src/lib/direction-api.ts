@@ -4,7 +4,9 @@ import { invalidateDashboardCache } from './dashboard-cache';
 import type { Locale } from "@/i18n/config";
 import type { DirectionPlan } from "@/lib/direction";
 
-export type DirectionCareerPreview = { id: string; title: string; summary: string };
+import type { CareerStudyPreview } from "./study-options";
+
+export type DirectionCareerPreview = { id: string; title: string; summary: string; study?: CareerStudyPreview };
 export type DirectionOverview = DirectionCareerPreview & {
   reasons: string[];
   guidance: string[];

@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import Link from 'next/link';
+import SavedCareerReader from './SavedCareerReader';
 import { GraduationCap, Lightbulb, Sparkles } from 'lucide-react';
 
 import type {
@@ -257,7 +258,9 @@ export function DreamCareerStudentGuide({
   retryingRelationships = {},
   embedded = false,
   showCourseOptions = true,
+  savedCareer,
 }: {
+  savedCareer?: { college: ReactNode; grade?: string };
   embedded?: boolean;
   showCourseOptions?: boolean;
   response: DreamCareerStudentGuideResponse;
@@ -310,13 +313,14 @@ export function DreamCareerStudentGuide({
   const pathQuestions: GuideQuestion[] = [];
   const nowQuestions: GuideQuestion[] = [];
 
-  if (current('whatYouDo') && (guide.aboutCareer.whatYouDo.trim() || guide.aboutCareer.activities.length)) {
+  const workSummary = savedCareer && guide.aboutCareer.whatYouDo.trim() === response.career.summary.trim() ? '' : guide.aboutCareer.whatYouDo.trim();
+  if (current('whatYouDo') && (workSummary || guide.aboutCareer.activities.length)) {
     aboutQuestions.push({
       id: 'what-you-do',
       title: text.whatYouDo,
       content: (
         <>
-          {guide.aboutCareer.whatYouDo.trim() ? <p>{guide.aboutCareer.whatYouDo}</p> : null}
+          {workSummary ? <p>{workSummary}</p> : null}
           {guide.aboutCareer.activities.length ? (
             <ProgressiveList
               items={guide.aboutCareer.activities}
@@ -640,6 +644,10 @@ export function DreamCareerStudentGuide({
       </div>
     </details>
   ) : null;
+
+  if (savedCareer) return <SavedCareerReader careerId={response.career.id} locale={locale} intro={response.career.summary}
+    about={aboutQuestions} path={pathQuestions} now={nowQuestions} college={savedCareer.college}
+    grade={savedCareer.grade} guideSources={sourcesPanel} fallbackText={text.englishFallback} guideInEnglish={guide.locale === 'en'} />;
 
   if (!chapters.length) {
     return (

@@ -159,7 +159,7 @@ function CollegeDetailContent() {
   const selectedCourse = offeringId ? college?.courses.find((course) => course.id === offeringId) : undefined;
   const backClass = "inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring";
   const back = (className: string) => returnTo
-    ? <Link href={returnTo} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{study.backResults}</Link>
+    ? <Link href={returnTo} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{returnTo.startsWith("/dream-careers/") ? study.backCareer : study.backResults}</Link>
     : <button type="button" onClick={() => router.back()} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{text.back}</button>;
 
   if (detail.isPending) {
@@ -174,7 +174,7 @@ function CollegeDetailContent() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <Header />
-        <main className="mx-auto max-w-xl px-5 py-12 sm:py-20">
+        <main className="site-frame py-12 sm:py-20">
           {back("text-primary")}
           <h1 className="mt-5 text-3xl font-semibold text-primary" role={detail.isError ? "alert" : undefined}>{heading}</h1>
           {!detail.isError && !offeringId && <p className="mt-3 leading-7 text-muted-foreground">{text.notFoundHelp}</p>}
@@ -190,8 +190,8 @@ function CollegeDetailContent() {
     <div className="min-h-screen bg-background text-foreground">
       <Header />
       <main>
-        <section className="bg-primary px-5 py-10 text-white sm:py-14">
-          <div className="mx-auto max-w-6xl">
+        <section className="bg-primary py-10 text-white sm:py-14">
+          <div className="site-frame">
             {back("text-primary-foreground")}
             <div className="mt-6 flex flex-wrap gap-2"><Badge className="border-white/15 bg-white/10 text-white hover:bg-white/10">{college.type || text.college}</Badge>{college.shortName ? <Badge variant="secondary">{college.shortName}</Badge> : null}</div>
             <h1 className="mt-5 max-w-4xl text-3xl font-semibold tracking-[-0.035em] sm:text-5xl">{college.name}</h1>
@@ -202,12 +202,7 @@ function CollegeDetailContent() {
           </div>
         </section>
 
-        <section className="mx-auto grid min-w-0 max-w-6xl gap-5 px-5 py-10 lg:grid-cols-[0.8fr_1.2fr] sm:py-14">
-          <div className="min-w-0 space-y-5">
-            <Card className="min-w-0 border-primary/10 shadow-none"><CardContent className="min-w-0 p-6"><SectionTitle icon={Building2} title={text.information} /><dl className="mt-5 min-w-0 space-y-4"><InfoRow icon={Building2} label={text.type} value={college.type} /><InfoRow icon={Globe} label={text.website} value={college.website} link /><InfoRow icon={Phone} label={text.phone} value={college.phone} /><InfoRow icon={MapPin} label={text.address} value={college.address} /><InfoRow icon={Calendar} label={text.established} value={college.yearFounded} /><InfoRow icon={BookOpen} label={text.stream} value={college.majorStream} /></dl></CardContent></Card>
-            <Card className="border-secondary/50 bg-secondary/15 shadow-none"><CardContent className="p-6"><h2 className="text-lg font-semibold text-primary">{text.checkTitle}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{college.releaseId ? text.catalogNotice : text.checkHelp}</p>{college.website ? <Button asChild className="mt-5 w-full rounded-xl"><a href={college.website} target="_blank" rel="noreferrer">{text.officialSite}<ExternalLink className="ml-2 h-4 w-4" /></a></Button> : <Button asChild className="mt-5 w-full rounded-xl"><Link href="/contact">{text.contact}</Link></Button>}</CardContent></Card>
-          </div>
-
+        <section className="site-frame grid min-w-0 gap-5 py-7 lg:grid-cols-[1.2fr_0.8fr] sm:py-10">
           <Card className="min-w-0 border-primary/10 shadow-none">
             <CardContent className="min-w-0 p-6 sm:p-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -223,6 +218,11 @@ function CollegeDetailContent() {
               )}
             </CardContent>
           </Card>
+          <div className="min-w-0 space-y-5">
+            <Card className="min-w-0 border-primary/10 shadow-none"><CardContent className="min-w-0 p-6"><SectionTitle icon={Building2} title={text.information} /><dl className="mt-5 min-w-0 space-y-4"><InfoRow icon={Building2} label={text.type} value={college.type} /><InfoRow icon={Globe} label={text.website} value={college.website} link /><InfoRow icon={Phone} label={text.phone} value={college.phone} /><InfoRow icon={MapPin} label={text.address} value={college.address} /><InfoRow icon={Calendar} label={text.established} value={college.yearFounded} /><InfoRow icon={BookOpen} label={text.stream} value={college.majorStream} /></dl></CardContent></Card>
+            <Card className="border-secondary/50 bg-secondary/15 shadow-none"><CardContent className="p-6"><h2 className="text-lg font-semibold text-primary">{text.checkTitle}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">{college.releaseId ? text.catalogNotice : text.checkHelp}</p>{college.website ? <Button asChild className="mt-5 w-full rounded-xl"><a href={college.website} target="_blank" rel="noreferrer">{text.officialSite}<ExternalLink className="ml-2 h-4 w-4" /></a></Button> : <Button asChild className="mt-5 w-full rounded-xl"><Link href="/contact">{text.contact}</Link></Button>}</CardContent></Card>
+          </div>
+
         </section>
       </main>
       <Footer />

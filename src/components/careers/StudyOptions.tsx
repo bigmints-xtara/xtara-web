@@ -17,6 +17,7 @@ import { getStates } from "@/lib/firebase/location";
 import { pathwayFromAccount } from "@/lib/profile-study";
 import {
   getStudyOptions,
+  collegeOfferingHref,
   studyOfferingAnchor,
   studyOptionsCareerReturn,
   type StudyOptionsResponse,
@@ -116,7 +117,7 @@ export default function StudyOptions({ careerId }: { careerId: string }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-8 sm:py-14">
+      <main className="site-frame py-8 sm:py-14">
         <Link
           href={backHref}
           className="inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-medium text-primary focus-visible:outline-2 focus-visible:outline-ring"
@@ -237,16 +238,12 @@ function ProgrammeCard({ programme, returnTo, text }: {
       <ul className="mt-3 divide-y divide-border">
         {programme.offerings.map((offering) => {
           const anchor = studyOfferingAnchor(offering.offeringId);
-          const params = new URLSearchParams({
-            offeringId: offering.offeringId,
-            returnTo: `${returnTo}#${anchor}`,
-          });
           const location = [offering.city, offering.state].filter(Boolean).join(", ");
           return (
             <li key={offering.offeringId} id={anchor} className="scroll-mt-20">
               <Link
                 className="group flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-lg py-3 focus-visible:outline-2 focus-visible:outline-ring"
-                href={`/colleges/${encodeURIComponent(offering.institutionId)}?${params}`}
+                href={collegeOfferingHref(offering, `${returnTo}#${anchor}`)}
               >
                 <span className="min-w-0 space-y-1">
                   <span className="block font-medium break-words text-primary group-hover:underline">{offering.institutionName}</span>

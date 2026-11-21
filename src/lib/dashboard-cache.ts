@@ -9,6 +9,15 @@ const pending = new Map<string, Promise<DirectionOverview | null | undefined>>()
 let generation = 0;
 let activeOwner: string | null | undefined;
 const strings = (value: unknown): value is string[] => Array.isArray(value) && value.every(item => typeof item === 'string');
+function validStudy(value: NonNullable<DirectionOverview['careers'][number]['study']>) {
+  return value && ['available', 'no_results', 'no_reviewed_mapping', 'temporarily_unavailable'].includes(value.status)
+    && typeof value.browse === 'boolean' && Array.isArray(value.offerings)
+    && value.offerings.every(item => item && typeof item.offeringId === 'string' && typeof item.institutionId === 'string'
+      && typeof item.institutionName === 'string' && typeof item.title === 'string'
+      && (item.city === undefined || typeof item.city === 'string') && (item.state === undefined || typeof item.state === 'string')
+      && (item.match === 'direct' || item.match === 'adjacent'));
+}
+
 function validOverview(value: unknown): value is DirectionOverview | null {
   if (value === null) return true;
   if (!value || typeof value !== 'object') return false;
@@ -16,7 +25,7 @@ function validOverview(value: unknown): value is DirectionOverview | null {
   return typeof item.id === 'string' && !!item.id && typeof item.title === 'string'
     && typeof item.summary === 'string' && typeof item.reflectionPrompt === 'string'
     && strings(item.reasons) && strings(item.guidance) && Array.isArray(item.careers)
-    && item.careers.every(c => c && typeof c.id === 'string' && typeof c.title === 'string' && typeof c.summary === 'string');
+    && item.careers.every(c => c && typeof c.id === 'string' && typeof c.title === 'string' && typeof c.summary === 'string' && (c.study === undefined || validStudy(c.study)));
 }
 export function readDashboardCache(owner: string, locale: Locale, now = Date.now()): Snapshot | null {
   try {

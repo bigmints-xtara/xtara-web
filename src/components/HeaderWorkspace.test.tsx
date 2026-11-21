@@ -102,6 +102,16 @@ describe("workspace-aware header", () => {
     else expect(link).not.toHaveAttribute("aria-current");
   });
 
+  it('keeps My Direction selected when opening an offering through a saved career', () => {
+    const backToCareer = '/dream-careers/software-developer?from=dashboard';
+    const backToStudy = '/explore/roles/software-developer/study-options?' + new URLSearchParams({ returnTo: backToCareer, state: 'Kerala' });
+    vi.mocked(usePathname).mockReturnValue('/colleges/example');
+    window.history.replaceState(null, '', '/colleges/example?' + new URLSearchParams({ offeringId: 'course', returnTo: backToStudy }));
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
+    renderHeader();
+    for (const link of screen.getAllByRole('link', { name: 'My Direction' })) expect(link).toHaveAttribute('aria-current', 'page');
+  });
+
   it.each([null, { uid: "anonymous-1", isAnonymous: true }])("links visitors to the public Explorer", (user) => {
     mocks.useAuth.mockReturnValue({ user });
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });

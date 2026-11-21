@@ -212,7 +212,9 @@ describe('pursued-area learner dashboard', () => {
       reasons: ['Finding out why something works'],
       guidance: ['Try sketching a tool for a problem at school.'],
       reflectionPrompt: 'What would you like to build?',
-      careers: [{ id: 'software-developer', title: 'Software Engineering', summary: 'Design and build software.' }],
+      careers: [{ id: 'software-developer', title: 'Software Engineering', summary: 'Design and build software.',
+        study: { status: 'available', browse: true, offerings: [{ offeringId: 'programme-1', institutionId: 'college-1', institutionName: 'Sample College',
+          title: 'Computing degree', match: 'direct' }] } }],
     });
 
     await act(async () => { root.render(<UserDashboard />); });
@@ -221,6 +223,8 @@ describe('pursued-area learner dashboard', () => {
     const page = container.textContent;
     expect(page).toContain('Build useful tools and solve problems with technology.');
     expect(page).toContain('Finding out why something works');
+    expect(page).toContain('Computing degree · Sample College');
+    expect(page!.indexOf('Computing degree')).toBeLessThan(page!.indexOf('Try sketching'));
     expect(page).toContain('Try sketching a tool for a problem at school.');
     expect(page).toContain('What would you like to build?');
     expect(container.querySelector('a[href="/dream-careers/software-developer?from=dashboard"]')?.textContent).toContain('Design and build software.');

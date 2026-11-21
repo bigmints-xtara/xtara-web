@@ -653,4 +653,4 @@ function humanize(value: string) { return value.split("_").filter(Boolean).map((
 function normalizeGrade(value?: string): AcademicGrade { return value === "grade9" || value === "grade10" || value === "grade11" || value === "grade12" ? value : "grade8"; }
 function gradeLabel(grade: AcademicGrade, text: Record<AcademicGrade, string>) { return text[grade]; }
 function withCurrent(options: string[], current: string) { return [...new Set([...(current ? [current] : []), ...options])]; }
-function ProfileSkeleton() { return <div className="min-h-screen bg-[#f7fafc]"><Header /><main className="mx-auto max-w-5xl space-y-5 px-4 py-8"><Skeleton className="h-10 w-48" /><Skeleton className="h-28 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></main></div>; }
+function ProfileSkeleton() { return <div className="min-h-screen bg-[#f7fafc]"><Header /><main className="site-frame space-y-5 py-8"><Skeleton className="h-10 w-48" /><Skeleton className="h-28 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /><Skeleton className="h-64 w-full rounded-2xl" /></main></div>; }

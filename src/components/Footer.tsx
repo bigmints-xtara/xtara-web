@@ -25,7 +25,7 @@ const Footer = () => {
 
     return (
         <footer className="bg-muted text-foreground py-10">
-            <div className="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-10" style={{ paddingInline: "var(--marketing-gutter, 24px)" }}>
+            <div className="site-frame grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div>
                     <Link href={isAdmin ? '/admin' : studentMvp ? '/dashboard' : '/'} className="flex items-center gap-2">
                         <Image

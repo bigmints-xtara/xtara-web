@@ -39,15 +39,27 @@ function subscribeToFragment(onChange: () => void) {
 }
 
 const readFragment = () => window.location.hash;
+const readCareerOrigin = () => {
+    let params = new URLSearchParams(window.location.search);
+    for (let step = 0; step < 3; step++) {
+        if (params.get("from") === "dashboard") return "dashboard";
+        const parent = params.get("returnTo");
+        if (!parent || !/^\/(?:dream-careers|explore\/roles)\/[\w-]+(?:\/study-options)?\?/.test(parent)) break;
+        params = new URLSearchParams(parent.split("?").slice(1).join("?").split("#")[0]);
+    }
+    return "";
+};
 const serverFragment = () => "";
 
-function currentNavigationUrl(urls: string[], pathname: string, fragment: string) {
+function currentNavigationUrl(urls: string[], pathname: string, fragment: string, careerOrigin: string) {
     const sectionUrl = pathname + fragment;
     if (fragment && urls.includes(sectionUrl)) return sectionUrl;
 
     if (pathname.startsWith("/organization/students/") && urls.includes("/organization/learners")) {
         return "/organization/learners";
     }
+    if (careerOrigin === "dashboard" && urls.includes("/dashboard") &&
+        (pathname.startsWith("/dream-careers/") || pathname.startsWith("/colleges/") || pathname.endsWith("/study-options"))) return "/dashboard";
     if (pathname.startsWith("/dream-careers/") && urls.includes("/explore")) return "/explore";
 
     return urls.reduce<string | undefined>((best, url) => {
@@ -61,6 +73,7 @@ const Header = () => {
     const { isStaff, loading: workspaceLoading, error: workspaceError } = useOrganizationWorkspace();
     const { t, locale } = useTranslations();
     const pathname = usePathname().replace(/\/+$/, "") || "/";
+    const careerOrigin = useSyncExternalStore(subscribeToFragment, readCareerOrigin, serverFragment);
     const fragment = useSyncExternalStore(subscribeToFragment, readFragment, serverFragment);
     const isLoggedIn = Boolean(user && !user.isAnonymous);
     const organizationRoute = isWorkspaceRoute("educator", pathname);
@@ -106,7 +119,7 @@ const Header = () => {
         if (MVP_NAVIGATION_ENABLED && key === "profile") return copy.profile;
         return t(`header.nav.${key}`);
     };
-    const currentUrl = currentNavigationUrl(navItems.map(({ url }) => url), pathname, fragment);
+    const currentUrl = currentNavigationUrl(navItems.map(({ url }) => url), pathname, fragment, careerOrigin);
     const current = (url: string) => url === currentUrl ? (url.includes("#") ? "location" : "page") : undefined;
     const navigationLink = (url: string) => {
         const [path, hash] = url.split("#");
@@ -127,7 +140,7 @@ const Header = () => {
 
     return <>
         <header className={`${!isStaff && !organizationRoute && !adminShell ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl`}>
-            <Container className="!px-0">
+            <Container marketing className="!px-0">
                 <nav className={headerStyles.navigation}>
                     {/* Logo */}
                     <LogoLink

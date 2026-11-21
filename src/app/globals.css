@@ -2,6 +2,21 @@
 @import "tw-animate-css";
 @import "./indic-fonts.css";
 
+/* Public and signed-in pages share the same outer grid at every viewport. */
+:root {
+  --marketing-width: 1280px;
+  --marketing-gutter: 32px;
+}
+@media (max-width: 700px) {
+  :root { --marketing-gutter: 22px; }
+}
+.site-frame {
+  width: 100%;
+  max-width: var(--marketing-width);
+  margin-inline: auto;
+  padding-inline: var(--marketing-gutter);
+}
+
 /* Resolve next/font's body-scoped variable where the utility is used. */
 @theme inline {
   --font-sans: var(--font-inter), var(--font-indic), sans-serif;

@@ -278,7 +278,7 @@ export default function CareerDirectionPage() {
     <div className={styles.surface}>
       <Header />
       <main className={`${explorer.explorer} ${design.shell}`} style={sceneTone}>
-        <div className="mx-auto max-w-6xl">
+        <div className="site-frame">
           <JourneySteps step={2} locale={locale} />
           <Link href={owner ? "/dashboard" : "/assessment/discovery"} className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-4 w-4" />{owner ? mvpNavigationCopy[locale].myDirection : text.results}

@@ -9,4 +9,5 @@
 .notice{max-width:1064px;margin:16px auto 0;padding:12px 20px;display:flex;gap:16px;align-items:center;justify-content:space-between;color:var(--muted-foreground);font-size:13px}.notice button{font-weight:600;color:var(--primary);flex-shrink:0}
 @keyframes breathe{to{opacity:.45}}
 @media(max-width:640px){.shell{padding:28px 20px 40px;min-height:calc(100svh - 64px)}.hero{grid-template-columns:1fr;padding:24px;gap:22px}.orb{width:120px;height:120px}.details{grid-template-columns:1fr}.panel:last-child{display:none}}
+.shell, .notice { width:100%; max-width:var(--marketing-width); padding-inline:var(--marketing-gutter); }
 @media(prefers-reduced-motion:reduce){.block{animation:none}}

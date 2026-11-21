@@ -7,6 +7,8 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, GraduationCap, MessageCircleMore, Plus, X } from 'lucide-react';
 
 import SlideshowOverlay from '@/components/career-path/SlideshowOverlay';
+import SavedCareerStudy from '@/components/careers/SavedCareerStudy';
+import SavedCareerReader from '@/components/careers/SavedCareerReader';
 import PilotCareerSpecializations from '@/components/careers/PilotCareerSpecializations';
 import {
   DreamCareerStudentGuide,
@@ -121,7 +123,14 @@ const selectionCopy: Record<DreamCareerGuideLocale, {
 };
 
 export default function DreamCareerPage() {
-  return <Suspense fallback={<div aria-busy="true" className="min-h-screen bg-background" />}><DreamCareerContent /></Suspense>;
+  return <Suspense fallback={<div aria-busy="true" className="min-h-screen bg-background" />}><CareerSession /></Suspense>;
+}
+
+function CareerSession() {
+  const { roleId } = useParams<{ roleId: string }>();
+  const { user } = useAuth();
+  const { locale } = useTranslations();
+  return <DreamCareerContent key={`${user?.uid ?? ''}:${roleId}:${locale}`} />;
 }
 
 function DreamCareerContent() {
@@ -141,6 +150,8 @@ function DreamCareerContent() {
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [studentContext, setStudentContext] = useState<CareerStudentContextResponse | null>(null);
+  const [contextAttempt, setContextAttempt] = useState(0);
+  const [contextFailed, setContextFailed] = useState(false);
   const [remotePlan, setRemotePlan] = useState<DirectionPlan | null>(null);
   const [selectionUpdating, setSelectionUpdating] = useState(false);
   const [conversationOpen, setConversationOpen] = useState(false);
@@ -184,21 +195,18 @@ function DreamCareerContent() {
     setSelectionError('');
     if (!contextUserId || contextAnonymous) return;
     const controller = new AbortController();
-    Promise.all([
-      getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId }),
-      getDirectionFromApi(contextUserId),
-    ])
-      .then(([context, direction]) => {
-        if (controller.signal.aborted) return;
-        setStudentContext(context);
-        setRemotePlan(direction);
-      })
+    setContextFailed(false);
+    getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId })
+      .then(context => { if (!controller.signal.aborted) setStudentContext(context); })
+      .catch(() => { if (!controller.signal.aborted) setContextFailed(true); });
+    getDirectionFromApi(contextUserId)
+      .then(direction => { if (!controller.signal.aborted) setRemotePlan(direction); })
       .catch(() => undefined);
     return () => { controller.abort(); selectionGeneration.current += 1; };
-  }, [roleId, contextUserId, contextAnonymous]);
+  }, [roleId, contextUserId, contextAnonymous, contextAttempt]);
 
   const careerId = response?.career.id ?? roleId;
-  const studyLink = isStudyOptionsCareer(careerId) && (
+  const studyLink = (studentContext?.study?.browse ?? isStudyOptionsCareer(careerId)) && (
     <Button asChild size="lg" variant="outline" className="w-fit rounded-lg">
       <Link href={studyOptionsHref(
         careerId,
@@ -318,6 +326,42 @@ function DreamCareerContent() {
   };
 
   if (authLoading || (loading && !response)) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
+  if (MVP_NAVIGATION_ENABLED && signedIn && from === 'dashboard' && careerIdentity) {
+    const available = (key: CareerGuideQuestionId) => {
+      const status = response?.coverage.byQuestion[key]?.status;
+      return status === 'available' || status === 'partial';
+    };
+    const slides = response ? careerConversationFromGuides([response], locale) : [];
+    const college = <>
+      <SavedCareerStudy careerId={careerIdentity.id} locale={locale} study={studentContext?.study} guide={response}
+        loading={!contextFailed && !studentContext} failed={contextFailed}
+        onRetry={() => {
+          setContextAttempt(attempt => attempt + 1);
+          if (response?.resolved.courseOptions.status === 'mapping_unavailable' || response?.relationshipErrors.some(error => error.subsection === 'courseOptions')) void retryRelationship('courseOptions');
+        }} />
+      {pilotSpecializations}
+    </>;
+    return <div className={styles.surface}><Header /><main key={careerIdentity.id}>
+      <header className="border-b border-border bg-muted/35">
+        <div className="site-frame grid items-center gap-3 pt-3 pb-6 sm:pt-5 sm:pb-8">
+          <Link href={backHref} className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-primary hover:underline"><ArrowLeft size={16} aria-hidden="true" />{text.back}</Link>
+          <div className="flex min-w-0 items-center justify-between gap-4">
+            <div className="min-w-0">
+              {area && <p className="mb-2 text-sm font-semibold text-muted-foreground">{area.title}</p>}
+              <h1 className="text-3xl leading-tight font-semibold tracking-[-.04em] break-words text-primary sm:text-5xl">{careerIdentity.title}</h1>
+              <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">{careerIdentity.summary}</p>
+            </div>
+            {careerIdentity.imageUrl && <Image unoptimized src={careerIdentity.imageUrl} alt="" width={208} height={140} className="hidden h-32 w-48 shrink-0 rounded-2xl object-contain sm:block" />}
+          </div>
+        </div>
+      </header>
+      {response ? <DreamCareerStudentGuide response={response} locale={guideLocale} savedCareer={{ college, grade: studentContext?.grade }}
+        showCourseOptions={false} onRetryRelationship={subsection => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
+        : <SavedCareerReader careerId={careerIdentity.id} locale={guideLocale} intro={careerIdentity.summary} college={college} />}
+      {response && (available('whatYouDo') || available('educationRoutes') || available('starterActivity')) && slides.length > 0 &&
+        <div className="site-frame pb-8"><Button variant="outline" onClick={() => setConversationOpen(true)}><MessageCircleMore aria-hidden="true" />{text.conversation}</Button></div>}
+    </main><Footer /><SlideshowOverlay isOpen={conversationOpen} onClose={() => setConversationOpen(false)} slides={slides} /></div>;
+  }
   if (missingGuideCareer) {
     return (
       <PageFrame>

@@ -39,7 +39,7 @@ export function StudentGuidanceEntry() {
     };
   }, [uid]);
   if (!uid || sharedWith !== uid) return null;
-  return <section className={styles.garden}><div className={styles.entry}>
+  return <section className={`site-frame ${styles.garden}`}><div className={styles.entry}>
     <span className={styles.entryIcon}><MessageCircle aria-hidden="true" size={27} /></span>
     <div className="min-w-0 flex-1"><h2 className="text-lg font-medium">{c.journal}</h2><p>{c.studentIntro}</p></div>
     <Button asChild className={styles.primary}><Link href="/guidance">{c.openJournal}<ArrowRight size={17} /></Link></Button>
