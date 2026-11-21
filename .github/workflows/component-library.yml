@@ -1,0 +1,29 @@
+name: Component library
+on:
+  workflow_call:
+  pull_request:
+    branches-ignore: [xtara-mvp]
+  push:
+    branches-ignore: [xtara-mvp]
+permissions:
+  contents: read
+jobs:
+  components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify inventory, decisions and reuse
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE=39c88f510ca60adeb9edab555e3aa5e88582c9fe
+          fi
+          node scripts/component-library.mjs --base "$BASE"

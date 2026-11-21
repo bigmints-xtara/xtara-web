@@ -21,3 +21,7 @@ npm run lint
 
 Use `../bin/xtara verify web --quick` for the declared repository gate. Verify
 loading, empty, error, retry, dark mode, localization, and compact web states.
+
+## Component reuse
+
+Before changing presentation, search the local [component library](../design-system/index.html) and this repository's `quality/components/library.json`. Follow the [creation and review rules](../knowledge/component-library.md). Compose the registered primitive first. Every new named UI component needs a decision in `quality/components/decisions.json` with its purpose, closest existing component, concrete gap, consumer and verification. Register shared exports in the same change. Run `node scripts/component-library.mjs --base HEAD` before committing.

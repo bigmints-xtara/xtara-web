@@ -1,0 +1,155 @@
+{
+  "src/components/ui/Carousel.tsx": {
+    "family": "Carousels",
+    "purpose": "Browse a horizontal collection of peer items. Supply a stable item width and give each child its own accessible name.",
+    "symbols": [
+      "Carousel"
+    ]
+  },
+  "src/components/ui/Skeleton.tsx": {
+    "family": "Loading",
+    "purpose": "Reserve the final content shape during the initial read. Put the accessible loading announcement on the containing region.",
+    "symbols": [
+      "Skeleton",
+      "SkeletonCard",
+      "SkeletonCircle",
+      "SkeletonText"
+    ]
+  },
+  "src/components/ui/avatar.tsx": {
+    "family": "Avatars",
+    "purpose": "Represent one person or organization. Supply a meaningful fallback when the image is absent.",
+    "symbols": [
+      "Avatar",
+      "AvatarFallback",
+      "AvatarImage"
+    ]
+  },
+  "src/components/ui/badge.tsx": {
+    "family": "Badges",
+    "purpose": "Give an item a short status label. Name the state in text so color is supplementary.",
+    "symbols": [
+      "Badge"
+    ]
+  },
+  "src/components/ui/button.tsx": {
+    "family": "Buttons",
+    "purpose": "Trigger an action. Use the default variant for the primary action, outline for a secondary action and destructive for irreversible changes.",
+    "symbols": [
+      "Button"
+    ]
+  },
+  "src/components/ui/card.tsx": {
+    "family": "Cards",
+    "purpose": "Group one subject with an optional heading, description, body, action and footer. Use a section for unrelated subjects.",
+    "symbols": [
+      "Card",
+      "CardAction",
+      "CardContent",
+      "CardDescription",
+      "CardFooter",
+      "CardHeader",
+      "CardTitle"
+    ]
+  },
+  "src/components/ui/dropdown-menu.tsx": {
+    "family": "Menus",
+    "purpose": "Collect secondary commands behind one labeled trigger. Group related commands and keep destructive actions distinguishable.",
+    "symbols": [
+      "DropdownMenu",
+      "DropdownMenuCheckboxItem",
+      "DropdownMenuContent",
+      "DropdownMenuGroup",
+      "DropdownMenuItem",
+      "DropdownMenuLabel",
+      "DropdownMenuPortal",
+      "DropdownMenuRadioGroup",
+      "DropdownMenuRadioItem",
+      "DropdownMenuSeparator",
+      "DropdownMenuShortcut",
+      "DropdownMenuSub",
+      "DropdownMenuSubContent",
+      "DropdownMenuSubTrigger",
+      "DropdownMenuTrigger"
+    ]
+  },
+  "src/components/ui/field.tsx": {
+    "family": "Form fields",
+    "purpose": "Compose a label, control, instructions and validation as one field. Associate the error with the invalid input.",
+    "symbols": [
+      "Field",
+      "FieldContent",
+      "FieldDescription",
+      "FieldError",
+      "FieldGroup",
+      "FieldLabel",
+      "FieldLegend",
+      "FieldSeparator",
+      "FieldSet",
+      "FieldTitle"
+    ]
+  },
+  "src/components/ui/input.tsx": {
+    "family": "Form fields",
+    "purpose": "Accept a single line of input with a visible label, appropriate type and autocomplete.",
+    "symbols": [
+      "Input"
+    ]
+  },
+  "src/components/ui/label.tsx": {
+    "family": "Form fields",
+    "purpose": "Give a control a visible accessible name using its unique id.",
+    "symbols": [
+      "Label"
+    ]
+  },
+  "src/components/ui/progress.tsx": {
+    "family": "Progress",
+    "purpose": "Show a measurable completion value. Name the activity and expose the current amount to assistive technology.",
+    "symbols": [
+      "Progress"
+    ]
+  },
+  "src/components/ui/select.tsx": {
+    "family": "Selection",
+    "purpose": "Choose one value from a known set. Use meaningful option labels and keyboard navigation.",
+    "symbols": [
+      "Select",
+      "SelectContent",
+      "SelectGroup",
+      "SelectItem",
+      "SelectLabel",
+      "SelectScrollDownButton",
+      "SelectScrollUpButton",
+      "SelectSeparator",
+      "SelectTrigger",
+      "SelectValue"
+    ]
+  },
+  "src/components/ui/separator.tsx": {
+    "family": "Dividers",
+    "purpose": "Separate related sections when spacing alone is insufficient. Set orientation to match the layout.",
+    "symbols": [
+      "Separator"
+    ]
+  },
+  "src/components/ui/table.tsx": {
+    "family": "Tables",
+    "purpose": "Present records with consistent columns and named headers. Use the existing admin table for server-backed datasets.",
+    "symbols": [
+      "Table",
+      "TableBody",
+      "TableCell",
+      "TableHead",
+      "TableHeader",
+      "TableRow"
+    ]
+  },
+  "src/components/ui/textarea.tsx": {
+    "family": "Form fields",
+    "purpose": "Collect a multiline answer. Keep instructions and errors outside the entered text.",
+    "symbols": [
+      "Textarea"
+    ]
+  }
+}
