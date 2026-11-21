@@ -158,9 +158,15 @@ function CollegeDetailContent() {
   const college = detail.data;
   const selectedCourse = offeringId ? college?.courses.find((course) => course.id === offeringId) : undefined;
   const backClass = "inline-flex min-h-11 items-center gap-2 rounded-sm text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring";
-  const back = (className: string) => returnTo
-    ? <Link href={returnTo} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{returnTo.startsWith("/dream-careers/") ? study.backCareer : study.backResults}</Link>
-    : <button type="button" onClick={() => router.back()} className={`${backClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{text.back}</button>;
+  const back = (className: string) => {
+    const classes = `${backClass} ${className}`;
+    const arrow = <ArrowLeft size={16} aria-hidden="true" />;
+    // App Router may append a new fragment to an already-fragmented cached career URL.
+    // A native navigation preserves the exact offering anchor while the guide hydrates.
+    if (returnTo?.startsWith("/dream-careers/")) return <a href={returnTo} className={classes}>{arrow}{study.backCareer}</a>;
+    if (returnTo) return <Link href={returnTo} className={classes}>{arrow}{study.backResults}</Link>;
+    return <button type="button" onClick={() => router.back()} className={classes}>{arrow}{text.back}</button>;
+  };
 
   if (detail.isPending) {
     return <div className="flex min-h-screen items-center justify-center bg-background" role="status"><Loader2 className="h-7 w-7 animate-spin text-primary" aria-hidden="true" /><span className="sr-only">{text.loading}</span></div>;
