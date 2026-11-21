@@ -1,0 +1,23 @@
+{
+  "src/components/careers/SavedCareerContractView.tsx#SavedCareerContractView": {
+    "purpose": "Present the authenticated versioned career screen in its published order.",
+    "closest": "SavedCareerReader, SavedCareerSections and Button",
+    "gap": "The legacy reader assembles a guide locally. The API provides ordered typed blocks with localized action labels.",
+    "consumer": "Signed-in saved career route",
+    "verification": "DreamCareerStudentGuidePage.test.tsx and verify:saved-career-ui"
+  },
+  "src/components/careers/SavedCareerSections.tsx#SavedCareerSections": {
+    "purpose": "Give saved readers a shared document outline, section anchors and compact jump navigation.",
+    "closest": "DropdownMenu, DropdownMenuItem and Button",
+    "gap": "Both saved career transports need the same responsive document shell, headings and keyboard destination focus.",
+    "consumer": "SavedCareerReader and SavedCareerContractView",
+    "verification": "SavedCareerReader.test.tsx and verify:saved-career-ui"
+  },
+  "src/components/careers/SavedOfferingLink.tsx#SavedOfferingLink": {
+    "purpose": "Open the precise college offering and restore focus on return.",
+    "closest": "Next.js Link and studyOptionsHref",
+    "gap": "The reviewed recommendation must carry both IDs, display the match reason, and restore focus to its specific source link.",
+    "consumer": "SavedCareerStudy and SavedCareerContractView",
+    "verification": "CollegeOfferingPage.test.tsx and verify:saved-career-ui"
+  }
+}
