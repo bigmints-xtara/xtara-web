@@ -187,7 +187,7 @@ export default function ChallengesPage() {
                             </div>
                         ) : (
                             challengesList.map(challenge => (
-                                <button
+                                <Button variant="surface"
                                     key={challenge.id}
                                     onClick={() => setSelectedChallengeId(challenge.id)}
                                     className={cn(
@@ -211,7 +211,7 @@ export default function ChallengesPage() {
                                         </div>
                                     </div>
                                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                                </button>
+                                </Button>
                             ))
                         )}
                     </div>
@@ -303,7 +303,7 @@ export default function ChallengesPage() {
 
                                                 <div className="space-y-3">
                                                     {activeChallenge.questions?.[currentQuestionIndex]?.options.map((option, idx) => (
-                                                        <button
+                                                        <Button variant="surface"
                                                             key={idx}
                                                             onClick={() => handleSelectOption(idx)}
                                                             className={cn(
@@ -322,7 +322,7 @@ export default function ChallengesPage() {
                                                                 </div>
                                                                 <span className="text-lg">{option}</span>
                                                             </div>
-                                                        </button>
+                                                        </Button>
                                                     ))}
                                                 </div>
 

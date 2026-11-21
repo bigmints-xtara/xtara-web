@@ -1,5 +1,6 @@
 "use client";
 
+import { NativeSelect } from "@/components/ui/native-select";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -97,16 +98,16 @@ export default function StudyOptions({ careerId }: { careerId: string }) {
   const locationSelect = (id: string) => (
     <div className="grid min-w-0 gap-2">
       <label htmlFor={id} className="text-sm font-medium">{text.location}</label>
-      <select
+      <NativeSelect
         id={id}
-        className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+        className="min-h-11 w-full"
         value={!invalidState && state ? state : allIndia}
         onChange={(event) => changeState(event.target.value)}
         disabled={statesLoading}
       >
         <option value={allIndia}>{text.allIndia}</option>
         {states?.map((name) => <option key={name} value={name}>{name}</option>)}
-      </select>
+      </NativeSelect>
     </div>
   );
   const backHref = studyOptionsCareerReturn(careerId, search.get("returnTo"));

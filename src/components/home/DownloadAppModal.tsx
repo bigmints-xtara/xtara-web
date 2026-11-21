@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { X, Smartphone } from "lucide-react";
 import { useTranslations } from "@/i18n/language-provider";
 
@@ -20,12 +21,12 @@ export default function DownloadAppModal({ isOpen, onClose, title }: DownloadApp
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="bg-[#1A2342] border border-white/10 rounded-2xl w-full max-w-sm p-6 relative  animate-in fade-in zoom-in duration-200">
-                <button
+                <Button variant="ghost" size="icon" aria-label="Close download options"
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                    className="absolute top-4 right-4"
                 >
                     <X size={20} className="text-gray-400" />
-                </button>
+                </Button>
 
                 <div className="text-center pt-4">
                     <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-400">
@@ -38,12 +39,12 @@ export default function DownloadAppModal({ isOpen, onClose, title }: DownloadApp
                     </p>
 
                     <div className="space-y-3">
-                        <button className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
+                        <Button variant="outline" className="w-full">
                             {t("downloadModal.ios")}
-                        </button>
-                        <button className="w-full py-3 bg-transparent border border-gray-600 hover:bg-white/5 text-white font-semibold rounded-xl transition-colors">
+                        </Button>
+                        <Button variant="outline" className="w-full">
                             {t("downloadModal.android")}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>

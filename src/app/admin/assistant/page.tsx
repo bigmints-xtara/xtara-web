@@ -193,14 +193,14 @@ function HistoryPanel({
                 <div className="space-y-1">
                   {group.items.map((conversation) => (
                     <div className="group relative min-w-0" key={conversation.id}>
-                      <button
+                      <Button variant="surface"
                         className={cn('grid h-11 w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-transparent px-3 pr-10 text-left transition-colors hover:border-border hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', selectedId === conversation.id && 'border-border bg-muted')}
                         onClick={() => onSelect(conversation)}
                         type="button"
                       >
                         <span className="truncate text-sm font-medium" title={displayTitle(conversation)}>{displayTitle(conversation)}</span>
                         <time className="text-[0.7rem] text-muted-foreground" dateTime={conversation.updatedAt}>{conversationTime(conversation.updatedAt)}</time>
-                      </button>
+                      </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button aria-label={`Actions for ${displayTitle(conversation)}`} className="absolute right-1.5 top-1.5 opacity-70 group-hover:opacity-100" size="icon-sm" type="button" variant="ghost"><MoreHorizontal /></Button>
@@ -451,10 +451,10 @@ export default function AdminAssistantPage() {
               <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">Ask in plain language. Xtara Admin can inspect records and use its admin tools to create, review, publish, archive, import, and configure platform content.</p>
               <div className="mt-8 grid w-full max-w-3xl gap-3 sm:grid-cols-2">
                 {suggestions.map((suggestion) => (
-                  <button className="group flex min-h-28 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-colors hover:border-foreground/20 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" disabled={sending} key={suggestion.title} onClick={() => void sendMessage(suggestion.prompt)} type="button">
+                  <Button variant="surface" className="group flex min-h-28 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-colors hover:border-foreground/20 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" disabled={sending} key={suggestion.title} onClick={() => void sendMessage(suggestion.prompt)} type="button">
                     <span className="flex items-center justify-between text-sm font-semibold">{suggestion.title}<ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" /></span>
                     <span className="mt-4 text-xs leading-5 text-muted-foreground">{suggestion.description}</span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@/components/ui/button";
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { getCareerOverview } from '@/lib/career-overview-api';
@@ -36,7 +37,7 @@ export default function CareerOverviewSections({ career }: { career: ExplorerCar
   </li>;
   return <div className={styles.careerSections} lang="en">
     {isPending && <p role="status">Loading career guidance…</p>}
-    {isError && <div role="alert"><p>More career guidance could not be loaded. You can still explore the career basics.</p><button className={styles.secondary} onClick={() => void refetch()}>Try again</button></div>}
+    {isError && <div role="alert"><p>More career guidance could not be loaded. You can still explore the career basics.</p><Button onClick={() => void refetch()}>Try again</Button></div>}
     {facts.map(([id, label, values], index) => <section className={styles.careerSection} key={id} aria-labelledby={`section-${id}`}>
       <header><span className={styles.sectionNumber} aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><h2 id={`section-${id}`}>{label}</h2></header>
       {!values.length ? missing : <ul className={id === 'skills' ? styles.skillList : styles.factList}>{values.map((value, i) => <li key={`${i}:${value}`}>{value}</li>)}</ul>}

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 
@@ -71,7 +72,7 @@ export default function CareerDetailPage() {
         return (
             <div className="min-h-screen bg-gray-100 flex items-center justify-center flex-col gap-4">
                 <h2 className="text-xl font-bold text-gray-900">Career path not found</h2>
-                <button onClick={() => router.back()} className="text-blue-600 hover:underline">Go Back</button>
+                <Button variant="link" onClick={() => router.back()} >Go Back</Button>
             </div>
         );
     }
@@ -91,10 +92,10 @@ export default function CareerDetailPage() {
             <header className="bg-primary text-primary-foreground py-12">
                 <div className="container mx-auto px-4 max-w-7xl">
                     {/* Back Link */}
-                    <button onClick={() => router.back()} className="flex items-center text-primary-foreground/70 hover:text-primary-foreground transition-colors mb-8 group">
+                    <Button variant="ghost" onClick={() => router.back()} className="mb-8">
                         <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                         Back
-                    </button>
+                    </Button>
 
                     <div className="relative z-10">
                         <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -125,18 +126,17 @@ export default function CareerDetailPage() {
                         <div className="flex flex-wrap gap-4 items-center">
                             {/* Logic matched with Flutter: Hide button if already pursuing or anonymous */}
                             {!isPursuing && user && !user.isAnonymous && (
-                                <button
+                                <Button
                                     onClick={handleSwitchCareer}
                                     disabled={switching}
-                                    className="px-6 py-3 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl transition-colors  shadow-sky-900/20 disabled:opacity-50 flex items-center gap-2"
                                 >
                                     {switching ? "Switching..." : <><Rocket size={20} /> Switch to this Career</>}
-                                </button>
+                                </Button>
                             )}
 
-                            <button className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold rounded-xl transition-colors flex items-center gap-2">
+                            <Button variant="outline" >
                                 <Share2 size={18} /> Share
-                            </button>
+                            </Button>
                         </div>
                         {switchError && (
                             <p className="mt-4 text-destructive-foreground text-sm flex items-center gap-2">

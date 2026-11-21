@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { useEffect } from 'react';
 import Link from 'next/link';
 
@@ -40,12 +41,11 @@ export default function NewsError({
             There was an error loading the news page. Please try again.
           </p>
           <div className="space-x-3">
-            <button
+            <Button
               onClick={reset}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-ocean-navy hover:bg-ocean-navy/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean-navy"
             >
               Try again
-            </button>
+            </Button>
             <Link
               href="/"
               className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ocean-navy"

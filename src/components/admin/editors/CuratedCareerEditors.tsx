@@ -1,5 +1,9 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
+import { Input as LibraryInput } from "@/components/ui/input";
+import { Textarea as LibraryTextarea } from "@/components/ui/textarea";
+import { NativeSelect } from "@/components/ui/native-select";
 import { useEffect, useState } from 'react';
 import { Save, X } from 'lucide-react';
 import Link from 'next/link';
@@ -299,7 +303,7 @@ function SourcePicker({ values, onChange, label = 'Verified sources', descriptio
       <div className="mt-3 grid gap-2 md:grid-cols-2">
         {sources.map((source) => (
           <label key={source.id} className="flex items-start gap-3 rounded-lg border bg-white p-3 text-sm">
-            <input type="checkbox" checked={values.includes(source.id)} onChange={(event) => toggle(source.id, event.target.checked)} className="mt-0.5" />
+            <LibraryInput type="checkbox" checked={values.includes(source.id)} onChange={(event) => toggle(source.id, event.target.checked)} className="mt-0.5" />
             <span><span className="font-medium text-slate-900">{source.label}</span><span className={`block text-xs ${source.status === 'published' ? 'text-emerald-700' : 'text-amber-700'}`}>{source.id} · {source.status === 'published' ? 'Ready for approval' : `${source.status} — not ready`}</span></span>
           </label>
         ))}
@@ -307,7 +311,7 @@ function SourcePicker({ values, onChange, label = 'Verified sources', descriptio
       {unknownIds.length ? (
         <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           <p className="font-medium">Unknown source IDs</p>
-          <div className="mt-2 flex flex-wrap gap-2">{unknownIds.map((id) => <button key={id} type="button" onClick={() => toggle(id, false)} className="rounded-full border border-amber-300 bg-white px-3 py-1 text-xs">{id} ×</button>)}</div>
+          <div className="mt-2 flex flex-wrap gap-2">{unknownIds.map((id) => <Button key={id} type="button" onClick={() => toggle(id, false)} >{id} ×</Button>)}</div>
         </div>
       ) : null}
     </fieldset>
@@ -375,8 +379,8 @@ function EditorShell({ title, saving, error, onCancel, onSubmit, children }: { t
     <div className="flex items-center justify-between border-b bg-white p-5">
       <div><h2 className="text-xl font-semibold text-slate-900">{title}</h2><p className="mt-1 text-sm text-slate-500">Curated, deterministic content</p></div>
       <div className="flex gap-2">
-        <button type="button" onClick={onCancel} className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium"><X size={16} />Cancel</button>
-        <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"><Save size={16} />{saving ? 'Saving…' : 'Save draft'}</button>
+        <Button variant="ghost" type="button" onClick={onCancel} ><X size={16} />Cancel</Button>
+        <Button type="submit" disabled={saving} ><Save size={16} />{saving ? 'Saving…' : 'Save draft'}</Button>
       </div>
     </div>
     {error ? <p role="alert" className="shrink-0 border-b border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700">{error}</p> : null}
@@ -395,7 +399,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 function Input({ value, onChange, placeholder, type = 'text' }: { value: string; onChange: (value: string) => void; placeholder?: string; type?: string }) {
-  return <input type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />;
+  return <LibraryInput type={type} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="w-full" />;
 }
 
 function ReadOnlyValue({ value }: { value: string }) {
@@ -403,15 +407,15 @@ function ReadOnlyValue({ value }: { value: string }) {
 }
 
 function NumberInput({ value, min, onChange }: { value: number; min: number; onChange: (value: number) => void }) {
-  return <input type="number" min={min} value={value} onChange={(event) => onChange(Number(event.target.value))} className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />;
+  return <LibraryInput type="number" min={min} value={value} onChange={(event) => onChange(Number(event.target.value))} className="w-full" />;
 }
 
 function Textarea({ value, onChange, rows, placeholder }: { value: string; onChange: (value: string) => void; rows: number; placeholder?: string }) {
-  return <textarea value={value} rows={rows} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />;
+  return <LibraryTextarea value={value} rows={rows} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} className="w-full" />;
 }
 
 function Select({ value, onChange, options }: { value: string; onChange: (value: string) => void; options: Array<[string, string]> }) {
-  return <select value={value} onChange={(event) => onChange(event.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">{options.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select>;
+  return <NativeSelect value={value} onChange={(event) => onChange(event.target.value)} className="w-full">{options.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</NativeSelect>;
 }
 
 function StatusSelect({ value, onChange, allowPublished = true }: { value: CurationStatus; onChange: (value: CurationStatus) => void; allowPublished?: boolean }) {

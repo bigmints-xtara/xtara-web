@@ -189,7 +189,7 @@ function QuestionInput({
                 placeholder={labels.textPlaceholder}
                 value={typeof value === "string" ? value : ""}
                 onChange={(event) => onChange(event.target.value)}
-            />
+ />
         );
     }
 
@@ -199,7 +199,7 @@ function QuestionInput({
                 type="number"
                 value={typeof value === "number" ? value : ""}
                 onChange={(event) => onChange(event.target.value === "" ? undefined : Number(event.target.value))}
-            />
+ />
         );
     }
 
@@ -209,7 +209,7 @@ function QuestionInput({
                 {question.options?.map((option) => {
                     const selected = value === option.id;
                     return (
-                        <button
+                        <Button variant="surface"
                             type="button"
                             key={option.id}
                             role="radio"
@@ -228,7 +228,7 @@ function QuestionInput({
                             <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${selected ? "bg-primary text-primary-foreground" : "border border-slate-300"}`}>
                                 {selected ? <Check size={12} /> : null}
                             </span>
-                        </button>
+                        </Button>
                     );
                 })}
             </div>
@@ -247,7 +247,7 @@ function QuestionInput({
                         const exclusive = option.metadata?.exclusive === true;
                         const disabled = !selected && !exclusive && max !== undefined && selectedValues.length >= max;
                         return (
-                            <button
+                            <Button variant="surface"
                                 type="button"
                                 key={option.id}
                                 role="checkbox"
@@ -267,7 +267,7 @@ function QuestionInput({
                                 <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded ${selected ? "bg-primary text-primary-foreground" : "border border-slate-300"}`}>
                                     {selected ? <Check size={12} /> : null}
                                 </span>
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
@@ -279,14 +279,13 @@ function QuestionInput({
         const numericValue = typeof value === "number" ? value : question.validation?.minValue ?? 0;
         return (
             <div className="py-4">
-                <input
+                <Input
                     type="range"
                     min={question.validation?.minValue ?? 0}
                     max={question.validation?.maxValue ?? 100}
-                    className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 accent-primary"
                     value={numericValue}
                     onChange={(event) => onChange(Number(event.target.value))}
-                />
+ />
                 <div className="mt-3 text-center text-xl font-semibold text-primary">{numericValue}</div>
             </div>
         );

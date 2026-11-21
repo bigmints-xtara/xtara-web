@@ -184,7 +184,7 @@ function LearningShelf({ shelf, viewAll, open, onOpen }: {
 
 function StoryBubble({ item, onOpen }: { item: LearnItem; onOpen: (item: LearnItem) => void }) {
   return (
-    <button type="button" onClick={() => onOpen(item)} className="w-[5.25rem] shrink-0 text-center">
+    <Button variant="surface" type="button" onClick={() => onOpen(item)} className="w-[5.25rem] shrink-0 text-center">
       <span className="mx-auto flex h-[4.5rem] w-[4.5rem] items-center justify-center overflow-hidden rounded-full border-[3px] border-accent bg-card text-primary">
         {/* Remote editorial images are already validated by the API and may
             come from more than one configured CDN. */}
@@ -192,7 +192,7 @@ function StoryBubble({ item, onOpen }: { item: LearnItem; onOpen: (item: LearnIt
         {item.image ? <img src={item.image} alt="" className="h-full w-full object-cover" /> : <BookOpen className="h-6 w-6" />}
       </span>
       <span className="mt-2 line-clamp-2 text-xs font-semibold leading-4 text-foreground">{item.title}</span>
-    </button>
+    </Button>
   );
 }
 

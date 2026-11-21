@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
@@ -110,7 +111,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
 
     return (
         <div className="mb-7">
-            <button
+            <Button variant="surface"
                 className="flex items-center justify-between w-full px-4 pt-7 text-lg text-left border-t border-gray-300"
                 onClick={() => setIsOpen(!isOpen)}
                 aria-expanded={isOpen}
@@ -121,7 +122,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
                 ) : (
                     <Plus className="w-5 h-5 text-foreground flex-shrink-0" />
                 )}
-            </button>
+            </Button>
             {isOpen && (
                 <div className="px-4 pt-4 pb-2">
                     <p className="text-muted-foreground">{answer}</p>
@@ -147,21 +148,21 @@ export default function LandingPage() {
                         </p>
                         <div className="mt-6 mb-8 flex flex-col sm:flex-row items-center sm:gap-4 w-fit mx-auto">
                             <Link href="/assessment">
-                                <button
+                                <Button
                                     type="button"
-                                    className="flex items-center justify-center min-w-[205px] mt-3 px-8 h-14 rounded-full w-full sm:w-fit text-black bg-amber-500 hover:bg-amber-500/80 font-semibold transition-colors"
+                                    className="min-w-[205px] mt-3 w-full sm:w-fit"
                                 >
                                     Take an Assessment
                                     <ArrowRight className="ml-2 w-5 h-5" />
-                                </button>
+                                </Button>
                             </Link>
                             <Link href="/login">
-                                <button
+                                <Button variant="outline"
                                     type="button"
-                                    className="flex items-center justify-center min-w-[205px] mt-3 px-8 h-14 rounded-full w-full sm:w-fit text-white bg-transparent border-2 border-white hover:bg-white/10 font-semibold transition-colors"
+                                    className="min-w-[205px] mt-3 w-full sm:w-fit"
                                 >
                                     Login to Account
-                                </button>
+                                </Button>
                             </Link>
                         </div>
                     </div>
@@ -211,9 +212,9 @@ export default function LandingPage() {
                                 </p>
                                 <div className="mt-4 flex flex-col sm:flex-row items-center sm:gap-4">
                                     <a href="https://apps.apple.com/app/xtara-career-guidance/id1234567890">
-                                        <button
+                                        <Button variant="outline"
                                             type="button"
-                                            className="flex items-center justify-center min-w-[205px] mt-3 px-6 h-14 rounded-full w-full sm:w-fit text-foreground bg-white hover:bg-gray-100 transition-colors"
+                                            className="min-w-[205px] mt-3 w-full sm:w-fit"
                                         >
                                             <div className="mr-3">
                                                 <svg viewBox="0 0 384 512" width="30">
@@ -227,12 +228,12 @@ export default function LandingPage() {
                                                 <div className="text-xs text-left">Download on the</div>
                                                 <div className="-mt-1 font-sans text-xl font-semibold">App Store</div>
                                             </div>
-                                        </button>
+                                        </Button>
                                     </a>
                                     <a href="https://play.google.com/store/apps/details?id=com.bigmints.xtara">
-                                        <button
+                                        <Button variant="outline"
                                             type="button"
-                                            className="flex items-center justify-center min-w-[205px] mt-3 px-6 h-14 rounded-full w-full sm:w-fit text-foreground bg-white hover:bg-gray-100 transition-colors"
+                                            className="min-w-[205px] mt-3 w-full sm:w-fit"
                                         >
                                             <div className="mr-3">
                                                 <svg viewBox="30 336.7 120.9 129.2" width="30">
@@ -246,7 +247,7 @@ export default function LandingPage() {
                                                 <div className="text-xs text-left">GET IT ON</div>
                                                 <div className="-mt-1 font-sans text-xl font-semibold">Google Play</div>
                                             </div>
-                                        </button>
+                                        </Button>
                                     </a>
                                 </div>
                             </div>

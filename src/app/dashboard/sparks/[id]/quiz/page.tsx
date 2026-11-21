@@ -271,7 +271,7 @@ export default function SparkQuizPage() {
                     {currentQuestion.options.map((option, idx) => {
                         const isSelected = selectedAnswers[currentQuestionIndex] === idx;
                         return (
-                            <button
+                            <Button variant="surface"
                                 key={idx}
                                 onClick={() => handleSelectOption(idx)}
                                 className={cn(
@@ -292,7 +292,7 @@ export default function SparkQuizPage() {
                                         {option}
                                     </span>
                                 </div>
-                            </button>
+                            </Button>
                         );
                     })}
                 </CardContent>

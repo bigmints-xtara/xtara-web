@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { useState } from "react";
 
@@ -47,13 +49,12 @@ export default function EditProfileModal({
             <div className="w-full max-w-md bg-[#0f172c] border border-white/10 rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-white">Edit Personal Information</h2>
-                    <button
+                    <Button variant="ghost" size="icon" aria-label="Close dialog"
                         onClick={onClose}
-                        className="p-1 hover:bg-white/5 rounded-lg transition-colors"
                         disabled={isSaving}
                     >
                         <X size={20} className="text-gray-400" />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="space-y-4">
@@ -61,28 +62,28 @@ export default function EditProfileModal({
                         <label className="text-sm text-gray-400 mb-2 block">
                             Full Name <span className="text-red-400">*</span>
                         </label>
-                        <input
+                        <Input
                             type="text"
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
-                            className="w-full rounded-lg bg-[#12192E] border border-white/10 px-3 py-2.5 text-white focus:outline-none focus:border-blue-400"
+                            className="bg-background text-foreground"
                             placeholder="Enter your full name"
                             disabled={isSaving}
-                        />
+ />
                     </div>
 
                     <div>
                         <label className="text-sm text-gray-400 mb-2 block">
                             Display Name (Optional)
                         </label>
-                        <input
+                        <Input
                             type="text"
                             value={displayName}
                             onChange={(e) => setDisplayName(e.target.value)}
-                            className="w-full rounded-lg bg-[#12192E] border border-white/10 px-3 py-2.5 text-white focus:outline-none focus:border-blue-400"
+                            className="bg-background text-foreground"
                             placeholder="How you'd like to be called"
                             disabled={isSaving}
-                        />
+ />
                     </div>
 
                     {error && (
@@ -91,20 +92,18 @@ export default function EditProfileModal({
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">
-                    <button
+                    <Button variant="ghost"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
                         disabled={isSaving}
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-500 hover:bg-blue-600 rounded-lg disabled:opacity-60"
                         disabled={isSaving}
                     >
                         {isSaving ? "Saving..." : "Save Changes"}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

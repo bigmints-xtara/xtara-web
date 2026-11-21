@@ -1,5 +1,6 @@
 "use client";
 
+import { NativeSelect } from "@/components/ui/native-select";
 import { trackProductEvent } from "@/lib/analytics";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -63,7 +64,7 @@ export default function OrganizationSignupPage() {
           <CardContent className="p-6 sm:p-8">
             <form className="space-y-5" onSubmit={submit}>
               <label className="block space-y-2"><span className="text-sm font-medium text-slate-700">Institution name</span><Input value={name} onChange={(event) => setName(event.target.value)} maxLength={120} required placeholder="Example Public School" /></label>
-              <label className="block space-y-2"><span className="text-sm font-medium text-slate-700">Institution type</span><select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={kind} onChange={(event) => setKind(event.target.value as typeof kind)}><option value="school">School</option><option value="college">College</option><option value="university">University</option><option value="educational_institution">Educational institution</option></select></label>
+              <label className="block space-y-2"><span className="text-sm font-medium text-slate-700">Institution type</span><NativeSelect className="w-full" value={kind} onChange={(event) => setKind(event.target.value as typeof kind)}><option value="school">School</option><option value="college">College</option><option value="university">University</option><option value="educational_institution">Educational institution</option></NativeSelect></label>
               <label className="block space-y-2"><span className="text-sm font-medium text-slate-700">Academic year <span className="font-normal text-slate-400">(optional)</span></span><Input value={academicYear} onChange={(event) => setAcademicYear(event.target.value)} maxLength={40} placeholder="2026–27" /></label>
               <div className="flex gap-3 rounded-2xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-900"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" /><span>Xtara creates a time-limited trial. Learners keep their personal accounts and data if institution access later ends.</span></div>
               {error ? <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}

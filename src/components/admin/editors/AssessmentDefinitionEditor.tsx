@@ -1,4 +1,5 @@
 'use client';
+import { NativeSelect } from "@/components/ui/native-select";
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,7 +53,7 @@ export default function AssessmentDefinitionEditor({ entity, onSave, onCancel }:
   </div>;
 }
 function DefinitionSelectors({ locale, grade, onLocale, onGrade }: { locale: DefinitionLocale; grade: DefinitionGrade; onLocale: (value: DefinitionLocale) => void; onGrade: (value: DefinitionGrade) => void }) {
-  return <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-medium">Language<select className="mt-1 block w-full rounded-md border bg-background p-2" value={locale} onChange={(event) => onLocale(event.target.value as DefinitionLocale)}>{assessmentLocales.map((item) => <option key={item} value={item}>{({ en: 'English', ml: 'Malayalam', hi: 'Hindi', ta: 'Tamil' })[item]}</option>)}</select></label><label className="text-sm font-medium">Grade<select className="mt-1 block w-full rounded-md border bg-background p-2" value={grade} onChange={(event) => onGrade(event.target.value as DefinitionGrade)}>{assessmentGrades.map((item) => <option key={item} value={item}>{item.replace('grade', 'Grade ')}</option>)}</select></label></div>;
+  return <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-medium">Language<NativeSelect className="mt-1 w-full" value={locale} onChange={(event) => onLocale(event.target.value as DefinitionLocale)}>{assessmentLocales.map((item) => <option key={item} value={item}>{({ en: 'English', ml: 'Malayalam', hi: 'Hindi', ta: 'Tamil' })[item]}</option>)}</NativeSelect></label><label className="text-sm font-medium">Grade<NativeSelect className="mt-1 w-full" value={grade} onChange={(event) => onGrade(event.target.value as DefinitionGrade)}>{assessmentGrades.map((item) => <option key={item} value={item}>{item.replace('grade', 'Grade ')}</option>)}</NativeSelect></label></div>;
 }
 export function AssessmentDefinitionPreview({ entity }: { entity: AssessmentDefinitionAdmin }) {
   const [locale, setLocale] = useState<DefinitionLocale>('en'); const [grade, setGrade] = useState<DefinitionGrade>('grade8');

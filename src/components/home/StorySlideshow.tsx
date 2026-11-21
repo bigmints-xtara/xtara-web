@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -175,20 +176,20 @@ export default function StorySlideshow({ story, isOpen, onClose, onComplete, use
                 </div>
 
                 {/* Close button */}
-                <button
+                <Button variant="ghost" size="icon"
                     onClick={handleClose}
-                    className="absolute top-4 right-4 z-[120] p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                    className="absolute top-4 right-4 z-[120]"
                     aria-label="Close story"
                 >
                     <X size={24} />
-                </button>
+                </Button>
 
                 {saveError && (
                     <div className="absolute inset-x-4 bottom-6 z-[130] rounded-xl bg-black/85 p-4 text-center" role="alert">
                         <p className="text-sm">{saveError}</p>
-                        <button
+                        <Button
                             type="button"
-                            className="mt-3 rounded-md bg-white px-4 py-2 text-sm font-medium text-black disabled:opacity-50"
+                            className="mt-3"
                             onClick={(event) => {
                                 event.stopPropagation();
                                 void handleComplete();
@@ -196,7 +197,7 @@ export default function StorySlideshow({ story, isOpen, onClose, onComplete, use
                             disabled={savingCompletion}
                         >
                             {savingCompletion ? "Saving…" : "Retry"}
-                        </button>
+                        </Button>
                     </div>
                 )}
 

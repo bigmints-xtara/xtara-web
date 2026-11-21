@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import Container from "@/components/Container";
 import MarketingLayout from "@/components/MarketingLayout";
 import { useState } from "react";
@@ -89,29 +92,29 @@ This request was submitted through the Xtara website account deletion form.`;
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email Address *
                 </label>
-                <input
+                <Input
                   type="email"
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors"
+                  className="w-full"
                   placeholder="Enter the email address associated with your account"
-                />
+ />
               </div>
 
               <div>
                 <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-2">
                   Reason for Deletion (Optional)
                 </label>
-                <textarea
+                <Textarea
                   id="reason"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-colors"
+                  className="w-full"
                   placeholder="Please let us know why you're leaving. This helps us improve our service."
-                />
+ />
               </div>
 
               {error && (
@@ -132,13 +135,13 @@ This request was submitted through the Xtara website account deletion form.`;
                 </ul>
               </div>
 
-              <button
+              <Button variant="destructive"
                 type="submit"
                 disabled={isSubmitting || !email}
-                className="w-full bg-primary text-white py-3 px-6 rounded-lg font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full"
               >
                 {isSubmitting ? "Processing..." : "Request Account Deletion"}
-              </button>
+              </Button>
             </form>
 
             <div className="mt-6 text-center">
@@ -175,16 +178,16 @@ This request was submitted through the Xtara website account deletion form.`;
                 xtara.connect@gmail.com
               </a>
             </p>
-            <button
+            <Button variant="outline"
               onClick={() => {
                 setIsSubmitted(false);
                 setEmail("");
                 setReason("");
               }}
-              className="mt-6 bg-primary text-white py-2 px-4 rounded-lg hover:bg-opacity-90 transition-colors"
+              className="mt-6"
             >
               Submit Another Request
-            </button>
+            </Button>
           </div>
         )}
 

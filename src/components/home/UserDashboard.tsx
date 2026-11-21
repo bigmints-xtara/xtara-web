@@ -135,7 +135,7 @@ export default function UserDashboard() {
   if (isAccount && !currentReadback && !cachedReadback) return <DashboardSkeleton />;
   if (isAccount && currentReadback && accountLoad.error && !cachedReadback) return <main className={loadingStyles.shell}><p role="alert">{getAssessmentV2Catalog(locale).ui.errorTitle}</p><Button onClick={() => setRetryAccount((value) => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></main>;
   const refreshNotice = isAccount && currentReadback && accountLoad.error && cachedReadback
-    ? <div className={loadingStyles.notice} role="status"><span>{({en:'Showing your saved view. We couldn’t refresh it.',ml:'സംരക്ഷിച്ച കാഴ്ചയാണ് കാണിക്കുന്നത്. പുതുക്കാനായില്ല.',hi:'आपका सहेजा हुआ दृश्य दिखाया जा रहा है। अभी अपडेट नहीं हो पाया।',ta:'சேமித்த காட்சி காட்டப்படுகிறது. புதுப்பிக்க முடியவில்லை.'})[locale]}</span><button onClick={() => setRetryAccount(value => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</button></div> : null;
+    ? <div className={loadingStyles.notice} role="status"><span>{({en:'Showing your saved view. We couldn’t refresh it.',ml:'സംരക്ഷിച്ച കാഴ്ചയാണ് കാണിക്കുന്നത്. പുതുക്കാനായില്ല.',hi:'आपका सहेजा हुआ दृश्य दिखाया जा रहा है। अभी अपडेट नहीं हो पाया।',ta:'சேமித்த காட்சி காட்டப்படுகிறது. புதுப்பிக்க முடியவில்லை.'})[locale]}</span><Button onClick={() => setRetryAccount(value => value + 1)}>{getAssessmentV2Catalog(locale).ui.retry}</Button></div> : null;
 
   const name = (userProfile?.fullName || user?.displayName || "").trim();
   const greeting = name && name.toLowerCase() !== "student" ? text.greeting.replace("{name}", name.split(/\s+/)[0]) : "";
@@ -309,7 +309,7 @@ export default function UserDashboard() {
                 {progressGoals.map((step) => {
                   const content = <><span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${step.completed ? "bg-emerald-700 text-white" : "bg-slate-100 text-slate-500"}`}>{step.completed ? <Check className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}</span><span className={step.completed ? "text-sm text-muted-foreground line-through" : "text-sm font-medium text-foreground"}>{step.title}</span></>;
                   return step.id === "discuss" && !step.completed ? (
-                    <button key={step.id} type="button" aria-pressed={false} onClick={() => updateStep(step.id)} className="flex w-full items-center gap-3 rounded-2xl border border-primary/10 p-4 text-left hover:border-primary/30">{content}</button>
+                    <Button variant="surface" key={step.id} type="button" aria-pressed={false} onClick={() => updateStep(step.id)} className="flex w-full items-center gap-3 rounded-2xl border border-primary/10 p-4 text-left hover:border-primary/30">{content}</Button>
                   ) : (
                     <div key={step.id} className="flex w-full items-center gap-3 rounded-2xl border border-primary/10 p-4 text-left">{content}</div>
                   );

@@ -1,6 +1,7 @@
 "use client";
 
 
+import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
@@ -37,7 +38,7 @@ export default function CareerHubLayout({
         return (
             <div className="min-h-screen bg-[#0f172c] text-white flex items-center justify-center flex-col gap-4">
                 <h2 className="text-xl font-bold">Career path not found</h2>
-                <button onClick={() => router.push('/')} className="text-blue-400 hover:underline">Return Home</button>
+                <Button variant="ghost" onClick={() => router.push('/')} >Return Home</Button>
             </div>
         );
     }
@@ -48,13 +49,13 @@ export default function CareerHubLayout({
 
             <div className="container mx-auto max-w-5xl p-6 md:p-8 pb-20">
                 {/* Breadcrumb nav */}
-                <button
+                <Button variant="ghost"
                     onClick={() => router.push(`/careers/${id}`)}
-                    className="flex items-center text-gray-400 hover:text-white transition-colors mb-8 group text-sm font-medium"
+                    className="mb-8"
                 >
                     <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" />
                     Back to {careerPath?.title}
-                </button>
+                </Button>
 
                 {/* Header */}
                 {!hideHeader && (

@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -92,13 +94,13 @@ export default function ExploreCareers() {
   const directionIsCurrent = state.step === 'roles' && !state.industry;
   const breadcrumbs = <nav aria-label={copy.path}>
     <ol className={styles.breadcrumbs}>
-      <li><button onClick={() => navigate({ ...initialExploreState, view: state.view })}>{copy.directions}</button></li>
+      <li><Button variant="ghost" onClick={() => navigate({ ...initialExploreState, view: state.view })}>{copy.directions}</Button></li>
       {direction && <li>
         <ChevronRight aria-hidden="true" />
         {directionIsCurrent ? <span aria-current="page">{direction.title}</span> :
-          <button onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}>{direction.title}</button>}
+          <Button variant="ghost" onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}>{direction.title}</Button>}
       </li>}
-      {parent && <li><ChevronRight aria-hidden="true" /><button onClick={() => goCareer(parent.id)}>{parent.title}</button></li>}
+      {parent && <li><ChevronRight aria-hidden="true" /><Button variant="ghost" onClick={() => goCareer(parent.id)}>{parent.title}</Button></li>}
       {career && <li>
         <ChevronRight aria-hidden="true" />
         <span aria-current="page">{invitation ? invite.yourDream : specialization ? copy.specializations : career.title}</span>
@@ -132,10 +134,10 @@ export default function ExploreCareers() {
         </div>}
         {!introduction && <div className={styles.topline} data-inner={!home || undefined}>
           {!home && breadcrumbs}
-          <button className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>
+          <Button variant="ghost" size="icon" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>
             <MotionIcon size={17} aria-hidden="true" />
             <span>{motionLabel}</span>
-          </button>
+          </Button>
         </div>}
       <div key={`${groupKey}:${locale}`} className={styles.stage}>
         {introduction ? <section className={styles.guideIntro}>
@@ -144,12 +146,12 @@ export default function ExploreCareers() {
         </div>
         <h1 ref={heading} tabIndex={-1}>{guide.guideTitle}</h1>
         <p>{guide.guideLead}</p>
-        <button className={styles.primary} onClick={() => navigate(initialExploreState)}>{guide.guideStart}<ArrowRight size={16}/></button>
-      </section> : isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><button className={styles.primary} onClick={() => void refetch()}>{copy.retry}</button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
+        <Button onClick={() => navigate(initialExploreState)}>{guide.guideStart}<ArrowRight size={16}/></Button>
+      </section> : isPending ? <div className={styles.status} role="status"><span className={styles.loadingOrb} />{copy.loading}</div> : isError ? <div className={styles.status}><p role="alert">{copy.error}</p><Button onClick={() => void refetch()}>{copy.retry}</Button></div> : !data?.directions.length || !data.careers.length ? <p className={styles.status} role="status">{copy.empty}</p> : invitation && career && direction ? <section className={styles.invitationContent}>
         <div className={styles.invitationBubble}><ExplorerScene illustration={selectedArtwork.illustration} contextTitle={selectedArtwork.contextTitle} placeholder={text.illustration} bubble /></div>
         <p className={styles.eyebrow}>{text.nextStep}</p>
         <h1 ref={heading} tabIndex={-1}>{invite.headingLead}<br /><span>{invite.headingAccent}</span></h1>
-        <div className={styles.careerIntent}><p>{invite.choice}</p><h2>{parent?.title || career.title}</h2>{parent && <p>{career.title}</p>}<button className={styles.quiet} onClick={() => navigate({...state,career:null,step:'roles',q:''})}>{invite.change}</button></div>
+        <div className={styles.careerIntent}><p>{invite.choice}</p><h2>{parent?.title || career.title}</h2>{parent && <p>{career.title}</p>}<Button variant="ghost" onClick={() => navigate({...state,career:null,step:'roles',q:''})}>{invite.change}</Button></div>
         <section className={styles.accountBenefits} aria-labelledby="account-benefits-title"><h2 id="account-benefits-title">{invite.benefitsTitle}</h2><ul>{[
           [text.benefitSave, invite.saveDetail], [text.benefitGuide, invite.guideDetail], [text.benefitReturn, invite.returnDetail],
         ].map(([title, detail]) => <li key={title}><span aria-hidden="true">✓</span><div><strong>{title}</strong><p>{detail}</p></div></li>)}</ul></section>
@@ -158,7 +160,7 @@ export default function ExploreCareers() {
       </section> : overview && career ? <>
         <div className={styles.connection} aria-label={`${direction?.title || ''}, ${parent?.title || career.title}, ${parent ? career.title : text.nextStep}`}>
           <span className={styles.orbit} /><span className={styles.orbitTwo} />
-          <button className={`${styles.satellite} ${styles.connectionLink}`} aria-label={direction?.title} disabled={!direction} onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}><ExplorerScene illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></button>
+          <Button variant="surface" className={`${styles.satellite} ${styles.connectionLink}`} aria-label={direction?.title} disabled={!direction} onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}><ExplorerScene illustration={direction?.illustration} placeholder={text.illustration} bubble /><span>{direction?.title}</span></Button>
           <div className={styles.central}><ExplorerScene illustration={centerContextShown ? undefined : centerArtwork.illustration}
             contextTitle={centerArtwork.contextTitle} contextShown={centerContextShown} placeholder={text.illustration} bubble /><span>{parent?.title || career.title}</span></div>
           <div className={styles.satellite}>{parent ? <ExplorerScene illustration={detailContextShown ? undefined : selectedArtwork.illustration} contextTitle={selectedArtwork.contextTitle} contextShown={detailContextShown} placeholder={text.illustration} bubble /> : <div className={`${styles.media} ${styles.bubbleMedia}`}><Sparkles className={styles.nextSpark} size={42} strokeWidth={1.25} /></div>}<span>{parent ? career.title : text.nextStep}</span></div>
@@ -172,11 +174,11 @@ export default function ExploreCareers() {
           {[direction, ...(parent ? [parent] : [])].filter(item => item.summary).map(item => <div key={item.id}><h3>{item.title}</h3><p>{item.summary}</p></div>)}
         </section>}
         <CareerOverviewSections career={career} />
-        <section className={styles.decision}><ExplorerAccountContext /><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href={assessmentHref}>{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <button className={styles.primary} disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></button>}</div>
+        <section className={styles.decision}><ExplorerAccountContext /><div className={styles.decisionBar}><div className={styles.decisionCopy}><h2>{text.chapter}</h2><p>{text.chapterHint}</p></div><div className={styles.decisionActions}><Link className={styles.secondary} href={assessmentHref}>{copy.assessment}<ArrowUpRight size={16} /></Link>{saveState === 'saved' ? <Link className={styles.primary} href="/dashboard">{text.continue}<ArrowRight size={16} /></Link> : <Button disabled={saveState === 'saving'} onClick={() => void onPursue()}>{saveState === 'saving' ? text.saving : text.pursue}<ArrowRight size={16} /></Button>}</div>
           {saveState === 'error' && <p role="alert">{text.saveError}</p>}{saveState === 'saved' && <p role="status">{text.saved}</p>}
           </div>
           {(!user || user.isAnonymous) && <details className={styles.benefits}><summary>{text.benefits}</summary><ul><li>{text.benefitSave}</li><li>{text.benefitGuide}</li><li>{text.benefitReturn}</li></ul></details>}
-          <button className={styles.quiet} onClick={() => navigate(initialExploreState)}>{copy.keepExploring} <ArrowRight size={14} /></button>
+          <Button variant="ghost" onClick={() => navigate(initialExploreState)}>{copy.keepExploring} <ArrowRight size={14} /></Button>
         </section>
       </> : <>
         <section className={styles.browseFold}>
@@ -201,7 +203,7 @@ export default function ExploreCareers() {
           const repeatedContext = !active && Boolean(artwork?.contextTitle && artwork.illustration &&
             (sceneCounts.get(artwork.illustration.url) ?? 0) > 1);
           const illustration = artwork ? artwork.illustration : 'illustration' in item ? item.illustration : undefined;
-          return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={repeatedContext ? undefined : illustration} contextTitle={artwork?.contextTitle} contextShown={repeatedContext} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><button tabIndex={active ? 0 : -1} className={styles.cardAction} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</button></div></div>;
+          return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={repeatedContext ? undefined : illustration} contextTitle={artwork?.contextTitle} contextShown={repeatedContext} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><Button variant="outline" tabIndex={active ? 0 : -1} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</Button></div></div>;
         }} />}
         </section>
         {home && <section className={styles.directionNotes}><h2>{guide.howTo}</h2>
@@ -222,11 +224,11 @@ export default function ExploreCareers() {
         {!home && state.step !== 'industries' && <details className={styles.completeList} key={`directory:${groupKey}`}>
           <summary>{specialization ? 'All specializations' : 'All careers in this direction'} · {choices.length} {specialization ? 'specializations' : 'careers and groups'}</summary>
           <p>Groups open their specializations. Careers may appear in more than one direction.</p>
-          <label>Find a career<input type="search" value={listQuery} onChange={event => setListQuery(event.target.value)} /></label>
-          <ul>{choices.filter(item => `${item.title} ${item.summary}`.toLocaleLowerCase(locale).includes(listQuery.toLocaleLowerCase(locale))).map(item => <li key={item.id}><button onClick={() => goCareer(item.id)}><span>{item.title}</span>{'specializationIds' in item && Boolean(item.specializationIds?.length) && <small>{item.specializationIds?.length} specializations</small>}<ArrowRight size={16} /></button></li>)}</ul>
+          <label>Find a career<Input type="search" value={listQuery} onChange={event => setListQuery(event.target.value)} /></label>
+          <ul>{choices.filter(item => `${item.title} ${item.summary}`.toLocaleLowerCase(locale).includes(listQuery.toLocaleLowerCase(locale))).map(item => <li key={item.id}><Button variant="surface" onClick={() => goCareer(item.id)}><span>{item.title}</span>{'specializationIds' in item && Boolean(item.specializationIds?.length) && <small>{item.specializationIds?.length} specializations</small>}<ArrowRight size={16} /></Button></li>)}</ul>
           {listQuery && !choices.some(item => `${item.title} ${item.summary}`.toLocaleLowerCase(locale).includes(listQuery.toLocaleLowerCase(locale))) && <p role="status">{copy.noMatches}</p>}
         </details>}
-        {specialization && <button className={styles.quiet} onClick={() => goCareer(career!.id, true)}>{text.meet}: {career?.title}<ArrowRight size={14} /></button>}
+        {specialization && <Button variant="ghost" onClick={() => goCareer(career!.id, true)}>{text.meet}: {career?.title}<ArrowRight size={14} /></Button>}
       </>}
     </div>
       </main>

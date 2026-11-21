@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -67,20 +68,19 @@ export default function ManageSubjectsModal({
                             {selectedSubjects.length} subject{selectedSubjects.length !== 1 ? 's' : ''} selected
                         </p>
                     </div>
-                    <button
+                    <Button variant="ghost" size="icon" aria-label="Close dialog"
                         onClick={onClose}
-                        className="p-1 hover:bg-white/5 rounded-lg transition-colors"
                         disabled={isSaving}
                     >
                         <X size={20} className="text-gray-400" />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
                     {allSubjects.map((subject) => {
                         const isSelected = selectedSubjects.includes(subject);
                         return (
-                            <button
+                            <Button variant="surface"
                                 key={subject}
                                 onClick={() => toggleSubject(subject)}
                                 className={`p-3 rounded-lg border-2 transition-all text-left ${isSelected
@@ -100,7 +100,7 @@ export default function ManageSubjectsModal({
                                     </div>
                                     <span className="text-sm font-medium">{subject}</span>
                                 </div>
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
@@ -110,20 +110,18 @@ export default function ManageSubjectsModal({
                 )}
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                    <button
+                    <Button variant="ghost"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
                         disabled={isSaving}
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-teal-500 hover:bg-teal-600 rounded-lg disabled:opacity-60"
                         disabled={isSaving}
                     >
                         {isSaving ? "Saving..." : "Save Changes"}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

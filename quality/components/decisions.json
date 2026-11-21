@@ -19,5 +19,12 @@
     "gap": "The reviewed recommendation must carry both IDs, display the match reason, and restore focus to its specific source link.",
     "consumer": "SavedCareerStudy and SavedCareerContractView",
     "verification": "CollegeOfferingPage.test.tsx and verify:saved-career-ui"
+  },
+  "src/components/ui/native-select.tsx#NativeSelect": {
+    "purpose": "Give native form pickers consistent focus, disabled and theme styling.",
+    "closest": "Select and SelectTrigger",
+    "gap": "Form editors consume DOM change events, option children and native validation. Radix Select has a different event and option model.",
+    "consumer": "Admin content editors, study options and profile forms. Flutter retains its platform pickers.",
+    "verification": "The local interactive picker specimen and web form tests exercise real option changes."
   }
 }

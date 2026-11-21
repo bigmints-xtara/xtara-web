@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { useState } from 'react';
 import { CheckCircle2, CircleDashed, Languages } from 'lucide-react';
 
@@ -60,7 +61,7 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
           const coverageState = coverage.state;
           const ready = coverageState === 'complete';
           return (
-            <button
+            <Button variant="surface"
               aria-pressed={locale === item.id}
               className={`flex items-center justify-between rounded-lg border px-3 py-2 text-left text-sm font-medium ${locale === item.id ? 'border-blue-600 bg-blue-600 text-white' : 'bg-white text-slate-800'}`}
               key={item.id}
@@ -77,7 +78,7 @@ export default function DreamCareerTranslationReviewPanel({ career }: { career: 
                 </span>
               </span>
               {ready ? <CheckCircle2 className="size-4" /> : <CircleDashed className="size-4" />}
-            </button>
+            </Button>
           );
         })}
       </div>

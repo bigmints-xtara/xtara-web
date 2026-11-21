@@ -82,7 +82,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
                       <Link href={browse ? studyOptionsHref(career.id, href) : `${href}#courses-and-colleges`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold hover:underline">{study.action}<ArrowRight size={15} aria-hidden="true" /></Link>
                     </div>
                   </div> : null}
-                  {career.study?.status === "temporarily_unavailable" && <p className={styles.studyStatus}>{study.unavailable} <button onClick={onRetry}>{study.retry}</button></p>}
+                  {career.study?.status === "temporarily_unavailable" && <p className={styles.studyStatus}>{study.unavailable} <Button onClick={onRetry}>{study.retry}</Button></p>}
                 </li>
               );
             })}

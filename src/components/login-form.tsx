@@ -147,7 +147,7 @@ export function LoginForm({
                   disabled={controlsDisabled}
                   className="h-12 rounded-xl bg-background px-4 shadow-none"
                   required
-                />
+ />
               </Field>
               <Field>
                 <FieldLabel htmlFor="login-password">{copy.password}</FieldLabel>
@@ -161,18 +161,18 @@ export function LoginForm({
                   disabled={controlsDisabled}
                   className="h-12 rounded-xl bg-background pl-4 pr-14 shadow-none"
                   required
-                />
-                  <button
+ />
+                  <Button variant="ghost" size="icon"
                     type="button"
                     aria-label={passwordVisible ? copy.hidePassword : copy.showPassword}
                     aria-pressed={passwordVisible}
                     aria-controls="login-password"
                     disabled={controlsDisabled}
                     onClick={() => setPasswordVisible(visible => !visible)}
-                    className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-xl text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50"
+                    className="absolute inset-y-0 right-0 w-12"
                   >
                     {passwordVisible ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
-                  </button>
+                  </Button>
                 </div>
               </Field>
               <Field>

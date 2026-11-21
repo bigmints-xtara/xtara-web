@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 
 export interface ResourceItem {
@@ -32,7 +33,7 @@ export default function ResourceList({ items, emptyMessage = "No items available
     return (
         <div className="space-y-1">
             {items.map((item) => (
-                <button
+                <Button variant="surface"
                     key={item.id}
                     onClick={() => onItemClick?.(item)}
                     className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-200 flex items-center gap-3 group"
@@ -53,7 +54,7 @@ export default function ResourceList({ items, emptyMessage = "No items available
 
                     {/* Chevron on right */}
                     <ChevronRight size={16} className="text-gray-400 group-hover:text-gray-600 flex-shrink-0" />
-                </button>
+                </Button>
             ))}
         </div>
     );

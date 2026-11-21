@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 import { useTranslations } from '@/i18n/language-provider';
@@ -42,7 +43,7 @@ function ConversationViewer({ onClose, slides, onRetry, retryLabel, status }: Om
   return <dialog ref={dialog} className={styles.dialog} aria-label={text.title} aria-busy={status === 'loading'} onCancel={(event) => { event.preventDefault(); onClose(); }}>
     <header className={styles.header}>
       <span>{text.title}</span>
-      <button type="button" onClick={onClose} aria-label={text.close}><X size={20} aria-hidden="true" /></button>
+      <Button variant="ghost" size="icon" type="button" onClick={onClose} aria-label={text.close}><X size={20} aria-hidden="true" /></Button>
     </header>
     <div className={styles.layout}>
       <nav className={styles.topics} aria-label={text.topics}>
@@ -62,9 +63,9 @@ function ConversationViewer({ onClose, slides, onRetry, retryLabel, status }: Om
       </div>
     </div>
     <footer className={styles.footer}>
-      {onRetry ? <button type="button" onClick={onRetry}>{retryLabel}</button> : null}
-      <button type="button" disabled={current === 0} onClick={() => setIndex(current - 1)}><ArrowLeft size={17} aria-hidden="true" />{text.previous}</button>
-      <button type="button" className={styles.next} onClick={() => current === slides.length - 1 ? onClose() : setIndex(current + 1)}>{current === slides.length - 1 ? text.finish : text.next}<ArrowRight size={17} aria-hidden="true" /></button>
+      {onRetry ? <Button variant="outline" type="button" onClick={onRetry}>{retryLabel}</Button> : null}
+      <Button variant="outline" type="button" disabled={current === 0} onClick={() => setIndex(current - 1)}><ArrowLeft size={17} aria-hidden="true" />{text.previous}</Button>
+      <Button type="button" onClick={() => current === slides.length - 1 ? onClose() : setIndex(current + 1)}>{current === slides.length - 1 ? text.finish : text.next}<ArrowRight size={17} aria-hidden="true" /></Button>
     </footer>
   </dialog>;
 }

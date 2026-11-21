@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 import { Search, Globe, FileText, GraduationCap, CheckCircle } from "lucide-react";
 import CareerHubLayout from "@/components/careers/CareerHubLayout";
@@ -40,7 +41,7 @@ export default function ScholarshipDetailPage() {
 
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-white">Scholarship Information</h2>
-                    <button className="px-4 py-1.5 bg-white/10 text-xs font-bold rounded-full text-gray-300 hover:bg-white/20 transition-colors">Details</button>
+                    <Button variant="outline" >Details</Button>
                 </div>
 
                 <div className="bg-[#1e293b] rounded-2xl border border-white/10 overflow-hidden">

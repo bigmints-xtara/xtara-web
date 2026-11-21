@@ -165,7 +165,7 @@ function CollegeDetailContent() {
     // A native navigation preserves the exact offering anchor while the guide hydrates.
     if (returnTo?.startsWith("/dream-careers/")) return <a href={returnTo} className={classes}>{arrow}{study.backCareer}</a>;
     if (returnTo) return <Link href={returnTo} className={classes}>{arrow}{study.backResults}</Link>;
-    return <button type="button" onClick={() => router.back()} className={classes}>{arrow}{text.back}</button>;
+    return <Button variant="ghost" type="button" onClick={() => router.back()} className={classes}>{arrow}{text.back}</Button>;
   };
 
   if (detail.isPending) {

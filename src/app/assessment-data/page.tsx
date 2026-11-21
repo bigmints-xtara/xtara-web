@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import Navbar from "@/components/layout/Navbar";
 import { ArrowLeft } from "lucide-react";
@@ -172,9 +173,9 @@ export default function AssessmentDataPage() {
             <div className="min-h-screen bg-gray-50">
                 <Navbar />
                 <div className="container mx-auto px-4 py-8">
-                    <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6">
+                    <Button variant="ghost" onClick={() => router.back()} className="mb-6">
                         <ArrowLeft size={20} /> Back
-                    </button>
+                    </Button>
                     <div className="bg-white rounded-xl p-8 text-center">
                         <p className="text-gray-500">No assessment data available. Complete your assessment to view your personalized report.</p>
                     </div>
@@ -190,10 +191,10 @@ export default function AssessmentDataPage() {
             <Navbar />
 
             <main className="container mx-auto px-4 py-8 max-w-4xl">
-                <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 transition-colors">
+                <Button variant="ghost" onClick={() => router.back()} className="mb-8">
                     <ArrowLeft size={20} />
                     <span className="font-medium">Back to profile</span>
-                </button>
+                </Button>
 
                 {/* Simple Header */}
                 <div className="mb-12">

@@ -1,5 +1,7 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { AlertCircle, CalendarDays, CheckCircle2, Loader2, Minus, Plus } from "lucide-react";
 
@@ -223,16 +225,14 @@ export default function WeeklyPlanCard() {
                 const target = draft[kind] ?? 1;
                 return (
                   <div key={kind} className={`flex min-w-0 items-center gap-2 rounded-2xl border p-3 ${selected ? "border-primary/20 bg-secondary/15" : "border-primary/10"}`}>
-                    <input
-                      type="checkbox"
-                      aria-label={text.kind[kind]}
-                      checked={selected}
-                      onChange={() => toggle(kind)}
-                      className="h-5 w-5 shrink-0 accent-primary"
-                    />
-                    <button type="button" onClick={() => toggle(kind)} className="min-w-0 flex-1 text-left text-sm font-semibold text-primary">
-                      {text.kind[kind]}
-                    </button>
+                    <Label className="min-w-0 flex-1">
+                      <Input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => toggle(kind)}
+                      />
+                      <span>{text.kind[kind]}</span>
+                    </Label>
                     {selected ? (
                       <div className="flex shrink-0 items-center">
                         <Button type="button" size="icon" variant="ghost" className="h-9 w-9 rounded-full" aria-label={`${text.decrease} ${text.kind[kind]}`} onClick={() => changeTarget(kind, -1)} disabled={target <= 1}>

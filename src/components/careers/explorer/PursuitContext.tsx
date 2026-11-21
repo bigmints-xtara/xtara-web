@@ -1,4 +1,5 @@
 'use client';
+import { Button } from "@/components/ui/button";
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from '@/i18n/language-provider';
 import { getCareerExplorer } from '@/lib/career-explorer-api';
@@ -17,6 +18,6 @@ function PublishedPursuitContext({ careerId, directionId }: { careerId: string; 
   const { data, isError, isPending, refetch } = useQuery({queryKey:['career-explorer',locale],queryFn:({signal}) => getCareerExplorer(locale,signal),enabled:Boolean(careerId && directionId),meta:{authScope:'public'},retry:false});
   const career = data?.careers.find(item => item.id === careerId && item.directionIds.includes(directionId));
   return <section className="mb-5 text-center text-foreground" aria-live="polite">
-    {isPending ? <p className="text-sm">{explorerCopy[locale].loading}</p> : isError ? <button className="min-h-11 text-sm underline" onClick={() => void refetch()}>{explorerCopy[locale].retry}</button> : career ? <><p className="text-xs font-medium uppercase tracking-widest">{text.pursue}</p><h2 className="mt-2 text-xl font-semibold">{career.title}</h2><p className="mt-2 text-sm">{text.benefitSave} · {text.benefitReturn}</p></> : <p className="text-sm">{explorerCopy[locale].workEmpty}</p>}
+    {isPending ? <p className="text-sm">{explorerCopy[locale].loading}</p> : isError ? <Button variant="link" className="min-h-11" onClick={() => void refetch()}>{explorerCopy[locale].retry}</Button> : career ? <><p className="text-xs font-medium uppercase tracking-widest">{text.pursue}</p><h2 className="mt-2 text-xl font-semibold">{career.title}</h2><p className="mt-2 text-sm">{text.benefitSave} · {text.benefitReturn}</p></> : <p className="text-sm">{explorerCopy[locale].workEmpty}</p>}
   </section>;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 
@@ -41,7 +42,7 @@ export default function ToolsGrid({
             {/* Grid of tools */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {visibleItems.map((item) => (
-                    <button
+                    <Button variant="surface"
                         key={item.id}
                         onClick={() => onItemClick?.(item)}
                         className="bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover: transition-all text-center group"
@@ -62,20 +63,19 @@ export default function ToolsGrid({
                                 {item.description.substring(0, 30)}...
                             </p>
                         )}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
             {/* Load More Button */}
             {hasMore && (
                 <div className="mt-6 text-center">
-                    <button
-                        onClick={() => setDisplayCount(prev => Math.min(prev + initialDisplay, items.length))}
-                        className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
+                    <Button variant="outline"
+                      onClick={() => setDisplayCount(prev => Math.min(prev + initialDisplay, items.length))}
                     >
                         Load More
                         <ChevronRight size={16} className="rotate-90" />
-                    </button>
+                    </Button>
                     <p className="text-xs text-gray-500 mt-2">
                         Showing {displayCount} of {items.length} tools
                     </p>

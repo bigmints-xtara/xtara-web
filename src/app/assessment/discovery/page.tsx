@@ -169,9 +169,9 @@ export default function DiscoveryResultPage() {
                   <div className={design.recommendationCopy}>
                     <h2 id={`result-${area.id}`}>
                       {featured ? title : (
-                        <button type="button" className={design.directionPick} onClick={select} disabled={saving}>
+                        <Button variant="surface" type="button" className={design.directionPick} onClick={select} disabled={saving}>
                           <span>{title}</span><ChevronRight size={17} aria-hidden="true" />
-                        </button>
+                        </Button>
                       )}
                     </h2>
                     <div className={design.actions}>

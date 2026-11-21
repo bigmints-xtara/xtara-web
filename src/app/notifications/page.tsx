@@ -56,11 +56,11 @@ export default function NotificationsPage() {
           return <article key={item.id} className={`rounded-2xl border p-4 shadow-sm sm:p-5 ${unread ? "border-sky-200 bg-sky-50/70 dark:border-sky-900 dark:bg-sky-950/30" : "border-primary/10 bg-card"}`}>
             <div className="flex items-start gap-3">
               <span className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${unread ? "bg-sky-600" : "bg-transparent"}`} aria-label={unread ? text.unread : undefined} />
-              <button type="button" onClick={() => void openNotification(item)} disabled={!href} className="min-w-0 flex-1 text-left disabled:cursor-default">
+              <Button variant="surface" type="button" onClick={() => void openNotification(item)} disabled={!href} className="min-w-0 flex-1 text-left disabled:cursor-default">
                 <span className="flex items-start justify-between gap-3"><span className="font-semibold text-primary">{item.title}</span>{href ? <ChevronRight className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" aria-label={text.open} /> : null}</span>
                 <span className="mt-1 block text-sm leading-6 text-muted-foreground">{item.body}</span>
                 <time className="mt-3 block text-xs text-muted-foreground" dateTime={item.createdAt}>{new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(item.createdAt))}</time>
-              </button>
+              </Button>
               <Button size="icon" variant="ghost" aria-label={`${text.dismiss}: ${item.title}`} disabled={actions.dismiss.isPending} onClick={() => actions.dismiss.mutate(item.id)}><X className="h-4 w-4" /></Button>
             </div>
           </article>;

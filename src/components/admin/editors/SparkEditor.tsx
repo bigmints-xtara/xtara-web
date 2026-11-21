@@ -1,5 +1,8 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { useState } from 'react';
 import { Save, X } from 'lucide-react';
 import type { Spark } from '@/types/admin';
@@ -67,22 +70,20 @@ export default function SparkEditor({ spark, onSave, onCancel }: SparkEditorProp
                     {spark ? 'Edit Spark' : 'Create New Spark'}
                 </h2>
                 <div className="flex gap-2">
-                    <button
+                    <Button variant="ghost"
                         type="button"
                         onClick={onCancel}
-                        className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2"
                     >
                         <X size={18} />
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         disabled={isSaving}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                     >
                         <Save size={18} />
                         {isSaving ? 'Saving...' : 'Save'}
-                    </button>
+                    </Button>
                 </div>
                 <ContentTagEditor value={formData} onChange={(tags) => setFormData((current) => ({ ...current, ...tags }))} />
             </div>
@@ -100,14 +101,14 @@ export default function SparkEditor({ spark, onSave, onCancel }: SparkEditorProp
                             <label className="block text-sm font-medium mb-1">
                                 Title <span className="text-red-500">*</span>
                             </label>
-                            <input
+                            <Input
                                 type="text"
                                 required
                                 value={formData.title || ''}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full"
                                 placeholder="Enter spark title"
-                            />
+ />
                         </div>
 
                         <div>
@@ -115,14 +116,14 @@ export default function SparkEditor({ spark, onSave, onCancel }: SparkEditorProp
                                 Type <span className="text-red-500">*</span>
                             </label>
                             <div className="flex flex-col gap-2">
-                                <input
+                                <Input
                                     type="text"
                                     required
                                     value={typeValue}
                                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full"
                                     placeholder="e.g. motivation, fact, tip"
-                                />
+ />
                                 {typeValue && (
                                     <p className="text-xs text-gray-500">
                                         Preview: <span className="font-medium text-blue-600">{formatSnakeCaseToTitleCase(typeValue)}</span>
@@ -135,15 +136,15 @@ export default function SparkEditor({ spark, onSave, onCancel }: SparkEditorProp
                             <label className="block text-sm font-medium mb-1">
                                 Status <span className="text-red-500">*</span>
                             </label>
-                            <select
+                            <NativeSelect
                                 value={getStatus()}
                                 onChange={(e) => setStatus(e.target.value)}
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full"
                             >
                                 <option value="draft">Draft</option>
                                 <option value="inReview">In Review</option>
                                 <option value="published">Published</option>
-                            </select>
+                            </NativeSelect>
                         </div>
                     </div>
                 </div>

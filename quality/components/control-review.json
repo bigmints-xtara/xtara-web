@@ -1,0 +1,1643 @@
+{
+  "baseline": "5e610032fd5eefcc1ea17195c64cbf89364c3dbc",
+  "uses": [
+    {
+      "path": "src/app/admin/assistant/page.tsx",
+      "line": 112,
+      "control": "button",
+      "reason": "The full-viewport backdrop dismisses the overlay. It must cover the viewport independently of the visible dialog actions.",
+      "fingerprint": "56917919ee2b012227ac8ad079d717dc5eb97c37d297f1927990888cf08affc5"
+    },
+    {
+      "path": "src/app/admin/assistant/page.tsx",
+      "line": 196,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/admin/assistant/page.tsx",
+      "line": 414,
+      "control": "button",
+      "reason": "The full-viewport backdrop dismisses the overlay. It must cover the viewport independently of the visible dialog actions.",
+      "fingerprint": "2d0aad3995c9e55f1f1b55bc2191a335c1608c99e9d28ea497da46dabc991475"
+    },
+    {
+      "path": "src/app/admin/assistant/page.tsx",
+      "line": 454,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/admin/career-basics/page.tsx",
+      "line": 55,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/admin/layout.tsx",
+      "line": 95,
+      "control": "button",
+      "reason": "The full-viewport backdrop dismisses the overlay. It must cover the viewport independently of the visible dialog actions.",
+      "fingerprint": "6aca0f9f1814390540bc2a6c2c2bc9ecf2835effc904fd4d4f2b22f42c86e6b1"
+    },
+    {
+      "path": "src/app/admin/mvp-readiness/page.tsx",
+      "line": 48,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/admin/settings/page.tsx",
+      "line": 233,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/admin/users/[uid]/page.tsx",
+      "line": 116,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/admin/users/[uid]/page.tsx",
+      "line": 130,
+      "control": "button",
+      "reason": "This is a tab in a tablist. Its selected indicator, tab role and keyboard focus belong to the tab strip.",
+      "fingerprint": "5b4aa4c8aa9ceb687fe8cc4132ca69077920616da4214f5628c22a8ddc814691"
+    },
+    {
+      "path": "src/app/assessment-data/page.tsx",
+      "line": 175,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/assessment-data/page.tsx",
+      "line": 193,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/assessment/careers/[areaId]/page.tsx",
+      "line": 309,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/assessment/careers/[areaId]/page.tsx",
+      "line": 327,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/assessment/discovery/page.tsx",
+      "line": 172,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/assessment/page.tsx",
+      "line": 187,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/assessment/results/[id]/page.tsx",
+      "line": 108,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/careers/[id]/learn/scholarships/[scholarshipId]/page.tsx",
+      "line": 43,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/careers/[id]/page.tsx",
+      "line": 74,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/careers/[id]/page.tsx",
+      "line": 94,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/careers/[id]/page.tsx",
+      "line": 128,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/careers/[id]/page.tsx",
+      "line": 137,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/colleges/[id]/page.tsx",
+      "line": 168,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/dashboard/challenges/page.tsx",
+      "line": 190,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/dashboard/challenges/page.tsx",
+      "line": 306,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/dashboard/sparks/[id]/quiz/page.tsx",
+      "line": 274,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/error.tsx",
+      "line": 41,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/global-error.tsx",
+      "line": 43,
+      "control": "button",
+      "reason": "The global error document renders outside the application layout. Its recovery action must remain usable when shared layout assets fail.",
+      "fingerprint": "e604cdef5e053917658064a39160e65924de99c4810b822229f8ab16599dc731"
+    },
+    {
+      "path": "src/app/join/[code]/page.tsx",
+      "line": 168,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/join/[code]/page.tsx",
+      "line": 174,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/news/error.tsx",
+      "line": 43,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/news/page.tsx",
+      "line": 151,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/news/page.tsx",
+      "line": 161,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/notifications/page.tsx",
+      "line": 59,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/organization/profile/page.tsx",
+      "line": 232,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/organization/signup/page.tsx",
+      "line": 66,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/app/privacy-policy/delete-account/page.tsx",
+      "line": 92,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/app/privacy-policy/delete-account/page.tsx",
+      "line": 107,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/app/privacy-policy/delete-account/page.tsx",
+      "line": 135,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/privacy-policy/delete-account/page.tsx",
+      "line": 178,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/profile/page.tsx",
+      "line": 526,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/app/profile/page.tsx",
+      "line": 580,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/AssessmentForm.tsx",
+      "line": 72,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/AssessmentForm.tsx",
+      "line": 88,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/AssessmentForm.tsx",
+      "line": 100,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/ContactForm.tsx",
+      "line": 74,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/ContactForm.tsx",
+      "line": 92,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/ContactForm.tsx",
+      "line": 111,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/ContactForm.tsx",
+      "line": 134,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/ContactForm.tsx",
+      "line": 172,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/FAQ.tsx",
+      "line": 31,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/Pricing/PricingColumn.tsx",
+      "line": 24,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/AdminCollegeDetailPage.tsx",
+      "line": 75,
+      "control": "button",
+      "reason": "This is a tab in a tablist. Its selected indicator, tab role and keyboard focus belong to the tab strip.",
+      "fingerprint": "77db59650f912abc7f4ebc2029fd84d93d56b532c39467c9c53b60c3076891a2"
+    },
+    {
+      "path": "src/components/admin/AdminContentEditorPage.tsx",
+      "line": 420,
+      "control": "button",
+      "reason": "This is a tab in a tablist. Its selected indicator, tab role and keyboard focus belong to the tab strip.",
+      "fingerprint": "b5894b1637952423ade51b5a05e1d36705921f1beecee67e5c69cc0a9de8d89c"
+    },
+    {
+      "path": "src/components/admin/AdminDataTable.tsx",
+      "line": 93,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/AdminDataTable.tsx",
+      "line": 109,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/AdminListTile.tsx",
+      "line": 44,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/AdminMasterDetail.tsx",
+      "line": 62,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/CareerReviewEvidencePanel.tsx",
+      "line": 18,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/CareerReviewEvidencePanel.tsx",
+      "line": 96,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/CareerReviewEvidencePanel.tsx",
+      "line": 107,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/CareerReviewEvidencePanel.tsx",
+      "line": 125,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/CareerReviewEvidencePanel.tsx",
+      "line": 128,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/ContentTagEditor.tsx",
+      "line": 66,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/ContentTagEditor.tsx",
+      "line": 71,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/ContentTagEditor.tsx",
+      "line": 76,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/ContentTagEditor.tsx",
+      "line": 81,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 122,
+      "control": "button",
+      "reason": "The full-viewport backdrop dismisses the overlay. It must cover the viewport independently of the visible dialog actions.",
+      "fingerprint": "f9898f5df3a3704f6d1f98a111908ed2820970b38df68e920f1c13b3c6e76662"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 184,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 185,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 261,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 262,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 263,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/DreamCareerPhase1ReviewPage.tsx",
+      "line": 274,
+      "control": "table",
+      "reason": "This scroll container owns both sticky axes. The shared table adds a second scroll container and would change the sticky header boundary.",
+      "fingerprint": "19b712ce0b4e40c3d10acc30298f58580eb43366fe5e0a6ddfaf054bcab2f5e8"
+    },
+    {
+      "path": "src/components/admin/editors/AssessmentDefinitionEditor.tsx",
+      "line": 55,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/AssessmentDefinitionEditor.tsx",
+      "line": 55,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 107,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 115,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 167,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 180,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 193,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 206,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/CareerPathEditor.tsx",
+      "line": 219,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 175,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 183,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 213,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 225,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 236,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 247,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 260,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 281,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 293,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 304,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 315,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 333,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 353,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 365,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 382,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 397,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 409,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 422,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 430,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 442,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 456,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/ChallengeEditor.tsx",
+      "line": 468,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 302,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 310,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 378,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 379,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 398,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 406,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 410,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/CuratedCareerEditors.tsx",
+      "line": 414,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 295,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 296,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 297,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 298,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 300,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 301,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 301,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 302,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerDetailProfileEditor.tsx",
+      "line": 302,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerStudentGuideReviewPanel.tsx",
+      "line": 63,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/DreamCareerTranslationReviewPanel.tsx",
+      "line": 63,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 137,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 145,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 168,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 182,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 197,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 217,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 232,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 249,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 277,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/GameEditor.tsx",
+      "line": 290,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/GameTemplateEditor.tsx",
+      "line": 49,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/GameTemplateEditor.tsx",
+      "line": 50,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/GameTemplateEditor.tsx",
+      "line": 52,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/SparkEditor.tsx",
+      "line": 70,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/SparkEditor.tsx",
+      "line": 78,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/SparkEditor.tsx",
+      "line": 103,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/SparkEditor.tsx",
+      "line": 118,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/SparkEditor.tsx",
+      "line": 138,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 89,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 97,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 121,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 135,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 147,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 160,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 181,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 191,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 201,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 216,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 222,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 224,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 225,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 226,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 227,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 228,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/admin/editors/StoryEditor.tsx",
+      "line": 229,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/assessment/AssessmentEngine.tsx",
+      "line": 212,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/assessment/AssessmentEngine.tsx",
+      "line": 250,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/assessment/AssessmentEngine.tsx",
+      "line": 282,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/career-path/SlideshowOverlay.tsx",
+      "line": 45,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/career-path/SlideshowOverlay.tsx",
+      "line": 50,
+      "control": "button",
+      "reason": "The active step marker selects a slide by position and exposes its current state.",
+      "fingerprint": "0239ce76e22ea60042811372b7f7c4c69bc8cc35ee9e6be91f4a7744e53e204a"
+    },
+    {
+      "path": "src/components/career-path/SlideshowOverlay.tsx",
+      "line": 65,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/career-path/SlideshowOverlay.tsx",
+      "line": 66,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/career-path/SlideshowOverlay.tsx",
+      "line": 67,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/career-path/UniversalSlide.tsx",
+      "line": 76,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/CareerHubLayout.tsx",
+      "line": 40,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/CareerHubLayout.tsx",
+      "line": 51,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/CareerTabs.tsx",
+      "line": 25,
+      "control": "button",
+      "reason": "The tab bar animates its shared selection indicator between destinations.",
+      "fingerprint": "2978bd9917acaf22c358383ea9ae459c5ac99602e5ff43d176b2b00f0398764f"
+    },
+    {
+      "path": "src/components/careers/CareerTabs.tsx",
+      "line": 50,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/DreamCareerStudentGuide.tsx",
+      "line": 812,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/DreamCareerStudentGuide.tsx",
+      "line": 862,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/DreamCareerStudentGuide.tsx",
+      "line": 885,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 95,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 99,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 101,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 135,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 147,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 148,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 152,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 161,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 175,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 179,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 204,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 225,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 226,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ExploreCareers.tsx",
+      "line": 229,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ResourceDetailModal.tsx",
+      "line": 120,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ResourceDetailModal.tsx",
+      "line": 232,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ResourceDetailModal.tsx",
+      "line": 241,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ResourceDetailModal.tsx",
+      "line": 250,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ResourceDetailModal.tsx",
+      "line": 259,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ResourceList.tsx",
+      "line": 35,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/SavedCareerReader.tsx",
+      "line": 87,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/SavedCareerStudy.tsx",
+      "line": 39,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/StudyOptions.tsx",
+      "line": 100,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/careers/ToolsGrid.tsx",
+      "line": 44,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/ToolsGrid.tsx",
+      "line": 72,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/explorer/CareerOverviewSections.tsx",
+      "line": 39,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/explorer/DirectionNotes.tsx",
+      "line": 49,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/explorer/ExplorerAccountContext.tsx",
+      "line": 14,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/explorer/PursuitContext.tsx",
+      "line": 20,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/explorer/VisualCarousel.tsx",
+      "line": 94,
+      "control": "button",
+      "reason": "The transparent focus target covers the illustrated carousel item and names the item for keyboard activation.",
+      "fingerprint": "576cfb71469295c0497054362c14d2b795f1badc5e152d62894bcd84d8e40b7b"
+    },
+    {
+      "path": "src/components/careers/explorer/VisualCarousel.tsx",
+      "line": 100,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/careers/explorer/VisualCarousel.tsx",
+      "line": 102,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 112,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 113,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 114,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 114,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 115,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 115,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 137,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 137,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 137,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 138,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/guidance/ConversationJournal.tsx",
+      "line": 140,
+      "control": "textarea",
+      "component": "Textarea"
+    },
+    {
+      "path": "src/components/home/AnonymousView.tsx",
+      "line": 23,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/DownloadAppModal.tsx",
+      "line": 23,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/DownloadAppModal.tsx",
+      "line": 41,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/DownloadAppModal.tsx",
+      "line": 44,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/LandingPage.tsx",
+      "line": 113,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/LandingPage.tsx",
+      "line": 150,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/LandingPage.tsx",
+      "line": 159,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/LandingPage.tsx",
+      "line": 214,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/LandingPage.tsx",
+      "line": 233,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/LockedContentOverlay.tsx",
+      "line": 34,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/MyDirectionOverview.tsx",
+      "line": 85,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/StorySlide.tsx",
+      "line": 66,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/StorySlideshow.tsx",
+      "line": 178,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/StorySlideshow.tsx",
+      "line": 189,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/UserDashboard.tsx",
+      "line": 138,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/UserDashboard.tsx",
+      "line": 312,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/home/WeeklyPlanCard.tsx",
+      "line": 226,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/home/WeeklyPlanCard.tsx",
+      "line": 233,
+      "control": "button",
+      "component": "Label"
+    },
+    {
+      "path": "src/components/learn/LearnHub.tsx",
+      "line": 187,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/login-form.tsx",
+      "line": 165,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/organization/OrganizationWorkspacePage.tsx",
+      "line": 164,
+      "control": "table",
+      "component": "Table"
+    },
+    {
+      "path": "src/components/organization/OrganizationWorkspacePage.tsx",
+      "line": 179,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/organization/OrganizationWorkspacePage.tsx",
+      "line": 179,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/organization/OrganizationWorkspacePage.tsx",
+      "line": 192,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/organization/OrganizationWorkspacePage.tsx",
+      "line": 192,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/profile/EditAcademicProfileModal.tsx",
+      "line": 53,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditAcademicProfileModal.tsx",
+      "line": 67,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/profile/EditAcademicProfileModal.tsx",
+      "line": 86,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/profile/EditAcademicProfileModal.tsx",
+      "line": 109,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/profile/EditAcademicProfileModal.tsx",
+      "line": 129,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditAcademicProfileModal.tsx",
+      "line": 136,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditLocationModal.tsx",
+      "line": 64,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditLocationModal.tsx",
+      "line": 78,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/profile/EditLocationModal.tsx",
+      "line": 92,
+      "control": "select",
+      "component": "NativeSelect"
+    },
+    {
+      "path": "src/components/profile/EditLocationModal.tsx",
+      "line": 111,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/profile/EditLocationModal.tsx",
+      "line": 127,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditLocationModal.tsx",
+      "line": 134,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditProfileModal.tsx",
+      "line": 50,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditProfileModal.tsx",
+      "line": 64,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/profile/EditProfileModal.tsx",
+      "line": 78,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/profile/EditProfileModal.tsx",
+      "line": 94,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/EditProfileModal.tsx",
+      "line": 101,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/ManageSubjectsModal.tsx",
+      "line": 70,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/ManageSubjectsModal.tsx",
+      "line": 83,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/ManageSubjectsModal.tsx",
+      "line": 113,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/ManageSubjectsModal.tsx",
+      "line": 120,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/ProfileMenuItem.tsx",
+      "line": 21,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/UpdateExamMarksModal.tsx",
+      "line": 76,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/UpdateExamMarksModal.tsx",
+      "line": 108,
+      "control": "input",
+      "component": "Input"
+    },
+    {
+      "path": "src/components/profile/UpdateExamMarksModal.tsx",
+      "line": 145,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/profile/UpdateExamMarksModal.tsx",
+      "line": 152,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/ui/Carousel.tsx",
+      "line": 67,
+      "control": "button",
+      "component": "Button"
+    },
+    {
+      "path": "src/components/ui/Carousel.tsx",
+      "line": 89,
+      "control": "button",
+      "component": "Button"
+    }
+  ]
+}

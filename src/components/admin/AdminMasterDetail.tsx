@@ -59,7 +59,7 @@ export default function AdminMasterDetail<T extends AdminEntity>({ config }: Pro
   };
 
   const columns: AdminDataColumn<T>[] = [
-    { id: 'title', label: 'Name', sortable: true, cell: (entity) => <button aria-label={`Open ${config.getTitle(entity) || entity.id}`} className="block max-w-lg text-left" onClick={() => router.push(`${listHref}/${encodeURIComponent(entity.id)}`)}><span className="block truncate font-medium">{config.getTitle(entity) || `Untitled ${config.entityName}`}</span><span className="mt-1 block truncate text-xs text-muted-foreground">{config.getSubtitle(entity) || entity.id}</span></button> },
+    { id: 'title', label: 'Name', sortable: true, cell: (entity) => <Button variant="surface" aria-label={`Open ${config.getTitle(entity) || entity.id}`} className="block max-w-lg text-left" onClick={() => router.push(`${listHref}/${encodeURIComponent(entity.id)}`)}><span className="block truncate font-medium">{config.getTitle(entity) || `Untitled ${config.entityName}`}</span><span className="mt-1 block truncate text-xs text-muted-foreground">{config.getSubtitle(entity) || entity.id}</span></Button> },
     { id: 'status', label: 'Status', sortable: true, cell: (entity) => <StatusBadge status={((entity as AdminEntity & { deletedAt?: Date }).deletedAt ? 'archived' : config.getStatus(entity)) as EntityStatus} /> },
     { id: 'domain', label: 'Domain / type', sortable: true, className: 'hidden md:table-cell', cell: (entity) => formatSnakeCaseToTitleCase(config.getDomain(entity) || 'General') },
     { id: 'updatedAt', label: 'Updated', sortable: true, className: 'hidden lg:table-cell', cell: (entity) => formatDate(entity.updatedAt || entity.createdAt) },

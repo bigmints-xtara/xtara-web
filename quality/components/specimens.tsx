@@ -1,3 +1,4 @@
+import { NativeSelect } from "@/components/ui/native-select";
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,9 @@ function Demo({ name }: { name: string }) {
             Reset
           </Button>
           <Button disabled>Continue</Button>
+          <Button variant="surface" aria-pressed={saved} onClick={() => setSaved(!saved)}>
+            {saved ? "Selected direction" : "Select direction"}
+          </Button>
         </div>
       );
     case "card":
@@ -129,7 +133,13 @@ function Demo({ name }: { name: string }) {
         </Field>
       );
     case "input":
-      return <Input aria-label="Search careers" placeholder="Search careers" />;
+      return (
+        <div className="grid gap-4">
+          <Input aria-label="Search careers" placeholder="Search careers" />
+          <label><Input type="checkbox" /> Include saved careers</label>
+          <label>Interest level <Input type="range" min={0} max={10} /></label>
+        </div>
+      );
     case "label":
       return (
         <Field>
@@ -143,6 +153,17 @@ function Demo({ name }: { name: string }) {
           aria-label="Your reflection"
           placeholder="What did you learn?"
         />
+      );
+    case "native-select":
+      return (
+        <div className="grid gap-4">
+          <NativeSelect defaultValue="design" aria-label="Career direction">
+            <option value="design">Design</option><option value="science">Science</option>
+          </NativeSelect>
+          <NativeSelect multiple defaultValue={["science"]} aria-label="Subjects">
+            <option value="design">Design</option><option value="science">Science</option>
+          </NativeSelect>
+        </div>
       );
     case "select":
       return (

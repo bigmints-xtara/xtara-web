@@ -1,5 +1,6 @@
 'use client';
 
+import { NativeSelect } from "@/components/ui/native-select";
 import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -63,24 +64,24 @@ export function ContentTagEditor({ value, onChange }: {
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2 text-sm font-medium">Future Directions
-          <select aria-label="Future Directions" className="min-h-36 w-full rounded-md border bg-background p-2" multiple onChange={(event) => update({ futureDirectionIds: selectedValues(event) })} value={tags.futureDirectionIds}>
+          <NativeSelect aria-label="Future Directions" className="min-h-36" multiple onChange={(event) => update({ futureDirectionIds: selectedValues(event) })} value={tags.futureDirectionIds}>
             {response.taxonomy.futureDirections.map((item) => <option key={item.id} value={item.id}>{item.label} ({item.id})</option>)}
-          </select>
+          </NativeSelect>
         </label>
         <label className="space-y-2 text-sm font-medium">Dream Careers
-          <select aria-label="Dream Careers" className="min-h-36 w-full rounded-md border bg-background p-2" multiple onChange={(event) => update({ dreamCareerIds: selectedValues(event) })} value={tags.dreamCareerIds}>
+          <NativeSelect aria-label="Dream Careers" className="min-h-36" multiple onChange={(event) => update({ dreamCareerIds: selectedValues(event) })} value={tags.dreamCareerIds}>
             {careers.map((item) => <option key={item.id} value={item.id}>{item.label} ({item.id})</option>)}
-          </select>
+          </NativeSelect>
         </label>
         <label className="space-y-2 text-sm font-medium">Skills
-          <select aria-label="Skills" className="min-h-28 w-full rounded-md border bg-background p-2" multiple onChange={(event) => update({ skillIds: selectedValues(event) })} value={tags.skillIds}>
+          <NativeSelect aria-label="Skills" className="min-h-28" multiple onChange={(event) => update({ skillIds: selectedValues(event) })} value={tags.skillIds}>
             {response.taxonomy.skills.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-          </select>
+          </NativeSelect>
         </label>
         <label className="space-y-2 text-sm font-medium">Grade stages
-          <select aria-label="Grade stages" className="min-h-28 w-full rounded-md border bg-background p-2" multiple onChange={(event) => update({ gradeStages: selectedValues(event) })} value={tags.gradeStages}>
+          <NativeSelect aria-label="Grade stages" className="min-h-28" multiple onChange={(event) => update({ gradeStages: selectedValues(event) })} value={tags.gradeStages}>
             {response.taxonomy.gradeStages.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-          </select>
+          </NativeSelect>
         </label>
       </div>
       <label className="block space-y-2 text-sm font-medium">Topics

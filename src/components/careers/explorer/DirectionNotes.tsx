@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useQuery } from '@tanstack/react-query';
 import type { Locale } from '@/i18n/config';
 import type { ExplorerCareer, ExplorerDirection } from '@/types/career-explorer';
@@ -46,6 +47,6 @@ export default function DirectionNotes({ direction, careers, locale }: {
       <details key={number}><summary>{copy.gradeNumber.replace('{n}', String(number))}</summary><ul>{ideas.map((line, i) => <li key={i}>{line}</li>)}</ul></details>)}</div>}
     {fallback && locale !== 'en' && <p>{explorerCopy[locale].fallback}</p>}
     {isPending && <p role="status">{explorerCopy[locale].loading}</p>}
-    {isError && <div><p role="status">{copy.detailError}</p><button onClick={() => void refetch()}>{explorerCopy[locale].retry}</button></div>}
+    {isError && <div><p role="status">{copy.detailError}</p><Button variant="link" onClick={() => void refetch()}>{explorerCopy[locale].retry}</Button></div>}
   </section>;
 }

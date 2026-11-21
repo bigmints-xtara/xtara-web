@@ -1,4 +1,7 @@
 'use client';
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { isEnglishCatalogueGuideCandidate, type CareerContentVersion } from '@/lib/career-content-versions';
@@ -15,10 +18,10 @@ export default function CareerReviewEvidencePanel({ collection, recordId, versio
     <h2 className="text-lg font-semibold">Human review evidence</h2>
     <p className="text-sm text-muted-foreground">Record what you actually reviewed against an exact saved content revision. Evidence does not approve or publish content. English fallback previews, machine translations and completeness labels are not proof of human review.</p>
     <label className="block text-sm font-medium">Content version
-      <select className="mt-2 block w-full rounded-md border bg-background p-3" value={versionId} onChange={(event) => setVersionId(event.target.value)}>
+      <NativeSelect className="mt-2 w-full" value={versionId} onChange={(event) => setVersionId(event.target.value)}>
         <option value="">Choose a version to review</option>
         {versions.map((version) => <option key={version.id} value={version.id}>Revision {version.revision} · {version.status} · {version.id}</option>)}
-      </select>
+      </NativeSelect>
     </label>
     {!versions.length ? <p>No saved versions are available. Create a content draft first.</p> : null}
     {englishGuide ? <p className="text-sm text-muted-foreground">This release publishes the English guide only. Existing translations are preserved.</p> : null}
@@ -93,9 +96,9 @@ function VersionEvidence({ target, mayRecord, onSnapshotMutation }: { target: Re
     <div className="rounded-lg border p-4"><h3 className="font-medium">Server review coverage</h3><p className="mt-2 text-sm">{snapshot.coverage.complete ? 'Recorded review coverage is complete. This is not publication approval.' : 'Review coverage is incomplete.'}</p><ul className="mt-2 list-disc pl-5 text-sm">{snapshot.coverage.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}</ul></div>
     {!mayRecord ? <p className="rounded-lg border p-4 text-sm">Read-only access. A verified human Admin must record or revoke evidence.</p> : snapshot.status !== 'inReview' ? <p className="rounded-lg border p-4 text-sm">Evidence can be recorded only for a version submitted for review. Submit its draft first; historical receipts remain readable below.</p> : <fieldset disabled={busy} className="space-y-4 rounded-lg border p-4">
       <legend className="px-1 font-medium">Record a review</legend>
-      <label className="block text-sm font-medium">Review type<select className="mt-1 block w-full rounded-md border bg-background p-2" value={kind} onChange={(event) => { setKind(event.target.value as ReviewKind); setScope(emptyScope()); setReadSnapshot(false); }}>
+      <label className="block text-sm font-medium">Review type<NativeSelect className="mt-1 w-full" value={kind} onChange={(event) => { setKind(event.target.value as ReviewKind); setScope(emptyScope()); setReadSnapshot(false); }}>
         <option value="factual">Factual accuracy</option><option value="translation">Language review</option><option value="grade">Grade suitability</option><option value="jurisdiction">State or union territory pathways</option>
-      </select></label>
+      </NativeSelect></label>
       <ScopeChoices label="Languages reviewed" values={allowed.locales} selected={scope.locales} onChange={(locales) => setScope({ ...scope, locales })} />
       <ScopeChoices label="Grades reviewed" values={allowed.grades} selected={scope.grades} onChange={(grades) => setScope({ ...scope, grades })} />
       <ScopeChoices label="States and union territories reviewed" values={allowed.jurisdictions} selected={scope.jurisdictions} onChange={(jurisdictions) => setScope({ ...scope, jurisdictions })} />
@@ -104,7 +107,7 @@ function VersionEvidence({ target, mayRecord, onSnapshotMutation }: { target: Re
       <Notes label="Evidence source IDs (one per line)" value={sources} onChange={setSources} hint="Use source IDs from the saved content snapshot." />
       <Notes label="Supported claims (one per line)" value={claims} onChange={setClaims} hint="Describe the specific statements you checked." />
       <Notes label="Applicability rationale" value={rationale} onChange={setRationale} hint="Explain the evidence, limitations and why it supports the selected scope. Record unresolved issues in the content draft rather than attesting that they are reviewed." />
-      <label className="flex items-start gap-2 text-sm"><input type="checkbox" className="mt-1" checked={readSnapshot} onChange={(event) => setReadSnapshot(event.target.checked)} />I reviewed this exact saved snapshot and the stated evidence for the selected scope.</label>
+      <label className="flex items-start gap-2 text-sm"><Input type="checkbox" className="mt-1" checked={readSnapshot} onChange={(event) => setReadSnapshot(event.target.checked)} />I reviewed this exact saved snapshot and the stated evidence for the selected scope.</label>
       <Button disabled={!readSnapshot || busy} onClick={() => void record()} type="button">{busy ? 'Verifying…' : 'Record review evidence'}</Button>
     </fieldset>}
     {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
@@ -122,8 +125,8 @@ function VersionEvidence({ target, mayRecord, onSnapshotMutation }: { target: Re
   </div>;
 }
 function Notes({ label, value, onChange, hint }: { label: string; value: string; onChange: (value: string) => void; hint?: string }) {
-  return <label className="block text-sm font-medium">{label}{hint ? <span className="mt-1 block text-xs font-normal text-muted-foreground">{hint}</span> : null}<textarea className="mt-2 block min-h-20 w-full rounded-md border bg-background p-2 font-normal" value={value} onChange={(event) => onChange(event.target.value)} /></label>;
+  return <label className="block text-sm font-medium">{label}{hint ? <span className="mt-1 block text-xs font-normal text-muted-foreground">{hint}</span> : null}<Textarea className="mt-2 min-h-20 w-full" value={value} onChange={(event) => onChange(event.target.value)} /></label>;
 }
 function ScopeChoices({ label, values, selected, onChange }: { label: string; values: string[]; selected: string[]; onChange: (value: string[]) => void }) {
-  return <fieldset className="rounded-md border p-3"><legend className="px-1 text-sm font-medium">{label}</legend><div className="grid max-h-60 gap-2 overflow-auto sm:grid-cols-2">{values.map((value) => <label key={value} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={selected.includes(value)} onChange={(event) => onChange(event.target.checked ? [...selected, value] : selected.filter((item) => item !== value))} />{value}</label>)}</div></fieldset>;
+  return <fieldset className="rounded-md border p-3"><legend className="px-1 text-sm font-medium">{label}</legend><div className="grid max-h-60 gap-2 overflow-auto sm:grid-cols-2">{values.map((value) => <label key={value} className="flex items-center gap-2 text-sm"><Input type="checkbox" checked={selected.includes(value)} onChange={(event) => onChange(event.target.checked ? [...selected, value] : selected.filter((item) => item !== value))} />{value}</label>)}</div></fieldset>;
 }

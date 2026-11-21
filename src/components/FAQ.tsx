@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import publicType from "@/components/MarketingLayout.module.css";
 import { useState } from "react";
 import { Minus, Plus } from "lucide-react";
@@ -28,7 +29,7 @@ const FAQ = () => {
             const answerId = `home-faq-answer-${index}`;
             return (
               <div key={faq.question}>
-                <button
+                <Button variant="surface"
                   type="button"
                   aria-expanded={isOpen}
                   aria-controls={answerId}
@@ -39,7 +40,7 @@ const FAQ = () => {
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary">
                     {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                   </span>
-                </button>
+                </Button>
                 {isOpen ? (
                   <div id={answerId} className="max-w-2xl pb-6 pr-12 text-sm leading-7 text-slate-600 sm:text-base">
                     {faq.answer}

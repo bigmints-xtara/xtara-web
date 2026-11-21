@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 
 interface ProfileMenuItemProps {
@@ -18,7 +19,7 @@ export default function ProfileMenuItem({
     const iconClasses = iconWrapperClassName || "bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20";
 
     return (
-        <button
+        <Button variant="surface"
             onClick={onClick}
             type="button"
             className="w-full flex items-center p-4 bg-transparent hover:bg-white/5 transition-colors text-left group"
@@ -33,6 +34,6 @@ export default function ProfileMenuItem({
             </div>
 
             <ChevronRight size={20} className="text-gray-500 group-hover:text-white transition-colors" />
-        </button>
+        </Button>
     );
 }

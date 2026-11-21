@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Locale } from '@/i18n/config';
 import { getCareerOverview } from '@/lib/career-overview-api';
@@ -84,7 +85,7 @@ export default function SavedCareerReader({ careerId, locale, intro, about = [],
     {preparation.length > 0 && <Questions items={preparation} />}
     {!phases.length && !preparation.length && (status === 'ready' || status === 'missing') && <p>{copy.school}</p>}
     {!preparation.length && status === 'loading' && <p role="status">{copy.loading}</p>}
-    {status === 'failed' && <div role="status"><p>{copy.error}</p><button className="min-h-11 font-semibold text-primary underline" onClick={() => { setStatus('loading'); setAttempt(value => value + 1); }}>{studyOptionsCopy[locale].retry}</button></div>}
+    {status === 'failed' && <div role="status"><p>{copy.error}</p><Button variant="link" className="min-h-11" onClick={() => { setStatus('loading'); setAttempt(value => value + 1); }}>{studyOptionsCopy[locale].retry}</Button></div>}
   </> });
   sections.push({ id: 'courses-and-colleges', title: copy.colleges, content: college });
   if (practice.length || overview?.skills.length) sections.push({ id: 'what-you-can-do-now', title: copy.skills, content: <>

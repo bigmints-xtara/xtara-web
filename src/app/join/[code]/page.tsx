@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { trackProductEvent } from "@/lib/analytics";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
@@ -165,13 +166,13 @@ export default function JoinOrganizationPage() {
                 const checked = selectedScopes.includes(scope);
                 return (
                   <label key={scope} className="flex cursor-pointer gap-3 rounded-2xl border border-slate-200 p-4 transition-colors has-[:checked]:border-primary/30 has-[:checked]:bg-primary/[0.025]">
-                    <input type="checkbox" className="mt-1 h-4 w-4 accent-[var(--primary)]" checked={checked} onChange={(event) => setSelectedScopes((current) => event.target.checked ? [...new Set([...current, scope])] : current.filter((item) => item !== scope))} />
+                    <Input type="checkbox" className="mt-1" checked={checked} onChange={(event) => setSelectedScopes((current) => event.target.checked ? [...new Set([...current, scope])] : current.filter((item) => item !== scope))} />
                     <span><span className="text-sm font-medium text-primary">{copy.title}{copy.required ? " · Required" : " · Optional"}</span><span className="mt-1 block text-sm leading-6 text-slate-600">{copy.description}</span></span>
                   </label>
                 );
               })}
               <label className="flex cursor-pointer gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
-                <input type="checkbox" className="mt-1 h-4 w-4 accent-[var(--primary)]" checked={guardianConfirmed} onChange={(event) => setGuardianConfirmed(event.target.checked)} />
+                <Input type="checkbox" className="mt-1" checked={guardianConfirmed} onChange={(event) => setGuardianConfirmed(event.target.checked)} />
                 <span><span className="text-sm font-medium text-amber-950">Parent or guardian permission</span><span className="mt-1 block text-sm leading-6 text-amber-900/80">I confirm that my parent or guardian has given permission for me to join this institution in Xtara.</span></span>
               </label>
             </div>

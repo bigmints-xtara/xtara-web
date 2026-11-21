@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { X } from "lucide-react";
 import { useState } from "react";
 
@@ -61,13 +64,12 @@ export default function EditLocationModal({
             <div className="w-full max-w-md bg-white border border-gray-100 rounded-2xl p-6 ">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-gray-900">Edit Location</h2>
-                    <button
+                    <Button variant="ghost" size="icon" aria-label="Close dialog"
                         onClick={onClose}
-                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                         disabled={isSaving}
                     >
                         <X size={20} className="text-gray-500" />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="space-y-4">
@@ -75,24 +77,24 @@ export default function EditLocationModal({
                         <label className="text-sm text-gray-600 mb-2 block font-medium">
                             City <span className="text-red-500">*</span>
                         </label>
-                        <input
+                        <Input
                             type="text"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                            className="w-full rounded-lg bg-gray-50 border border-gray-200 px-3 py-2.5 text-gray-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors"
+                            className="w-full"
                             placeholder="Enter your city"
                             disabled={isSaving}
-                        />
+ />
                     </div>
 
                     <div>
                         <label className="text-sm text-gray-600 mb-2 block font-medium">
                             State <span className="text-red-500">*</span>
                         </label>
-                        <select
+                        <NativeSelect
                             value={state}
                             onChange={(e) => setState(e.target.value)}
-                            className="w-full rounded-lg bg-gray-50 border border-gray-200 px-3 py-2.5 text-gray-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors"
+                            className="w-full"
                             disabled={isSaving}
                         >
                             <option value="">Select a state</option>
@@ -101,21 +103,21 @@ export default function EditLocationModal({
                                     {stateName}
                                 </option>
                             ))}
-                        </select>
+                        </NativeSelect>
                     </div>
 
                     <div>
                         <label className="text-sm text-gray-600 mb-2 block font-medium">
                             Country <span className="text-red-500">*</span>
                         </label>
-                        <input
+                        <Input
                             type="text"
                             value={country}
                             onChange={(e) => setCountry(e.target.value)}
-                            className="w-full rounded-lg bg-gray-50 border border-gray-200 px-3 py-2.5 text-gray-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors"
+                            className="w-full"
                             placeholder="Country"
                             disabled={isSaving}
-                        />
+ />
                     </div>
 
                     {error && (
@@ -124,20 +126,18 @@ export default function EditLocationModal({
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">
-                    <button
+                    <Button variant="ghost"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors font-semibold"
                         disabled={isSaving}
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-60 transition-colors  shadow-blue-500/20"
                         disabled={isSaving}
                     >
                         {isSaving ? "Saving..." : "Save Changes"}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

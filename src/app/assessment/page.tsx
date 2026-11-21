@@ -184,9 +184,9 @@ function AssessmentJourneyBody({ owner }: { owner?: string }) {
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-center">
         <h1 className="text-2xl font-semibold text-primary">{ui.errorTitle}</h1>
         <p role="alert" className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">{processingError || ui.errorTitle}</p>
-        <button type="button" onClick={() => { setProcessingError(""); if (definitionFailed) setDefinitionAttempt((attempt) => attempt + 1); }} className="mt-6 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-white">
+        <Button type="button" onClick={() => { setProcessingError(""); if (definitionFailed) setDefinitionAttempt((attempt) => attempt + 1); }} className="mt-6">
           {ui.retry}
-        </button>
+        </Button>
       </div>
     );
   }

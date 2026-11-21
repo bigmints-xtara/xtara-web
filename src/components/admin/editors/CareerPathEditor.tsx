@@ -1,5 +1,8 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from 'react';
 import { Save, X } from 'lucide-react';
 import type { AdminCareerPath } from '@/types/admin';
@@ -104,22 +107,20 @@ export default function CareerPathEditor({ careerPath, onSave, onCancel }: Caree
           {isCreating ? 'Create Career Path' : 'Career Path Details'}
         </h2>
         <div className="flex gap-2">
-          <button
+          <Button variant="ghost"
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2"
           >
             <X size={18} />
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSaving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
           >
             <Save size={18} />
             {isSaving ? 'Saving...' : 'Save'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -164,67 +165,67 @@ export default function CareerPathEditor({ careerPath, onSave, onCancel }: Caree
               <label className="block text-sm font-medium mb-1">
                 Title
               </label>
-              <input
+              <Input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 placeholder="Enter career title"
-              />
+ />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
                 Description
               </label>
-              <textarea
+              <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 placeholder="Enter description"
-              />
+ />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
                 What You Do
               </label>
-              <textarea
+              <Textarea
                 value={formData.whatYouDo}
                 onChange={(e) => setFormData({ ...formData, whatYouDo: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 placeholder="Describe the day-to-day responsibilities"
-              />
+ />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
                 Why It Matters
               </label>
-              <textarea
+              <Textarea
                 value={formData.whyItMatters}
                 onChange={(e) => setFormData({ ...formData, whyItMatters: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 placeholder="Explain the impact of this career"
-              />
+ />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
                 Match Reasoning
               </label>
-              <textarea
+              <Textarea
                 value={formData.matchReasoning}
                 onChange={(e) =>
                   setFormData({ ...formData, matchReasoning: e.target.value })
                 }
                 rows={3}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 placeholder="Why this career is a good match"
-              />
+ />
             </div>
           </div>
         </section>

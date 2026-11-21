@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 
 export default function AnonymousView() {
@@ -20,9 +21,9 @@ export default function AnonymousView() {
           </p>
           
           <div className="flex flex-wrap gap-4">
-            <button className="px-6 py-3 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors ">
+            <Button >
               Create Free Account
-            </button>
+            </Button>
             <Link 
               href="/assessment?isRetake=true"
               className="px-6 py-3 bg-indigo-500/30 text-white font-semibold rounded-xl hover:bg-indigo-500/40 transition-colors backdrop-blur-sm border border-white/20"

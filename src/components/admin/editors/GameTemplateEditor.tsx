@@ -1,5 +1,7 @@
 'use client';
 
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from 'react';
 import { Save, X } from 'lucide-react';
 
@@ -46,10 +48,10 @@ export default function GameTemplateEditor({
       {error ? <p className="border-b border-destructive/20 bg-destructive/5 px-6 py-3 text-sm text-destructive" role="alert">{error}</p> : null}
       <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
         <label className="block space-y-2 text-sm font-medium">Title<Input onChange={(event) => setForm({ ...form, title: event.target.value })} required value={form.title || ''} /></label>
-        <label className="block space-y-2 text-sm font-medium">Description<textarea className="min-h-28 w-full rounded-md border bg-background px-3 py-2 font-normal" onChange={(event) => setForm({ ...form, description: event.target.value })} required value={form.description || ''} /></label>
-        <label className="block space-y-2 text-sm font-medium">Mode<select className="h-10 w-full rounded-md border bg-background px-3 font-normal" onChange={(event) => setForm({ ...form, mode: event.target.value as GameTemplate['mode'] })} value={form.mode || 'quiz'}><option value="quiz">Quiz</option><option value="wordquest">WordQuest</option><option value="puzzle">Puzzle</option><option value="memory">Memory</option><option value="simulation">Simulation</option></select></label>
+        <label className="block space-y-2 text-sm font-medium">Description<Textarea className="min-h-28 w-full" onChange={(event) => setForm({ ...form, description: event.target.value })} required value={form.description || ''} /></label>
+        <label className="block space-y-2 text-sm font-medium">Mode<NativeSelect className="w-full" onChange={(event) => setForm({ ...form, mode: event.target.value as GameTemplate['mode'] })} value={form.mode || 'quiz'}><option value="quiz">Quiz</option><option value="wordquest">WordQuest</option><option value="puzzle">Puzzle</option><option value="memory">Memory</option><option value="simulation">Simulation</option></NativeSelect></label>
         <label className="block space-y-2 text-sm font-medium">Thumbnail URL<Input onChange={(event) => setForm({ ...form, thumbnail: event.target.value })} value={form.thumbnail || ''} /></label>
-        <label className="block space-y-2 text-sm font-medium">Configuration JSON<textarea className="min-h-64 w-full rounded-md border bg-background px-3 py-2 font-mono text-xs" onChange={(event) => setConfigText(event.target.value)} spellCheck={false} value={configText} /></label>
+        <label className="block space-y-2 text-sm font-medium">Configuration JSON<Textarea className="min-h-64 w-full font-mono" onChange={(event) => setConfigText(event.target.value)} spellCheck={false} value={configText} /></label>
       </div>
     </form>
   );

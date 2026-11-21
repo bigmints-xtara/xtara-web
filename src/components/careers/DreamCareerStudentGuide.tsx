@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import Link from 'next/link';
 import SavedCareerReader from './SavedCareerReader';
@@ -809,9 +810,9 @@ export function DreamCareerStudentGuideError({ locale, onRetry }: { locale: Drea
     <div role="alert" className="mx-auto my-12 max-w-xl px-4 sm:my-20">
       <div className="rounded-3xl border border-border bg-card px-6 py-10 text-center shadow-sm sm:px-10">
       <p className="text-lg font-semibold text-foreground">{text.unavailable}</p>
-      <button type="button" className="mt-5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
+      <Button type="button" className="mt-5" onClick={onRetry}>
         {text.tryAgain}
-      </button>
+      </Button>
       </div>
     </div>
   );
@@ -859,9 +860,9 @@ function ProgressiveList<Item>({ items, renderItem, labels: text, initialCount =
     <div>
       <div className="space-y-3">{visible.map((item, index) => <div key={itemKey(item, index)}>{renderItem(item, index)}</div>)}</div>
       {items.length > initialCount ? (
-        <button type="button" className="mt-5 rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setExpanded((value) => !value)}>
+        <Button variant="outline" type="button" className="mt-5" onClick={() => setExpanded((value) => !value)}>
           {expanded ? text.showLess : text.seeAll}
-        </button>
+        </Button>
       ) : null}
     </div>
   );
@@ -882,9 +883,9 @@ function RelationshipUnavailable({ label, message, retryLabel, retryAccessiblePr
     <div className="border-l-2 border-muted-foreground/40 py-1 pl-4">
       <p>{message}</p>
       {onRetry ? (
-        <button type="button" aria-label={`${retryAccessiblePrefix} ${label.charAt(0).toLocaleLowerCase()}${label.slice(1)}`} disabled={retrying} className="mt-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={onRetry}>
+        <Button variant="link" type="button" aria-label={`${retryAccessiblePrefix} ${label.charAt(0).toLocaleLowerCase()}${label.slice(1)}`} disabled={retrying} className="mt-3" onClick={onRetry}>
           {retryLabel}
-        </button>
+        </Button>
       ) : null}
     </div>
   );

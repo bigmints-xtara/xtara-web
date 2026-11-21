@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import styles from '../ExploreCareers.module.css';
@@ -97,9 +98,9 @@ export default function VisualCarousel({ items, renderItem, label, previous, nex
       })}
     </div>
     {items.length > 1 && <div className={styles.controls}>
-      <button aria-label={previous} disabled={!loop && index === 0} onClick={() => focus(index - 1)}><ArrowLeft size={20} /></button>
+      <Button variant="ghost" size="icon" aria-label={previous} disabled={!loop && index === 0} onClick={() => focus(index - 1)}><ArrowLeft size={20} /></Button>
       <span className={styles.position} aria-live="polite" aria-atomic="true">{index + 1} / {items.length}</span>
-      <button aria-label={next} disabled={!loop && index === items.length - 1} onClick={() => focus(index + 1)}><ArrowRight size={20} /></button>
+      <Button variant="ghost" size="icon" aria-label={next} disabled={!loop && index === items.length - 1} onClick={() => focus(index + 1)}><ArrowRight size={20} /></Button>
     </div>}
     {items.length > 1 && hint && <p className={styles.hint}>{hint}</p>}
   </section>;

@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from 'react';
 import { QuestionModel, QuestionOption } from '@/lib/types';
 import { AssessmentService } from '@/lib/services/assessment';
@@ -69,13 +71,12 @@ export default function AssessmentForm({ questions, userId, onComplete }: Props)
       </div>
 
       <div className="mt-8 flex justify-end">
-        <button
+        <Button
           onClick={handleNext}
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? 'Saving...' : currentStep === questions.length - 1 ? 'Finish' : 'Next'}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -85,19 +86,19 @@ function renderInput(question: QuestionModel, value: any, onChange: (val: any) =
   switch (question.type) {
     case 'text':
       return (
-        <input
+        <Input
           type="text"
           value={value || ''}
           onChange={e => onChange(e.target.value)}
-          className="w-full p-3 border rounded-lg"
+          className="w-full"
           placeholder="Type your answer..."
-        />
+ />
       );
     case 'singleSelect':
       return (
         <div className="space-y-2">
           {question.options?.map(opt => (
-            <button
+            <Button variant="surface"
               key={opt.id}
               onClick={() => onChange(opt.id)}
               className={`w-full p-4 text-left border rounded-lg transition-colors ${
@@ -108,7 +109,7 @@ function renderInput(question: QuestionModel, value: any, onChange: (val: any) =
               {opt.description && (
                 <div className="text-sm text-gray-500">{opt.description}</div>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       );

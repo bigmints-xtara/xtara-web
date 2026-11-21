@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useEffect, Children } from "react";
 
@@ -64,13 +65,13 @@ export default function Carousel({ children, itemWidth, gap = 24 }: CarouselProp
         <div className="relative">
             {/* Left Arrow - Always visible when can scroll */}
             {canScrollLeft && (
-                <button
+                <Button variant="ghost" size="icon"
                     onClick={() => scroll('left')}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 p-2 rounded-full transition-all  border border-gray-300 hover:scale-110"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
                     aria-label="Scroll left"
                 >
                     <ChevronLeft size={16} strokeWidth={3} />
-                </button>
+                </Button>
             )}
 
             {/* Carousel Container */}
@@ -86,13 +87,13 @@ export default function Carousel({ children, itemWidth, gap = 24 }: CarouselProp
 
             {/* Right Arrow - Always visible when can scroll */}
             {canScrollRight && (
-                <button
+                <Button variant="ghost" size="icon"
                     onClick={() => scroll('right')}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 text-gray-800 p-2 rounded-full transition-all  border border-gray-300 hover:scale-110"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
                     aria-label="Scroll right"
                 >
                     <ChevronRight size={16} strokeWidth={3} />
-                </button>
+                </Button>
             )}
 
             {/* Page Indicator - Airbnb style */}

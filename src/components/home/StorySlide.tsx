@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { StorySlide as StorySlideType } from "@/lib/api/content";
 import { ExternalLink } from "lucide-react";
 import { useState } from "react";
@@ -63,15 +64,14 @@ export default function StorySlide({ slide, brandColor }: StorySlideProps) {
 
                     {/* Hyperlink button */}
                     {slide.hyperlink && slide.hyperlinkText && (
-                        <button
-                            onClick={handleHyperlinkClick}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-full transition-all"
+                        <Button variant="outline"
+                          onClick={handleHyperlinkClick}
                         >
                             <span className="text-white font-medium text-sm">
                                 {slide.hyperlinkText}
                             </span>
                             <ExternalLink size={16} className="text-white" />
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>

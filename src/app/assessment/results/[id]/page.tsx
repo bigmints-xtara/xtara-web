@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getCareerPath } from "@/lib/firebase/assessment";
@@ -105,7 +106,7 @@ export default function CareerResultsPage() {
                 <div className="text-red-500 text-5xl mb-4">⚠️</div>
                 <h2 className="text-2xl font-bold mb-2 text-red-400">Error</h2>
                 <p className="text-gray-400 mt-2">{error || "Something went wrong"}</p>
-                <button onClick={() => window.location.reload()} className="mt-8 px-6 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 text-white font-bold">Retry</button>
+                <Button onClick={() => window.location.reload()} className="mt-8">Retry</Button>
             </div>
         );
     }

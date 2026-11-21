@@ -1,3 +1,5 @@
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -73,13 +75,12 @@ export default function UpdateExamMarksModal({
                         <h2 className="text-xl font-bold text-white">Update exam performance</h2>
                         <p className="text-sm text-gray-400 mt-1">Drag sliders to set marks (0-100)</p>
                     </div>
-                    <button
+                    <Button variant="ghost" size="icon" aria-label="Close dialog"
                         onClick={onClose}
-                        className="p-1 hover:bg-white/5 rounded-lg transition-colors"
                         disabled={isSaving}
                     >
                         <X size={20} className="text-gray-400" />
-                    </button>
+                    </Button>
                 </div>
 
                 {subjects.length === 0 ? (
@@ -105,13 +106,13 @@ export default function UpdateExamMarksModal({
 
                                     {/* Slider */}
                                     <div className="relative">
-                                        <input
+                                        <Input
                                             type="range"
                                             min="0"
                                             max="100"
                                             value={currentMark}
                                             onChange={(e) => handleMarkChange(subject, parseInt(e.target.value))}
-                                            className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-[#12192E] slider"
+                                            className="slider"
                                             style={{
                                                 background: `linear-gradient(to right, ${currentMark >= 80 ? '#10b981' :
                                                         currentMark >= 60 ? '#3b82f6' :
@@ -119,7 +120,7 @@ export default function UpdateExamMarksModal({
                                                     } ${currentMark}%, #12192E ${currentMark}%)`
                                             }}
                                             disabled={isSaving}
-                                        />
+ />
                                     </div>
 
                                     {/* Performance indicator */}
@@ -142,20 +143,18 @@ export default function UpdateExamMarksModal({
                 )}
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                    <button
+                    <Button variant="ghost"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
                         disabled={isSaving}
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={handleSave}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg disabled:opacity-60"
                         disabled={isSaving || subjects.length === 0}
                     >
                         {isSaving ? "Saving..." : "Save marks"}
-                    </button>
+                    </Button>
                 </div>
             </div>
 

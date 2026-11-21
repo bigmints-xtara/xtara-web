@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { X, MapPin, ChevronRight, Loader2, GraduationCap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ResourceItem } from "./ResourceList";
@@ -117,13 +118,12 @@ export default function ResourceDetailModal({ isOpen, onClose, item }: ResourceD
                             <p className="text-blue-100 font-medium">{item.subtitle}</p>
                         )}
                     </div>
-                    <button
+                    <Button variant="ghost" size="icon"
                         onClick={onClose}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0"
                         aria-label="Close modal"
                     >
                         <X size={24} />
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Content - White Background */}
@@ -229,7 +229,7 @@ export default function ResourceDetailModal({ isOpen, onClose, item }: ResourceD
                             <div className="mb-6">
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Filter by Location</p>
                                 <div className="flex flex-wrap gap-2">
-                                    <button
+                                    <Button variant="surface"
                                         onClick={() => setLocationFilter('all')}
                                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${locationFilter === 'all'
                                             ? 'bg-blue-600 text-white '
@@ -237,8 +237,8 @@ export default function ResourceDetailModal({ isOpen, onClose, item }: ResourceD
                                             }`}
                                     >
                                         <MapPin size={14} /> All ({allColleges.length})
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button variant="surface"
                                         onClick={() => setLocationFilter('city')}
                                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${locationFilter === 'city'
                                             ? 'bg-blue-600 text-white '
@@ -246,8 +246,8 @@ export default function ResourceDetailModal({ isOpen, onClose, item }: ResourceD
                                             }`}
                                     >
                                         🏢 In {userProfile?.city || 'Your City'} ({cityColleges.length})
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button variant="surface"
                                         onClick={() => setLocationFilter('state')}
                                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${locationFilter === 'state'
                                             ? 'bg-blue-600 text-white '
@@ -255,8 +255,8 @@ export default function ResourceDetailModal({ isOpen, onClose, item }: ResourceD
                                             }`}
                                     >
                                         📍 In {userProfile?.state || 'Your State'} ({stateColleges.length})
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button variant="surface"
                                         onClick={() => setLocationFilter('outside')}
                                         className={`px-4 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${locationFilter === 'outside'
                                             ? 'bg-blue-600 text-white '
@@ -264,7 +264,7 @@ export default function ResourceDetailModal({ isOpen, onClose, item }: ResourceD
                                             }`}
                                     >
                                         🌍 Outside {userProfile?.state || 'Your State'} ({outsideColleges.length})
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
 

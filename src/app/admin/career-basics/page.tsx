@@ -1,5 +1,6 @@
 'use client';
 
+import { Input } from "@/components/ui/input";
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { xtaraApi } from '@/lib/api/client';
@@ -52,8 +53,8 @@ export default function CareerBasicsPage() {
     <div className="space-y-3">
       <label className="block text-sm font-medium">
         Catalogue plan JSON
-        <input type="file" accept=".json,application/json" disabled={busy}
-          className="mt-2 block w-full rounded-lg border p-3"
+        <Input type="file" accept=".json,application/json" disabled={busy}
+          className="mt-2 w-full"
           onChange={(event) => { setFile(event.target.files?.[0] ?? null); setStaged(null); setReceipt(null); }} />
       </label>
       <Button disabled={busy || !file} onClick={() => void run('stage')}>Stage replacement</Button>

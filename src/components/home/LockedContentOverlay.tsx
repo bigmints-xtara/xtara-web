@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -31,9 +32,9 @@ export default function LockedContentOverlay({
                 <Lock size={32} className="text-white" />
             </div>
             <p className="text-white font-bold text-lg px-4 text-center">{message}</p>
-            <button className="px-6 py-2 bg-white text-blue-900 font-bold rounded-lg hover:bg-blue-50 transition-colors">
+            <Button >
                 Sign Up Free
-            </button>
+            </Button>
         </div>
     );
 }

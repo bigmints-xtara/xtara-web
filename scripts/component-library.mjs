@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -57,6 +58,7 @@ function inspect(file, source) {
   const uses = {};
   const violations = {};
   const inputs = {};
+  const rawUses = [];
   for (const stmt of ast.statements) {
     if (
       ts.isExportDeclaration(stmt) &&
@@ -116,8 +118,14 @@ function inspect(file, source) {
       uses[name] = (uses[name] || 0) + 1;
       if (
         controls.has(name) &&
-        file !== shared + implementations[name] + ".tsx"
+        file !== shared + implementations[name] + ".tsx" &&
+        !(name === "select" && file === shared + "native-select.tsx")
       ) {
+        rawUses.push({
+          control: name,
+          line: ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1,
+          fingerprint: createHash("sha256").update(owner + "/" + node.getText(ast)).digest("hex"),
+        });
         const key = owner + "/" + name;
         violations[key] = (violations[key] || 0) + 1;
       }
@@ -131,6 +139,7 @@ function inspect(file, source) {
     public: [...exports].filter((s) => /^[A-Z]/.test(s)).sort(),
     uses,
     violations,
+    rawUses,
   };
 }
 function scan(ref) {
@@ -216,19 +225,18 @@ if (at >= 0) {
         );
       }
     }
-    for (const [key, count] of Object.entries(entry.violations)) {
-      if (count > (previous[file]?.violations[key] || 0))
-        errors.push(
-          file +
-            " " +
-            key +
-            " adds a raw control. Compose its registered primitive."
-        );
-    }
+
   }
 }
+const reviewPath = "quality/components/control-review.json";
+const review = JSON.parse(revision >= 0 ? git("show", process.argv[revision + 1] + ":" + reviewPath) : fs.readFileSync(reviewPath, "utf8"));
+const audit = JSON.parse(execFileSync("python3", ["scripts/control_review.py"], {
+  input: JSON.stringify({ review, files: current, registry, cohort_digest: "0485294bc3c7557f8df39a1b3f171e6cfe1202b2a60213479c76a65ce4c8101a" }),
+  encoding: "utf8", maxBuffer: 16 * 1024 * 1024
+}));
+errors.push(...audit.errors);
 if (process.argv.includes("--json"))
-  console.log(JSON.stringify({ registry, decisions, files: current, errors }));
+  console.log(JSON.stringify({ audit, registry, decisions, files: current, errors }));
 else
   console.log(
     errors.length

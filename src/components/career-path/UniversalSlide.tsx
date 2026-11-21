@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import { CareerSlideData } from '@/types/career';
 import { ListVisualization } from './visualizations/ListVisualization';
@@ -73,16 +74,13 @@ export default function UniversalSlide({ slideData, onButtonClick, isLastSlide =
                 transition={{ delay: 0.3 }}
                 className="mt-4 md:mt-6 w-full max-w-md mx-auto flex-shrink-0"
             >
-                <button
+                <Button
+                    className="w-full"
+                    variant={isLastSlide ? "secondary" : "default"}
                     onClick={onButtonClick}
-                    className={`w-full py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] 
-            ${isLastSlide
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-emerald-500/25'
-                            : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-blue-500/25'
-                        }`}
                 >
                     {slideData.buttonLabel}
-                </button>
+                </Button>
             </motion.div>
         </div>
     );

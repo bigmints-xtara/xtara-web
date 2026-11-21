@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -306,7 +307,7 @@ export default function CareerDirectionPage() {
 
             {loading && !careers.length ? <p className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />{text.loading}</p> : null}
             <label className="mt-6 block text-sm font-medium">{({ en: 'Find a career', ml: 'കരിയർ കണ്ടെത്തൂ', hi: 'करियर खोजें', ta: 'தொழிலைத் தேடுங்கள்' })[locale]}
-              <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} className={`${styles.search} mt-2 block w-full border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`} />
+              <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} className={styles.search} />
             </label>
             {careers.length > 0 && !careers.some((career) => `${career.title} ${career.englishTitle || ''}`.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase())) ? <p role="status" className="mt-6">{({ en: 'No careers found. Try another name.', ml: 'കരിയറുകൾ കണ്ടെത്താനായില്ല. മറ്റൊരു പേര് പരീക്ഷിക്കൂ.', hi: 'कोई करियर नहीं मिला। दूसरा नाम खोजें।', ta: 'தொழில்கள் கிடைக்கவில்லை. வேறு பெயரைத் தேடுங்கள்.' })[locale]}</p> : null}
             <div className={styles.careerGrid}>
@@ -324,7 +325,7 @@ export default function CareerDirectionPage() {
                         {selected ? <Check size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />}
                         {selected ? ({ en: 'Remove', ml: 'നീക്കുക', hi: 'हटाएँ', ta: 'நீக்கு' })[locale] : ({ en: 'Choose', ml: 'തിരഞ്ഞെടുക്കൂ', hi: 'चुनें', ta: 'தேர்ந்தெடுக்கவும்' })[locale]}
                       </Button></div>
-                      <button type="button" disabled={saving} onClick={(event) => {
+                      <Button variant="surface" type="button" disabled={saving} onClick={(event) => {
                           event.currentTarget.focus({ preventScroll: true });
                           openPreview(career);
                         }} className={styles.careerRead} aria-label={career.title}>
@@ -335,7 +336,7 @@ export default function CareerDirectionPage() {
                           <span className={styles.careerSummary}>{career.summary}</span>
                         </span>
                         <span className={styles.details}>{text.details}<ArrowRight size={14} aria-hidden="true" /></span>
-                      </button>
+                      </Button>
 
                     </CardContent>
                   </Card>

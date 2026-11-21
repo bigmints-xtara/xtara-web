@@ -1,4 +1,8 @@
 "use client"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { useTranslations } from "@/i18n/language-provider";
 
@@ -71,16 +75,16 @@ const ContactForm = () => {
               {t("contact.form.fields.name.label")}
             </label>
             <div className="mt-2">
-              <input
+              <Input
                 type="text"
                 name="name"
                 id="name"
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-3 px-4 text-gray-900  ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                className="w-full"
                 placeholder={t("contact.form.fields.name.placeholder")}
-              />
+ />
             </div>
           </div>
 
@@ -89,16 +93,16 @@ const ContactForm = () => {
               {t("contact.form.fields.email.label")}
             </label>
             <div className="mt-2">
-              <input
+              <Input
                 type="email"
                 name="email"
                 id="email"
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-3 px-4 text-gray-900  ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                className="w-full"
                 placeholder={t("contact.form.fields.email.placeholder")}
-              />
+ />
             </div>
           </div>
         </div>
@@ -108,13 +112,13 @@ const ContactForm = () => {
             {t("contact.form.fields.subject.label")}
           </label>
           <div className="mt-2">
-            <select
+            <NativeSelect
               name="subject"
               id="subject"
               required
               value={formData.subject}
               onChange={handleChange}
-              className="block w-full rounded-md border-0 py-3 px-4 text-gray-900  ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+              className="w-full"
             >
               <option value="">{t("contact.form.fields.subject.placeholder")}</option>
               {subjectOptions.map((option) => (
@@ -122,7 +126,7 @@ const ContactForm = () => {
                   {option.label}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </div>
         </div>
 
@@ -131,16 +135,16 @@ const ContactForm = () => {
             {t("contact.form.fields.message.label")}
           </label>
           <div className="mt-2">
-            <textarea
+            <Textarea
               name="message"
               id="message"
               rows={6}
               required
               value={formData.message}
               onChange={handleChange}
-              className="block w-full rounded-md border-0 py-3 px-4 text-gray-900  ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+              className="w-full"
               placeholder={t("contact.form.fields.message.placeholder")}
-            />
+ />
           </div>
         </div>
 
@@ -169,13 +173,12 @@ const ContactForm = () => {
         )}
 
         <div className="flex justify-end">
-          <button
+          <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-md bg-primary px-6 py-3 text-sm font-semibold text-white  hover:bg-primary/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? t("contact.form.actions.sending") : t("contact.form.actions.submit")}
-          </button>
+          </Button>
         </div>
       </form>
 

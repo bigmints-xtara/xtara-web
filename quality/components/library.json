@@ -91,7 +91,7 @@
   },
   "src/components/ui/input.tsx": {
     "family": "Form fields",
-    "purpose": "Accept a single line of input with a visible label, appropriate type and autocomplete.",
+    "purpose": "Use for text entry, checkboxes, radio choices and ranges. The input type selects the shared treatment and preserves native form and keyboard behavior.",
     "symbols": [
       "Input"
     ]
@@ -150,6 +150,13 @@
     "purpose": "Collect a multiline answer. Keep instructions and errors outside the entered text.",
     "symbols": [
       "Textarea"
+    ]
+  },
+  "src/components/ui/native-select.tsx": {
+    "family": "Selection",
+    "purpose": "Use for a browser picker or multi-select listbox when a form needs native options, constraint validation or a DOM change event.",
+    "symbols": [
+      "NativeSelect"
     ]
   }
 }

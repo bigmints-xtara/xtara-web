@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 import { CheckCircle2 } from "lucide-react";
 
@@ -21,9 +22,9 @@ const PricingColumn = ({ tier, highlight }: Props) => {
                     </span>
                     {typeof price === 'number' && <span className="text-lg font-normal text-gray-600">/mo</span>}
                 </p>
-                <button className={clsx("w-full py-3 px-4 rounded-full transition-colors", { "bg-amber-500 text-black hover:bg-amber-500/80": highlight, "bg-muted hover:bg-gray-200": !highlight })}>
+                <Button variant={highlight ? "default" : "secondary"} className="w-full">
                     Get Started
-                </button>
+                </Button>
             </div>
             <div className="p-6 mt-1">
                 <p className="font-bold mb-0">FEATURES</p>

@@ -41,7 +41,7 @@ export default function AdminListTile({
 
   return (
     <div className={cn('group relative border-b transition-colors', isSelected ? 'bg-accent/12' : 'hover:bg-muted/45')}>
-      <button
+      <Button variant="surface"
         aria-pressed={isSelected}
         className="w-full px-4 py-4 pr-12 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
         onClick={onTap}
@@ -63,7 +63,7 @@ export default function AdminListTile({
           </Badge>
         </div>
         {domain ? <p className="mt-2 truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground/75">{formatSnakeCaseToTitleCase(domain)}</p> : null}
-      </button>
+      </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

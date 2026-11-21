@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import SavedOfferingLink from './SavedOfferingLink';
 import Link from 'next/link';
 import { ArrowRight, GraduationCap } from 'lucide-react';
@@ -36,7 +37,7 @@ export default function SavedCareerStudy({ careerId, locale, study, guide, loadi
     {offerings.length > 0 && <ul className="divide-y divide-border rounded-xl border border-border bg-card px-4">
       {offerings.map(offering => <li key={offering.offeringId}><SavedOfferingLink careerId={careerId} offering={offering} label={text[offering.match]} /></li>)}
     </ul>}
-    {unavailable ? <div role="status"><p>{text.unavailable}</p><button className="min-h-11 font-semibold text-primary underline" onClick={onRetry}>{text.retry}</button></div>
+    {unavailable ? <div role="status"><p>{text.unavailable}</p><Button variant="link" className="min-h-11" onClick={onRetry}>{text.retry}</Button></div>
       : !offerings.length && loading ? <p role="status">{text.loading}</p>
       : !offerings.length && (study || !browse) ? <p>{study?.status === 'no_results' ? text.noResults : text.noMapping}</p> : null}
     {browse && <Link href={study?.status === 'no_results' ? `${offersHref}&state=all` : offersHref} className="inline-flex min-h-11 w-fit max-w-full items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">

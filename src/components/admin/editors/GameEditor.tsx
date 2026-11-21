@@ -1,5 +1,9 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from 'react';
 import { Save, X } from 'lucide-react';
 import { getGamePublicationIssues } from '@/lib/admin/configs/gamesConfig';
@@ -134,22 +138,20 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
           {game ? 'Edit Game' : 'Create New Game'}
         </h2>
         <div className="flex gap-2">
-          <button
+          <Button variant="ghost"
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50 flex items-center gap-2"
           >
             <X size={18} />
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={isSaving}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
           >
             <Save size={18} />
             {isSaving ? 'Saving...' : 'Save'}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -165,44 +167,44 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
               <label className="block text-sm font-medium mb-1">
                 Title <span className="text-red-500">*</span>
               </label>
-              <input
+              <Input
                 type="text"
                 required
                 value={formData.title || ''}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
                 placeholder="Enter game title"
-              />
+ />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">
                 Mode <span className="text-red-500">*</span>
               </label>
-              <select
+              <NativeSelect
                 value={formData.mode}
                 onChange={(e) => setFormData({ ...formData, mode: e.target.value as GameInstance['mode'] })}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
               >
                 <option value="quiz">Quiz</option>
                 <option value="wordquest">WordQuest</option>
                 <option value="puzzle">Puzzle</option>
                 <option value="memory">Memory</option>
                 <option value="simulation">Simulation</option>
-              </select>
+              </NativeSelect>
             </div>
 
             <label className="block text-sm font-medium" htmlFor="game-template-id">
               Template ID (optional)
-              <input
+              <Input
                 id="game-template-id"
-                className="mt-1 w-full rounded-lg border px-3 py-2 font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 w-full"
                 onChange={(event) => setFormData({
                   ...formData,
                   templateId: event.target.value.trim() ? event.target.value : null,
                 })}
                 value={formData.templateId || ''}
-              />
+ />
             </label>
 
             {formData.templateId ? (
@@ -214,30 +216,30 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
             {formData.mode === 'wordquest' ? (
               <label className="block text-sm font-medium" htmlFor="game-target-word">
                 Target word
-                <input
+                <Input
                   id="game-target-word"
-                  className="mt-1 w-full rounded-lg border px-3 py-2 font-normal uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 w-full uppercase"
                   onChange={(event) => setFormData({
                     ...formData,
                     content: { ...formData.content, targetWord: event.target.value.toUpperCase() },
                   })}
                   value={typeof formData.content?.targetWord === 'string' ? formData.content.targetWord : ''}
-                />
+ />
               </label>
             ) : null}
 
             {formData.mode === 'quiz' ? (
               <label className="block text-sm font-medium" htmlFor="game-embedded-questions">
                 Embedded questions JSON
-                <textarea
+                <Textarea
                   id="game-embedded-questions"
-                  className="mt-1 min-h-40 w-full rounded-lg border px-3 py-2 font-mono text-xs font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 min-h-40 w-full font-mono"
                   aria-describedby={parsedQuestions.error ? 'game-embedded-questions-error' : undefined}
                   aria-invalid={parsedQuestions.error ? true : undefined}
                   onChange={(event) => setQuestionsText(event.target.value)}
                   spellCheck={false}
                   value={questionsText}
-                />
+ />
                 {parsedQuestions.error ? <span className="mt-1 block text-xs text-red-600" id="game-embedded-questions-error">{parsedQuestions.error}</span> : null}
               </label>
             ) : null}
@@ -246,14 +248,14 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
               <label className="block text-sm font-medium mb-1">
                 Status <span className="text-red-500">*</span>
               </label>
-              <select
+              <NativeSelect
                 value={formData.isPublished ? 'published' : 'draft'}
                 onChange={(e) => setFormData({ ...formData, isPublished: e.target.value === 'published' })}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
-              </select>
+              </NativeSelect>
             </div>
           </div>
         </div>
@@ -274,26 +276,26 @@ export default function GameEditor({ game, onSave, onCancel }: GameEditorProps) 
               <label className="block text-sm font-medium mb-1" htmlFor="game-start-date-time">
                 Start date and time (Asia/Kolkata)
               </label>
-              <input
+              <Input
                 id="game-start-date-time"
                 type="datetime-local"
                 value={formatDateForIndiaInput(formData.schedule?.startDateTime)}
                 onChange={(e) => handleDateChange('startDateTime', e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+                className="w-full"
+ />
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1" htmlFor="game-end-date-time">
                 End date and time (Asia/Kolkata)
               </label>
-              <input
+              <Input
                 id="game-end-date-time"
                 type="datetime-local"
                 value={formatDateForIndiaInput(formData.schedule?.endDateTime)}
                 onChange={(e) => handleDateChange('endDateTime', e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+                className="w-full"
+ />
             </div>
           </div>
           <p className="mt-3 text-xs text-gray-600">Required for publication. Drafts can be saved without a schedule.</p>

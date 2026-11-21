@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import publicType from "@/components/MarketingLayout.module.css";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -148,22 +149,21 @@ const NewsPage = () => {
           {totalPages > 1 && (
             <div className="flex justify-between mt-8">
               {currentPage > 1 ? (
-                <button
+                <Button variant="ghost"
                   onClick={() => handlePageChange(currentPage - 1)}
-                  className="text-foreground font-semibold hover:underline"
                 >
                   {t("common.pagination.previous")}
-                </button>
+                </Button>
               ) : (
                 <span />
               )}
               {currentPage < totalPages && (
-                <button
+                <Button variant="ghost"
                   onClick={() => handlePageChange(currentPage + 1)}
-                  className="ml-auto text-foreground font-semibold hover:underline"
+                  className="ml-auto"
                 >
                   {t("common.pagination.next")}
-                </button>
+                </Button>
               )}
             </div>
           )}

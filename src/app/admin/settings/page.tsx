@@ -230,7 +230,7 @@ export default function AdminSettingsPage() {
         <Card className="shadow-sm">
           <CardContent className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
             <label className="flex cursor-pointer items-start gap-3">
-              <input checked={config.enabled} className="mt-0.5 size-4 accent-[var(--primary)]" onChange={(event) => { setConfig((current) => ({ ...current, enabled: event.target.checked })); setSaved(false); }} type="checkbox" />
+              <Input checked={config.enabled} className="mt-0.5" onChange={(event) => { setConfig((current) => ({ ...current, enabled: event.target.checked })); setSaved(false); }} type="checkbox" />
               <span><span className="block text-sm font-medium">Enable the admin assistant</span><span className="mt-1 block text-xs leading-5 text-muted-foreground">The active provider and its selected model will be used for new chat turns.</span></span>
             </label>
             <div className="text-sm sm:text-right"><p className="font-medium">{activeProvider?.providerName || 'No active provider'}</p><p className="mt-1 text-xs text-muted-foreground">{activeProvider?.model || 'Select a model below'}</p></div>

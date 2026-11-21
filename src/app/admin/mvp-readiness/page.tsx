@@ -1,5 +1,6 @@
 'use client';
 
+import { Input } from "@/components/ui/input";
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { xtaraApi } from '@/lib/api/client';
@@ -45,7 +46,7 @@ export default function MvpReadinessPage() {
         ['Stored careers', report.totals.careers], ['Currently published', report.totals.published], ['Verified for this MVP', report.totals.ready],
       ].map(([label, count]) => <div key={label} className="rounded-xl border bg-card p-4"><p className="text-sm text-muted-foreground">{label}</p><p className="mt-1 text-2xl font-semibold">{count}</p></div>)}</div>
       <p className="text-sm text-muted-foreground">{report.notice} Text presence is not proof of translation completeness. State and per-language review attestations are not yet recorded by the content contract.</p>
-      <label className="block text-sm font-medium">Find a career<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} className="mt-2 block w-full max-w-lg rounded-lg border bg-background p-3" /></label>
+      <label className="block text-sm font-medium">Find a career<Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} className="mt-2 w-full max-w-lg" /></label>
       {!records.length ? <p role="status">{report.records.length ? 'No careers match your search.' : 'No careers are stored in this catalogue yet.'}</p> : <ul className="space-y-4">
         {records.map((record) => <li key={record.id} className="rounded-xl border bg-card p-5">
           <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-lg font-semibold">{record.title}</h2><p className="text-sm text-muted-foreground">{record.id} · {record.status}</p></div>

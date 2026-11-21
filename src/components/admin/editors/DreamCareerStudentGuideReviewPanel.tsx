@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from "@/components/ui/button";
 import { useState, type ReactNode } from 'react';
 import { BookOpenCheck, Languages } from 'lucide-react';
 
@@ -60,7 +61,7 @@ export default function DreamCareerStudentGuideReviewPanel({ career }: { career:
         {LOCALES.map((item) => {
           const available = Boolean(guides[item.id]);
           return (
-            <button
+            <Button variant="surface"
               aria-pressed={locale === item.id}
               className={`flex min-h-12 items-center justify-between rounded-lg border px-3 py-2 text-left text-sm font-medium ${locale === item.id ? 'border-primary bg-primary text-primary-foreground' : 'bg-background text-foreground'} disabled:cursor-not-allowed disabled:opacity-50`}
               disabled={!available}
@@ -70,7 +71,7 @@ export default function DreamCareerStudentGuideReviewPanel({ career }: { career:
             >
               <span>{item.label}</span>
               <Languages className="size-4" />
-            </button>
+            </Button>
           );
         })}
       </div>
