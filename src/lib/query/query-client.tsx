@@ -14,5 +14,11 @@ export default function ReactQueryProvider({ children }: { children: React.React
     },
   }));
 
+  React.useEffect(() => {
+    const invalidate = () => { void queryClient.invalidateQueries({ queryKey: ['saved-career-context'] }); };
+    window.addEventListener('xtara:learner-write', invalidate);
+    return () => window.removeEventListener('xtara:learner-write', invalidate);
+  }, [queryClient]);
+
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

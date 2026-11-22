@@ -2,6 +2,11 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCareerExplorer } from '@/components/careers/explorer/useCareerExplorer';
+import { resolveCareerArtwork } from '@/components/careers/explorer/career-artwork';
+import { ExplorerScene } from '@/components/careers/explorer/ExplorerScene';
+import { withCatalogueSpecializations } from '@/components/careers/saved-career-visuals';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, GraduationCap, MessageCircleMore, Plus, X } from 'lucide-react';
@@ -150,9 +155,8 @@ function DreamCareerContent() {
   const [missingGuideCareer, setMissingGuideCareer] = useState<CareerIdentityView | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
-  const [studentContext, setStudentContext] = useState<CareerStudentContextResponse | null>(null);
-  const [contextAttempt, setContextAttempt] = useState(0);
-  const [contextFailed, setContextFailed] = useState(false);
+  const [directContext, setStudentContext] = useState<CareerStudentContextResponse | null>(null);
+  const [directContextFailed, setContextFailed] = useState(false);
   const [remotePlan, setRemotePlan] = useState<DirectionPlan | null>(null);
   const [selectionUpdating, setSelectionUpdating] = useState(false);
   const [conversationOpen, setConversationOpen] = useState(false);
@@ -161,12 +165,26 @@ function DreamCareerContent() {
   const rawPlan = useSyncExternalStore(subscribeToDirection, getDirectionSnapshot, serverDirectionSnapshot);
   const plan = useMemo(() => parseDirectionPlan(rawPlan), [rawPlan]);
 
+  const savedEntry = MVP_NAVIGATION_ENABLED && Boolean(user && !user.isAnonymous) && from === 'dashboard';
+  const queryClient = useQueryClient();
+  const savedContext = useQuery({
+    queryKey: ['saved-career-context', user?.uid, roleId, guideLocale],
+    queryFn: ({ signal }) => getDreamCareerStudentContext(roleId, { signal, expectedUserId: user!.uid, screenLocale: guideLocale }),
+    enabled: savedEntry && !authLoading, staleTime: 60_000, gcTime: 300_000, retry: false,
+  });
+  const studentContext = savedEntry ? (savedContext.isError ? undefined : savedContext.data) : directContext;
+  const contextFailed = savedEntry ? savedContext.isError : directContextFailed;
   const loadGuide = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     setLoadFailed(false);
     setMissingGuideCareer(null);
     try {
-      const next = await getDreamCareerStudentGuide(roleId, { locale: guideLocale, location: studentContext?.location, signal });
+      const location = studentContext?.location;
+      const next = await queryClient.fetchQuery({
+        queryKey: ['career-guide', roleId, guideLocale, location?.country ?? '', location?.state ?? '', location?.city ?? ''],
+        queryFn: ({ signal }) => getDreamCareerStudentGuide(roleId, { locale: guideLocale, location, signal }),
+        staleTime: 300_000, retry: false, meta: { authScope: location?.country || location?.state || location?.city ? 'localized' : 'public' },
+      });
       if (!signal?.aborted) setResponse(next);
     } catch (error) {
       if (!signal?.aborted) {
@@ -178,12 +196,14 @@ function DreamCareerContent() {
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, [guideLocale, roleId, studentContext?.location]);
+  }, [guideLocale, roleId, studentContext?.location, queryClient]);
 
-  const savedEntry = MVP_NAVIGATION_ENABLED && Boolean(user && !user.isAnonymous) && from === 'dashboard';
   const screen = savedEntry && studentContext?.screen?.schemaVersion === 1 && studentContext.screen.careerId === roleId
     && studentContext.screen.locale === guideLocale ? studentContext.screen : undefined;
-  const waitForScreen = savedEntry && !contextFailed && !studentContext;
+  const { data: catalogue } = useCareerExplorer(locale, savedEntry && !!screen && !screen.illustration);
+  const publishedCareer = catalogue?.careers.find(item => item.id === roleId);
+  const artwork = screen?.illustration ? { illustration: screen.illustration } : resolveCareerArtwork(catalogue, publishedCareer);
+  const waitForScreen = Boolean(user && !user.isAnonymous) && !contextFailed && !studentContext;
   useEffect(() => {
     if (authLoading || waitForScreen || screen) return;
     const controller = new AbortController();
@@ -199,17 +219,17 @@ function DreamCareerContent() {
     setRemotePlan(null);
     setSelectionUpdating(false);
     setSelectionError('');
-    if (!contextUserId || contextAnonymous) return;
+    if (!contextUserId || contextAnonymous || savedEntry) return;
     const controller = new AbortController();
     setContextFailed(false);
-    getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId, ...(savedEntry ? { screenLocale: guideLocale } : {}) })
+    getDreamCareerStudentContext(roleId, { signal: controller.signal, expectedUserId: contextUserId })
       .then(context => { if (!controller.signal.aborted) setStudentContext(context); })
       .catch(() => { if (!controller.signal.aborted) setContextFailed(true); });
-    if (!savedEntry) getDirectionFromApi(contextUserId)
+    getDirectionFromApi(contextUserId)
       .then(direction => { if (!controller.signal.aborted) setRemotePlan(direction); })
       .catch(() => undefined);
     return () => { controller.abort(); selectionGeneration.current += 1; };
-  }, [roleId, contextUserId, contextAnonymous, contextAttempt, savedEntry, guideLocale]);
+  }, [roleId, contextUserId, contextAnonymous, savedEntry, guideLocale]);
 
   const careerId = response?.career.id ?? roleId;
   const studyLink = (studentContext?.study?.browse ?? isStudyOptionsCareer(careerId)) && (
@@ -332,7 +352,7 @@ function DreamCareerContent() {
   };
 
   if (authLoading || (!screen && (waitForScreen || (loading && !response)))) return <PageFrame><DreamCareerStudentGuideLoading locale={guideLocale} /></PageFrame>;
-  const savedIdentity = screen ? { id: screen.careerId, title: screen.title, summary: screen.summary, imageUrl: undefined } : careerIdentity;
+  const savedIdentity = screen ? { id: screen.careerId, title: screen.title, summary: screen.summary, imageUrl: artwork.illustration?.url } : careerIdentity;
   if (savedEntry && savedIdentity) {
     const available = (key: CareerGuideQuestionId) => {
       const status = response?.coverage.byQuestion[key]?.status;
@@ -343,7 +363,7 @@ function DreamCareerContent() {
       <SavedCareerStudy careerId={savedIdentity.id} locale={locale} study={studentContext?.study} guide={response}
         loading={!contextFailed && !studentContext} failed={contextFailed}
         onRetry={() => {
-          setContextAttempt(attempt => attempt + 1);
+          void savedContext.refetch();
           if (response?.resolved.courseOptions.status === 'mapping_unavailable' || response?.relationshipErrors.some(error => error.subsection === 'courseOptions')) void retryRelationship('courseOptions');
         }} />
       {pilotSpecializations}
@@ -352,17 +372,21 @@ function DreamCareerContent() {
       <header className="border-b border-border bg-muted/35">
         <div className="site-frame grid items-center gap-3 pt-3 pb-6 sm:pt-5 sm:pb-8">
           <Link href={backHref} className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-primary hover:underline"><ArrowLeft size={16} aria-hidden="true" />{mvpNavigationCopy[guideLocale].myDirection}</Link>
-          <div className="flex min-w-0 items-center justify-between gap-4">
-            <div className="min-w-0">
+          <div className={savedIdentity.imageUrl ? 'grid min-w-0 grid-cols-[minmax(0,1fr)_6.5rem] items-center gap-x-4 gap-y-3 sm:grid-cols-[minmax(0,1fr)_minmax(12rem,32%)] sm:gap-x-8 sm:gap-y-0' : 'min-w-0'}>
+            <div className="min-w-0 self-center sm:self-end">
               {!screen && area && <p className="mb-2 text-sm font-semibold text-muted-foreground">{area.title}</p>}
               <h1 className="text-3xl leading-tight font-semibold tracking-[-.04em] break-words text-primary sm:text-5xl">{savedIdentity.title}</h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">{savedIdentity.summary}</p>
             </div>
-            {savedIdentity.imageUrl && <Image unoptimized src={savedIdentity.imageUrl} alt="" width={208} height={140} className="hidden h-32 w-48 shrink-0 rounded-2xl object-contain sm:block" />}
+            {savedIdentity.imageUrl && <div data-testid="saved-career-artwork" className="col-start-2 row-start-1 aspect-square overflow-hidden rounded-2xl bg-muted/50 sm:row-span-2 sm:aspect-auto sm:h-48 lg:h-60 [&>div]:h-full [&>div]:w-full">
+              <ExplorerScene illustration={artwork.illustration ?? { url: savedIdentity.imageUrl, alt: savedIdentity.title }}
+                contextTitle={artwork.contextTitle} placeholder="" sizes="(max-width:640px) 104px, 350px" />
+            </div>}
+            <p className={'col-span-full max-w-2xl self-start text-base leading-7 text-muted-foreground sm:col-span-1 sm:text-lg ' +
+              (savedIdentity.imageUrl ? 'sm:mt-3' : 'mt-3')}>{savedIdentity.summary}</p>
           </div>
         </div>
       </header>
-      {screen ? <SavedCareerContractView screen={screen} retry={() => setContextAttempt(attempt => attempt + 1)} /> : response ? <DreamCareerStudentGuide response={response} locale={guideLocale} savedCareer={{ college, grade: studentContext?.grade }}
+      {screen ? <SavedCareerContractView screen={withCatalogueSpecializations(screen, catalogue)} retry={() => void savedContext.refetch()} /> : response ? <DreamCareerStudentGuide response={response} locale={guideLocale} savedCareer={{ college, grade: studentContext?.grade }}
         showCourseOptions={false} onRetryRelationship={subsection => void retryRelationship(subsection)} retryingRelationships={retryingRelationships} />
         : <SavedCareerReader careerId={savedIdentity.id} locale={guideLocale} intro={savedIdentity.summary} college={college} />}
       {response && (available('whatYouDo') || available('educationRoutes') || available('starterActivity')) && slides.length > 0 &&

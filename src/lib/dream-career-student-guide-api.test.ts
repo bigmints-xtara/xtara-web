@@ -30,7 +30,7 @@ describe('Dream Career Student Guide API adapter', () => {
   it('requests the localized saved screen for the current account', async () => {
     await getDreamCareerStudentContext('data/engineer', { expectedUserId: 'learner', screenLocale: 'ta' });
     expect(mocks.get).toHaveBeenCalledWith(
-      '/api/v1/me/dream-careers/data%2Fengineer/student-context?screen=1&locale=ta',
+      '/api/v1/me/dream-careers/data%2Fengineer/student-context?screen=1&locale=ta&visuals=1',
       expect.objectContaining({ expectedUserId: 'learner' }),
     );
   });
@@ -40,6 +40,17 @@ describe('Dream Career Student Guide API adapter', () => {
     expect(await getDreamCareerStudentContext('data-engineer', { screenLocale: 'en' })).toEqual({
       careerId: 'data-engineer', saved: true, screen: undefined,
     });
+  });
+
+  it('retains approved media on the hero and nested specialization after parsing the actual wire format', async () => {
+    const art = { url: 'https://xtara.ai/xtara-service/api/v1/media/images/approved', alt: 'Medicine' };
+    const child = { url: 'http://127.0.0.1:4012/api/v1/media/images/cardio', alt: 'Cardiology' };
+    const screen = { schemaVersion: 1, careerId: 'doctor', locale: 'en', title: 'Medicine', summary: '', englishFallback: false,
+      illustration: art, tabs: [{ id: 'specializations', title: 'Specializations', sectionIds: ['specializations'] }],
+      sections: [{ id: 'specializations', title: 'Specializations', blocks: [{ kind: 'specializations', title: 'Specializations',
+        items: [{ id: 'cardiologist', title: 'Cardiology', overview: 'Heart health', illustration: child }] }] }] };
+    mocks.get.mockResolvedValueOnce({ careerId: 'doctor', screen });
+    expect((await getDreamCareerStudentContext('doctor', { screenLocale: 'en' })).screen).toEqual(screen);
   });
 
   it('requests signed-in context through its separate authenticated operation', async () => {

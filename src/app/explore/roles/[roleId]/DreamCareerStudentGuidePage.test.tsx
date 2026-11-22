@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import AppQueryProvider from '@/lib/query/query-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useParams, useSearchParams } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -159,13 +160,17 @@ describe('Dream Career Student Guide page', () => {
     localStorage.clear();
   });
 
+  function mountCareer() {
+    return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } })}><DreamCareerPage /></QueryClientProvider>);
+  }
+
   it('returns to the selected API direction even when it is absent from bundled area copy', async () => {
     const response = guideResponse();
     response.career.futureDirectionIds = ['custom-api-direction'];
     response.career.primaryFutureDirectionId = 'custom-api-direction';
     mocks.getGuide.mockResolvedValue(response);
     saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('custom-api-direction'), 'data-engineer'));
-    render(<DreamCareerPage />);
+    mountCareer();
     await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
     expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/assessment/careers/custom-api-direction');
     expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
@@ -173,7 +178,7 @@ describe('Dream Career Student Guide page', () => {
 
   it('does not add an unrelated career to an anonymous direction', async () => {
     saveDirectionPlan(createAreaDirectionPlan('unrelated-direction'));
-    render(<DreamCareerPage />);
+    mountCareer();
     fireEvent.click(await screen.findByRole('button', { name: 'Choose this career' }));
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Continue' })).not.toBeInTheDocument();
@@ -186,7 +191,7 @@ describe('Dream Career Student Guide page', () => {
     response.guide.howToGetThere.educationRoutes = [];
     response.guide.whatYouCanDoNow.starterActivity = null;
     mocks.getGuide.mockResolvedValue(response);
-    render(<DreamCareerPage />);
+    mountCareer();
     await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
     expect(screen.getByText('Career overview')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Start Career Conversation' })).not.toBeInTheDocument();
@@ -197,7 +202,7 @@ describe('Dream Career Student Guide page', () => {
   it('returns to Explore when opened from the catalogue', async () => {
     vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('from=explore') as ReturnType<typeof useSearchParams>);
     saveDirectionPlan(createAreaDirectionPlan('technology'));
-    render(<DreamCareerPage />);
+    mountCareer();
     await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
     expect(screen.getByRole('link', { name: /Back/ })).toHaveAttribute('href', '/explore');
   });
@@ -205,7 +210,7 @@ describe('Dream Career Student Guide page', () => {
   it('keeps the MVP career page read-only, with no duplicate selection or continue controls', async () => {
     mocks.mvp = true;
     saveDirectionPlan(toggleDreamCareer(createAreaDirectionPlan('technology'), 'data-engineer'));
-    render(<DreamCareerPage />);
+    mountCareer();
     await screen.findByRole('heading', { name: 'Data Engineer', level: 1 });
     expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Choose this career' })).toBeNull();
@@ -217,12 +222,12 @@ describe('Dream Career Student Guide page', () => {
   it('refreshes guide relationships with signed-in state and country context', async () => {
     mocks.user = { uid: 'student-1', isAnonymous: false };
     mocks.getContext.mockResolvedValue({ careerId: 'data-engineer', saved: false, assessmentReasons: [], location: { state: 'Kerala', country: 'India' } });
-    render(<DreamCareerPage />);
+    mountCareer();
     await waitFor(() => expect(mocks.getGuide).toHaveBeenCalledWith('data-engineer', expect.objectContaining({ location: { state: 'Kerala', country: 'India' } })));
   });
 
   it('renders a public canonical guide without assessment or Future Direction state', async () => {
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer', level: 1 })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'About this career' })).toBeInTheDocument();
@@ -233,7 +238,7 @@ describe('Dream Career Student Guide page', () => {
   });
 
   it('preserves save and career-conversation actions in the hero', async () => {
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(await screen.findByRole('button', { name: 'Choose this career' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Start Career Conversation' }));
@@ -244,7 +249,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.user = { uid: 'student-1', isAnonymous: false };
     mocks.getContext.mockRejectedValue(new Error('context unavailable'));
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer' })).toBeInTheDocument();
     expect(screen.getAllByText('Good data helps people make sound decisions.')).not.toHaveLength(0);
@@ -259,7 +264,7 @@ describe('Dream Career Student Guide page', () => {
     }
     mocks.getGuide.mockResolvedValue(value);
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer' })).toBeInTheDocument();
     expect(screen.queryByText('Good data helps people make sound decisions.')).not.toBeInTheDocument();
@@ -274,7 +279,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.getDirection.mockResolvedValue(remote);
     let resolveSave!: (value: typeof saved) => void;
     mocks.saveDirection.mockReturnValue(new Promise((resolve) => { resolveSave = resolve; }));
-    const view = render(<DreamCareerPage />);
+    const view = mountCareer();
     const add = await screen.findByRole('button', { name: 'Choose this career' });
     await waitFor(() => expect(mocks.getDirection).toHaveBeenCalledOnce());
     fireEvent.click(add);
@@ -301,7 +306,7 @@ describe('Dream Career Student Guide page', () => {
     let resolveSave!: (value: typeof saved) => void;
     mocks.saveDirection.mockReturnValue(new Promise((resolve) => { resolveSave = resolve; }));
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     const add = await screen.findByRole('button', { name: 'Choose this career' });
     await waitFor(() => expect(mocks.getDirection).toHaveBeenCalledOnce());
@@ -322,7 +327,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.user = { uid: 'student-1', isAnonymous: false };
     mocks.getDirection.mockResolvedValue(createAreaDirectionPlan('health'));
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     fireEvent.click(await screen.findByRole('button', { name: 'Choose this career' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Saving is unavailable because this career does not match a saved Career Direction in your account.');
@@ -334,7 +339,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.getDirection.mockResolvedValue(createAreaDirectionPlan('technology'));
     mocks.saveDirection.mockRejectedValue(new Error('write failed'));
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     fireEvent.click(await screen.findByRole('button', { name: 'Choose this career' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('We could not update My Dream Careers. Your saved state has not changed.');
@@ -344,7 +349,7 @@ describe('Dream Career Student Guide page', () => {
   it('shows loading and an honest retryable guide error without legacy fallback content', async () => {
     mocks.getGuide.mockRejectedValueOnce(new Error('guide unavailable')).mockResolvedValueOnce(guideResponse());
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(screen.getByRole('status')).toHaveTextContent('Loading career guide');
     expect(await screen.findByRole('alert')).toHaveTextContent('This career guide is temporarily unavailable.');
@@ -361,7 +366,7 @@ describe('Dream Career Student Guide page', () => {
       { career: { id: 'data-engineer', title: 'Data Engineer', summary: 'Reviewed career summary.', primaryFutureDirectionId: 'technology', futureDirectionIds: ['technology'] } },
     ));
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(await screen.findByRole('heading', { name: 'Data Engineer', level: 1 })).toBeInTheDocument();
     expect(screen.getByText('Reviewed career summary.')).toBeInTheDocument();
@@ -387,7 +392,7 @@ describe('Dream Career Student Guide page', () => {
         futureDirectionIds: ['technology'],
       } },
     ));
-    render(<DreamCareerPage />);
+    mountCareer();
     const link = await screen.findByRole('link', { name: 'Find courses and colleges' });
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
@@ -411,7 +416,7 @@ describe('Dream Career Student Guide page', () => {
           { id: 'study', title: 'School preparation', blocks: [{ kind: 'heading', text: 'Your stage', phase: 'afterGrade10', current: true }] },
         ] },
     });
-    render(<DreamCareerPage />);
+    mountCareer();
     await screen.findByRole('heading', { name: 'Shared career title', level: 1 });
     expect(screen.getByRole('link', { name: 'My Direction' })).toHaveAttribute('href', '/dashboard');
     expect(screen.getAllByRole('heading', { level: 2 }).map(el => el.textContent)).toEqual(['What engineers do', 'Additional reviewed topic']);
@@ -424,6 +429,65 @@ describe('Dream Career Student Guide page', () => {
     expect(mocks.getGuide).not.toHaveBeenCalled();
     expect(mocks.getOverview).not.toHaveBeenCalled();
     expect(mocks.getDirection).not.toHaveBeenCalled();
+  });
+
+  it('renders old-screen catalogue art and specialty links once, then refreshes only account data after a write', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'first-learner', isAnonymous: false };
+    vi.mocked(useParams).mockReturnValue({ roleId: 'doctor' });
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('from=dashboard') as ReturnType<typeof useSearchParams>);
+    const medicalArt = { url: 'https://xtara.ai/medicine.webp', alt: 'Reviewed Medicine scene' };
+    const childArt = { url: 'https://xtara.ai/cardiology.webp', alt: 'Reviewed cardiology scene' };
+    const work = [{ kind: 'heading', text: 'Specializations' }, { kind: 'list', items: ['Cardiology'] },
+      { kind: 'heading', text: 'Daily work' }, { kind: 'list', items: ['Assess symptoms'] }];
+    mocks.getContext.mockResolvedValue({ careerId: 'doctor', saved: true, location: {}, screen: {
+      schemaVersion: 1, careerId: 'doctor', title: 'Medicine', summary: 'Medical work', locale: 'en', englishFallback: false,
+      sections: [{ id: 'work', title: 'The work', blocks: work }],
+    } });
+    mocks.getExplorer.mockResolvedValue({ careers: [
+      { id: 'doctor', title: 'Medicine', illustration: medicalArt, specializationIds: ['cardiologist'] },
+      { id: 'cardiologist', title: 'Cardiology', summary: 'Heart medicine', illustration: childArt },
+    ] });
+    const view = render(<AppQueryProvider><DreamCareerPage /></AppQueryProvider>);
+    const tab = await screen.findByRole('tab', { name: 'Specializations' });
+    expect(screen.getByRole('img', { name: medicalArt.alt })).toHaveAttribute('src', medicalArt.url);
+    expect(screen.queryByRole('heading', { name: 'Specializations' })).toBeNull();
+    expect(screen.getByText('Assess symptoms')).toBeVisible();
+    fireEvent.keyDown(tab, { key: 'Enter' });
+    expect(screen.getByRole('img', { name: childArt.alt })).toHaveAttribute('src', childArt.url);
+    expect(screen.getByRole('link', { name: /Cardiology.*Heart medicine/ })).toHaveAttribute('href', '/explore?career=cardiologist&step=work');
+    view.rerender(<AppQueryProvider><div /></AppQueryProvider>);
+    view.rerender(<AppQueryProvider><DreamCareerPage /></AppQueryProvider>);
+    await screen.findByRole('tab', { name: 'Specializations' });
+    expect(mocks.getExplorer).toHaveBeenCalledTimes(1);
+    expect(mocks.getContext).toHaveBeenCalledTimes(1);
+    act(() => { window.dispatchEvent(new Event('xtara:learner-write')); });
+    await waitFor(() => expect(mocks.getContext).toHaveBeenCalledTimes(2));
+    expect(mocks.getExplorer).toHaveBeenCalledTimes(1);
+    mocks.user = { uid: 'second-learner', isAnonymous: false };
+    view.rerender(<AppQueryProvider><DreamCareerPage /></AppQueryProvider>);
+    await waitFor(() => expect(mocks.getContext).toHaveBeenCalledWith('doctor', expect.objectContaining({ expectedUserId: 'second-learner' })));
+  });
+
+  it('uses canonical career art and the three server tabs without downloading another catalogue', async () => {
+    mocks.mvp = true;
+    mocks.user = { uid: 'learner', isAnonymous: false };
+    vi.mocked(useParams).mockReturnValue({ roleId: 'doctor' });
+    vi.mocked(useSearchParams).mockReturnValue(new URLSearchParams('from=dashboard') as ReturnType<typeof useSearchParams>);
+    const art = { url: 'https://xtara.ai/reviewed.webp', alt: 'Published illustration' };
+    mocks.getContext.mockResolvedValue({ careerId: 'doctor', saved: true, location: {}, screen: {
+      schemaVersion: 1, careerId: 'doctor', title: 'Medicine', summary: 'Medical work', locale: 'en', englishFallback: false, illustration: art,
+      tabs: [{ id: 'overview', title: 'Overview', sectionIds: ['work'] }, { id: 'study', title: 'Study & colleges', sectionIds: ['colleges'] },
+        { id: 'specializations', title: 'Clinical specialties', sectionIds: ['specializations'] }],
+      sections: [{ id: 'work', title: 'Daily work', blocks: [] }, { id: 'colleges', title: 'Colleges', blocks: [] },
+        { id: 'specializations', title: 'Clinical specialties', blocks: [{ kind: 'specializations', items: [{ id: 'child-id', title: 'Reviewed child', overview: 'A published description.' }] }] }],
+    } });
+    mountCareer();
+    const tab = await screen.findByRole('tab', { name: 'Clinical specialties' });
+    expect(screen.getByRole('img', { name: art.alt })).toHaveAttribute('src', art.url);
+    fireEvent.keyDown(tab, { key: 'Enter' });
+    expect(screen.getByRole('link', { name: /Reviewed child/ })).toHaveAttribute('href', '/explore?career=child-id&step=work');
+    expect(mocks.getExplorer).not.toHaveBeenCalled();
   });
 
   it('opens a reviewed offering from a saved career even when its overview is unpublished', async () => {
@@ -514,7 +578,7 @@ describe('Dream Career Student Guide page', () => {
     }];
     mocks.getGuide.mockResolvedValueOnce(initial).mockResolvedValueOnce(retried);
 
-    render(<DreamCareerPage />);
+    mountCareer();
 
     expect(await screen.findByRole('heading', { name: 'Where can I find an internship?' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Retry where can I find an internship?' }));

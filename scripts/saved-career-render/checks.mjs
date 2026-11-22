@@ -5,12 +5,12 @@ import { writeFile } from 'node:fs/promises';
 const populated = 'data-scientist';
 const sparse = 'ai-governance-specialist';
 
-function screenFor(fixture, career, locale) {
+function screenFor(fixture, career, locale, visual = false) {
   for (const [key, envelope] of Object.entries(fixture.routes)) {
     const [method, href] = key.split(' ');
     const url = new URL(href, 'http://127.0.0.1');
     if (method === 'GET' && url.pathname === '/api/v1/me/dream-careers/' + career + '/student-context'
-        && url.searchParams.get('screen') === '1' && url.searchParams.get('locale') === locale) {
+        && (!visual || url.searchParams.get('visuals') === '1') && url.searchParams.get('screen') === '1' && url.searchParams.get('locale') === locale) {
       const screen = envelope.data.screen;
       assert.equal(screen.careerId, career);
       assert.equal(screen.locale, locale);
@@ -20,7 +20,7 @@ function screenFor(fixture, career, locale) {
   throw new Error('Fixture lacks saved screen ' + career + ' in ' + locale);
 }
 
-export async function walkthrough({ browser, origin, fixture, session, manifest, output, viewport, width, locale, screenshots }) {
+export async function walkthrough({ browser, origin, mediaOrigin, fixture, session, manifest, output, viewport, width, locale, screenshots }) {
   const colorScheme = locale === 'en' ? 'light' : 'dark';
   const context = await browser.newContext({ colorScheme, viewport: { width, height: width < 600 ? 844 : 900 }, reducedMotion: 'reduce', deviceScaleFactor: 1 });
   let page;
@@ -28,7 +28,8 @@ export async function walkthrough({ browser, origin, fixture, session, manifest,
   try {
     await context.route('**/*', route => {
       const url = new URL(route.request().url());
-      return ['data:', 'blob:'].includes(url.protocol) || url.origin === origin ? route.continue() : route.abort();
+      const fixtureImage = url.origin === mediaOrigin && /^\/api\/v1\/media\/images\/[a-f0-9]{64}$/.test(url.pathname);
+      return fixtureImage || ['data:', 'blob:'].includes(url.protocol) || url.origin === origin ? route.continue() : route.abort();
     });
     await context.addCookies([{ name: 'xtara_locale', value: locale, url: origin }]);
     page = await context.newPage();
@@ -180,6 +181,67 @@ export async function walkthrough({ browser, origin, fixture, session, manifest,
       await page.locator('main a[href*="from=dashboard#career-study"]').first().press('Enter');
       await reader.getByRole('tab', { selected: true }).waitFor();
       assert.equal(await studyTab.getAttribute('aria-selected'), 'true');
+    }
+    if (locale === 'en' && screenshots) {
+      const heroSha256 = {};
+      const publicRequests = [];
+      const contextualRequests = [];
+      page.on('request', request => {
+        const url = new URL(request.url());
+        if (/\/api\/v1\/(?:career-explorer|dream-careers\/[^/]+\/(?:overview|student-guide))$/.test(url.pathname)) publicRequests.push(url.pathname + url.search);
+        if (url.pathname.endsWith('/student-context')) contextualRequests.push(url.pathname + url.search);
+      });
+      for (const careerId of ['art-therapist', 'doctor']) {
+        const screen = screenFor(fixture, careerId, locale, true);
+        await page.goto(origin + '/dream-careers/' + careerId + '?from=dashboard');
+        await page.getByRole('heading', { level: 1, name: screen.title, exact: true }).waitFor();
+        const art = page.locator('[data-testid="saved-career-artwork"] img');
+        await art.waitFor();
+        const imageInfo = await art.evaluate(async img => { await img.decode(); return { src: img.currentSrc, size: img.naturalWidth }; });
+        assert(imageInfo.size > 0);
+        const assetHash = url => url.match(/[0-9a-f]{64}/)?.[0];
+        heroSha256[careerId] = assetHash(imageInfo.src);
+        assert(heroSha256[careerId] && heroSha256[careerId] === assetHash(screen.illustration.url), 'Hero did not render the reviewed image');
+        if (careerId === 'art-therapist') {
+          await capture(careerId, 'career', 'main h1');
+          continue;
+        }
+        const tab = page.locator('[data-career-tab="specializations"]');
+        await tab.click();
+        const panel = page.getByRole('tabpanel');
+        const cards = panel.locator('a[data-specialization-id]');
+        const specializationIds = await cards.evaluateAll(links => links.map(link => link.dataset.specializationId));
+        const expected = screen.sections.flatMap(section => section.blocks).find(block => block.kind === 'specializations').items;
+        assert.deepEqual(specializationIds, expected.map(item => item.id));
+        assert(specializationIds.length > 1);
+        const illustrated = expected.find(item => item.illustration);
+        assert(illustrated, 'Expected an illustrated medical specialty');
+        const child = cards.filter({ has: page.getByRole('heading', { name: illustrated.title, exact: true }) });
+        const childArt = child.locator('img');
+        await childArt.waitFor();
+        assert(await childArt.evaluate(async img => { await img.decode(); return img.naturalWidth > 0; }));
+        assert.equal(assetHash(await childArt.getAttribute('src')), assetHash(illustrated.illustration.url));
+        await capture(careerId, 'specializations', 'main h1');
+
+        async function openChild() {
+          await child.click();
+          await page.waitForURL(url => url.pathname === '/explore' && url.searchParams.get('career') === illustrated.id && url.searchParams.get('step') === 'work');
+          await page.locator('h1').filter({ hasText: illustrated.title }).waitFor();
+        }
+        await openChild();
+        await page.goBack();
+        await child.waitFor();
+        const beforePublic = publicRequests.length;
+        const beforeContext = contextualRequests.length;
+        await openChild();
+        await page.goBack();
+        await child.waitFor();
+        assert.equal(publicRequests.length, beforePublic, 'Second visit repeated a fresh public read');
+        assert.equal(contextualRequests.length, beforeContext, 'Second visit repeated a fresh account career read');
+        manifest.visuals = { heroSha256, specializationIds, openedCareerId: illustrated.id };
+        (manifest.cacheReads ??= {})[viewport] = { publicKeys: [...new Set(publicRequests)], firstPublic: beforePublic, secondPublic: publicRequests.length - beforePublic,
+          firstStudentContext: beforeContext, secondStudentContext: contextualRequests.length - beforeContext };
+      }
     }
     if (colorScheme === 'dark') manifest.darkAppearance.previewClassApplied = usesThemePreview;
     manifest.measurements.push({ viewport, locale, width, colorScheme, usesThemePreview, publicGutter: gutter, pages: measurements });

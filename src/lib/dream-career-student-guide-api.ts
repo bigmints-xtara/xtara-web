@@ -28,7 +28,7 @@ export async function getDreamCareerStudentContext(
   options: { signal?: AbortSignal; expectedUserId?: string; screenLocale?: DreamCareerGuideLocale } = {},
 ): Promise<CareerStudentContextResponse> {
   const path = xtaraApiOperationPath('getMeDreamCareersCareerIdStudentContext', { careerId });
-  const query = options.screenLocale ? `?${new URLSearchParams({ screen: '1', locale: options.screenLocale })}` : '';
+  const query = options.screenLocale ? `?${new URLSearchParams({ screen: '1', locale: options.screenLocale, visuals: '1' })}` : '';
   const context = await xtaraApi.get<CareerStudentContextResponse>(path + query, { signal: options.signal, expectedUserId: options.expectedUserId });
   return context.screen ? { ...context, screen: parseSavedCareerScreen(context.screen) } : context;
 }

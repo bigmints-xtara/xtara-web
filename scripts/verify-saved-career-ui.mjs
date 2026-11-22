@@ -12,7 +12,7 @@ import { walkthrough } from './saved-career-render/checks.mjs';
 import { localPort, prepareWeb, processWithLog, waitFor } from './saved-career-render/server.mjs';
 
 const { values } = parseArgs({ options: {
-  fixture: { type: 'string' }, api: { type: 'string' }, output: { type: 'string' }, chrome: { type: 'string' },
+  fixture: { type: 'string' }, api: { type: 'string' }, output: { type: 'string' }, chrome: { type: 'string' }, 'legacy-visuals': { type: 'boolean' },
 } });
 assert(values.fixture && values.output, 'Use --fixture <API export.json> --output <new evidence directory> [--api <loopback gateway>/api/v1] [--chrome <binary>]');
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -50,7 +50,7 @@ try {
   // Only start the companion API when a shared gateway was not supplied by the orchestrator.
   if (!apiAddress) {
     const ready = path.join(temp, 'fixture-ready.json');
-    const fixtureServer = processWithLog('npm', ['run', 'render:fixture', '--', '--serve', '--input', fixturePath, '--port', '0', '--ready-file', ready],
+    const fixtureServer = processWithLog('npm', ['run', 'render:fixture', '--', '--serve', '--input', fixturePath, '--port', '0', '--ready-file', ready, ...(values['legacy-visuals'] ? ['--legacy-visuals'] : [])],
       path.resolve(root, '../xtara-api'), process.env, path.join(output, 'fixture-server.log'));
     children.push(fixtureServer);
     apiAddress = (await waitFor(fixtureServer, 'API fixture', async () => JSON.parse(await readFile(ready, 'utf8')))).apiBaseUrl;
@@ -76,9 +76,9 @@ try {
   const translated = ['ml', 'hi', 'ta'].find(locale => languages.has(locale));
   for (const [viewport, width, locale, screenshots] of [['desktop', 1512, 'en', true], ['compact-390', 390, 'en', true], ['compact-320', 320, 'en', false], ['compact-390', 390, translated, false]]) {
     assert(locale, 'Fixture needs one translated career screen.');
-    await walkthrough({ browser, origin, fixture, session, manifest, output, viewport, width, locale, screenshots });
+    await walkthrough({ browser, origin, mediaOrigin: api.origin, fixture, session, manifest, output, viewport, width, locale, screenshots });
   }
-  manifest.checks = { sectionOrder: true, tabSelection: true, studyTabReturn: true, offeringIdentity: true, sparseCoverage: true, keyboardOfferingReturn: true, keyboardStudyResultsReturn: true,
+  manifest.checks = { sectionOrder: true, tabSelection: true, studyTabReturn: true, careerArtwork: true, specializationNavigation: true, publicContentCache: true, offeringIdentity: true, sparseCoverage: true, keyboardOfferingReturn: true, keyboardStudyResultsReturn: true,
     currentGradePhase: true, selectedProgrammeTitle: true, dashboardReturnLabel: true, publicGutters: true, translatedWidth: true, darkStylePreview: true, noHorizontalOverflow: true };
   manifest.passed = true;
 } catch (error) {

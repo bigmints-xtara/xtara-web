@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, expect, it, vi } from 'vitest';
 import type { Locale } from '@/i18n/config';
@@ -24,7 +25,7 @@ it.each(['en', 'hi', 'ml', 'ta'] as Locale[])('uses the requested %s layout, lan
     }] }, sources: [{ id: 'source-1', label: 'Programme handbook', url: 'https://example.edu/programme' }], studyOptions: 'public_pilot',
   };
   vi.mocked(getCareerOverview).mockResolvedValue(overview);
-  render(<SavedCareerReader careerId={overview.id} locale={locale} intro={overview.overview} about={[{ id: 'work', title: 'Reviewed work', content: 'Design systems' }]} path={education} college={<div />} />);
+  render(<QueryClientProvider client={new QueryClient()}><SavedCareerReader careerId={overview.id} locale={locale} intro={overview.overview} about={[{ id: 'work', title: 'Reviewed work', content: 'Design systems' }]} path={education} college={<div />} /></QueryClientProvider>);
   expect(screen.getByRole('tab', { name: copy.tabs.overview })).toHaveAttribute('aria-selected', 'true');
   expect(screen.getByText('Design systems')).toBeVisible();
   expect(screen.queryByText('A reviewed degree route')).toBeNull();

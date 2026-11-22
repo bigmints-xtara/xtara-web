@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Locale } from '@/i18n/config';
@@ -28,12 +29,16 @@ export default function SavedCareerReader({ careerId, locale, intro, about = [],
   college: ReactNode; guideSources?: ReactNode; fallbackText?: string; guideInEnglish?: boolean; grade?: string;
 }) {
   const copy = savedCareerCopy[locale];
+  const queryClient = useQueryClient();
   const [overview, setOverview] = useState<CareerOverview | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'missing' | 'failed'>('loading');
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
-    getCareerOverview(careerId, controller.signal, locale).then(value => {
+    queryClient.fetchQuery({
+      queryKey: ['career-overview', careerId, locale], queryFn: ({ signal }) => getCareerOverview(careerId, signal, locale),
+      staleTime: 300_000, retry: false, meta: { authScope: 'public' },
+    }).then(value => {
       if (controller.signal.aborted) return;
       setOverview(value);
       setStatus('ready');
@@ -41,7 +46,7 @@ export default function SavedCareerReader({ careerId, locale, intro, about = [],
       if (!controller.signal.aborted) setStatus(error instanceof XtaraApiError && error.status === 404 ? 'missing' : 'failed');
     });
     return () => controller.abort();
-  }, [careerId, locale, attempt]);
+  }, [careerId, locale, attempt, queryClient]);
   const sources = (ids: string[]) => {
     const links = overview?.sources.filter(source => ids.includes(source.id) && /^https:\/\//i.test(source.url));
     return links?.length ? <details className="mt-2 text-sm"><summary className="w-fit cursor-pointer font-semibold text-primary">{copy.sources}</summary>

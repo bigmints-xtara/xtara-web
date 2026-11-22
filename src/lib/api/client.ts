@@ -103,7 +103,12 @@ export async function apiRequest<T>(path: string, init: XtaraRequestInit = {}): 
     throw new XtaraApiError(message, response.status, requestId || error?.requestId, error?.details);
   }
 
-  return unwrap<T>(payload as ApiEnvelope<T>);
+  const result = unwrap<T>(payload as ApiEnvelope<T>);
+  if (typeof window !== 'undefined' && /^(POST|PUT|PATCH|DELETE)$/i.test(init.method ?? '') &&
+      /^(?:\/api\/v1)?\/(?:me|assessment|auth)(?:[/?]|$)/.test(path)) {
+    window.dispatchEvent(new Event('xtara:learner-write'));
+  }
+  return result;
 }
 
 export async function apiDownload(path: string): Promise<Blob> {

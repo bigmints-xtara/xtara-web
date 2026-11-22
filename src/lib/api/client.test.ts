@@ -71,3 +71,22 @@ it('omits cookies and pins authorization for successful account-bound requests',
   expect(mocks.fetch.mock.calls[0][1].credentials).toBe('omit');
   expect(new Headers(mocks.fetch.mock.calls[0][1].headers).get('Authorization')).toBe('Bearer a-token');
 });
+
+it('invalidates learner projections after a successful profile write, without invalidating public reads or failed requests', async () => {
+  const written = vi.fn();
+  window.addEventListener('xtara:learner-write', written);
+  try {
+    mocks.getFirebaseAuth.mockReturnValue({ currentUser: { uid: 'learner', getIdToken: async () => 'token' } });
+    mocks.fetch.mockReset().mockResolvedValue({ ok: true, json: async () => ({ data: {} }), headers: new Headers() });
+    vi.stubGlobal('fetch', mocks.fetch);
+    await apiRequest('/me', { expectedUserId: 'learner' });
+    expect(written).not.toHaveBeenCalled();
+    await apiRequest('/api/v1/me', { method: 'PATCH', expectedUserId: 'learner' });
+    expect(written).toHaveBeenCalledOnce();
+    mocks.fetch.mockResolvedValue({ ok: false, status: 403, statusText: 'Forbidden', headers: new Headers(), json: async () => ({}) });
+    await expect(apiRequest('/me/direction', { method: 'PUT', expectedUserId: 'learner' })).rejects.toThrow();
+    expect(written).toHaveBeenCalledOnce();
+  } finally {
+    window.removeEventListener('xtara:learner-write', written);
+  }
+});
