@@ -134,7 +134,7 @@ export default function ExploreCareers() {
         </div>}
         {!introduction && <div className={styles.topline} data-inner={!home || undefined}>
           {!home && breadcrumbs}
-          <Button variant="ghost" size="icon" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>
+          <Button variant="ghost" className={styles.motion} onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label={motionLabel} title={motionLabel}>
             <MotionIcon size={17} aria-hidden="true" />
             <span>{motionLabel}</span>
           </Button>

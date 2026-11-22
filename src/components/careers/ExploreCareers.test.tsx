@@ -165,7 +165,9 @@ describe("career exploration", () => {
     await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     for (const name of ['What you’ll do', 'Skills you’ll use', 'Where you’ll work', 'Good to know']) {
-      expect(screen.getByRole('region', { name })).toHaveTextContent('Reviewed guidance has not been published yet.');
+    const section = screen.getByRole('region', { name });
+    expect(section.firstElementChild).toBe(screen.getByRole('heading', { name, level: 2 }));
+    expect(section).toHaveTextContent('Reviewed guidance has not been published yet.');
     }
     fireEvent.click(screen.getAllByRole('button', { name: 'Help people' }).at(-1)!);
     expect(window.location.search).toContain('step=roles');

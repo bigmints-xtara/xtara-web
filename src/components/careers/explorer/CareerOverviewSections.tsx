@@ -38,21 +38,21 @@ export default function CareerOverviewSections({ career }: { career: ExplorerCar
   return <div className={styles.careerSections} lang="en">
     {isPending && <p role="status">Loading career guidance…</p>}
     {isError && <div role="alert"><p>More career guidance could not be loaded. You can still explore the career basics.</p><Button onClick={() => void refetch()}>Try again</Button></div>}
-    {facts.map(([id, label, values], index) => <section className={styles.careerSection} key={id} aria-labelledby={`section-${id}`}>
-      <header><span className={styles.sectionNumber} aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><h2 id={`section-${id}`}>{label}</h2></header>
+    {facts.map(([id, label, values]) => <section className={styles.careerSection} key={id} aria-labelledby={`section-${id}`}>
+      <h2 id={`section-${id}`}>{label}</h2>
       {!values.length ? missing : <ul className={id === 'skills' ? styles.skillList : styles.factList}>{values.map((value, i) => <li key={`${i}:${value}`}>{value}</li>)}</ul>}
     </section>)}
-    <section className={styles.careerSection} aria-labelledby="section-roles"><header><span className={styles.sectionNumber}>05</span><h2 id="section-roles">Job roles</h2></header>
+    <section className={styles.careerSection} aria-labelledby="section-roles"><h2 id="section-roles">Job roles</h2>
       {!data?.jobRoles.length ? missing : <ul className={styles.factList}>{data.jobRoles.map(role => <li key={role.id}><h3>{role.label}</h3><p>{role.description}</p>{role.jobTitles.length > 0 && <p>{role.jobTitles.join(' · ')}</p>}{citations(role.sourceIds)}</li>)}</ul>}
     </section>
-  <section className={styles.careerSection} aria-labelledby="section-pay"><header><span className={styles.sectionNumber}>06</span><h2 id="section-pay">Pay outlook</h2></header>
+    <section className={styles.careerSection} aria-labelledby="section-pay"><h2 id="section-pay">Pay outlook</h2>
     {data?.earnings.status === 'available' ? <>
       <p>{data.earnings.description}</p>
       <p className={styles.studyMeta}>{[data.earnings.measure, data.earnings.population, data.earnings.experience, data.earnings.geography, data.earnings.asOf].join(' · ')}</p>
       {citations(data.earnings.sourceIds)}
     </> : <p className={styles.sectionEmpty}>Reviewed qualitative pay guidance is not available yet.</p>}
   </section>
-    <section className={styles.careerSection} aria-labelledby="section-study"><header><span className={styles.sectionNumber}>07</span><h2 id="section-study">Your study path</h2></header>
+    <section className={styles.careerSection} aria-labelledby="section-study"><h2 id="section-study">Your study path</h2>
       <div className={styles.studyPhases}>{phases.map(([key, label]) => <section key={key}><h3>{label}</h3>{!data?.studyPaths[key].length ? missing : <ul className={styles.factList}>{data.studyPaths[key].map(studyItem)}</ul>}</section>)}
         {canBrowseStudyOptions(career.id, data?.studyOptionsBrowse ?? career.studyOptionsBrowse, data?.studyOptions) && <p><Link className={styles.secondary} href={studyOptionsHref(career.id, `/explore?career=${encodeURIComponent(career.id)}&step=work`)}>Explore study options</Link><span className={styles.studyMeta}>Check entry requirements with each provider.</span></p>}
         <p><Link className={styles.quiet} href="/colleges">Browse the college finder →</Link></p>
