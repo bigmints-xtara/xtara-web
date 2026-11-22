@@ -536,7 +536,7 @@ describe('Dream Career Student Guide page', () => {
     fireEvent.keyDown(await screen.findByRole('tab', { name: 'Study & colleges' }), { key: 'Enter' });
     expect(await screen.findByText(/Study options are temporarily unavailable/)).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText(/No study routes have been reviewed/)).toBeVisible();
+    expect(await screen.findByText('We haven’t verified any college programmes for this career yet.')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Data Engineer', level: 1 })).toBeVisible();
   });
 

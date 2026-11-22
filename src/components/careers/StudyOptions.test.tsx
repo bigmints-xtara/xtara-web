@@ -126,7 +126,7 @@ describe("Study options", () => {
     mount();
     expect(await screen.findByRole("alert")).toHaveTextContent("Study options are temporarily unavailable.");
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    expect(await screen.findByText("No study routes have been reviewed for this career yet.")).toBeInTheDocument();
+    expect(await screen.findByText("We haven’t verified any college programmes for this career yet.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "See options across India" })).not.toBeInTheDocument();
   });
 });
