@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/config";
 import { dashboardCopy } from "@/lib/dashboard-copy";
 import { savedCareerCopy } from "@/components/careers/saved-career-copy";
-import { studyOptionsCopy } from "@/components/careers/study-options-copy";
-import { savedCareerHref, studyOptionsHref, isStudyOptionsCareer } from "@/lib/study-options";
+import { studyLevelLabel, studyOptionsCopy } from "@/components/careers/study-options-copy";
+import { savedCareerHref, studyOptionsHref, canBrowseStudyOptions } from "@/lib/study-options";
 import type { DirectionOverview } from "@/lib/direction-api";
 import { directionOverviewCopy } from "@/lib/direction-overview-copy";
 import { mvpNavigationCopy } from "@/lib/mvp-navigation";
@@ -70,9 +70,10 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
           <ol data-testid="dream-career-list" className={styles.savedCareerRows}>
             {direction.careers.map((career) => {
               const href = savedCareerHref(career.id);
-              const artwork = resolveCareerArtwork(catalogue, catalogue?.careers.find(item => item.id === career.id), direction.id);
+              const publishedCareer = catalogue?.careers.find(item => item.id === career.id);
+              const artwork = resolveCareerArtwork(catalogue, publishedCareer, direction.id);
               const offering = career.study?.offerings[0];
-              const browse = career.study?.browse ?? isStudyOptionsCareer(career.id);
+              const browse = canBrowseStudyOptions(career.id, career.study?.browse ?? publishedCareer?.studyOptionsBrowse);
               return (
                 <li key={career.id} className={styles.savedCareerRow}>
                   <Link href={href} className={styles.savedCareerAction}>
@@ -88,7 +89,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
                   {offering || browse ? <div className={styles.studyPreview}>
                     <GraduationCap size={20} aria-hidden="true" />
                     <div className="min-w-0">
-                      {offering && <Link href={`${href}#courses-and-colleges`} className="block font-semibold hover:underline">{offering.title} · {offering.institutionName}</Link>}
+                      {offering && <Link href={`${href}#courses-and-colleges`} className="block font-semibold hover:underline">{[offering.title, offering.institutionName, studyLevelLabel(offering.level, study)].filter(Boolean).join(" · ")}</Link>}
                       <Link href={browse ? studyOptionsHref(career.id, href) : `${href}#courses-and-colleges`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold hover:underline">{study.action}<ArrowRight size={15} aria-hidden="true" /></Link>
                     </div>
                   </div> : null}

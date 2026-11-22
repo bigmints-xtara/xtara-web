@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getCareerOverview } from '@/lib/career-overview-api';
 import type { ExplorerCareer } from '@/types/career-explorer';
 import type { CareerStudyItem } from '@/types/career-overview';
-import { studyOptionsHref } from '@/lib/study-options';
+import { canBrowseStudyOptions, studyOptionsHref } from '@/lib/study-options';
 import styles from '../ExploreCareers.module.css';
 
 const phases = [['grades8To10', 'Grades 8–10'], ['afterGrade10', 'After grade 10'], ['afterGrade12', 'After grade 12']] as const;
@@ -54,7 +54,7 @@ export default function CareerOverviewSections({ career }: { career: ExplorerCar
   </section>
     <section className={styles.careerSection} aria-labelledby="section-study"><header><span className={styles.sectionNumber}>07</span><h2 id="section-study">Your study path</h2></header>
       <div className={styles.studyPhases}>{phases.map(([key, label]) => <section key={key}><h3>{label}</h3>{!data?.studyPaths[key].length ? missing : <ul className={styles.factList}>{data.studyPaths[key].map(studyItem)}</ul>}</section>)}
-        {data?.studyOptions === 'public_pilot' && <p><Link className={styles.secondary} href={studyOptionsHref(career.id, `/explore?career=${encodeURIComponent(career.id)}&step=work`)}>Explore study options</Link><span className={styles.studyMeta}>Public pilot for this career. Check entry requirements with each provider.</span></p>}
+        {canBrowseStudyOptions(career.id, data?.studyOptionsBrowse ?? career.studyOptionsBrowse, data?.studyOptions) && <p><Link className={styles.secondary} href={studyOptionsHref(career.id, `/explore?career=${encodeURIComponent(career.id)}&step=work`)}>Explore study options</Link><span className={styles.studyMeta}>Check entry requirements with each provider.</span></p>}
         <p><Link className={styles.quiet} href="/colleges">Browse the college finder →</Link></p>
       </div>
     </section>

@@ -143,7 +143,7 @@ describe('Dream Career Student Guide page', () => {
     mocks.getGuide.mockReset();
     mocks.getContext.mockReset();
     mocks.getDirection.mockReset();
-    mocks.getExplorer.mockReset();
+    mocks.getExplorer.mockReset().mockResolvedValue({ careers: [], directions: [] });
     mocks.getOverview.mockReset().mockRejectedValue(new XtaraApiError('Not published', 404));
     mocks.saveDirection.mockReset();
     mocks.generateSlides.mockReset();
@@ -397,6 +397,15 @@ describe('Dream Career Student Guide page', () => {
     const url = new URL(link.getAttribute('href')!, window.location.origin);
     expect(url.pathname).toBe('/explore/roles/software-developer/study-options');
     expect(url.searchParams.get('returnTo')).toBe('/dream-careers/software-developer?from=dashboard#career-study');
+  });
+
+  it('offers the generic study route for an anonymously viewed, server-enabled career', async () => {
+    mocks.mvp = true;
+    mocks.getExplorer.mockResolvedValue({ careers: [{ id: 'data-engineer', studyOptionsBrowse: true }] });
+    mountCareer();
+    const link = await screen.findByRole('link', { name: 'Find courses and colleges' });
+    expect(new URL(link.getAttribute('href')!, location.origin).pathname).toBe('/explore/roles/data-engineer/study-options');
+    expect(mocks.getContext).not.toHaveBeenCalled();
   });
 
   it('uses the authenticated panel order and study actions without fetching legacy editorial sources', async () => {

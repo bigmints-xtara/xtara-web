@@ -6,14 +6,15 @@ import Link from 'next/link';
 import { ArrowRight, GraduationCap } from 'lucide-react';
 import type { Locale } from '@/i18n/config';
 import type { CareerStudyPreview, StudyOffering } from '@/lib/study-options';
-import { isStudyOptionsCareer, savedCareerHref, studyOptionsHref } from '@/lib/study-options';
+import { canBrowseStudyOptions, savedCareerHref, studyOptionsHref } from '@/lib/study-options';
 import type { DreamCareerStudentGuideResponse } from '@/types/dream-career-student-guide';
-import { studyOptionsCopy } from './study-options-copy';
+import { studyLevelLabel, studyOptionsCopy } from './study-options-copy';
 
-export default function SavedCareerStudy({ careerId, locale, study, guide, loading, failed, onRetry }: {
+export default function SavedCareerStudy({ careerId, locale, study, guide, loading, failed, onRetry, browseCapability }: {
   careerId: string;
   locale: Locale;
   study?: CareerStudyPreview;
+  browseCapability?: boolean;
   guide: DreamCareerStudentGuideResponse | null;
   loading: boolean;
   failed: boolean;
@@ -21,7 +22,7 @@ export default function SavedCareerStudy({ careerId, locale, study, guide, loadi
 }) {
   const text = studyOptionsCopy[locale];
   const href = savedCareerHref(careerId);
-  const browse = study?.browse ?? isStudyOptionsCareer(careerId);
+  const browse = canBrowseStudyOptions(careerId, study?.browse ?? browseCapability);
   const coverage = guide?.coverage.byQuestion.coursesAndColleges?.status;
   const guideOfferings: StudyOffering[] = coverage === 'available' || coverage === 'partial'
     ? (guide?.resolved.courseOptions.items ?? []).map(option => ({
@@ -35,7 +36,7 @@ export default function SavedCareerStudy({ careerId, locale, study, guide, loadi
   const offersHref = studyOptionsHref(careerId, href);
   return <div className="grid min-w-0 gap-3">
     {offerings.length > 0 && <ul className="divide-y divide-border rounded-xl border border-border bg-card px-4">
-      {offerings.map(offering => <li key={offering.offeringId}><SavedOfferingLink careerId={careerId} offering={offering} label={text[offering.match]} /></li>)}
+      {offerings.map(offering => <li key={offering.offeringId}><SavedOfferingLink careerId={careerId} offering={offering} label={[text[offering.match], studyLevelLabel(offering.level, text)].filter(Boolean).join(' · ')} /></li>)}
     </ul>}
     {unavailable ? <div role="status"><p>{text.unavailable}</p><Button variant="link" className="min-h-11" onClick={onRetry}>{text.retry}</Button></div>
       : !offerings.length && loading ? <p role="status">{text.loading}</p>

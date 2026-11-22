@@ -1,7 +1,10 @@
 import { xtaraApi } from "@/lib/api/client";
 import { xtaraApiOperationPath } from "@/lib/api/generated/xtara-api-operations";
 
-export function isStudyOptionsCareer(careerId: string): boolean {
+export function canBrowseStudyOptions(careerId: string, capability?: boolean, legacy?: 'public_pilot' | 'unavailable'): boolean {
+  if (capability !== undefined) return capability;
+  if (legacy !== undefined) return legacy === 'public_pilot';
+  // These two routes predate the capability field and were linked by the original clients.
   return careerId === "software-developer" || careerId === "ux-designer";
 }
 
@@ -37,6 +40,7 @@ export interface StudyOffering {
   title: string;
   city?: string;
   state?: string;
+  level?: string;
   match: "direct" | "adjacent";
 }
 

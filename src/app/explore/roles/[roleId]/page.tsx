@@ -51,7 +51,7 @@ import { getDirectionFromApi, saveDirectionToApi } from '@/lib/direction-api';
 import { loadDiscoveryResult } from '@/lib/assessment-v2';
 import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from '@/lib/mvp-navigation';
 import { markDiscoveryCacheOwner } from '@/lib/discovery-cache-owner';
-import { isStudyOptionsCareer, studyOptionsHref } from '@/lib/study-options';
+import { canBrowseStudyOptions, studyOptionsHref } from '@/lib/study-options';
 import type {
   CareerIdentityView,
   CareerGuideQuestionId,
@@ -200,7 +200,10 @@ function DreamCareerContent() {
 
   const screen = savedEntry && studentContext?.screen?.schemaVersion === 1 && studentContext.screen.careerId === roleId
     && studentContext.screen.locale === guideLocale ? studentContext.screen : undefined;
-  const { data: catalogue } = useCareerExplorer(locale, savedEntry && !!screen && !screen.illustration);
+  const needsCatalogue = savedEntry && screen
+    ? !screen.illustration
+    : !studentContext?.study && Boolean(response || missingGuideCareer);
+  const { data: catalogue } = useCareerExplorer(locale, !authLoading && needsCatalogue);
   const publishedCareer = catalogue?.careers.find(item => item.id === roleId);
   const artwork = screen?.illustration ? { illustration: screen.illustration } : resolveCareerArtwork(catalogue, publishedCareer);
   const waitForScreen = Boolean(user && !user.isAnonymous) && !contextFailed && !studentContext;
@@ -232,7 +235,7 @@ function DreamCareerContent() {
   }, [roleId, contextUserId, contextAnonymous, savedEntry, guideLocale]);
 
   const careerId = response?.career.id ?? roleId;
-  const studyLink = (studentContext?.study?.browse ?? isStudyOptionsCareer(careerId)) && (
+  const studyLink = canBrowseStudyOptions(careerId, studentContext?.study?.browse ?? publishedCareer?.studyOptionsBrowse) && (
     <Button asChild size="lg" variant="outline" className="w-fit rounded-lg">
       <Link href={studyOptionsHref(
         careerId,
@@ -360,7 +363,7 @@ function DreamCareerContent() {
     };
     const slides = !screen && response ? careerConversationFromGuides([response], locale) : [];
     const college = <>
-      <SavedCareerStudy careerId={savedIdentity.id} locale={locale} study={studentContext?.study} guide={response}
+      <SavedCareerStudy careerId={savedIdentity.id} locale={locale} study={studentContext?.study} browseCapability={publishedCareer?.studyOptionsBrowse} guide={response}
         loading={!contextFailed && !studentContext} failed={contextFailed}
         onRetry={() => {
           void savedContext.refetch();

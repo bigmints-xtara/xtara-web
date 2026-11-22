@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 import type { Locale } from "@/i18n/config";
 import { getCareerExplorer } from "@/lib/career-explorer-api";
-import { isStudyOptionsCareer, studyOptionsHref } from "@/lib/study-options";
+import { canBrowseStudyOptions, studyOptionsHref } from "@/lib/study-options";
 import { explorerCopy } from "./explorer/copy";
 import { studyOptionsCopy } from "./study-options-copy";
 
@@ -19,7 +19,7 @@ export default function PilotCareerSpecializations({ careerId, locale }: { caree
   });
   const parent = data?.careers.find((item) => item.id === careerId);
   const specializations = data?.careers.filter((item) =>
-    isStudyOptionsCareer(item.id) && parent?.specializationIds?.includes(item.id),
+    canBrowseStudyOptions(item.id, item.studyOptionsBrowse) && parent?.specializationIds?.includes(item.id),
   );
   if (!specializations?.length) return null;
 

@@ -24,7 +24,7 @@ import {
   type StudyOptionsResponse,
   type StudyProgramme,
 } from "@/lib/study-options";
-import { studyOptionsCopy } from "./study-options-copy";
+import { studyLevelLabel, studyOptionsCopy } from "./study-options-copy";
 
 const allIndia = "all";
 
@@ -230,11 +230,15 @@ function ProgrammeCard({ programme, returnTo, text }: {
   returnTo: string;
   text: (typeof studyOptionsCopy)[keyof typeof studyOptionsCopy];
 }) {
+  const level = studyLevelLabel(programme.level, text);
   return (
     <article className="min-w-0 rounded-2xl border border-border bg-card px-4 py-5 sm:px-6">
       <h2 className="text-xl font-semibold break-words text-primary">{programme.title}</h2>
-      {programme.qualificationCode && (
-        <p className="mt-1 text-xs font-semibold text-muted-foreground uppercase">{programme.qualificationCode}</p>
+      {(level || programme.qualificationCode) && (
+        <p className="mt-1 text-xs font-semibold text-muted-foreground">
+          {level}{level && programme.qualificationCode && " · "}
+          {programme.qualificationCode && <span className="uppercase">{programme.qualificationCode}</span>}
+        </p>
       )}
       <ul className="mt-3 divide-y divide-border">
         {programme.offerings.map((offering) => {

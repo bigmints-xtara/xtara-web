@@ -241,6 +241,56 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
         manifest.visuals = { heroSha256, specializationIds, openedCareerId: illustrated.id };
         (manifest.cacheReads ??= {})[viewport] = { publicKeys: [...new Set(publicRequests)], firstPublic: beforePublic, secondPublic: publicRequests.length - beforePublic,
           firstStudentContext: beforeContext, secondStudentContext: contextualRequests.length - beforeContext };
+
+        await page.locator('[data-career-tab="study"]').click();
+        const colleges = panel.locator('[data-section="colleges"]');
+        const blocks = screen.sections.find(section => section.id === 'colleges').blocks;
+        const preview = blocks.find(block => block.kind === 'offering')?.offering;
+        const action = blocks.find(block => block.kind === 'action' && block.action === 'all_states')
+          ?? blocks.find(block => block.kind === 'action' && block.action === 'browse_study');
+        assert(action, 'Expected a reviewed Medicine study-options action');
+        await colleges.evaluate(section => section.scrollIntoView({ block: 'start' }));
+        await capture(careerId, 'study', 'main h1');
+        const [response] = await Promise.all([
+          page.waitForResponse(result => new URL(result.url()).pathname.endsWith('/study-options/doctor') && result.ok()),
+          colleges.getByRole('link', { name: action.label, exact: true }).press('Enter'),
+        ]);
+        await page.waitForURL(url => url.pathname.endsWith('/doctor/study-options'));
+        const resultUrl = new URL(response.url());
+        const fixtureKey = Object.keys(fixture.routes).find(key => {
+          const url = new URL(key.split(' ')[1], origin);
+          return key.startsWith('GET ') && url.pathname === '/api/v1/study-options/doctor' && url.search === resultUrl.search;
+        });
+        assert(fixtureKey, 'Missing fixture record for rendered Doctor college results');
+        const results = fixture.routes[fixtureKey].data;
+        assert.equal(results.status, 'available');
+        const offerings = results.programmes.flatMap(programme => programme.offerings);
+        const offering = offerings.find(row => row.offeringId === preview?.offeringId) ?? offerings[0];
+        assert.equal(offering.match, 'direct');
+        const programme = results.programmes.find(group => group.offerings.some(row => row.offeringId === offering.offeringId));
+        assert.equal(programme.level, 'undergraduate');
+        const group = page.getByRole('article').filter({ has: page.getByRole('heading', { level: 2, name: programme.title, exact: true }) });
+        await group.getByText('Undergraduate', { exact: false }).first().waitFor();
+        const anchor = 'study-offering-' + offering.offeringId;
+        const result = page.locator('li[id="' + anchor + '"] a');
+        await result.getByText(offering.institutionName, { exact: true }).waitFor();
+        await result.scrollIntoViewIfNeeded();
+        await capture(careerId, 'options', 'main h1');
+        await result.press('Enter');
+        await page.waitForURL(url => decodeURIComponent(url.pathname) === '/colleges/' + offering.institutionId && url.searchParams.get('offeringId') === offering.offeringId);
+        await page.getByRole('heading', { level: 1, name: offering.institutionName, exact: true }).waitFor();
+        const selected = page.getByRole('heading', { level: 3, name: offering.title, exact: true });
+        await selected.waitFor();
+        await selected.scrollIntoViewIfNeeded();
+        await capture(careerId, 'college', 'main h1');
+        await page.locator('main a[href*="/study-options?"]').first().press('Enter');
+        await page.waitForFunction(id => location.hash === '#' + id && document.activeElement?.closest('li')?.id === id, anchor);
+        await page.locator('main a[href*="from=dashboard#career-study"]').first().press('Enter');
+        await page.locator('[data-career-tab="study"][aria-selected="true"]').waitFor();
+        const medicine = { careerId, programme: offering.title, offeringId: offering.offeringId, institutionId: offering.institutionId, institutionName: offering.institutionName };
+        if (manifest.medicine) assert.deepEqual(medicine, manifest.medicine);
+        manifest.medicine = medicine;
+        Object.assign(manifest.checks, { medicineOffering: true, medicineReturn: true });
       }
     }
     if (colorScheme === 'dark') manifest.darkAppearance.previewClassApplied = usesThemePreview;

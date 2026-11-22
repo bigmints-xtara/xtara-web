@@ -19,7 +19,7 @@ const block = z.discriminatedUnion('kind', [
     kind: z.literal('offering'), matchLabel: text,
     offering: z.object({
       offeringId: text, institutionId: text, institutionName: text, title: text,
-      city: z.string().optional(), state: z.string().optional(), match: z.enum(['direct', 'adjacent']),
+      city: z.string().optional(), state: z.string().optional(), level: z.string().optional(), match: z.enum(['direct', 'adjacent']),
     }),
   }),
   z.object({ kind: z.literal('action'), action: z.enum(['browse_study', 'all_states', 'retry']), label: text }),

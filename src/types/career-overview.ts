@@ -35,5 +35,6 @@ export interface CareerOverview extends CareerOverviewIdentity {
   };
   studyPaths: { grades8To10: CareerStudyItem[]; afterGrade10: CareerStudyItem[]; afterGrade12: CareerStudyItem[] };
   sources: { id: string; label: string; url: string }[];
+  studyOptionsBrowse?: boolean;
   studyOptions: 'public_pilot' | 'unavailable';
 }

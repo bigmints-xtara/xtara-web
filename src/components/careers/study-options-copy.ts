@@ -1,5 +1,7 @@
 export const studyOptionsCopy = {
   en: {
+    undergraduate: "Undergraduate",
+    postgraduate: "Postgraduate",
     title: "Study options",
     action: "Find courses and colleges",
     backCareer: "Back to career",
@@ -28,6 +30,8 @@ export const studyOptionsCopy = {
     missingOffering: "This programme listing is no longer available.",
   },
   ml: {
+    undergraduate: "ബിരുദം",
+    postgraduate: "ബിരുദാനന്തര ബിരുദം",
     title: "പഠന ഓപ്ഷനുകൾ",
     action: "കോഴ്സുകളും കോളേജുകളും കണ്ടെത്തൂ",
     backCareer: "കരിയറിലേക്ക് മടങ്ങൂ",
@@ -56,6 +60,8 @@ export const studyOptionsCopy = {
     missingOffering: "ഈ പഠന പരിപാടിയുടെ ലിസ്റ്റിംഗ് ഇപ്പോൾ ലഭ്യമല്ല.",
   },
   hi: {
+    undergraduate: "स्नातक",
+    postgraduate: "स्नातकोत्तर",
     title: "पढ़ाई के विकल्प",
     action: "कोर्स और कॉलेज खोजें",
     backCareer: "करियर पर वापस जाएँ",
@@ -84,6 +90,8 @@ export const studyOptionsCopy = {
     missingOffering: "यह कार्यक्रम अब सूची में उपलब्ध नहीं है।",
   },
   ta: {
+    undergraduate: "இளநிலை",
+    postgraduate: "முதுநிலை",
     title: "படிப்பு வாய்ப்புகள்",
     action: "படிப்புகளையும் கல்லூரிகளையும் தேடுங்கள்",
     backCareer: "தொழில் பக்கத்திற்குத் திரும்புக",
@@ -112,3 +120,8 @@ export const studyOptionsCopy = {
     missingOffering: "இந்தப் படிப்புத் திட்டத்தின் பதிவு இனி கிடைக்கவில்லை.",
   },
 } as const;
+
+
+export function studyLevelLabel(level: string | undefined, text: { undergraduate: string; postgraduate: string }) {
+  return level === "undergraduate" || level === "postgraduate" ? text[level] : undefined;
+}

@@ -42,6 +42,23 @@ it('renders reviewed qualitative pay with its population and citation', async ()
   expect(screen.getByText(/Public hospital residents/)).toBeInTheDocument();
   expect(screen.getAllByRole('link', { name: 'Reviewed source' })).toHaveLength(3);
 });
+it('opens Doctor study options when the API allows browsing even if the legacy enum reports unavailable', async () => {
+  const doctor = { ...career, id: 'doctor', title: 'Medicine', studyOptionsBrowse: true };
+  vi.mocked(getCareerOverview).mockResolvedValue({ ...overview, id: doctor.id, title: doctor.title, studyOptions: 'unavailable', studyOptionsBrowse: true });
+  mount(<CareerOverviewSections career={doctor} />);
+  const link = await screen.findByRole('link', { name: 'Explore study options' });
+  expect(new URL(link.getAttribute('href')!, location.origin).pathname).toBe('/explore/roles/doctor/study-options');
+  expect(screen.queryByText(/Public pilot/)).toBeNull();
+});
+
+it('honours an explicit false capability over a legacy pilot flag', async () => {
+  vi.mocked(getCareerOverview).mockResolvedValue({ ...overview, studyOptionsBrowse: false });
+  mount(<CareerOverviewSections career={career} />);
+  await screen.findByText('Junior developer');
+  expect(screen.queryByRole('link', { name: 'Explore study options' })).toBeNull();
+  expect(screen.getByRole('link', { name: /Browse the college finder/ })).toBeVisible();
+});
+
 it('keeps basics on a failed overview, then retries without substituting made-up fields', async () => {
   vi.mocked(getCareerOverview).mockRejectedValueOnce(new Error('offline'));
   mount(<CareerOverviewSections career={career} />);

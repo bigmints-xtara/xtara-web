@@ -16,3 +16,5 @@ The walkthrough starts at the public page to measure the site gutter. It opens e
 `manifest.json` contains the fixture SHA-256, Chrome version, section order, measurements, named assertions and PNG filenames. The process exits unsuccessfully when a required assertion fails. The output directory retains the failed viewport, synthetic-page diagnostics and local server logs for inspection.
 
 The visual walkthrough opens Art Therapy and Doctor directly as the signed-in fixture learner, checks the displayed artwork hashes against the published records, opens a real specialization, and counts public and account content requests on repeat navigation. Use `--legacy-visuals` with the standalone responder to verify the same screens when the API omits the newer visuals fields.
+
+The Doctor walkthrough follows the saved guide’s location-specific college action, opens the exact undergraduate Medicine programme at the listed institution, then returns to the same offering and study tab using the keyboard. The manifest records the selected programme and institution under `medicine` and includes desktop and compact captures of each step.

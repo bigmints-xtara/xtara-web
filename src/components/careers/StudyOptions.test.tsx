@@ -45,6 +45,7 @@ const programme = {
   courseConceptId: "programme-1",
   title: "Interaction design",
   qualificationCode: "BDes",
+  level: "undergraduate",
   offerings: [offering],
 };
 
@@ -114,6 +115,7 @@ describe("Study options", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Show more options" }));
     expect(await screen.findByRole("link", { name: /Related College.*Related study route/ })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { name: "Interaction design" })).toHaveLength(1);
+    expect(screen.getByText("BDes").parentElement).toHaveTextContent("Undergraduate · BDes");
     expect(xtaraApi.get).toHaveBeenNthCalledWith(1, `${apiPath}?state=Karnataka`, expect.any(Object));
     expect(xtaraApi.get).toHaveBeenNthCalledWith(2, `${apiPath}?state=Karnataka&cursor=opaque%2Bpage%3D`, expect.any(Object));
   });

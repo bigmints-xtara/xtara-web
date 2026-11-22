@@ -78,7 +78,7 @@ try {
     assert(locale, 'Fixture needs one translated career screen.');
     await walkthrough({ browser, origin, mediaOrigin: api.origin, fixture, session, manifest, output, viewport, width, locale, screenshots });
   }
-  manifest.checks = { sectionOrder: true, tabSelection: true, studyTabReturn: true, careerArtwork: true, specializationNavigation: true, publicContentCache: true, offeringIdentity: true, sparseCoverage: true, keyboardOfferingReturn: true, keyboardStudyResultsReturn: true,
+  manifest.checks = { ...manifest.checks, sectionOrder: true, tabSelection: true, studyTabReturn: true, careerArtwork: true, specializationNavigation: true, publicContentCache: true, offeringIdentity: true, sparseCoverage: true, keyboardOfferingReturn: true, keyboardStudyResultsReturn: true,
     currentGradePhase: true, selectedProgrammeTitle: true, dashboardReturnLabel: true, publicGutters: true, translatedWidth: true, darkStylePreview: true, noHorizontalOverflow: true };
   manifest.passed = true;
 } catch (error) {
