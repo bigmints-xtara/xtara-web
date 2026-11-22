@@ -131,6 +131,19 @@ describe('pursued-area learner dashboard', () => {
     container?.remove();
   });
 
+  it.each([null, { id: 'health', title: 'Health', summary: '', reasons: [], guidance: [], reflectionPrompt: '', careers: [] }])(
+    'offers one illustrated Explorer entry with and without a saved direction', async direction => {
+      mocks.mvpEnabled = true;
+      mocks.hydrateDirection.mockResolvedValue(direction);
+      await act(async () => { root.render(<UserDashboard />); });
+      const banner = container.querySelector('section[aria-labelledby="dashboard-explore-title"]')!;
+      expect(banner.querySelector('a')?.getAttribute('href')).toBe('/explore');
+      expect(banner.querySelector('a')?.textContent).toBe('Explore Careers');
+      expect(Array.from(banner.querySelectorAll('[aria-hidden="true"] img')).map(img => img.getAttribute('src')))
+        .toEqual(['art', 'digital', 'science'].map(id => '/images/explorer-guide/' + id + '.webp'));
+    },
+  );
+
   it('shows a page-shaped skeleton on a first visit while the account loads', async () => {
     mocks.mvpEnabled = true;
     mocks.hydrateDirection.mockReturnValue(new Promise(() => {}));

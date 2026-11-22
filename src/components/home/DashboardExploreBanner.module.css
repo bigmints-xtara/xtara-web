@@ -1,0 +1,67 @@
+.banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.87fr);
+  align-items: stretch;
+  overflow: hidden;
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--card-foreground);
+  text-align: start;
+}
+
+.copy {
+  align-self: center;
+  padding: clamp(24px, 3.1vw, 44px);
+  overflow-wrap: anywhere;
+}
+
+.copy h2 {
+  color: var(--primary);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.copy p {
+  max-width: 42ch;
+  margin: 10px 0 18px;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+}
+
+.field {
+  display: grid;
+  place-items: center;
+  padding: 14px clamp(8px, 2vw, 28px);
+  background: linear-gradient(110deg, var(--card), color-mix(in srgb, var(--primary) 9%, var(--card)) 38%, color-mix(in srgb, var(--accent) 33%, var(--card)));
+}
+
+.scene {
+  position: relative;
+  width: min(100%, 450px);
+  aspect-ratio: 2.45;
+  isolation: isolate;
+}
+
+.scene img {
+  position: absolute;
+  height: auto;
+  object-fit: contain;
+}
+
+.art { left: 0; bottom: 6%; width: 31%; }
+.digital { left: 26%; bottom: 0; width: 48%; z-index: 1; }
+.science { right: 0; bottom: 6%; width: 31%; }
+
+@media (max-width: 700px) {
+  .banner { grid-template-columns: minmax(0, 1fr); }
+  .copy { padding: 22px 20px 0; }
+  .field {
+    padding: 15px 16px 12px;
+    background: linear-gradient(var(--card), color-mix(in srgb, var(--primary) 8%, var(--card)) 75%, color-mix(in srgb, var(--accent) 29%, var(--card)));
+  }
+  .scene { max-width: 320px; aspect-ratio: 2.1; }
+}

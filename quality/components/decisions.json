@@ -40,5 +40,12 @@
     "gap": "The two routes need different presentation with the same eligible directions, owner isolation and verified write.",
     "consumer": "Assessment discovery and the My Direction change action. Flutter uses its native ExplorerCarousel.",
     "verification": "DiscoveryResultPage tests and local Explorer browser journey."
+  },
+  "src/components/home/DashboardExploreBanner.tsx#DashboardExploreBanner": {
+    "purpose": "Open the career explorer from either signed-in dashboard state.",
+    "closest": "Button with Next Link, and the existing three Explorer guide illustrations.",
+    "gap": "A dashboard invitation needs the same accessible action and responsive illustration composition in the saved-direction and empty states.",
+    "consumer": "MyDirectionOverview and UserDashboard",
+    "verification": "UserDashboard.test.tsx and Chrome dashboard walkthrough at desktop and compact widths."
   }
 }

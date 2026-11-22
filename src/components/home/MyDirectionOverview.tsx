@@ -18,6 +18,7 @@ import { studyLevelLabel, studyOptionsCopy } from "@/components/careers/study-op
 import { savedCareerHref, studyOptionsHref, canBrowseStudyOptions } from "@/lib/study-options";
 import type { DirectionOverview } from "@/lib/direction-api";
 import { directionOverviewCopy } from "@/lib/direction-overview-copy";
+import DashboardExploreBanner from "./DashboardExploreBanner";
 import { mvpNavigationCopy } from "@/lib/mvp-navigation";
 
 export default function MyDirectionOverview({ direction, locale, greeting, hasAssessment, canEditCareers, onRetry }: {
@@ -33,7 +34,6 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
   const copy = directionOverviewCopy[locale];
   const study = studyOptionsCopy[locale];
   const careerText = savedCareerCopy[locale];
-  const navigation = mvpNavigationCopy[locale];
   const { data: catalogue } = useCareerExplorer(locale);
   const presentation = resolveExplorerDirection(catalogue?.directions, direction.id)?.presentation;
   const changeHref = hasAssessment ? "/explore?choose=direction" : "/assessment";
@@ -44,7 +44,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
   return (
     <main className={`${styles.dashboard} ${styles.studentDashboard}`}>
       {greeting && <p className="text-sm font-medium text-muted-foreground">{greeting}</p>}
-      <h1 className="mt-1 text-primary">{navigation.myDirection}</h1>
+      <h1 className="mt-1 text-primary">{mvpNavigationCopy[locale].myDirection}</h1>
 
       <section data-testid="career-direction-hero" className={styles.directionStrip} style={explorerTone(presentation)} aria-labelledby="career-direction-title">
         <DirectionImage directionId={direction.id} />
@@ -131,10 +131,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
         </section>
       ) : null}
 
-      <section className={styles.dashboardBrowse}>
-        <div><h2 className="mb-1 text-lg font-semibold">{copy.explore}</h2><p>{navigation.description}</p></div>
-        <Link href="/explore" className={styles.overviewLink}>{navigation.exploreCareers}<ArrowRight size={18} aria-hidden="true" /></Link>
-      </section>
+      <DashboardExploreBanner locale={locale} />
       {conversationOpen ? <CareerConversation isOpen onClose={() => setConversationOpen(false)} careerIds={direction.careers.map((career) => career.id)} /> : null}
     </main>
   );

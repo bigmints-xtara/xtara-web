@@ -52,6 +52,8 @@ import {
 import { AchievementsService } from "@/lib/firebase/achievements-service";
 
 import { MVP_NAVIGATION_ENABLED, mvpNavigationCopy } from "@/lib/mvp-navigation";
+import DashboardExploreBanner from "./DashboardExploreBanner";
+import type { Locale } from "@/i18n/config";
 
 type RewardSummary = { points: number; medals: number; level: string };
 
@@ -158,10 +160,9 @@ export default function UserDashboard() {
       hasAssessment={hasAccountAssessment} canEditCareers={isAccount || plan?.areaId === direction.id} /></>;
     const draft = userId && isAccount && hasAssessmentDraft(userId);
     const catalog = getAssessmentV2Catalog(locale);
-    const browse = mvpNavigationCopy[locale].exploreCareers;
     return <>{refreshNotice}{hasAccountAssessment
-      ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" browse={browse} />
-      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={draft ? text.resumeAssessment : catalog.ui.startAssessment} href="/assessment" browse={browse} />}</>;
+      ? <EmptyState title={text.chooseDirection} description={text.chooseDirectionDescription} action={text.reviewDirections} href="/assessment/discovery" browseLocale={locale} />
+      : <EmptyState title={text.noPlan} description={text.noPlanDescription} action={draft ? text.resumeAssessment : catalog.ui.startAssessment} href="/assessment" browseLocale={locale} />}</>;
   }
 
   if (!result) return <EmptyState title={text.noPlan} description={text.noPlanDescription} action={text.start} href="/assessment" />;
@@ -278,9 +279,7 @@ export default function UserDashboard() {
         )}
       </section>
 
-      {MVP_NAVIGATION_ENABLED ? <section className={styles.dashboardBrowse}>
-        <p>{mvpNavigationCopy[locale].description}</p><Link href="/explore">{mvpNavigationCopy[locale].exploreCareers}<ArrowRight size={18} aria-hidden="true" /></Link>
-      </section> : null}
+      {MVP_NAVIGATION_ENABLED ? <DashboardExploreBanner locale={locale} /> : null}
 
       {selectedCareers.length ? (
         <>
@@ -343,8 +342,8 @@ function RewardValue({ value, label, compact = false }: { value: string; label: 
   return <div className="rounded-xl bg-slate-50 px-2 py-3"><p className={`${compact ? "text-sm capitalize" : "text-lg"} truncate font-semibold text-primary`}>{value}</p><p className="mt-1 text-[11px] text-muted-foreground">{label}</p></div>;
 }
 
-function EmptyState({ title, description, action, href, browse }: { title: string; description: string; action: string; href: string; browse?: string }) {
-  return <main className="site-frame py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button>{browse && <Button asChild variant="outline" className="rounded-full"><Link href="/explore">{browse}</Link></Button>}</div></main>;
+function EmptyState({ title, description, action, href, browseLocale }: { title: string; description: string; action: string; href: string; browseLocale?: Locale }) {
+  return <main className="site-frame py-16 text-center"><Compass className="mx-auto h-12 w-12 text-primary" /><h1 className="mt-5 text-3xl font-semibold text-primary">{title}</h1><p className="mx-auto mt-3 max-w-xl text-muted-foreground">{description}</p><div className="mt-7 flex flex-wrap justify-center gap-3"><Button asChild className="rounded-full"><Link href={href}>{action}<ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div>{browseLocale && <DashboardExploreBanner locale={browseLocale} />}</main>;
 }
 
 function subscribeToDiscovery(onChange: () => void) {

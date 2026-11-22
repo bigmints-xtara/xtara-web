@@ -82,6 +82,43 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
       const saved = page.locator('a[href="/dream-careers/' + career + '?from=dashboard"]').first();
       await saved.waitFor();
       await capture(career, 'dashboard', 'main h1');
+      if (career === populated) {
+        const banner = page.locator('section[aria-labelledby="dashboard-explore-title"]');
+        const action = banner.getByRole('link');
+        await banner.scrollIntoViewIfNeeded();
+        const arrangement = await banner.evaluate(async section => {
+          const artwork = [...section.querySelectorAll('img')];
+          await Promise.all(artwork.map(image => image.decode()));
+          const rect = element => element.getBoundingClientRect();
+          const images = artwork.map(image => ({ filename: new URL(image.currentSrc).pathname.split('/').at(-1),
+            decoded: image.naturalWidth > 0, left: rect(image).left, right: rect(image).right, top: rect(image).top, width: rect(image).width }));
+          const { right, bottom, height } = rect(section.querySelector('a'));
+          return { images, action: { right, bottom, height }, width: rect(section).width, scroll: section.scrollWidth };
+        });
+        const [art, digital, science] = arrangement.images;
+        assert.deepEqual(arrangement.images.map(image => image.filename), ['art.webp', 'digital.webp', 'science.webp']);
+        assert(arrangement.images.every(image => image.decoded));
+        assert(art.left < digital.left && digital.left < science.left && digital.width > art.width && digital.width > science.width);
+        assert(arrangement.action.height >= 44 && arrangement.scroll <= arrangement.width + 1);
+        assert(width <= 700 ? arrangement.images.every(image => image.top >= arrangement.action.bottom)
+          : arrangement.images.every(image => image.left >= arrangement.action.right));
+        assert.equal(await action.getAttribute('href'), '/explore');
+        await action.focus();
+        assert(await action.evaluate(link => link === document.activeElement));
+        if (screenshots) {
+          const image = [locale, viewport, 'dashboard-explore-banner'].join('-') + '.png';
+          await banner.screenshot({ path: path.join(output, image), animations: 'disabled' });
+          manifest.captures.push({ scenario: career, step: 'explore-banner', viewport, width, locale, image, route: '/dashboard' });
+        }
+        if (locale === 'en' && viewport === 'desktop') {
+          await action.press('Enter');
+          await page.waitForURL(url => url.pathname === '/explore');
+          await page.goBack();
+          await saved.waitFor();
+        }
+        await page.evaluate(() => window.scrollTo(0, 0));
+        manifest.checks.dashboardExplorerBanner = true;
+      }
       await saved.focus();
       await saved.press('Enter');
       await page.getByRole('heading', { level: 1, name: screen.title, exact: true }).waitFor();
