@@ -220,6 +220,62 @@ describe("career exploration", () => {
     expect(screen.getByText('Building sites')).toBeInTheDocument();
     expect(screen.getByText('Work can happen outdoors')).toBeInTheDocument();
   });
+  it('opens Paediatric Cardiology through Medicine and restores its deep links', async () => {
+    const graph = structuredClone(fixture);
+    const health = graph.directions.find(direction => direction.id === 'health')!;
+    health.id = 'health-and-wellbeing';
+    health.title = 'Health & Wellbeing';
+    health.careerIds = ['doctor'];
+    const medicine = graph.careers.find(career => career.id === 'doctor')!;
+    medicine.title = 'Medicine';
+    medicine.directionIds = [health.id];
+    medicine.specializationIds = ['cardiologist'];
+    graph.careers.push(
+      { ...medicine, id: 'cardiologist', title: 'Cardiology', parentCareerId: 'doctor', specializationIds: ['pediatric-cardiologist'] },
+      { ...medicine, id: 'pediatric-cardiologist', title: 'Paediatric Cardiology', parentCareerId: 'cardiologist', specializationIds: [] },
+    );
+    vi.mocked(getCareerExplorer).mockResolvedValue(graph);
+    window.history.replaceState({}, '', `/explore?direction=${health.id}&step=roles`);
+    const journey = mount();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Explore specializations' }));
+    expect(await screen.findByRole('heading', { name: /^Cardiology$/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Explore specializations' }));
+    expect(await screen.findByRole('heading', { name: /^Paediatric Cardiology$/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Meet this career$/ }));
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Paediatric Cardiology');
+    expect(screen.getByRole('navigation', { name: 'Your path' })).toHaveTextContent('Health & Wellbeing');
+
+    const nestedQuery = 'career=pediatric-cardiologist&step=work';
+    for (const query of [window.location.search, nestedQuery, `direction=${health.id}&${nestedQuery}`]) {
+      expect(readExploreState(query, graph)).toMatchObject({
+        direction: health.id, career: 'pediatric-cardiologist', step: 'work',
+      });
+    }
+    expect(readExploreState(`direction=build&${nestedQuery}`, graph)).toMatchObject({
+      direction: 'build', career: null, step: 'roles',
+    });
+
+    journey.unmount();
+    window.history.replaceState({}, '', `/explore?${nestedQuery}`);
+    mount();
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Paediatric Cardiology');
+    expect(screen.getByRole('navigation', { name: 'Your path' })).toHaveTextContent('Health & Wellbeing');
+    fireEvent.click(screen.getByRole('button', { name: 'Pursue this career' }));
+    expect(await screen.findByRole('link', { name: 'Create an account' })).toHaveAttribute(
+      'href', '/signup?pursueCareer=pediatric-cardiologist&directionId=health-and-wellbeing&next=%2Fdashboard',
+    );
+
+    const cardiology = graph.careers.find(career => career.id === 'cardiologist')!;
+    health.careerIds.push('missing-id');
+    for (const brokenParent of ['missing-id', 'pediatric-cardiologist']) {
+      cardiology.parentCareerId = brokenParent;
+      expect(readExploreState(`direction=${health.id}&${nestedQuery}`, graph)).toMatchObject({
+        direction: health.id, career: null, step: 'roles',
+      });
+    }
+  });
+
   it('opens a legacy assessment Direction and keeps its group and detail context', async () => {
     const graph = structuredClone(fixture);
     graph.directions[0].id = 'engineering-and-built-world';

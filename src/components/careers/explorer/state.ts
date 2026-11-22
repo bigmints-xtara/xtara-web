@@ -46,15 +46,16 @@ export function readExploreState(
     (i) => i.id === state.industry && d?.industryIds.includes(i.id),
   );
   if (!i) state.industry = null;
-  const career = data.careers.find(
-    (c) =>
-      c.id === state.career &&
-      (i ? includesCareerOrParent(i.careerIds, c) : d ? includesCareerOrParent(d.careerIds, c) : true),
-  );
+  const selected = data.careers.find((c) => c.id === state.career);
+  const ancestry = careerAncestry(selected, data.careers);
+  const scope = i ?? d;
+  const career = selected && (!scope || scope.careerIds.some((id) => ancestry.has(id)))
+    ? selected
+    : undefined;
   if (!career) state.career = null;
   if (career && !state.direction)
     state.direction =
-      data.directions.find((d) => includesCareerOrParent(d.careerIds, career))?.id ?? null;
+      data.directions.find((d) => d.careerIds.some((id) => ancestry.has(id)))?.id ?? null;
   if (career)
     state.step =
       p.get("step") === "pursuit"
@@ -72,8 +73,14 @@ export function readExploreState(
   return state;
 }
 
-function includesCareerOrParent(ids: string[], career: ExplorerCareer) {
-  return ids.includes(career.id) || Boolean(career.parentCareerId && ids.includes(career.parentCareerId));
+function careerAncestry(career: ExplorerCareer | undefined, careers: ExplorerCareer[]) {
+  const ids = new Set<string>();
+  for (let current = career; current && !ids.has(current.id);) {
+    ids.add(current.id);
+    const parentId = current.parentCareerId;
+    current = parentId ? careers.find((entry) => entry.id === parentId) : undefined;
+  }
+  return ids;
 }
 export function exploreUrl(state: ExploreState): string {
   const p = new URLSearchParams({ view: state.view });
