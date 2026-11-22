@@ -115,7 +115,7 @@
 .careerSummary { font-size:14px; }
 .selectionBar { border-radius:10px; border-color:var(--journey-line); }
 .receiptHeader, .previewIntro { background:var(--journey-soft); color:var(--journey-ink); }
-.dashboard > h1 { font-size:clamp(36px,4vw,52px); letter-spacing:-.045em; font-weight:600; }
+.dashboard > h1, .dashboardHeading { font-size:clamp(36px,4vw,52px); letter-spacing:-.045em; font-weight:600; }
 .dashboardHero { margin-top:36px; border-radius:12px; background:#143d58; }
 .dashboardHero h2 { font-size:clamp(30px,3.5vw,46px); }
 .dashboardCareer { border-radius:10px; padding:28px; }

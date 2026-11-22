@@ -1,5 +1,6 @@
 "use client";
 
+import journey from '@/components/journey/journey.module.css';
 import { NativeSelect } from "@/components/ui/native-select";
 import { Table } from "@/components/ui/table";
 import { trackProductEvent } from "@/lib/analytics";
@@ -110,8 +111,8 @@ export default function OrganizationWorkspacePage({ section = "overview" }: { se
   if (!context) return <NoWorkspace />;
 
   return (
-    <div className={`${guidanceStyles.garden} ${guidanceStyles.canvas}`}>
-      <main className="mx-auto max-w-7xl px-5 py-8 pb-20 sm:py-10">
+    <div className={`${journey.surface} ${guidanceStyles.canvas}`}>
+      <main className="site-frame py-8 pb-20 sm:py-10">
         <section className="flex flex-wrap items-center justify-between gap-3 border-b pb-5">
           <h1 className="text-xl font-semibold tracking-tight">{context.organization.name}</h1>
           <div className="flex flex-wrap gap-2"><Badge variant="secondary">{formatRole(context.membership.role)}</Badge><Badge variant="outline">{formatLabel(context.effectiveStatus)}</Badge></div>

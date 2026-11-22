@@ -1,14 +1,31 @@
 "use client";
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Sprout } from 'lucide-react';
-import Header from '@/components/Header';
-import { useAuth } from '@/context/AuthContext';
-import { ConversationJournal, useConversationCopy } from '@/components/guidance/ConversationJournal';
-import styles from '@/components/guidance/guidance.module.css';
+
+import { useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import { useAuth } from "@/context/AuthContext";
+import { ConversationJournal, useConversationCopy } from "@/components/guidance/ConversationJournal";
+import journey from "@/components/journey/journey.module.css";
+
 export default function StudentGuidancePage() {
-  const { user, loading } = useAuth(); const router = useRouter(); const { c } = useConversationCopy();
-  useEffect(() => { if (!loading && (!user || user.isAnonymous)) router.replace('/login?next=%2Fguidance'); }, [user, loading, router]);
-  return <div className={`${styles.garden} ${styles.canvas}`}><Header /><main className="site-frame py-8 pb-20"><Link href="/dashboard" className="inline-flex items-center gap-2 text-sm"><ArrowLeft size={16} />{c.back}</Link><header className={styles.hero}><div><p className={styles.eyebrow}><Sprout size={18} />{c.connected}</p><h1>{c.tagline}</h1><p>{c.studentIntro}</p></div></header>{(loading || (user && !user.isAnonymous)) && <ConversationJournal />}</main></div>;
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const { c } = useConversationCopy();
+  useEffect(() => {
+    if (!loading && (!user || user.isAnonymous)) router.replace("/login?next=%2Fguidance");
+  }, [user, loading, router]);
+
+  return <div className={journey.surface}>
+    <Navbar />
+    <main className={`site-frame ${journey.studentDashboard} pt-6 pb-24 sm:pt-9`}>
+      <Link href="/dashboard" className="inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-primary hover:underline focus-visible:outline-2 focus-visible:outline-ring">
+        <ArrowLeft size={16} aria-hidden="true" />{c.back}
+      </Link>
+      {(loading || (user && !user.isAnonymous)) && <ConversationJournal />}
+    </main>
+    <Footer />
+  </div>;
 }

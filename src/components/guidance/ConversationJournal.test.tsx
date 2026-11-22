@@ -25,7 +25,9 @@ it('failed student save preserves typed reflection and offers list refresh', asy
 });
 it('teacher records explicitly shared recap and retains draft on failure', async () => {
   mocks.get.mockResolvedValue({ items: [], nextOffset: null, canRecord: true }); show(true); fireEvent.click(await screen.findByRole('button', { name: copy.en.record }));
-  const form = screen.getByRole('form', { name: copy.en.record }); expect(within(form).getByText(copy.en.sharedNotice)).toBeInTheDocument();
+  const form = screen.getByRole('form', { name: copy.en.record });
+  expect(within(form).getByRole('textbox', { name: copy.en.actionLabel + ' 1' })).toBeEnabled();
+  expect(within(form).getByRole('combobox', { name: copy.en.actionOwner })).toBeEnabled(); expect(within(form).getByText(copy.en.sharedNotice)).toBeInTheDocument();
   fireEvent.change(within(form).getByRole('textbox', { name: copy.en.title }), { target: { value: record.title } });
   fireEvent.change(within(form).getByRole('textbox', { name: new RegExp(copy.en.recap) }), { target: { value: record.recap } });
   mocks.save.mockRejectedValueOnce(new Error('Retry save')).mockResolvedValue(record);
@@ -45,4 +47,20 @@ it('keeps the teacher journal off Home when the account has no shared conversati
   render(<LanguageProvider initialLocale="en"><StudentGuidanceEntry /></LanguageProvider>);
   await waitFor(() => expect(mocks.get).toHaveBeenCalledWith('student'));
   expect(screen.queryByRole('link', { name: copy.en.openJournal })).toBeNull();
+});
+
+
+it.each([false, true])('uses the correct heading levels for the populated student and educator journal', async teacher => {
+  show(teacher);
+  expect(await screen.findByRole('heading', { name: record.title, level: teacher ? 3 : 2 })).toBeVisible();
+  expect(screen.getByRole('heading', { name: copy.en.journal, level: teacher ? 2 : 1 })).toBeVisible();
+  expect(screen.getByRole('button', { name: copy.en.refresh })).toBeEnabled();
+});
+
+it('reports a read failure separately from an unsaved reflection and keeps retry available', async () => {
+  mocks.get.mockRejectedValueOnce(new Error('Disconnected'));
+  show();
+  expect(await screen.findByRole('alert')).toHaveTextContent(copy.en.loadError);
+  fireEvent.click(screen.getByRole('button', { name: copy.en.retry }));
+  expect(await screen.findByRole('heading', { name: record.title })).toBeVisible();
 });

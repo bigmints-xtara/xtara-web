@@ -58,6 +58,7 @@ function currentNavigationUrl(urls: string[], pathname: string, fragment: string
     if (pathname.startsWith("/organization/students/") && urls.includes("/organization/learners")) {
         return "/organization/learners";
     }
+    if (pathname === "/guidance" && urls.includes("/dashboard")) return "/dashboard";
     if (careerOrigin === "dashboard" && urls.includes("/dashboard") &&
         (pathname.startsWith("/dream-careers/") || pathname.startsWith("/colleges/") || pathname.endsWith("/study-options"))) return "/dashboard";
     if (pathname.startsWith("/dream-careers/") && urls.includes("/explore")) return "/explore";
