@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Compass, GraduationCap, MessageCircleMore, Sparkles } from "lucide-react";
+import { ArrowRight, Compass, MessageCircleMore, Sparkles } from "lucide-react";
 import CareerConversation from "@/components/career-path/CareerConversation";
 import { ExplorerScene, explorerTone } from "@/components/careers/explorer/ExplorerScene";
 import { resolveCareerArtwork } from "@/components/careers/explorer/career-artwork";
@@ -14,25 +14,22 @@ import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/config";
 import { dashboardCopy } from "@/lib/dashboard-copy";
 import { savedCareerCopy } from "@/components/careers/saved-career-copy";
-import { studyLevelLabel, studyOptionsCopy } from "@/components/careers/study-options-copy";
-import { savedCareerHref, studyOptionsHref, canBrowseStudyOptions } from "@/lib/study-options";
+import { savedCareerHref } from "@/lib/study-options";
 import type { DirectionOverview } from "@/lib/direction-api";
 import { directionOverviewCopy } from "@/lib/direction-overview-copy";
 import DashboardExploreBanner from "./DashboardExploreBanner";
 import { mvpNavigationCopy } from "@/lib/mvp-navigation";
 
-export default function MyDirectionOverview({ direction, locale, greeting, hasAssessment, canEditCareers, onRetry }: {
+export default function MyDirectionOverview({ direction, locale, greeting, hasAssessment, canEditCareers }: {
   direction: DirectionOverview;
   locale: Locale;
   greeting: string;
   hasAssessment: boolean;
   canEditCareers: boolean;
-  onRetry: () => void;
 }) {
   const [conversationOpen, setConversationOpen] = useState(false);
   const text = dashboardCopy[locale];
   const copy = directionOverviewCopy[locale];
-  const study = studyOptionsCopy[locale];
   const careerText = savedCareerCopy[locale];
   const { data: catalogue } = useCareerExplorer(locale);
   const presentation = resolveExplorerDirection(catalogue?.directions, direction.id)?.presentation;
@@ -72,8 +69,8 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
               const href = savedCareerHref(career.id);
               const publishedCareer = catalogue?.careers.find(item => item.id === career.id);
               const artwork = resolveCareerArtwork(catalogue, publishedCareer, direction.id);
-              const offering = career.study?.offerings[0];
-              const browse = canBrowseStudyOptions(career.id, career.study?.browse ?? publishedCareer?.studyOptionsBrowse);
+
+
               return (
                 <li key={career.id} className={styles.savedCareerRow}>
                   <Link href={href} className={styles.savedCareerAction}>
@@ -86,20 +83,11 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
                     </span>
                     <span className={styles.openCareer}>{careerText.open}<ArrowRight size={16} aria-hidden="true" /></span>
                   </Link>
-                  {offering || browse ? <div className={styles.studyPreview}>
-                    <GraduationCap size={20} aria-hidden="true" />
-                    <div className="min-w-0">
-                      {offering && <Link href={`${href}#courses-and-colleges`} className="block font-semibold hover:underline">{[offering.title, offering.institutionName, studyLevelLabel(offering.level, study)].filter(Boolean).join(" · ")}</Link>}
-                      <Link href={browse ? studyOptionsHref(career.id, href) : `${href}#courses-and-colleges`} className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold hover:underline">{study.action}<ArrowRight size={15} aria-hidden="true" /></Link>
-                    </div>
-                  </div> : null}
-                  {career.study?.status === "temporarily_unavailable" && <p className={styles.studyStatus}>{study.unavailable} <Button onClick={onRetry}>{study.retry}</Button></p>}
                 </li>
               );
             })}
           </ol>
         ) : <Button asChild className="mt-4"><Link href={editHref}>{canEditCareers ? text.chooseDreamCareers : hasAssessment ? text.reviewDirections : text.startAssessment}</Link></Button>}
-        {hasCareers && direction.careers.every(career => career.study?.status === "no_reviewed_mapping") && <p className={styles.studyStatus}>{careerText.noMatches}</p>}
       </section>
 
       {direction.reasons.length > 0 || hasGuidance || direction.reflectionPrompt ? (

@@ -81,6 +81,26 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
       await page.goto(origin + '/dashboard');
       const saved = page.locator('a[href="/dream-careers/' + career + '?from=dashboard"]').first();
       await saved.waitFor();
+      const dashboardCareers = fixture.routes['GET /api/v1/me/direction?locale=' + locale].data.overview.careers;
+      const offerings = dashboardCareers.flatMap(item => item.study?.offerings ?? []);
+      assert(offerings.length > 0, 'Dashboard check needs a real reviewed offering in the signed learner response.');
+      const savedList = page.getByTestId('dream-career-list');
+      const rows = savedList.getByRole('listitem');
+      assert.equal(await rows.count(), dashboardCareers.length);
+      for (const [i, expected] of dashboardCareers.entries()) {
+        const row = rows.nth(i);
+        const links = row.getByRole('link');
+        assert.equal(await links.count(), 1);
+        assert.equal(await links.getAttribute('href'), '/dream-careers/' + expected.id + '?from=dashboard');
+        assert.equal((await row.innerText()).trim(), (await links.innerText()).trim());
+      }
+      const section = savedList.locator('..');
+      assert.equal(await section.locator('a[href*="/colleges/"], a[href*="/study-options"], a[href*="#courses-and-colleges"]').count(), 0);
+      const content = await section.innerText();
+      for (const offering of offerings) {
+        assert(!content.includes(offering.title) && !content.includes(offering.institutionName), 'Saved careers unexpectedly include a programme preview.');
+      }
+      manifest.checks.dashboardCareersOnly = true;
       await capture(career, 'dashboard', 'main h1');
       if (career === populated) {
         const banner = page.locator('section[aria-labelledby="dashboard-explore-title"]');

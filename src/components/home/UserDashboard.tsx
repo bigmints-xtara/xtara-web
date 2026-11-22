@@ -156,7 +156,7 @@ export default function UserDashboard() {
     const direction = serverOverview === undefined ? fallback : serverOverview;
     const hasAccountAssessment = Boolean(storedResult?.areas.length) &&
       (!isAccount || localStorage.getItem(discoveryCacheOwnerKey) === userId);
-    if (direction) return <>{refreshNotice}<MyDirectionOverview onRetry={() => setRetryAccount(value => value + 1)} direction={direction} locale={locale} greeting={greeting}
+    if (direction) return <>{refreshNotice}<MyDirectionOverview direction={direction} locale={locale} greeting={greeting}
       hasAssessment={hasAccountAssessment} canEditCareers={isAccount || plan?.areaId === direction.id} /></>;
     const draft = userId && isAccount && hasAssessmentDraft(userId);
     const catalog = getAssessmentV2Catalog(locale);

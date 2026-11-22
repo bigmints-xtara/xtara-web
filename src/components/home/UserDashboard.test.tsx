@@ -246,13 +246,30 @@ describe('pursued-area learner dashboard', () => {
     const thumbnail = container.querySelector('a[href="/dream-careers/software-developer?from=dashboard"] img');
     expect(thumbnail?.getAttribute('src')).toBe('https://xtara.ai/media/software.webp');
     expect(thumbnail?.getAttribute('alt')).toBe('');
-    expect(page).toContain('Computing degree · Sample College');
-    expect(page!.indexOf('Computing degree')).toBeLessThan(page!.indexOf('Try sketching'));
+    expect(page).not.toContain('Computing degree');
+    expect(page).not.toContain('Sample College');
+    const savedList = container.querySelector('[data-testid="dream-career-list"]')!;
+    expect(savedList.querySelectorAll('a')).toHaveLength(1);
+    expect(savedList.textContent).toContain('Open career');
     expect(page).toContain('Try sketching a tool for a problem at school.');
     expect(page).toContain('What would you like to build?');
     expect(container.querySelector('a[href="/dream-careers/software-developer?from=dashboard"]')?.textContent).toContain('Design and build software.');
     expect(container.querySelector('a[href="/assessment/careers/digital-and-computing"]')).not.toBeNull();
   });
+
+  it.each(['temporarily_unavailable', 'no_reviewed_mapping', 'no_results'])(
+    'keeps study coverage state %s out of the saved career section', async status => {
+      mocks.mvpEnabled = true;
+      mocks.hydrateDirection.mockResolvedValue({ id: 'design', title: 'Design', summary: '', reasons: [], guidance: [], reflectionPrompt: '',
+        careers: [{ id: 'ux-designer', title: 'UX Design', summary: '', study: { status, browse: true, offerings: [] } }],
+      });
+      await act(async () => { root.render(<UserDashboard />); });
+      const section = container.querySelector('[data-testid="dream-career-list"]')!.closest('section')!;
+      expect(section.querySelectorAll('li a')).toHaveLength(1);
+      expect(section.querySelector('li a')?.getAttribute('href')).toBe('/dream-careers/ux-designer?from=dashboard');
+      expect(section.textContent).not.toMatch(/college|study options|try again/i);
+    },
+  );
 
   it('keeps the direction and career picker visible when no careers are saved', async () => {
     mocks.mvpEnabled = true;
