@@ -203,7 +203,20 @@ export default function ExploreCareers() {
           const repeatedContext = !active && Boolean(artwork?.contextTitle && artwork.illustration &&
             (sceneCounts.get(artwork.illustration.url) ?? 0) > 1);
           const illustration = artwork ? artwork.illustration : 'illustration' in item ? item.illustration : undefined;
-          return <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}><ExplorerScene key={item.id} illustration={repeatedContext ? undefined : illustration} contextTitle={artwork?.contextTitle} contextShown={repeatedContext} placeholder={text.illustration} bubble={!home} /><div className={styles.cardCopy}><h2>{item.title}</h2><p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p><Button variant="outline" tabIndex={active ? 0 : -1} onClick={open} aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>{action}{home ? <ArrowUpRight size={18} /> : <ArrowRight size={18} />}</Button></div></div>;
+          return (
+            <div className={styles.choiceBody} style={home && 'presentation' in item ? explorerTone(item.presentation) : undefined}>
+              <ExplorerScene key={item.id} illustration={repeatedContext ? undefined : illustration} contextTitle={artwork?.contextTitle}
+                contextShown={repeatedContext} placeholder={text.illustration} bubble={!home} />
+              <div className={styles.cardCopy}>
+                <h2>{item.title}</h2>
+                <p>{'cardSummary' in item ? item.cardSummary ?? item.summary : item.summary}</p>
+                <Button variant="surface" className={styles.cardAction} tabIndex={active ? 0 : -1} onClick={open}
+                  aria-hidden={!active || undefined} style={{ visibility: active ? 'visible' : 'hidden' }}>
+                  {action}{home ? <ArrowUpRight aria-hidden="true" size={18} /> : <ArrowRight aria-hidden="true" size={18} />}
+                </Button>
+              </div>
+            </div>
+          );
         }} />}
         </section>
         {home && <section className={styles.directionNotes}><h2>{guide.howTo}</h2>

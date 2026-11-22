@@ -1,3 +1,4 @@
+import explorerStyles from "@/components/careers/ExploreCareers.module.css";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -89,7 +90,10 @@ describe("discovery result chooser", () => {
     fireEvent.click(within(carousel as HTMLElement).getByRole("button", { name: "Next" }));
     const active = carousel.querySelector<HTMLElement>('[data-active="true"]')!;
     expect(active.querySelector("h2")?.textContent).not.toBe(before);
-    fireEvent.click(within(active).getByRole("button", { name: /Choose this direction:/ }));
+    const choose = within(active).getByRole("button", { name: /Choose this direction:/ });
+    expect(choose).toHaveAttribute("data-variant", "surface");
+    expect(choose).toHaveClass(explorerStyles.cardAction);
+    fireEvent.click(choose);
     await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(expect.stringMatching(/^\/assessment\/careers\//)));
   });
 

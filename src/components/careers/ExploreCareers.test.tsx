@@ -1,3 +1,4 @@
+import explorerStyles from "./ExploreCareers.module.css";
 import { act, fireEvent, render, screen, cleanup } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -185,11 +186,17 @@ describe("career exploration", () => {
     expect(window.location.search).toBe('?view=map');
     expect(getExplorerDirectionRecord).not.toHaveBeenCalled();
     expect(screen.queryByText('Consider build')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Explore this direction' }));
+    const directionAction = screen.getByRole('button', { name: 'Explore this direction' });
+    expect(directionAction).toHaveAttribute('data-variant', 'surface');
+    expect(directionAction).toHaveClass(explorerStyles.cardAction);
+    fireEvent.click(directionAction);
     expect(window.location.search).toContain('direction=health');
     expect(await screen.findByText('Consider health')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Doctor' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Meet this career' }));
+    const careerAction = screen.getByRole('button', { name: 'Meet this career' });
+    expect(careerAction).toHaveAttribute('data-variant', 'surface');
+    expect(careerAction).toHaveClass(explorerStyles.cardAction);
+    fireEvent.click(careerAction);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Doctor');
     expect(screen.getByText(/Some information is shown in English/)).toBeInTheDocument();
     const assessmentHref = screen.getByRole('link', { name: 'Take the assessment' }).getAttribute('href')!;

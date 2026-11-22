@@ -160,7 +160,7 @@ export default function DiscoveryResultPage({ choosing = false }: { choosing?: b
               return <div className={explorer.choiceBody} style={explorerTone(direction?.presentation)}>
                 <ExplorerScene illustration={direction?.illustration} placeholder={journeyCopy[locale].illustration} decorative />
                 <div className={explorer.cardCopy}><h2>{title}</h2><p>{area.description || direction?.summary}</p>
-                  <Button disabled={saving} style={{ visibility: active ? "visible" : "hidden" }}
+                  <Button variant="surface" className={explorer.cardAction} disabled={saving} style={{ visibility: active ? "visible" : "hidden" }}
                     aria-label={copy.choose + ": " + title} onClick={() => void pursueArea(owner ? direction?.id ?? area.id : area.id)}>
                     {copy.choose}<ArrowRight aria-hidden="true" size={16} />
                   </Button>

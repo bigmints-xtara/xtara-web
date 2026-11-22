@@ -367,7 +367,12 @@
 .journey .carousel .cardCopy { padding-block: 10px 4px; }
 .journey .carousel .cardCopy h2 { min-height: 0; }
 .journey .carousel .cardCopy p { display: block; overflow: visible; -webkit-line-clamp: unset; }
-.journey .carousel .cardAction { margin-top: 6px; }
+.carousel .cardCopy > .cardAction {
+  margin-block-start: 12px;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.cardAction svg { flex-shrink: 0; }
 .journey .carousel .controls { padding-block: 1px 4px; }
 .journey .carousel .hint { padding-bottom: 0; }
 .browseContext { margin: 36px auto 0; padding: 0 24px; text-align: center; }
