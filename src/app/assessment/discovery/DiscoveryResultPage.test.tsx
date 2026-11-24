@@ -10,9 +10,10 @@ vi.mock('@/components/careers/explorer/useCareerExplorer', () => ({
       id: 'engineering-and-built-world',
       title: 'Engineering and Built World',
       summary: 'Design, build, and improve infrastructure.',
+      careerIds: ['civil-engineering'],
       illustration: { url: 'https://example.test/engineering.webp', alt: 'Engineering world' },
       presentation: { accent: '#8b6224', tint: '#faedca', wash: '#fae5b2', washEnd: '#f9f0d9' },
-    }] },
+    }], careers: [{ id: 'civil-engineering', title: 'Civil Engineering' }] },
   }),
 }));
 
@@ -97,20 +98,17 @@ describe("discovery result chooser", () => {
     await waitFor(() => expect(mocks.push).toHaveBeenCalledWith(expect.stringMatching(/^\/assessment\/careers\//)));
   });
 
-  it("puts the direction decision first without badges or assessment jargon", async () => {
+  it("makes results and the next step clear with visible example careers", async () => {
     const { container } = render(<DiscoveryResultPage />);
 
-    expect(await screen.findByRole("heading", { name: "Choose a direction" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button", { name: /Choose this direction:/ })).toHaveLength(1);
+    expect(await screen.findByRole("heading", { name: "Your career starting points" })).toBeInTheDocument();
+    expect(screen.getByText("Assessment complete")).toBeVisible();
+    expect(screen.getAllByRole("button", { name: /Choose this direction:/ })).toHaveLength(3);
     const featured = screen.getAllByRole("article")[0];
-    const details = featured.querySelector("details")!;
-    expect(details).not.toHaveAttribute("open");
-    expect(within(featured).getByText("Physician")).not.toBeVisible();
-    fireEvent.click(within(featured).getByText("Details"));
-    expect(details).toHaveAttribute("open");
-    expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physician");
-    expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Physiotherapist");
-    expect(screen.getByRole("list", { name: "Health careers" })).toHaveTextContent("Biomedical Engineer");
+    const examples = within(featured).getByRole("list", { name: "Health · Careers you could explore" });
+    expect(within(examples).getByText("Physician")).toBeVisible();
+    expect(within(examples).getByText("Physiotherapist")).toBeVisible();
+    expect(within(examples).getByText("Biomedical Engineer")).toBeVisible();
     expect(screen.getByRole("link", { name: "Review my answers" })).toHaveAttribute("href", "/assessment");
     expect(container.querySelector("[data-slot='badge']")).toBeNull();
     expect(container.textContent).not.toContain("Strong pattern");
@@ -135,33 +133,41 @@ describe("discovery result chooser", () => {
     expect(cards[0]).toHaveAttribute('data-featured', 'true');
     expect(cards[1]).toHaveAttribute('data-featured', 'false');
     expect(within(cards[1]).getByRole('heading', { name: longTitle })).toBeVisible();
-    expect(within(cards[1]).getByText('Full description for Engineering.')).not.toBeVisible();
-    fireEvent.click(within(cards[1]).getByText('Details'));
     expect(within(cards[1]).getByText('Full description for Engineering.')).toBeVisible();
     expect(cards[1].querySelector('img')).toHaveAttribute('src', 'https://example.test/engineering.webp');
     expect(cards[1].querySelector('img')).toHaveAttribute('alt', '');
-    fireEvent.keyDown(within(cards[1]).getByRole('button', { name: `More options: ${longTitle}` }), { key: 'Enter' });
-    expect(await screen.findByRole('menuitem', { name: 'View all careers' })).toHaveAttribute('href', '/explore?direction=engineering-and-built-world&step=roles');
-    fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
+    expect(within(cards[1]).getByRole('link', { name: `View all careers: ${longTitle}` }))
+      .toHaveAttribute('href', '/explore?direction=engineering-and-built-world&step=roles');
+    expect(mocks.push).not.toHaveBeenCalled();
     expect(container.querySelector('header')!.compareDocumentPosition(screen.getByRole('heading', { level: 1 })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(within(cards[1]).getByRole('button', { name: longTitle }));
+    fireEvent.click(within(cards[1]).getByRole('button', { name: `Choose this direction: ${longTitle}` }));
     expect(mocks.push).toHaveBeenCalledWith('/assessment/careers/engineering-and-built-world');
   });
 
   it('shows the published name for a saved result without a catalogue snapshot', () => {
     localStorage.setItem(assessmentV2StorageKey, JSON.stringify({
-      ...result, areas: [{ ...result.areas[0], id: 'engineering-and-built-world' }],
+      ...result, areas: [{ ...result.areas[0], id: 'engineering-and-built-world', roleIds: [], evidenceRefs: [] }],
     }));
 
     render(<DiscoveryResultPage />);
 
     expect(screen.getByRole('heading', { name: 'Engineering and Built World' })).toBeVisible();
+    expect(screen.getByText('Design, build, and improve infrastructure.')).toBeVisible();
+    expect(screen.getByText('Civil Engineering')).toBeVisible();
+    expect(screen.queryByText('Based on what you told us')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Choose this direction: Engineering and Built World' })).toBeVisible();
+  });
+
+  it('offers a clear assessment entry when no results exist', () => {
+    localStorage.clear();
+    render(<DiscoveryResultPage />);
+    expect(screen.getByRole('link', { name: 'Start assessment' })).toHaveAttribute('href', '/assessment');
+    expect(screen.queryByText('Assessment complete')).not.toBeInTheDocument();
   });
 
   it("does not repeat the same answer beneath every direction", async () => {
     render(<DiscoveryResultPage />);
-    await screen.findByRole("heading", { name: "Choose a direction" });
+    await screen.findByRole("heading", { name: "Your career starting points" });
 
     expect(screen.getAllByText("Build an app, game, website, or digital tool")).toHaveLength(1);
     expect(screen.getAllByText("Investigate a question through facts or experiments")).toHaveLength(1);

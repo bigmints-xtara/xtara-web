@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, ArrowRight, ChevronDown, ChevronRight, Compass, Ellipsis,
+  ArrowLeft, ArrowRight, ArrowUpRight, ChevronDown, CircleCheck, Compass,
 } from "lucide-react";
 
 import VisualCarousel from "@/components/careers/explorer/VisualCarousel";
@@ -17,12 +17,6 @@ import design from '@/components/journey/ExplorerJourney.module.css';
 import styles from '@/components/journey/journey.module.css';
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useTranslations } from "@/i18n/language-provider";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -39,10 +33,46 @@ import { mvpNavigationCopy } from "@/lib/mvp-navigation";
 import { hydrateDiscoveryFromAccount } from "@/lib/discovery-save";
 
 const resultsCopy = {
-  en: { heading: "Choose a direction", choose: "Choose this direction", details: "Details", insights: "Assessment insights", all: "View all careers", more: "More options" },
-  ml: { heading: "ഒരു ദിശ തിരഞ്ഞെടുക്കൂ", choose: "ഈ ദിശ തിരഞ്ഞെടുക്കൂ", details: "വിശദാംശങ്ങൾ", insights: "അസസ്‌മെന്റ് കണ്ടെത്തലുകൾ", all: "എല്ലാ കരിയറുകളും കാണാം", more: "കൂടുതൽ ഓപ്ഷനുകൾ" },
-  hi: { heading: "एक दिशा चुनें", choose: "यह दिशा चुनें", details: "जानकारी", insights: "आकलन की जानकारी", all: "सभी करियर देखें", more: "और विकल्प" },
-  ta: { heading: "ஒரு திசையைத் தேர்ந்தெடுங்கள்", choose: "இந்தத் திசையைத் தேர்ந்தெடுக்கவும்", details: "விவரங்கள்", insights: "மதிப்பீட்டுக் குறிப்புகள்", all: "அனைத்துத் தொழில்களையும் பாருங்கள்", more: "மேலும் விருப்பங்கள்" },
+  en: {
+    heading: "Choose a direction",
+    title: "Your career starting points",
+    completed: "Assessment complete",
+    lead: "Your answers pointed to these career directions. Start with one that interests you and see the Dream Careers you could explore.",
+    choose: "Choose this direction",
+    examples: "Careers you could explore",
+    insights: "Assessment insights",
+    all: "View all careers",
+  },
+  ml: {
+    heading: "ഒരു ദിശ തിരഞ്ഞെടുക്കൂ",
+    title: "കരിയർ അന്വേഷണത്തിന് ഒരു തുടക്കം",
+    completed: "അസസ്‌മെന്റ് പൂർത്തിയായി",
+    lead: "നിങ്ങളുടെ ഉത്തരങ്ങൾ ഈ കരിയർ മേഖലകളിലേക്കാണ് വിരൽ ചൂണ്ടുന്നത്. താൽപ്പര്യമുള്ള ഒരു മേഖലയിൽ നിന്ന് തുടങ്ങി അതിലെ സ്വപ്ന കരിയറുകളെ പരിചയപ്പെടൂ.",
+    choose: "ഈ ദിശ തിരഞ്ഞെടുക്കൂ",
+    examples: "പരിചയപ്പെടാവുന്ന കരിയറുകൾ",
+    insights: "അസസ്‌മെന്റ് കണ്ടെത്തലുകൾ",
+    all: "എല്ലാ കരിയറുകളും കാണാം",
+  },
+  hi: {
+    heading: "एक दिशा चुनें",
+    title: "आपके करियर की शुरुआत",
+    completed: "आकलन पूरा हुआ",
+    lead: "आपके जवाब इन करियर दिशाओं की ओर इशारा करते हैं। जो दिशा दिलचस्प लगे, उससे शुरू करें और उसमें अपने ड्रीम करियर खोजें।",
+    choose: "यह दिशा चुनें",
+    examples: "करियर जिन्हें आप जान सकते हैं",
+    insights: "आकलन की जानकारी",
+    all: "सभी करियर देखें",
+  },
+  ta: {
+    heading: "ஒரு திசையைத் தேர்ந்தெடுங்கள்",
+    title: "உங்கள் தொழில் தேடலின் தொடக்கம்",
+    completed: "மதிப்பீடு முடிந்தது",
+    lead: "உங்கள் பதில்கள் இந்தத் தொழில் திசைகளைக் காட்டுகின்றன. உங்களுக்கு ஆர்வமுள்ள ஒரு திசையிலிருந்து தொடங்கி, அதில் உள்ள கனவுத் தொழில்களைப் பாருங்கள்.",
+    choose: "இந்தத் திசையைத் தேர்ந்தெடுக்கவும்",
+    examples: "நீங்கள் அறிந்துகொள்ளக்கூடிய தொழில்கள்",
+    insights: "மதிப்பீட்டுக் குறிப்புகள்",
+    all: "அனைத்துத் தொழில்களையும் பாருங்கள்",
+  },
 } as const;
 
 function subscribeToLocalResult(onChange: () => void) {
@@ -96,30 +126,35 @@ export default function DiscoveryResultPage({ choosing = false }: { choosing?: b
     return () => { active = false; };
   }, [attempt, loading, owner, storedResult]);
 
-  if (loading || (owner && !storedResult && readback?.owner !== owner)) {
-    return <main className="p-8 text-center"><p role="status">{catalog.ui.loading}</p></main>;
-  }
-  if (owner && !storedResult && readback?.owner === owner && readback.failed) {
-    return <main className="p-8 text-center">
-      <p role="alert">{catalog.ui.errorTitle}</p>
-      <Button className="mt-4" onClick={() => {
-        setReadback(null);
-        setAttempt(value => value + 1);
-      }}>{catalog.ui.retry}</Button>
-    </main>;
-  }
-
-  if (!result?.areas.length || !storedResult) {
+    const waiting = loading || (owner !== null && !storedResult && readback?.owner !== owner);
+  const loadFailed = owner !== null && !storedResult && readback?.owner === owner && readback.failed;
+  if (waiting || loadFailed || !result?.areas.length || !storedResult) {
     return (
-      <div className="min-h-screen bg-[#f7fafc]"><Header />
-        <main className="mx-auto max-w-xl px-5 py-20 text-center">
-          <Compass className="mx-auto h-10 w-10 text-primary" />
-          <h1 className="mt-5 text-2xl font-semibold text-primary">{catalog.result.emptyTitle}</h1>
-          <Button asChild className="mt-6 rounded-full"><Link href="/assessment">{catalog.ui.title}</Link></Button>
+      <div className={styles.surface}><Header />
+        <main className={`${explorer.explorer} ${design.shell} ${design.resultsShell}`}>
+          <div className={design.resultStatus} aria-busy={waiting}>
+            <Compass className={design.statusIcon} aria-hidden="true" />
+            {waiting ? <p role="status">{catalog.ui.loading}</p> : loadFailed ? (
+              <>
+                <h1 role="alert">{catalog.ui.errorTitle}</h1>
+                <Button onClick={() => {
+                  setReadback(null);
+                  setAttempt(value => value + 1);
+                }}>{catalog.ui.retry}</Button>
+              </>
+            ) : (
+              <>
+                <h1>{catalog.result.emptyTitle}</h1>
+                <Button asChild><Link href="/assessment">{catalog.ui.startAssessment}</Link></Button>
+              </>
+            )}
+          </div>
         </main>
       </div>
     );
   }
+
+  const publishedCareers = new Map(publicExplorer?.careers?.map(career => [career.id, career]));
 
   const pursueArea = async (areaId: string) => {
     if (saving) return;
@@ -144,10 +179,12 @@ export default function DiscoveryResultPage({ choosing = false }: { choosing?: b
   return (
     <div className={styles.surface}><Header />
       <main className={`${explorer.explorer} ${design.shell} ${design.resultsShell}`}>
-        <div className="site-frame">
+        <div className={choosing ? "site-frame" : design.resultFrame}>
           {choosing && <Link className={styles.overviewLink} href="/dashboard"><ArrowLeft size={16} />{mvpNavigationCopy[locale].myDirection}</Link>}
-          <header className={design.intro}>
-            <h1 className={design.heading}>{copy.heading}</h1>
+          <header className={choosing ? design.intro : design.resultIntro}>
+            {!choosing && <p className={design.completion}><CircleCheck size={18} aria-hidden="true" />{copy.completed}</p>}
+            <h1 className={design.heading}>{choosing ? copy.heading : copy.title}</h1>
+            {!choosing && <p className={design.resultLead}>{copy.lead}</p>}
           </header>
 
           {saveError && <p role="alert">{catalog.ui.errorTitle} {catalog.ui.retry}</p>}
@@ -174,60 +211,51 @@ export default function DiscoveryResultPage({ choosing = false }: { choosing?: b
               const description = area.description || direction?.summary;
               const featured = index === 0;
               const reasons = reasonsByArea[area.id] ?? [];
+              const roleIds = area.roleIds.length ? area.roleIds : direction?.careerIds ?? [];
+              const roles = area.roles.length ? area.roles : roleIds.flatMap(id => {
+                const career = publishedCareers.get(id);
+                return career ? [career] : [];
+              });
               const catalogueHref = `/explore?${new URLSearchParams({ direction: direction?.id ?? area.id, step: 'roles' })}`;
-
-              const select = () => void pursueArea(owner ? direction?.id ?? area.id : area.id);
 
               return (
                 <article key={area.id} className={design.recommendation} data-featured={featured}
                   style={explorerTone(direction?.presentation)} aria-labelledby={`result-${area.id}`}>
-                  <div className={design.recommendationArt}>
-                    <ExplorerScene illustration={direction?.illustration} placeholder={journeyCopy[locale].illustration}
-                      bubble decorative sizes={featured ? '(max-width: 600px) 104px, 320px' : '64px'} />
+                  <div className={design.recommendationHeader}>
+                    <div className={design.recommendationArt}>
+                      <ExplorerScene illustration={direction?.illustration} placeholder={journeyCopy[locale].illustration}
+                        bubble decorative sizes="(max-width: 600px) 80px, 132px" />
+                    </div>
+                    <h2 id={`result-${area.id}`}>{title}</h2>
                   </div>
                   <div className={design.recommendationCopy}>
-                    <h2 id={`result-${area.id}`}>
-                      {featured ? title : (
-                        <Button variant="surface" type="button" className={design.directionPick} onClick={select} disabled={saving}>
-                          <span>{title}</span><ChevronRight size={17} aria-hidden="true" />
-                        </Button>
+                    {description && <p className={design.directionDescription}>{description}</p>}
+                    {(reasons.length > 0 || roles.length > 0) && <div className={design.recommendationSupport}>
+                      {reasons.length > 0 && (
+                        <div className={design.recommendationDetails}>
+                          <h3>{catalog.result.why}</h3>
+                          <ul className={design.reasons}>{reasons.map(reason => <li key={reason}>{reason}</li>)}</ul>
+                        </div>
                       )}
-                    </h2>
-                    <div className={design.actions}>
-                      {featured ? (
-                        <Button type="button" className={design.action} aria-label={`${copy.choose}: ${title}`} onClick={select} disabled={saving}>
-                          {copy.choose}<ArrowRight size={16} aria-hidden="true" />
-                        </Button>
-                      ) : null}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button type="button" variant="ghost" size="icon" className={design.resultsMenu}
-                            aria-label={`${copy.more}: ${title}`}>
-                            <Ellipsis size={20} aria-hidden="true" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className={design.catalogueMenu}>
-                          <DropdownMenuItem asChild><Link href={catalogueHref}>{copy.all}</Link></DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                    {!!(description || reasons.length || area.roles.length) && (
-                      <details className={design.evidence}>
-                        <summary>{copy.details}</summary>
-                        {description && <p className={design.directionDescription}>{description}</p>}
-                        {reasons.length > 0 && (
-                          <div className={design.directionReasons}>
-                            <h3>{catalog.result.why}</h3>
-                            <ul className={design.reasons}>{reasons.map(reason => <li key={reason}>{reason}</li>)}</ul>
-                          </div>
-                        )}
-                        {area.roles.length > 0 && (
-                          <ul className={design.exampleCareers} aria-label={`${title} careers`}>
-                            {area.roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
+                      {roles.length > 0 && (
+                        <div className={design.recommendationDetails}>
+                          <h3>{copy.examples}</h3>
+                          <ul className={design.exampleCareers} aria-label={`${title} · ${copy.examples}`}>
+                            {roles.slice(0, 3).map(career => <li key={career.id}>{career.title}</li>)}
                           </ul>
-                        )}
-                      </details>
-                    )}
+                        </div>
+                      )}
+                    </div>}
+                  </div>
+                  <div className={design.actions}>
+                    <Button type="button" variant={featured ? "default" : "outline"} className={design.action}
+                      aria-label={`${copy.choose}: ${title}`}
+                      onClick={() => void pursueArea(owner ? direction?.id ?? area.id : area.id)} disabled={saving}>
+                      {copy.choose}<ArrowRight size={16} aria-hidden="true" />
+                    </Button>
+                    <Link className={design.resultLink} href={catalogueHref} aria-label={`${copy.all}: ${title}`}>
+                      {copy.all}<ArrowUpRight size={15} aria-hidden="true" />
+                    </Link>
                   </div>
                 </article>
               );
@@ -235,7 +263,7 @@ export default function DiscoveryResultPage({ choosing = false }: { choosing?: b
           </section>
           )}
 
-          {!choosing && <Link href="/assessment" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary underline-offset-4 hover:underline">
+          {!choosing && <Link href="/assessment" className={design.reviewAnswers}>
             {catalog.result.edit}<ArrowRight size={16} aria-hidden="true" />
           </Link>}
 
