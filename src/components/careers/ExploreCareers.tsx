@@ -168,8 +168,8 @@ export default function ExploreCareers() {
         <header className={styles.intro}><p className={styles.eyebrow}>{text.future}</p><h1 ref={heading} tabIndex={-1}>{text.closer}<br /><span>{career.title}.</span></h1><p>{career.summary}</p></header>
         {(career.translationFallback || parent?.translationFallback || direction?.translationFallback) && <p className={styles.notice}>{copy.fallback}</p>}
         {locale !== 'en' && <p className={styles.notice}>Career guidance below is currently in English.</p>}
-        {direction && <section className={styles.directionNotes}>
-          <h2>{guide.pathHeading}</h2>
+        {direction && <section className={styles.directionNotes} aria-labelledby="explorer-path-heading">
+          <h2 id="explorer-path-heading">{guide.pathHeading}</h2>
           <p>{(parent ? guide.pathTrio : guide.pathPair).replace('{direction}', direction.title).replace('{career}', (parent || career).title).replace('{specialty}', career.title)}</p>
           {[direction, ...(parent ? [parent] : [])].filter(item => item.summary).map(item => <div key={item.id}><h3>{item.title}</h3><p>{item.summary}</p></div>)}
         </section>}

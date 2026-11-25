@@ -319,6 +319,14 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
           await page.locator('h1').filter({ hasText: illustrated.title }).waitFor();
         }
         await openChild();
+        const overview = page.getByRole('main');
+        const crumbs = overview.locator('nav ol li > :is(button, [aria-current])');
+        const sizes = await crumbs.evaluateAll(labels => labels.map(label => getComputedStyle(label).fontSize));
+        assert.equal(sizes.length, 4);
+        assert.equal(new Set(sizes).size, 1, 'Clickable and current breadcrumbs must share a font size.');
+        const edges = await Promise.all(['h1', '#explorer-path-heading', '#section-work'].map(selector =>
+          overview.locator(selector).evaluate(heading => heading.getBoundingClientRect().left)));
+        assert(Math.max(...edges) - Math.min(...edges) <= 1, 'Career overview headings must share the reading column.');
         await page.goBack();
         await child.waitFor();
         const beforePublic = publicRequests.length;
