@@ -454,8 +454,9 @@ describe('Dream Career Student Guide page', () => {
       sections: [{ id: 'work', title: 'The work', blocks: work }],
     } });
     mocks.getExplorer.mockResolvedValue({ careers: [
-      { id: 'doctor', title: 'Medicine', illustration: medicalArt, specializationIds: ['cardiologist'] },
+      { id: 'doctor', title: 'Medicine', illustration: medicalArt, specializationIds: ['cardiologist', 'surgeon'] },
       { id: 'cardiologist', title: 'Cardiology', summary: 'Heart medicine', illustration: childArt },
+      { id: 'surgeon', title: 'General Surgery', summary: 'Surgical care' },
     ] });
     const view = render(<AppQueryProvider><DreamCareerPage /></AppQueryProvider>);
     const tab = await screen.findByRole('tab', { name: 'Specializations' });
@@ -463,8 +464,12 @@ describe('Dream Career Student Guide page', () => {
     expect(screen.queryByRole('heading', { name: 'Specializations' })).toBeNull();
     expect(screen.getByText('Assess symptoms')).toBeVisible();
     fireEvent.keyDown(tab, { key: 'Enter' });
-    expect(screen.getByRole('img', { name: childArt.alt })).toHaveAttribute('src', childArt.url);
-    expect(screen.getByRole('link', { name: /Cardiology.*Heart medicine/ })).toHaveAttribute('href', '/explore?career=cardiologist&step=work');
+    const choice = screen.getByRole('link', { name: 'Cardiology Heart medicine' });
+    expect(choice).toHaveAttribute('href', '/explore?career=cardiologist&step=work');
+    expect(choice.querySelector('img')).toHaveAttribute('src', childArt.url);
+    const textChoice = screen.getByRole('link', { name: 'General Surgery Surgical care' });
+    expect(textChoice.querySelector('img')).toBeNull();
+    expect(textChoice).toHaveAttribute('href', '/explore?career=surgeon&step=work');
     view.rerender(<AppQueryProvider><div /></AppQueryProvider>);
     view.rerender(<AppQueryProvider><DreamCareerPage /></AppQueryProvider>);
     await screen.findByRole('tab', { name: 'Specializations' });

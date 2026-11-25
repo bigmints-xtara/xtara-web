@@ -305,10 +305,16 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
         await childArt.waitFor();
         assert(await childArt.evaluate(async img => { await img.decode(); return img.naturalWidth > 0; }));
         assert.equal(assetHash(await childArt.getAttribute('src')), assetHash(illustrated.illustration.url));
+        await tab.evaluate(trigger => {
+          const top = trigger.getBoundingClientRect().top + window.scrollY;
+          const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0;
+          window.scrollTo(0, top - headerHeight);
+        });
         await capture(careerId, 'specializations', 'main h1');
 
         async function openChild() {
-          await child.click();
+          await child.focus();
+          await child.press('Enter');
           await page.waitForURL(url => url.pathname === '/explore' && url.searchParams.get('career') === illustrated.id && url.searchParams.get('step') === 'work');
           await page.locator('h1').filter({ hasText: illustrated.title }).waitFor();
         }
