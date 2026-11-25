@@ -320,10 +320,17 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
         }
         await openChild();
         const overview = page.getByRole('main');
-        const crumbs = overview.locator('nav ol li > :is(button, [aria-current])');
-        const sizes = await crumbs.evaluateAll(labels => labels.map(label => getComputedStyle(label).fontSize));
-        assert.equal(sizes.length, 4);
-        assert.equal(new Set(sizes).size, 1, 'Clickable and current breadcrumbs must share a font size.');
+        const crumbs = overview.locator('nav ol li > :is(a, [aria-current])');
+        const visible = await crumbs.evaluateAll(labels => labels.filter(label => label.getClientRects().length)
+          .map(label => ({ text: label.textContent.trim(), size: getComputedStyle(label).fontSize, height: label.getBoundingClientRect().height })));
+        if (await page.evaluate(() => matchMedia('(max-width: 700px)').matches)) {
+          assert.equal(visible.length, 1);
+          assert(visible[0].height >= 44, 'Parent navigation needs a 44px touch target.');
+          assert.equal(visible[0].text, await overview.locator('nav li[data-parent] a').textContent());
+        } else {
+          assert.equal(visible.length, 4);
+          assert.equal(new Set(visible.map(label => label.size)).size, 1);
+        }
         const edges = await Promise.all(['h1', '#explorer-path-heading', '#section-work'].map(selector =>
           overview.locator(selector).evaluate(heading => heading.getBoundingClientRect().left)));
         assert(Math.max(...edges) - Math.min(...edges) <= 1, 'Career overview headings must share the reading column.');

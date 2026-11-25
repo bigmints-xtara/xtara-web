@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronRight, CirclePause, CirclePlay, Sparkles, MoveHorizontal, ArrowDown, MousePointer2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Compass, CirclePause, CirclePlay, Sparkles, MoveHorizontal, ArrowDown, MousePointer2 } from 'lucide-react';
 import Header from '@/components/Header';
 import { useTranslations } from '@/i18n/language-provider';
 import { useAuth } from '@/context/AuthContext';
@@ -75,11 +75,12 @@ export default function ExploreCareers() {
   const introduction = !['view', 'direction', 'industry', 'career', 'step', 'q'].some(key => params.has(key));
   const guide = guideCopy[locale];
   const groupKey = `${state.step}:${state.direction}:${state.career}`;
-  const goCareer = (id: string, skip = false) => {
+  const careerDestination = (id: string, skip = false): ExploreState => {
     const item = data?.careers.find(c => c.id === id);
     const hasChildren = item?.specializationIds?.some(child => data?.careers.some(c => c.id === child));
-    navigate({ ...state, career: id, direction: state.direction || item?.directionIds[0] || null, step: hasChildren && !skip ? 'specializations' : 'work', q: '' });
+    return { ...state, career: id, direction: state.direction || item?.directionIds[0] || null, step: hasChildren && !skip ? 'specializations' : 'work', q: '' };
   };
+  const goCareer = (id: string, skip = false) => navigate(careerDestination(id, skip));
   const onPursue = async () => {
     if (!career || !direction) return;
     if (!user || user.isAnonymous) {
@@ -91,20 +92,49 @@ export default function ExploreCareers() {
   };
   const motionLabel = paused ? text.resume : text.pause;
   const MotionIcon = paused ? CirclePlay : CirclePause;
-  const directionIsCurrent = state.step === 'roles' && !state.industry;
-  const breadcrumbs = <nav aria-label={copy.path}>
+  const path: { label: string; destination?: ExploreState }[] = [
+    { label: copy.directions, destination: { ...initialExploreState, view: state.view } },
+  ];
+  const industry = data?.industries.find(item => item.id === state.industry);
+  if (direction) path.push({
+    label: direction.title,
+    destination: { ...state, industry: null, career: null, step: 'roles', q: '' },
+  });
+  if (industry) path.push({
+    label: industry.title,
+    destination: { ...state, career: null, step: 'roles', q: '' },
+  });
+  const ancestors = [];
+  const seen = new Set([career?.id]);
+  for (let ancestor = parent; ancestor && !seen.has(ancestor.id);) {
+    ancestors.push(ancestor);
+    seen.add(ancestor.id);
+    const nextId = ancestor.parentCareerId;
+    ancestor = data?.careers.find(item => item.id === nextId);
+  }
+  for (const ancestor of ancestors.reverse()) {
+    path.push({ label: ancestor.title, destination: careerDestination(ancestor.id) });
+  }
+  if (invitation && career) path.push({ label: career.title, destination: careerDestination(career.id, true) });
+  if (career) path.push({ label: invitation ? invite.yourDream : specialization ? copy.specializations : career.title });
+  else if (state.step === 'industries') path.push({ label: copy.industries });
+  else if (!direction && !industry) path.push({ label: copy.roles });
+
+  const breadcrumbs = <nav className={styles.pathNav} aria-label={copy.path}>
     <ol className={styles.breadcrumbs}>
-      <li><Button variant="ghost" onClick={() => navigate({ ...initialExploreState, view: state.view })}>{copy.directions}</Button></li>
-      {direction && <li>
-        <ChevronRight aria-hidden="true" />
-        {directionIsCurrent ? <span aria-current="page">{direction.title}</span> :
-          <Button variant="ghost" onClick={() => navigate({ ...state, industry: null, career: null, step: 'roles', q: '' })}>{direction.title}</Button>}
-      </li>}
-      {parent && <li><ChevronRight aria-hidden="true" /><Button variant="ghost" onClick={() => goCareer(parent.id)}>{parent.title}</Button></li>}
-      {career && <li>
-        <ChevronRight aria-hidden="true" />
-        <span aria-current="page">{invitation ? invite.yourDream : specialization ? copy.specializations : career.title}</span>
-      </li>}
+      {path.map(({ label, destination }, index) => {
+        const current = index === path.length - 1;
+        return <li key={index} data-parent={index === path.length - 2 || undefined}>
+          {index > 0 && <ChevronRight className={styles.pathDivider} aria-hidden="true" />}
+          {current || !destination ? <span aria-current="page">{label}</span> :
+            <Button variant="ghost" asChild><Link href={exploreUrl(destination)} prefetch={false}
+              onNavigate={event => { event.preventDefault(); navigate(destination); }}>
+              <ChevronLeft className={styles.pathUp} aria-hidden="true" />
+              {index === 0 && <Compass className={styles.pathRoot} aria-hidden="true" />}
+              {label}
+            </Link></Button>}
+        </li>;
+      })}
     </ol>
   </nav>;
   const common = { previous: text.previous, next: text.next, hint: text.swipe };

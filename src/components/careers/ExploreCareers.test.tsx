@@ -248,6 +248,11 @@ describe("career exploration", () => {
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Paediatric Cardiology');
     expect(screen.getByRole('navigation', { name: 'Your path' })).toHaveTextContent('Health & Wellbeing');
 
+    const path = screen.getByRole('navigation', { name: 'Your path' });
+    expect(Array.from(path.querySelectorAll('li')).map(item => item.textContent)).toEqual([
+      'Career directions', 'Health & Wellbeing', 'Medicine', 'Cardiology', 'Paediatric Cardiology',
+    ]);
+    expect(path.querySelector('li[data-parent] a')).toHaveTextContent('Cardiology');
     const nestedQuery = 'career=pediatric-cardiologist&step=work';
     for (const query of [window.location.search, nestedQuery, `direction=${health.id}&${nestedQuery}`]) {
       expect(readExploreState(query, graph)).toMatchObject({
