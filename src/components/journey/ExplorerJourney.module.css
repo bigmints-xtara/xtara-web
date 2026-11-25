@@ -231,10 +231,77 @@
   line-height: 1.35;
 }
 
-.chooserHeading { display: flex; align-items: center; justify-content: center; text-align: start; gap: 16px; margin: 20px auto; }
-.chooserDirectionArt { width: clamp(52px, 7vw, 80px); flex: none; }
-.chooserDirectionArt > div { width: 100%; height: auto; aspect-ratio: 1; min-height: 0; }
-.chooserSearch { display: grid; gap: 6px; max-width: 30rem; margin: 16px auto; font-size: .875rem; font-weight: 600; }
-.chooserActions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px; margin: 12px auto 0; }
-.chooserActions button { min-height: 44px; white-space: normal; }
-.chooserFooter { position: static; margin-top: 20px; }
+.picker { background: var(--background); padding-top: clamp(16px, 2vw, 28px); }
+.chooserHeading {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  margin-block: 16px 24px; padding: clamp(18px, 3vw, 32px); border-radius: 20px;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--xtara-sky) 12%, var(--card)), color-mix(in srgb, var(--scene-tint, var(--muted)) 55%, var(--card)));
+}
+.directionLabel { margin-bottom: 6px; color: var(--primary); font-size: .875rem; font-weight: 600; }
+.instructions, .shortlistHint, .choiceCopy > span, .choiceCopy small { color: var(--muted-foreground); }
+.instructions { margin-top: 8px; }
+.chooserDirectionArt { flex: none; width: clamp(68px, 10vw, 128px); aspect-ratio: 1; }
+.chooserDirectionArt > div, .choiceArt > div { height: 100%; background: transparent; }
+.chooserDirectionArt img, .choiceArt img { padding: 0; }
+.chooserDirectionArt > div::before, .chooserDirectionArt > div::after, .choiceArt > div::before, .choiceArt > div::after { content: none; }
+.pickerLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 30%); align-items: start; gap: clamp(18px, 3vw, 40px); }
+.options { min-width: 0; }
+.chooserSearch { position: relative; display: block; }
+.chooserSearch > svg { position: absolute; inset-inline-start: 14px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground); }
+.chooserSearch input { min-height: 44px; padding-inline-start: 42px; }
+.choiceList { display: grid; gap: 8px; margin-block: 14px 0; padding: 0; list-style: none; }
+.choice {
+  --thumb: clamp(3.75rem, 6vw, 5rem); --inset: 14px; --gap: 14px;
+  position: relative; border: 1px solid var(--border); border-radius: 14px; background: var(--card);
+}
+.choice[data-chosen=true] { border-color: var(--primary); background: color-mix(in srgb, var(--xtara-sky) 7%, var(--card)); }
+.choiceToggle {
+  display: grid; grid-template-columns: minmax(0,1fr) auto;
+  align-items: start; column-gap: var(--gap); width: 100%; padding: var(--inset) var(--inset) 0;
+  padding-inline-start: calc(var(--inset) + var(--thumb) + var(--gap));
+  min-height: 52px; text-align: start; border-radius: inherit; cursor: pointer;
+}
+.choiceToggle:disabled { opacity: 1; cursor: default; }
+.choiceArt { position: absolute; pointer-events: none; inset-inline-start: var(--inset); top: 50%; transform: translateY(-50%); width: var(--thumb); height: var(--thumb); border-radius: 12px; background: color-mix(in srgb, var(--xtara-sky) 10%, var(--card)); overflow: hidden; }
+.choiceCopy { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.choiceCopy strong { font-size: clamp(1.05rem, 1.65vw, 1.3rem); color: var(--primary); font-weight: 650; line-height: 1.25; }
+.choiceCopy > span { font-size: .9rem; line-height: 1.5; }
+.check { width: 23px; height: 23px; display: grid; place-items: center; border: 1.5px solid var(--muted-foreground); border-radius: 6px; }
+.choiceToggle:disabled .check { opacity: .45; }
+.choiceToggle[aria-pressed=true] .check { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.choice .choiceDetail { margin-inline-start: calc(var(--inset) + var(--thumb) + var(--gap)); height: auto; min-height: 44px; padding: 4px 0; font-size: .8125rem; }
+.shortlist { position: sticky; top: 6rem; gap: 12px; padding: clamp(16px, 2vw, 24px); background: var(--card); }
+.summaryContent, .shortlistBody { display: grid; gap: 12px; }
+.shortlistDisclosure, .shortlistBody:empty { display: none; }
+.shortlistHead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.shortlistHead h2 { font-size: 1.25rem; line-height: 1.2; color: var(--primary); font-weight: 650; }
+.shortlistHead > span { white-space: nowrap; font-size: .9rem; font-weight: 600; }
+.shortlistItems { display: flex; flex-wrap: wrap; gap: 6px; }
+.shortlistItems li { max-width: 100%; }
+.chip { display: inline-flex; gap: 8px; align-items: center; min-height: 44px; padding: 5px 10px; border-radius: 10px; background: color-mix(in srgb, var(--xtara-sky) 12%, var(--card)); color: var(--primary); font-size: .875rem; text-align: start; overflow-wrap: anywhere; }
+.chip svg { flex: none; }
+.shortlistHint { font-size: .875rem; line-height: 1.5; }
+.saveArea { display: grid; gap: 8px; }
+.saveArea button { min-height: 44px; white-space: normal; }
+@media (max-width: 760px) {
+  .pickerLayout { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .shortlist { display: contents; }
+  .summaryContent { grid-row: 1; gap: 0; padding: 0 14px; border: 1px solid var(--border); border-radius: 14px; }
+  .shortlistHead { display: none; }
+  .shortlistDisclosure { display: flex; gap: 10px; align-items: center; width: 100%; min-height: 48px; color: var(--primary); }
+  .shortlistDisclosure:disabled { opacity: 1; }
+  .shortlistDisclosure span { margin-inline-start: auto; font-weight: 600; }
+  .shortlistDisclosure[aria-expanded=true] svg { transform: rotate(180deg); }
+  .shortlistBody[data-open=false] { display: none; }
+  .shortlistBody[data-open=true] { padding-bottom: 12px; }
+  .options { grid-row: 2; }
+  .saveArea {
+    grid-row: 3; position: sticky; z-index: 2; bottom: var(--learner-nav-space, 0px);
+    padding: 8px 0; border-top: 1px solid var(--border); background: var(--background);
+  }
+  .choiceToggle, .choiceDetail, .chip { scroll-margin-bottom: calc(5rem + var(--learner-nav-space, 0px)); }
+  .chooserHeading { padding: 16px; margin-block: 12px 16px; }
+  .chooserHeading .heading { font-size: clamp(1.6rem, 6vw, 2rem); }
+  .chooserDirectionArt { width: 56px; }
+  .choice { --thumb: 48px; --gap: 10px; --inset: 12px; }
+}
