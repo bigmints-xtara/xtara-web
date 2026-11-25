@@ -250,7 +250,34 @@ export async function walkthrough({ browser, origin, mediaOrigin, fixture, sessi
       });
       for (const careerId of ['art-therapist', 'doctor']) {
         const screen = screenFor(fixture, careerId, locale, true);
-        await page.goto(origin + '/dream-careers/' + careerId + '?from=dashboard');
+        const guideUrl = origin + '/dream-careers/' + careerId + '?from=dashboard';
+        const captureLoader = careerId === 'art-therapist' && screenshots;
+        if (captureLoader) {
+          const { promise, resolve } = Promise.withResolvers();
+          await page.exposeFunction('waitForGuideCapture', () => promise);
+          await page.addInitScript(() => {
+            if (location.pathname !== '/dream-careers/art-therapist') return;
+            const fetch = window.fetch.bind(window);
+            window.fetch = async (input, init) => {
+              const url = new URL(input instanceof Request ? input.url : input, location.href);
+              if (url.pathname.endsWith('/art-therapist/student-context')) await window.waitForGuideCapture();
+              return fetch(input, init);
+            };
+          });
+          try {
+            await page.goto(guideUrl, { waitUntil: 'domcontentloaded' });
+            await page.locator('nav a[href="/dashboard"]').first().waitFor({ state: 'attached' });
+            const loader = page.getByRole('status').filter({ hasText: 'Loading career guide' });
+            await loader.locator('.animate-pulse').first().waitFor();
+            const image = [locale, viewport, careerId, 'loading'].join('-') + '.png';
+            await page.screenshot({ path: path.join(output, image), animations: 'disabled' });
+            manifest.captures.push({ scenario: careerId, step: 'loading', viewport, locale, width, image, route: '/dream-careers/' + careerId });
+          } finally {
+            resolve();
+          }
+        } else {
+          await page.goto(guideUrl);
+        }
         await page.getByRole('heading', { level: 1, name: screen.title, exact: true }).waitFor();
         const art = page.locator('[data-testid="saved-career-artwork"] img');
         await art.waitFor();

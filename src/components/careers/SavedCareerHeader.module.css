@@ -1,0 +1,30 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(7rem, 37vw, 13rem);
+  align-items: center;
+  gap: .75rem 1rem;
+}
+
+.artwork {
+  grid-column: 2;
+  grid-row: 1;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--muted);
+}
+
+.artwork > div { width: 100%; height: 100%; }
+.layout .artwork img { padding: 0; }
+
+@media (min-width: 640px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(13rem, 39%);
+    gap: 0 2rem;
+  }
+  .artwork {
+    grid-row: 1 / span 2;
+    aspect-ratio: auto;
+    height: clamp(15rem, 27vw, 22rem);
+  }
+}

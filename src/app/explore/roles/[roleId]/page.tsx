@@ -12,6 +12,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, GraduationCap, MessageCircleMore, Plus, X } from 'lucide-react';
 
 import SlideshowOverlay from '@/components/career-path/SlideshowOverlay';
+import headerStyles from '@/components/careers/SavedCareerHeader.module.css';
 import SavedCareerContractView from '@/components/careers/SavedCareerContractView';
 import SavedCareerStudy from '@/components/careers/SavedCareerStudy';
 import SavedCareerReader from '@/components/careers/SavedCareerReader';
@@ -375,14 +376,14 @@ function DreamCareerContent() {
       <header className="border-b border-border bg-muted/35">
         <div className="site-frame grid items-center gap-3 pt-3 pb-6 sm:pt-5 sm:pb-8">
           <Link href={backHref} className="inline-flex min-h-11 w-fit items-center gap-2 text-sm font-medium text-primary hover:underline"><ArrowLeft size={16} aria-hidden="true" />{mvpNavigationCopy[guideLocale].myDirection}</Link>
-          <div className={savedIdentity.imageUrl ? 'grid min-w-0 grid-cols-[minmax(0,1fr)_6.5rem] items-center gap-x-4 gap-y-3 sm:grid-cols-[minmax(0,1fr)_minmax(12rem,32%)] sm:gap-x-8 sm:gap-y-0' : 'min-w-0'}>
+          <div className={savedIdentity.imageUrl ? headerStyles.layout : 'min-w-0'}>
             <div className="min-w-0 self-center sm:self-end">
               {!screen && area && <p className="mb-2 text-sm font-semibold text-muted-foreground">{area.title}</p>}
               <h1 className="text-3xl leading-tight font-semibold tracking-[-.04em] break-words text-primary sm:text-5xl">{savedIdentity.title}</h1>
             </div>
-            {savedIdentity.imageUrl && <div data-testid="saved-career-artwork" className="col-start-2 row-start-1 aspect-square overflow-hidden rounded-2xl bg-muted/50 sm:row-span-2 sm:aspect-auto sm:h-48 lg:h-60 [&>div]:h-full [&>div]:w-full">
+            {savedIdentity.imageUrl && <div data-testid="saved-career-artwork" className={headerStyles.artwork}>
               <ExplorerScene illustration={artwork.illustration ?? { url: savedIdentity.imageUrl, alt: savedIdentity.title }}
-                contextTitle={artwork.contextTitle} placeholder="" sizes="(max-width:640px) 104px, 350px" />
+                contextTitle={artwork.contextTitle} placeholder="" sizes="(max-width: 639px) clamp(7rem, 37vw, 13rem), (max-width: 1280px) 39vw, 490px" />
             </div>}
             <p className={'col-span-full max-w-2xl self-start text-base leading-7 text-muted-foreground sm:col-span-1 sm:text-lg ' +
               (savedIdentity.imageUrl ? 'sm:mt-3' : 'mt-3')}>{savedIdentity.summary}</p>

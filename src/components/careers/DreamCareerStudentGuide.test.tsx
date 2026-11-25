@@ -621,7 +621,7 @@ describe('DreamCareerStudentGuide', () => {
     const { rerender } = render(<DreamCareerStudentGuideLoading locale="en" />);
     const loading = screen.getByRole('status');
     expect(loading).toHaveTextContent('Loading career guide');
-    expect(loading.querySelector('.animate-spin')).toHaveClass('motion-reduce:animate-none');
+    expect(loading.querySelectorAll('[aria-hidden="true"] .animate-pulse').length).toBeGreaterThan(0);
     for (const skeleton of loading.querySelectorAll('.animate-pulse')) {
       expect(skeleton).toHaveClass('motion-reduce:animate-none');
     }

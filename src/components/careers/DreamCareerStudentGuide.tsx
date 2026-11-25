@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Fragment, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import Link from 'next/link';
+import Skeleton from '@/components/ui/Skeleton';
+import headerStyles from './SavedCareerHeader.module.css';
 import SavedCareerReader from './SavedCareerReader';
 import { GraduationCap, Lightbulb, Sparkles } from 'lucide-react';
 
@@ -791,13 +793,25 @@ function GuideUtilityRail({
 
 export function DreamCareerStudentGuideLoading({ locale }: { locale: DreamCareerGuideLocale }) {
   return (
-    <div role="status" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
-      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-10">
-        <span className="mb-6 block h-7 w-7 animate-spin rounded-full border-2 border-primary/25 border-t-primary motion-reduce:animate-none" aria-hidden />
-        <p className="text-sm font-semibold text-foreground">{labels[locale].loading}</p>
-        <div aria-hidden className="mt-8 grid gap-4 lg:grid-cols-[minmax(0,0.55fr)_minmax(0,1.45fr)]">
-          <div className="h-28 animate-pulse rounded-2xl bg-muted motion-reduce:animate-none" />
-          <div className="h-44 animate-pulse rounded-2xl bg-muted motion-reduce:animate-none" />
+    <div role="status" className="min-h-[70svh] [&_.animate-pulse]:bg-foreground/[0.07]">
+      <span className="sr-only">{labels[locale].loading}</span>
+      <div aria-hidden="true" className="border-b border-border bg-muted/35">
+        <div className="site-frame grid gap-3 pt-3 pb-6 sm:pt-5 sm:pb-8">
+          <div className="flex min-h-11 items-center"><Skeleton className="h-4 w-28 motion-reduce:animate-none" /></div>
+          <div className={headerStyles.layout}>
+            <Skeleton className="h-9 w-4/5 self-center sm:h-12 sm:self-end motion-reduce:animate-none" />
+            <div className={headerStyles.artwork}><Skeleton rounded="2xl" className="motion-reduce:animate-none" /></div>
+            <div className="col-span-full grid gap-3 self-start sm:col-span-1 sm:mt-4">
+              <Skeleton className="h-4 w-full motion-reduce:animate-none" />
+              <Skeleton className="h-4 w-2/3 motion-reduce:animate-none" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div aria-hidden="true" className="site-frame">
+        <div className="flex h-14 items-center gap-8 border-b border-border">
+          <Skeleton className="h-4 w-20 motion-reduce:animate-none" />
+          <Skeleton className="h-4 w-28 motion-reduce:animate-none" />
         </div>
       </div>
     </div>

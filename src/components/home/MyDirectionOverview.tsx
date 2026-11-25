@@ -75,7 +75,7 @@ export default function MyDirectionOverview({ direction, locale, greeting, hasAs
                 <li key={career.id} className={styles.savedCareerRow}>
                   <Link href={href} className={styles.savedCareerAction}>
                     <div className={styles.savedArt} aria-hidden="true">
-                      <ExplorerScene illustration={artwork.illustration} decorative placeholder="" sizes="96px" />
+                      <ExplorerScene illustration={artwork.illustration} decorative placeholder="" sizes="(max-width: 600px) clamp(80px, 23vw, 112px), clamp(104px, 11vw, 144px)" />
                     </div>
                     <span className="min-w-0">
                       <span className={styles.careerTitle}>{career.title}</span>
