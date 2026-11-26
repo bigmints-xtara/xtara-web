@@ -7,7 +7,6 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Compass, Loader2, Search, X } from "lucide-react";
 
 import CareerPreviewDialog from "@/components/careers/CareerPreviewDialog";
-import Footer from "@/components/Footer";
 import styles from '@/components/journey/journey.module.css';
 import { ExplorerScene, explorerTone } from '@/components/careers/explorer/ExplorerScene';
 import { resolveCareerArtwork } from '@/components/careers/explorer/career-artwork';
@@ -243,7 +242,7 @@ export default function CareerDirectionPage() {
 
 
   if (authLoading || (!accountError && (!hydrated || catalog.isPending || (owner && loadedOwner !== owner)))) {
-    return <div className={styles.surface}><Header /><main role="status" className="site-frame flex min-h-[50vh] items-center justify-center gap-3 text-muted-foreground"><Loader2 aria-hidden="true" className="h-5 w-5 animate-spin motion-reduce:animate-none" />{text.loading}</main></div>;
+    return <div className={styles.surface}><Header focused /><main role="status" className="site-frame flex min-h-[50vh] items-center justify-center gap-3 text-muted-foreground"><Loader2 aria-hidden="true" className="h-5 w-5 animate-spin motion-reduce:animate-none" />{text.loading}</main></div>;
   }
 
   if ((catalog.isError && !publicExplorer) || accountError) {
@@ -296,7 +295,7 @@ export default function CareerDirectionPage() {
 
   return (
     <div className={`${styles.surface} ${explorer.page}`}>
-      <Header />
+      <Header focused />
       <main className={`${explorer.explorer} ${design.shell} ${design.picker}`} style={sceneTone}>
         <div className="site-frame">
           {!owner && <JourneySteps step={2} locale={locale} />}
@@ -389,13 +388,12 @@ export default function CareerDirectionPage() {
         </div>
       </main>
       {preview ? <CareerPreviewDialog career={preview} {...artworkFor(preview.id)} tone={sceneTone} onClose={closePreview} /> : null}
-      <Footer />
     </div>
   );
 }
 
 function EmptyState({ title, description, action, href }: { title: string; description?: string; action: string; href: string }) {
-  return <div className="min-h-screen bg-background"><Header /><main className="mx-auto max-w-xl px-5 py-20 text-center"><Compass className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-5 text-2xl font-semibold text-primary">{title}</h1>{description ? <p className="mt-3 leading-7 text-muted-foreground">{description}</p> : null}<Button asChild className="mt-6 rounded-full"><Link href={href}>{action}</Link></Button></main></div>;
+  return <div className="min-h-screen bg-background"><Header focused /><main className="mx-auto max-w-xl px-5 py-20 text-center"><Compass className="mx-auto h-10 w-10 text-primary" /><h1 className="mt-5 text-2xl font-semibold text-primary">{title}</h1>{description ? <p className="mt-3 leading-7 text-muted-foreground">{description}</p> : null}<Button asChild className="mt-6 rounded-full"><Link href={href}>{action}</Link></Button></main></div>;
 }
 
 function subscribeToAssessment(onChange: () => void) {

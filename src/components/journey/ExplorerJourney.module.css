@@ -296,10 +296,10 @@
   .shortlistBody[data-open=true] { padding-bottom: 12px; }
   .options { grid-row: 2; }
   .saveArea {
-    grid-row: 3; position: sticky; z-index: 2; bottom: var(--learner-nav-space, 0px);
-    padding: 8px 0; border-top: 1px solid var(--border); background: var(--background);
+    grid-row: 3; position: sticky; z-index: 2; bottom: 0;
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: var(--background);
   }
-  .choiceToggle, .choiceDetail, .chip { scroll-margin-bottom: calc(5rem + var(--learner-nav-space, 0px)); }
+  .choiceToggle, .choiceDetail, .chip { scroll-margin-bottom: calc(5rem + env(safe-area-inset-bottom)); }
   .chooserHeading { padding: 16px; margin-block: 12px 16px; }
   .chooserHeading .heading { font-size: clamp(1.6rem, 6vw, 2rem); }
   .chooserDirectionArt { width: 56px; }

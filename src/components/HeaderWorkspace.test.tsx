@@ -43,6 +43,16 @@ describe("workspace-aware header", () => {
     ]);
   });
 
+  it.each([null, { uid: "student" }])("shows only branding and language in the focused picker header", (user) => {
+    mocks.useAuth.mockReturnValue({ user });
+    mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });
+    render(<LanguageProvider initialLocale="en"><Header focused /></LanguageProvider>);
+    expect(screen.getByRole("img", { name: "Xtara Logo" })).toBeVisible();
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    expect(screen.queryByRole("navigation")).toBeNull();
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+
   it.each(["super_admin", "admin", "editor"])("uses administration navigation for %s accounts", (adminRole) => {
     mocks.useAuth.mockReturnValue({ user: { uid: "admin-1" }, userProfile: { uid: "admin-1", adminRole }, loading: false });
     mocks.useOrganizationWorkspace.mockReturnValue({ isStaff: false, loading: false });

@@ -69,7 +69,7 @@ function currentNavigationUrl(urls: string[], pathname: string, fragment: string
     }, undefined);
 }
 
-const Header = () => {
+const Header = ({ focused = false }: { focused?: boolean }) => {
     const { user, userProfile, loading: authLoading } = useAuth();
     const { isStaff, loading: workspaceLoading, error: workspaceError } = useOrganizationWorkspace();
     const { t, locale } = useTranslations();
@@ -139,6 +139,14 @@ const Header = () => {
         return Route;
     };
 
+    const logo = <Image src="/images/logo-color.svg" alt={t("header.logoAlt")} width={88} height={33} priority />;
+    if (focused) {
+        return <header className={`${studentStyles.studentChrome} sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl`}>
+            <Container marketing className="!px-0">
+                <div className={headerStyles.focusedHeader}>{logo}<LanguageSwitcher /></div>
+            </Container>
+        </header>;
+    }
     return <>
         <header className={`${!isStaff && !organizationRoute && !adminShell ? studentStyles.studentChrome : ""} sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 backdrop-blur-xl`}>
             <Container marketing className="!px-0">
@@ -148,13 +156,7 @@ const Header = () => {
                         href={logoTarget}
                         className="flex w-fit shrink-0 items-center rounded-md py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     >
-                        <Image
-                            src="/images/logo-color.svg"
-                            alt={t("header.logoAlt")}
-                            width={88}
-                            height={33}
-                            priority
-                        />
+                        {logo}
                     </LogoLink>
 
                     {/* Desktop Menu */}

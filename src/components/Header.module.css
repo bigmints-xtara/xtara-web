@@ -1,4 +1,4 @@
-.navigation {
+.navigation, .focusedHeader {
   display: flex;
   min-height: 64px;
   align-items: center;
@@ -84,4 +84,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .navLink, .login { transition: none; }
+}
+
+.focusedHeader { justify-content: space-between; }
+@media (min-width: 1024px) {
+  .focusedHeader { min-height: 72px; padding-inline: var(--marketing-gutter, 24px); }
 }
